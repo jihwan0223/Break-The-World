@@ -8,10 +8,24 @@ public class Click : MonoBehaviour
     private Collider2D _collider;
     private Health _health;
 
+    [SerializeField] private int goldReward = 1;
+
     void Start()
     {
         _collider = GetComponent<Collider2D>();
         _health = GetComponent<Health>();
+        _health.OnDied += HandleDied;
+    }
+
+    void OnDestroy()
+    {
+        _health.OnDied -= HandleDied;
+    }
+
+    private void HandleDied()
+    {
+        if (CurrencyManager.Instance != null)
+            CurrencyManager.Instance.AddGold(goldReward);
     }
 
     void Update()

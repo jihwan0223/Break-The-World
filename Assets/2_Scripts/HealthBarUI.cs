@@ -17,7 +17,9 @@ public class HealthBarUI : MonoBehaviour
 
         if (uiDocument.panelSettings == null)
         {
-            uiDocument.panelSettings = ScriptableObject.CreateInstance<PanelSettings>();
+            var settings = ScriptableObject.CreateInstance<PanelSettings>();
+            settings.themeStyleSheet = Resources.Load<ThemeStyleSheet>("UnityDefaultRuntimeTheme");
+            uiDocument.panelSettings = settings;
         }
 
         BuildBar(uiDocument.rootVisualElement);
