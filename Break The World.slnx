@@ -1,3 +1,5 @@
 ﻿<Solution>
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="UnityPlayModeSaver.csproj" />
+  <Project Path="UnityPlayModeSaverEditor.csproj" />
 </Solution>

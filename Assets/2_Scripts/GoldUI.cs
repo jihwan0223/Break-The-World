@@ -15,6 +15,7 @@ public class GoldUI : MonoBehaviour
 
         if (uiDocument.panelSettings == null)
         {
+            // PanelSettings + 기본 런타임 테마를 자동으로 채워줌 (HealthBarUI와 동일한 이유)
             var settings = ScriptableObject.CreateInstance<PanelSettings>();
             settings.themeStyleSheet = Resources.Load<ThemeStyleSheet>("UnityDefaultRuntimeTheme");
             uiDocument.panelSettings = settings;
@@ -26,6 +27,8 @@ public class GoldUI : MonoBehaviour
 
     void Start()
     {
+        // CurrencyManager.Awake()가 먼저 실행되도록 OnEnable이 아닌 Start에서 구독
+        // (Unity는 모든 오브젝트의 Awake를 먼저 실행한 뒤 Start를 실행하므로 순서가 보장됨)
         if (CurrencyManager.Instance != null)
         {
             CurrencyManager.Instance.OnGoldChanged += UpdateLabel;
@@ -39,6 +42,7 @@ public class GoldUI : MonoBehaviour
             CurrencyManager.Instance.OnGoldChanged -= UpdateLabel;
     }
 
+    // UXML/USS 없이 코드로 직접 "Gold: n" 라벨 + 반투명 배경을 구성
     private void BuildLabel(VisualElement root)
     {
         root.Clear();

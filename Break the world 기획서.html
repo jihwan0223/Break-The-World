@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Break The World — 120일 개발 체크리스트</title>
+<style>
+  :root{
+    --bg:#111014;
+    --page-plane:#0d0d0d;
+    --card:#1c1b1f;
+    --card-border:rgba(255,255,255,0.08);
+    --card-border-hover:rgba(255,255,255,0.16);
+    --text-primary:#ffffff;
+    --text-secondary:#c3c2b7;
+    --text-muted:#898781;
+    --gridline:#2c2c2a;
+    --ai-color:#3987e5;
+    --ai-bg:rgba(57,135,229,0.14);
+    --human-color:#d95926;
+    --human-bg:rgba(217,89,38,0.14);
+    --good:#0ca30c;
+    --good-bg:rgba(12,163,12,0.14);
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:'Malgun Gothic',-apple-system,'Segoe UI',Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text-primary);
+    padding:32px 16px 80px;
+    margin:0;
+  }
+  .wrap{max-width:840px;margin:0 auto}
+  header{text-align:center;margin-bottom:24px}
+  h1{margin:0 0 6px;font-size:1.7rem;letter-spacing:-0.01em}
+  .sub{color:var(--text-secondary);font-size:.95rem;margin:0}
+  .note{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:10px;
+    padding:12px 16px;
+    color:var(--text-secondary);
+    font-size:.85rem;
+    line-height:1.6;
+    margin:18px 0;
+  }
+  .note b{color:var(--text-primary)}
+
+  /* overall progress */
+  .overall{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:12px;
+    padding:18px 20px;
+    margin:18px 0 22px;
+  }
+  .overall-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+  .overall-top .pct{font-size:1.4rem;font-weight:700;color:var(--good)}
+  .overall-top .label{color:var(--text-secondary);font-size:.85rem}
+  .bar-track{height:10px;border-radius:6px;background:var(--gridline);overflow:hidden}
+  .bar-fill{height:100%;background:var(--good);border-radius:6px;transition:width .25s ease;width:0%}
+  .legend{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;font-size:.8rem;color:var(--text-secondary)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .dot.ai{background:var(--ai-color)}
+  .dot.human{background:var(--human-color)}
+
+  /* controls */
+  .controls{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .filter-group{display:flex;gap:6px;flex-wrap:wrap}
+  .btn{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    color:var(--text-secondary);
+    padding:7px 13px;
+    border-radius:20px;
+    font-size:.82rem;
+    cursor:pointer;
+    transition:.15s;
+  }
+  .btn:hover{border-color:var(--card-border-hover);color:var(--text-primary)}
+  .btn.active{background:var(--ai-color);border-color:var(--ai-color);color:#fff}
+  .io-group{display:flex;gap:6px}
+  .io-group .btn{font-size:.78rem}
+  #importInput{display:none}
+
+  /* phase section */
+  .phase{margin-bottom:22px}
+  .phase-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;
+    padding:10px 4px;
+    border-bottom:1px solid var(--gridline);
+    margin-bottom:10px;
+    gap:10px;
+  }
+  .phase-head h2{font-size:1rem;margin:0;color:var(--text-primary);display:flex;align-items:center;gap:8px}
+  .phase-head .range{color:var(--text-muted);font-size:.78rem;font-weight:400}
+  .phase-head .count{color:var(--text-secondary);font-size:.8rem;white-space:nowrap}
+  .phase-head .chevron{color:var(--text-muted);transition:transform .15s;font-size:.75rem}
+  .phase.collapsed .chevron{transform:rotate(-90deg)}
+  .phase.collapsed .items{display:none}
+  .phase-bar-track{height:5px;border-radius:4px;background:var(--gridline);overflow:hidden;margin:0 4px 10px}
+  .phase-bar-fill{height:100%;background:var(--good);width:0%;transition:width .2s}
+
+  /* daily routine card */
+  .routine-card{
+    background:var(--card);
+    border:1px solid var(--ai-color);
+    border-radius:12px;
+    padding:16px 20px;
+    margin:0 0 20px;
+  }
+  .routine-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+  .routine-head h2{font-size:1rem;margin:0;display:flex;align-items:center;gap:8px;color:var(--text-primary)}
+  .routine-card.collapsed #routineChevron{transform:rotate(-90deg);display:inline-block}
+  .routine-card.collapsed .routine-desc,
+  .routine-card.collapsed .routine-body{display:none}
+  #routineChevron{display:inline-block;transition:transform .15s;color:var(--text-muted);font-size:.75rem}
+  .routine-desc{color:var(--text-secondary);font-size:.82rem;line-height:1.6;margin:10px 0 14px}
+  .routine-body{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+  .routine-col-head{display:flex;justify-content:space-between;align-items:baseline;font-size:.85rem;color:var(--text-primary);margin-bottom:6px;font-weight:600}
+  .routine-pct{color:var(--ai-color);font-size:.8rem;font-weight:700}
+  .routine-list{display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:280px;overflow-y:auto;padding-right:4px}
+  .routine-row{
+    display:flex;align-items:center;gap:9px;
+    background:var(--bg);
+    border:1px solid var(--card-border);
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:.82rem;
+    cursor:pointer;
+  }
+  .routine-row input{width:16px;height:16px;flex:none;accent-color:var(--ai-color);cursor:pointer}
+  .routine-row.done{opacity:.5}
+  .routine-row.done span:last-child{text-decoration:line-through;color:var(--text-muted)}
+  @media (max-width:760px){
+    .routine-body{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:520px){
+    .routine-body{grid-template-columns:1fr}
+  }
+
+  .items{display:flex;flex-direction:column;gap:8px}
+  .day{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:10px;
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    transition:.15s;
+  }
+  .day:hover{border-color:var(--card-border-hover)}
+  .day.done{opacity:.55}
+  .day.done .task-text{text-decoration:line-through;color:var(--text-muted)}
+  .day input[type=checkbox]{
+    width:19px;height:19px;flex:none;accent-color:var(--good);cursor:pointer;
+  }
+  .day-num{
+    color:var(--text-muted);
+    font-size:.78rem;
+    min-width:52px;
+    flex:none;
+  }
+  .task-text{flex:1;font-size:.92rem;line-height:1.4}
+  .tag{
+    flex:none;
+    font-size:.72rem;
+    padding:3px 9px;
+    border-radius:12px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .tag.ai{background:var(--ai-bg);color:var(--ai-color)}
+  .tag.human{background:var(--human-bg);color:var(--human-color)}
+
+  .day.hide{display:none}
+
+  footer{
+    text-align:center;
+    color:var(--text-muted);
+    font-size:.78rem;
+    margin-top:40px;
+    line-height:1.7;
+  }
+
+  @media (max-width:520px){
+    .day{flex-wrap:wrap}
+    .task-text{order:3;flex-basis:100%}
+    .overall-top{flex-direction:column;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Break The World</h1>
+    <p class="sub">120일 개발 로드맵 · 1인 개발 · 2D 픽셀 클리커</p>
+  </header>
+
+  <div class="note">
+    <b>표기 안내</b> — 무기·오브젝트는 아직 세부 디자인이 확정되지 않아 <b>무기 디자인 n번째</b> / <b>오브젝트 디자인 n번째</b>로 표기했습니다 (실제 명칭·컨셉은 추후 확정). 각 항목의 <span class="tag ai" style="padding:2px 7px">AI 활용</span> / <span class="tag human" style="padding:2px 7px">사람 작업</span> 배지는 AI 보조가 유효한 리소스·문서 작업과, 직접 구현·테스트가 필요한 작업을 구분한 참고용 표시입니다.
+  </div>
+
+  <div class="overall">
+    <div class="overall-top">
+      <span class="label">전체 진행률</span>
+      <span class="pct" id="overallPct">0%</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="overallBar"></div></div>
+    <div class="legend">
+      <span><span class="dot ai"></span>AI 활용 <b id="aiCount" style="color:var(--text-primary)"></b></span>
+      <span><span class="dot human"></span>사람 작업 <b id="humanCount" style="color:var(--text-primary)"></b></span>
+      <span id="doneCount"></span>
+    </div>
+    <div id="autoSaveNote" style="margin-top:8px;font-size:.72rem;color:var(--text-muted)"></div>
+  </div>
+
+  <div class="routine-card" id="routineCard">
+    <div class="routine-head" id="routineHead">
+      <h2><span class="chevron" id="routineChevron">▾</span> 🔁 일일 루틴 — 오브젝트·무기·사운드 AI 생성</h2>
+    </div>
+    <p class="routine-desc">
+      Day 타임라인과 별개로, 개발 기간 내내 매일 병행하는 AI 생성 루틴입니다. 각 트랙은 <b>1일차</b>부터 시작합니다.
+      오브젝트 디자인은 최소 <b>20개 이상</b> 확보가 목표라 20일차까지, 무기 디자인과 사운드 이펙트는 14일차까지 채워보세요.
+      (Day 타임라인에 이미 들어있는 오브젝트 1~6번째·무기 1~5번째는 스토리 진행에 맞춰 배치된 별개 항목이며, 이 루틴은 그와 별도로 라이브러리를 계속 채워나가는 작업입니다.)
+    </p>
+    <div class="routine-body" id="routineBody">
+      <div class="routine-col">
+        <div class="routine-col-head">
+          <span>오브젝트 디자인 (AI)</span>
+          <span class="routine-pct" id="routineObjPct">0 / 20</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="routineObjBar" style="background:var(--ai-color)"></div></div>
+        <div class="routine-list" id="routineObjList"></div>
+      </div>
+      <div class="routine-col">
+        <div class="routine-col-head">
+          <span>무기 디자인 (AI)</span>
+          <span class="routine-pct" id="routineWeaponPct">0 / 14</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="routineWeaponBar" style="background:var(--ai-color)"></div></div>
+        <div class="routine-list" id="routineWeaponList"></div>
+      </div>
+      <div class="routine-col">
+        <div class="routine-col-head">
+          <span>사운드 이펙트 (AI)</span>
+          <span class="routine-pct" id="routineSoundPct">0 / 14</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="routineSoundBar" style="background:var(--ai-color)"></div></div>
+        <div class="routine-list" id="routineSoundList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="filter-group">
+      <button class="btn active" data-filter="all">전체</button>
+      <button class="btn" data-filter="todo">미완료</button>
+      <button class="btn" data-filter="done">완료</button>
+      <button class="btn" data-filter="ai">AI 활용</button>
+      <button class="btn" data-filter="human">사람 작업</button>
+    </div>
+    <div class="io-group">
+      <button class="btn" id="exportBtn">백업 파일로 저장</button>
+      <button class="btn" id="importBtn">백업 불러오기</button>
+      <input type="file" id="importInput" accept="application/json">
+    </div>
+  </div>
+
+  <div id="phases"></div>
+
+  <footer>
+    Break The World 개발 체크리스트 · 체크 상태는 이 브라우저에 자동 저장되어 다시 열어도 그대로 유지됩니다.<br>
+    다른 기기로 옮기거나 백업이 필요할 때는 "백업 파일로 저장" → "백업 불러오기"를 사용하세요.
+  </footer>
+
+</div>
+
+<script>
+// [day, task text, tag('ai'|'human')]
+const DATA = [
+[1,"개발 환경 구축 및 프로젝트 생성","human"],
+[2,"게임 컨셉 정리 및 핵심 루프 구현 계획","human"],
+[3,"클릭 입력 시스템 구현","human"],
+[4,"오브젝트 체력 시스템 구현","human"],
+[5,"파괴 판정 및 기본 이펙트 구현","human"],
+[6,"돈 획득 시스템 구현","human"],
+[7,"기본 UI 구조 제작","human"],
+[8,"오브젝트 디자인 1번째 제작","ai"],
+[9,"오브젝트 디자인 2번째 제작","ai"],
+[10,"초기 파괴 밸런스 조정","human"],
+[11,"업그레이드 데이터 구조 설계","human"],
+[12,"무기 업그레이드 시스템 구현","human"],
+[13,"파괴 대상 해금 시스템 구현","human"],
+[14,"업그레이드 UI 제작","ai"],
+[15,"저장 시스템 기본 구현","human"],
+[16,"초기 프로토타입 테스트","human"],
+[17,"무기 디자인 1번째 추가","ai"],
+[18,"오브젝트 디자인 3번째 제작","ai"],
+[19,"창문 파괴 콘텐츠 추가","human"],
+[20,"난이도 게이트 적용","human"],
+[21,"오브젝트 디자인 4번째 제작","ai"],
+[22,"오브젝트 디자인 5번째 제작","ai"],
+[23,"소형 가구 파괴 콘텐츠 추가","human"],
+[24,"중반 성장 밸런스 조정","human"],
+[25,"무기 디자인 2번째 설계","ai"],
+[26,"무기 디자인 2번째 적용 및 테스트","human"],
+[27,"오브젝트 디자인 6번째 제작","ai"],
+[28,"대형 오브젝트 파괴 연출","human"],
+[29,"파편 효과 개선","human"],
+[30,"오브젝트 파괴 진행도에 따른 크랙(금가는) 연출 추가","human"],
+[31,"파괴 시 파편/스파크 파티클 이펙트 추가","human"],
+[32,"파괴 시 화면 흔들림(스크린쉐이크) 연출 추가","human"],
+[33,"최종 파괴 순간 브레이크(깨지는) 연출 추가","human"],
+[34,"사운드 시스템 추가","human"],
+[35,"환생 시스템 설계","human"],
+[36,"환생 조건 구현","human"],
+[37,"환생 코인 구현","human"],
+[38,"영구 배수 업그레이드 구현","human"],
+[39,"환생 UI 제작","ai"],
+[40,"환생 밸런스 테스트","human"],
+[41,"자동화 시스템 설계","human"],
+[42,"자동 클릭 기능 구현","human"],
+[43,"환생 전용 업그레이드 추가","human"],
+[44,"초기 구간 스킵 기능 구현","human"],
+[45,"성장 속도 테스트","human"],
+[46,"방 파괴 단계 제작","human"],
+[47,"아파트 파괴 단계 제작","human"],
+[48,"무기 디자인 3번째 제작","ai"],
+[49,"무기 디자인 3번째 파괴 효과 구현","human"],
+[50,"건물 파괴 단계 제작","human"],
+[51,"도시 블록 단계 기획","human"],
+[52,"무기 디자인 4번째 제작","ai"],
+[53,"도시 파괴 콘텐츠 제작","human"],
+[54,"후반 성장 테스트","human"],
+[55,"행성 단계 기획","human"],
+[56,"무기 디자인 5번째 기획","ai"],
+[57,"행성 파괴 연출 제작","human"],
+[58,"대형 파괴 카메라 연출","human"],
+[59,"픽셀아트 스타일 정리","ai"],
+[60,"오브젝트 리소스 전체 다듬기","ai"],
+[61,"배경 리소스 제작","ai"],
+[62,"UI 디자인 개선","ai"],
+[63,"메뉴 화면 제작","ai"],
+[64,"UI 뼈대 완성 후 게임 전체 분위기(톤·컬러·무드) 조정","ai"],
+[65,"설정 화면 제작","human"],
+[66,"사운드 추가 및 조정","ai"],
+[67,"전체 사운드/BGM 볼륨 밸런스 조정 (볼륨 상향)","human"],
+[68,"음악 적용","ai"],
+[69,"업적 시스템 설계","human"],
+[70,"업적 기능 구현","human"],
+[71,"통계 시스템 구현","human"],
+[72,"게임 전체 밸런스 1차 조정","human"],
+[73,"클릭 보상 조정","human"],
+[74,"업그레이드 가격 조정","human"],
+[75,"환생 보상 공식 조정","human"],
+[76,"초반 플레이 테스트","human"],
+[77,"중반 플레이 테스트","human"],
+[78,"후반 플레이 테스트","human"],
+[79,"버그 수정 기간","human"],
+[80,"최적화 작업","human"],
+[81,"메모리 관리 개선","human"],
+[82,"로딩 개선","human"],
+[83,"저장 오류 테스트","human"],
+[84,"UI 오류 수정","human"],
+[85,"파괴 이펙트 개선","ai"],
+[86,"물리 연출 개선","human"],
+[87,"콘텐츠 누락 확인","human"],
+[88,"스팀 빌드 준비","human"],
+[89,"스팀 페이지 자료 준비","ai"],
+[90,"스크린샷 제작","ai"],
+[91,"게임 소개 영상 준비","ai"],
+[92,"베타 테스트 준비","human"],
+[93,"테스트 피드백 수집","human"],
+[94,"피드백 반영","human"],
+[95,"난이도 재조정","human"],
+[96,"경제 시스템 최종 조정","human"],
+[97,"환생 시스템 최종 조정","human"],
+[98,"전체 QA 1일차","human"],
+[99,"전체 QA 2일차","human"],
+[100,"전체 QA 3일차","human"],
+[101,"치명적 버그 수정","human"],
+[102,"최종 최적화","human"],
+[103,"출시 후보 빌드 제작","human"],
+[104,"최종 플레이 확인","human"],
+[105,"스팀 업로드 준비","human"],
+[106,"출시 체크리스트 작성","ai"],
+[107,"최종 빌드 업로드","human"],
+[108,"출시 전 검수","human"],
+[109,"출시 준비 완료","human"],
+[110,"출시 및 초기 대응","human"],
+];
+
+const PHASES = [
+  {from:1,   to:16,  title:"1부 · 기반 시스템 구축"},
+  {from:17,  to:34,  title:"2부 · 난이도 게이트 & 초기 콘텐츠"},
+  {from:35,  to:45,  title:"3부 · 환생 & 자동화 시스템"},
+  {from:46,  to:58,  title:"4부 · 스케일업 콘텐츠 확장"},
+  {from:59,  to:71,  title:"5부 · 비주얼·사운드·UI 폴리싱"},
+  {from:72,  to:84,  title:"6부 · 밸런싱 & 최적화"},
+  {from:85,  to:97,  title:"7부 · 마케팅 자료 & 베타 테스트"},
+  {from:98,  to:110, title:"8부 · 최종 QA & 출시"},
+];
+
+const STORAGE_KEY = "btw_checklist_progress_v3";
+
+// daily routine: an ongoing AI-generation pipeline tracked separately from the Day timeline,
+// each track starts at 1일차 (day 1 of the routine, independent of the Day 1~110 build calendar).
+// The 6 오브젝트 디자인 / 5 무기 디자인 already baked into the Day timeline stay where they are —
+// this routine is the extra daily backlog that builds the library up toward 20+ objects.
+const ROUTINE_OBJECT_COUNT = 20; // 오브젝트 디자인 1일차 ~ 20일차
+const ROUTINE_WEAPON_COUNT = 14; // 무기 디자인 1일차 ~ 14일차
+const ROUTINE_SOUND_COUNT = 14;  // 사운드 이펙트 1일차 ~ 14일차
+
+function loadFromStorage(){
+  const empty = { checked: new Set(), routineObj: new Set(), routineWeapon: new Set(), routineSound: new Set() };
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return empty;
+    const parsed = JSON.parse(raw);
+    return {
+      checked: Array.isArray(parsed.checkedDays) ? new Set(parsed.checkedDays) : new Set(),
+      routineObj: Array.isArray(parsed.routineObj) ? new Set(parsed.routineObj) : new Set(),
+      routineWeapon: Array.isArray(parsed.routineWeapon) ? new Set(parsed.routineWeapon) : new Set(),
+      routineSound: Array.isArray(parsed.routineSound) ? new Set(parsed.routineSound) : new Set(),
+    };
+  } catch (e) { /* storage unavailable or corrupt — start fresh */ }
+  return empty;
+}
+
+function saveToStorage(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      checkedDays: Array.from(state.checked),
+      routineObj: Array.from(state.routineObj),
+      routineWeapon: Array.from(state.routineWeapon),
+      routineSound: Array.from(state.routineSound),
+      savedAt: new Date().toISOString()
+    }));
+    const el = document.getElementById("autoSaveNote");
+    if (el) {
+      el.textContent = "자동 저장됨 · " + new Date().toLocaleTimeString("ko-KR");
+    }
+  } catch (e) {
+    const el = document.getElementById("autoSaveNote");
+    if (el) el.textContent = "이 브라우저에서는 자동 저장을 사용할 수 없어요 — 백업 파일로 저장 버튼을 이용하세요.";
+  }
+}
+
+const state = loadFromStorage();
+let currentFilter = "all";
+
+function buildDOM(){
+  const root = document.getElementById("phases");
+  root.innerHTML = "";
+  PHASES.forEach((ph, idx) => {
+    const items = DATA.filter(d => d[0] >= ph.from && d[0] <= ph.to);
+    const section = document.createElement("div");
+    section.className = "phase";
+    section.dataset.phaseIdx = idx;
+
+    const head = document.createElement("div");
+    head.className = "phase-head";
+    head.innerHTML = `
+      <h2><span class="chevron">▾</span> ${ph.title} <span class="range">Day ${ph.from}–${ph.to}</span></h2>
+      <span class="count" data-role="phase-count"></span>
+    `;
+    head.addEventListener("click", () => section.classList.toggle("collapsed"));
+    section.appendChild(head);
+
+    const barTrack = document.createElement("div");
+    barTrack.className = "phase-bar-track";
+    barTrack.innerHTML = `<div class="phase-bar-fill" data-role="phase-bar"></div>`;
+    section.appendChild(barTrack);
+
+    const list = document.createElement("div");
+    list.className = "items";
+    items.forEach(([day, text, tag]) => {
+      const row = document.createElement("label");
+      row.className = "day";
+      row.dataset.day = day;
+      row.dataset.tag = tag;
+      row.innerHTML = `
+        <input type="checkbox" data-day="${day}">
+        <span class="day-num">Day ${day}</span>
+        <span class="task-text">${text}</span>
+        <span class="tag ${tag}">${tag === "ai" ? "AI 활용" : "사람 작업"}</span>
+      `;
+      list.appendChild(row);
+    });
+    section.appendChild(list);
+    root.appendChild(section);
+  });
+
+  root.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.addEventListener("change", () => {
+      const day = Number(cb.dataset.day);
+      if (cb.checked) state.checked.add(day); else state.checked.delete(day);
+      saveToStorage();
+      refresh();
+    });
+  });
+}
+
+function applyFilter(){
+  document.querySelectorAll(".day").forEach(row => {
+    const day = Number(row.dataset.day);
+    const tag = row.dataset.tag;
+    const done = state.checked.has(day);
+    let show = true;
+    if (currentFilter === "todo") show = !done;
+    else if (currentFilter === "done") show = done;
+    else if (currentFilter === "ai") show = tag === "ai";
+    else if (currentFilter === "human") show = tag === "human";
+    row.classList.toggle("hide", !show);
+  });
+  // hide empty phases under filter
+  document.querySelectorAll(".phase").forEach(section => {
+    const visibleRows = section.querySelectorAll(".day:not(.hide)").length;
+    section.style.display = visibleRows === 0 ? "none" : "";
+  });
+}
+
+function refresh(){
+  document.querySelectorAll(".day").forEach(row => {
+    const day = Number(row.dataset.day);
+    const cb = row.querySelector("input[type=checkbox]");
+    const done = state.checked.has(day);
+    cb.checked = done;
+    row.classList.toggle("done", done);
+  });
+
+  const total = DATA.length;
+  const doneTotal = state.checked.size;
+  document.getElementById("overallPct").textContent = Math.round(doneTotal/total*100) + "%";
+  document.getElementById("overallBar").style.width = (doneTotal/total*100) + "%";
+  document.getElementById("doneCount").textContent = `완료 ${doneTotal} / 전체 ${total}`;
+
+  const aiTotal = DATA.filter(d => d[2] === "ai").length;
+  const humanTotal = DATA.filter(d => d[2] === "human").length;
+  document.getElementById("aiCount").textContent = `${aiTotal}일`;
+  document.getElementById("humanCount").textContent = `${humanTotal}일`;
+
+  document.querySelectorAll(".phase").forEach((section, idx) => {
+    const ph = PHASES[idx];
+    const items = DATA.filter(d => d[0] >= ph.from && d[0] <= ph.to);
+    const doneInPhase = items.filter(d => state.checked.has(d[0])).length;
+    section.querySelector('[data-role="phase-count"]').textContent = `${doneInPhase} / ${items.length}`;
+    section.querySelector('[data-role="phase-bar"]').style.width = (doneInPhase/items.length*100) + "%";
+  });
+
+  applyFilter();
+  refreshRoutine();
+}
+
+function buildRoutine(){
+  const objWrap = document.getElementById("routineObjList");
+  const wpnWrap = document.getElementById("routineWeaponList");
+  const sndWrap = document.getElementById("routineSoundList");
+  objWrap.innerHTML = "";
+  wpnWrap.innerHTML = "";
+  sndWrap.innerHTML = "";
+
+  for (let i = 1; i <= ROUTINE_OBJECT_COUNT; i++){
+    const row = document.createElement("label");
+    row.className = "routine-row";
+    row.dataset.idx = i;
+    row.innerHTML = `<input type="checkbox" data-routine="obj" data-idx="${i}"><span>${i}일차 · 오브젝트 디자인 ${i}번째 (AI 생성)</span>`;
+    objWrap.appendChild(row);
+  }
+  for (let i = 1; i <= ROUTINE_WEAPON_COUNT; i++){
+    const row = document.createElement("label");
+    row.className = "routine-row";
+    row.dataset.idx = i;
+    row.innerHTML = `<input type="checkbox" data-routine="wpn" data-idx="${i}"><span>${i}일차 · 무기 디자인 ${i}번째 (AI 생성)</span>`;
+    wpnWrap.appendChild(row);
+  }
+  for (let i = 1; i <= ROUTINE_SOUND_COUNT; i++){
+    const row = document.createElement("label");
+    row.className = "routine-row";
+    row.dataset.idx = i;
+    row.innerHTML = `<input type="checkbox" data-routine="snd" data-idx="${i}"><span>${i}일차 · 사운드 이펙트 ${i}번째 (AI 생성)</span>`;
+    sndWrap.appendChild(row);
+  }
+
+  const routineSetFor = tag => tag === "obj" ? state.routineObj : tag === "wpn" ? state.routineWeapon : state.routineSound;
+
+  document.querySelectorAll('[data-routine]').forEach(cb => {
+    cb.addEventListener("change", () => {
+      const idx = Number(cb.dataset.idx);
+      const set = routineSetFor(cb.dataset.routine);
+      if (cb.checked) set.add(idx); else set.delete(idx);
+      saveToStorage();
+      refreshRoutine();
+    });
+  });
+}
+
+function refreshRoutine(){
+  document.querySelectorAll('[data-routine="obj"]').forEach(cb => {
+    cb.checked = state.routineObj.has(Number(cb.dataset.idx));
+    cb.closest(".routine-row").classList.toggle("done", cb.checked);
+  });
+  document.querySelectorAll('[data-routine="wpn"]').forEach(cb => {
+    cb.checked = state.routineWeapon.has(Number(cb.dataset.idx));
+    cb.closest(".routine-row").classList.toggle("done", cb.checked);
+  });
+  document.querySelectorAll('[data-routine="snd"]').forEach(cb => {
+    cb.checked = state.routineSound.has(Number(cb.dataset.idx));
+    cb.closest(".routine-row").classList.toggle("done", cb.checked);
+  });
+
+  const objDone = state.routineObj.size;
+  const wpnDone = state.routineWeapon.size;
+  const sndDone = state.routineSound.size;
+  document.getElementById("routineObjPct").textContent = `${objDone} / ${ROUTINE_OBJECT_COUNT}`;
+  document.getElementById("routineObjBar").style.width = (objDone / ROUTINE_OBJECT_COUNT * 100) + "%";
+  document.getElementById("routineWeaponPct").textContent = `${wpnDone} / ${ROUTINE_WEAPON_COUNT}`;
+  document.getElementById("routineWeaponBar").style.width = (wpnDone / ROUTINE_WEAPON_COUNT * 100) + "%";
+  document.getElementById("routineSoundPct").textContent = `${sndDone} / ${ROUTINE_SOUND_COUNT}`;
+  document.getElementById("routineSoundBar").style.width = (sndDone / ROUTINE_SOUND_COUNT * 100) + "%";
+}
+
+document.querySelectorAll(".filter-group .btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-group .btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.dataset.filter;
+    applyFilter();
+  });
+});
+
+document.getElementById("exportBtn").addEventListener("click", () => {
+  const payload = {
+    project: "Break The World",
+    exportedAt: new Date().toISOString(),
+    checkedDays: Array.from(state.checked).sort((a,b)=>a-b),
+    routineObj: Array.from(state.routineObj).sort((a,b)=>a-b),
+    routineWeapon: Array.from(state.routineWeapon).sort((a,b)=>a-b),
+    routineSound: Array.from(state.routineSound).sort((a,b)=>a-b)
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "break_the_world_progress.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("importBtn").addEventListener("click", () => {
+  document.getElementById("importInput").click();
+});
+document.getElementById("importInput").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      if (Array.isArray(parsed.checkedDays)) {
+        state.checked = new Set(parsed.checkedDays);
+        state.routineObj = new Set(Array.isArray(parsed.routineObj) ? parsed.routineObj : []);
+        state.routineWeapon = new Set(Array.isArray(parsed.routineWeapon) ? parsed.routineWeapon : []);
+        state.routineSound = new Set(Array.isArray(parsed.routineSound) ? parsed.routineSound : []);
+        saveToStorage();
+        refresh();
+      }
+    } catch (err) {
+      alert("파일을 읽을 수 없습니다. 올바른 진행상황 JSON 파일인지 확인해주세요.");
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
+
+document.getElementById("routineHead").addEventListener("click", () => {
+  document.getElementById("routineCard").classList.toggle("collapsed");
+});
+
+buildDOM();
+buildRoutine();
+refresh();
+(function initAutoSaveNote(){
+  const el = document.getElementById("autoSaveNote");
+  if (!el) return;
+  try {
+    localStorage.getItem(STORAGE_KEY);
+    el.textContent = state.checked.size > 0
+      ? "이전 진행상황을 자동으로 불러왔어요."
+      : "체크할 때마다 이 브라우저에 자동 저장돼요.";
+  } catch (e) {
+    el.textContent = "이 브라우저에서는 자동 저장을 사용할 수 없어요 — 진행상황을 백업 파일로 저장해두세요.";
+  }
+})();
+</script>
+</body>
+</html>
