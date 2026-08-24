@@ -4,8 +4,12 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(UIDocument))]
 public class SidePanelUI : MonoBehaviour
 {
-    private VisualElement _panel;
-    private Label _panelTitle;
+    private VisualElement _panel; // 튀어나오는 빈 팝업 패널
+    private Label _panelTitle; // 팝업 좌상단 제목 ("Weapon" / "Object")
+    private VisualElement _weaponContent; // 무기 팝업일 때만 보이는 화살표+이름 영역
+    private Label _weaponNameLabel; // 현재 장착 중인 무기 이름 표시
+    private VisualElement _objectContent; // 오브젝트 팝업일 때만 보이는 화살표+이름 영역
+    private Label _objectNameLabel; // 현재 선택된 오브젝트 이름 표시
 
     void OnEnable()
     {
@@ -21,6 +25,30 @@ public class SidePanelUI : MonoBehaviour
         Build(uiDocument.rootVisualElement);
     }
 
+    void Start()
+    {
+        if (WeaponManager.Instance != null)
+        {
+            WeaponManager.Instance.OnWeaponChanged += HandleWeaponChanged;
+            RefreshWeaponLabel();
+        }
+
+        if (ObjectManager.Instance != null)
+        {
+            ObjectManager.Instance.OnObjectChanged += HandleObjectChanged;
+            RefreshObjectLabel();
+        }
+    }
+
+    void OnDisable()
+    {
+        if (WeaponManager.Instance != null)
+            WeaponManager.Instance.OnWeaponChanged -= HandleWeaponChanged;
+
+        if (ObjectManager.Instance != null)
+            ObjectManager.Instance.OnObjectChanged -= HandleObjectChanged;
+    }
+
     private void Build(VisualElement root)
     {
         root.Clear();
@@ -29,7 +57,8 @@ public class SidePanelUI : MonoBehaviour
         _panel = new VisualElement();
         _panel.style.position = Position.Absolute;
         _panel.style.left = 40;
-        _panel.style.right = 40;
+        // 오른쪽 버튼 컬럼(폭 25%)과 겹치지 않도록 그 바로 앞까지만 채움
+        _panel.style.right = Length.Percent(27);
         _panel.style.top = 40;
         _panel.style.bottom = 40;
         _panel.style.backgroundColor = new Color(0f, 0f, 0f, 0.85f);
@@ -38,6 +67,10 @@ public class SidePanelUI : MonoBehaviour
         _panel.style.borderBottomLeftRadius = 8;
         _panel.style.borderBottomRightRadius = 8;
         _panel.style.display = DisplayStyle.None;
+
+        // 이 패널 위에 포인터가 있는 동안은 뒤쪽 월드 오브젝트가 클릭되지 않도록 플래그를 켜고 끔
+        _panel.RegisterCallback<PointerEnterEvent>(_ => UIPointerGuard.IsPointerOverUI = true);
+        _panel.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
 
         _panelTitle = new Label();
         _panelTitle.style.position = Position.Absolute;
@@ -60,6 +93,36 @@ public class SidePanelUI : MonoBehaviour
         closeButton.style.color = Color.white;
         _panel.Add(closeButton);
 
+        _weaponNameLabel = new Label("Bare Hands");
+        _weaponContent = BuildArrowSection(
+            _weaponNameLabel,
+            () =>
+            {
+                Debug.Log("무기 이전 화살표 눌림");
+                WeaponManager.Instance?.SelectPrevious();
+            },
+            () =>
+            {
+                Debug.Log("무기 다음 화살표 눌림");
+                WeaponManager.Instance?.SelectNext();
+            });
+        _panel.Add(_weaponContent);
+
+        _objectNameLabel = new Label("Plate");
+        _objectContent = BuildArrowSection(
+            _objectNameLabel,
+            () =>
+            {
+                Debug.Log("오브젝트 이전 화살표 눌림");
+                ObjectManager.Instance?.SelectPrevious();
+            },
+            () =>
+            {
+                Debug.Log("오브젝트 다음 화살표 눌림");
+                ObjectManager.Instance?.SelectNext();
+            });
+        _panel.Add(_objectContent);
+
         root.Add(_panel);
 
         // 버튼 2개가 들어갈 오른쪽 컬럼. 폭이 화면 가로의 1/4
@@ -74,21 +137,68 @@ public class SidePanelUI : MonoBehaviour
         buttonColumn.style.paddingLeft = 8;
         buttonColumn.style.paddingRight = 8;
 
-        var weaponButton = CreateButton("무기", () =>
+        // 버튼 컬럼 위에 포인터가 있는 동안도 마찬가지로 월드 클릭을 막음
+        buttonColumn.RegisterCallback<PointerEnterEvent>(_ => UIPointerGuard.IsPointerOverUI = true);
+        buttonColumn.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
+
+        var weaponButton = CreateButton("Weapon", () =>
         {
             Debug.Log("무기 버튼 눌림");
-            OpenPanel("무기");
+            OpenPanel("Weapon", _weaponContent);
         });
 
-        var objectButton = CreateButton("오브젝트", () =>
+        var objectButton = CreateButton("Object", () =>
         {
             Debug.Log("오브젝트 버튼 눌림");
-            OpenPanel("오브젝트");
+            OpenPanel("Object", _objectContent);
         });
 
         buttonColumn.Add(weaponButton);
         buttonColumn.Add(objectButton);
         root.Add(buttonColumn);
+    }
+
+    // 팝업 안에 들어갈 화살표(<, >) + 이름 라벨 영역. 무기/오브젝트 팝업이 같은 모양을 공유하도록 공용화
+    private VisualElement BuildArrowSection(Label nameLabel, System.Action onPrev, System.Action onNext)
+    {
+        var content = new VisualElement();
+        content.style.position = Position.Absolute;
+        content.style.left = 0;
+        content.style.right = 0;
+        content.style.top = 70; // 제목/닫기 버튼 바로 아래, 위쪽에 배치 (아래는 이미지 자리로 비워둠)
+        content.style.height = 60;
+        content.style.flexDirection = FlexDirection.Row;
+        content.style.justifyContent = Justify.Center;
+        content.style.alignItems = Align.Center;
+        content.style.display = DisplayStyle.None;
+
+        var prevButton = new Button(onPrev) { text = "<" };
+        SetArrowButtonStyle(prevButton);
+
+        nameLabel.style.width = 240;
+        nameLabel.style.fontSize = 24;
+        nameLabel.style.color = Color.white;
+        nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+        nameLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+
+        var nextButton = new Button(onNext) { text = ">" };
+        SetArrowButtonStyle(nextButton);
+
+        content.Add(prevButton);
+        content.Add(nameLabel);
+        content.Add(nextButton);
+
+        return content;
+    }
+
+    private void SetArrowButtonStyle(Button button)
+    {
+        button.style.width = 48;
+        button.style.height = 48;
+        button.style.fontSize = 22;
+        button.style.unityFontStyleAndWeight = FontStyle.Bold;
+        button.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.85f);
+        button.style.color = Color.white;
     }
 
     // 가로로 긴 직사각형 버튼 (폭은 부모 컬럼을 꽉 채우고, 높이는 낮게)
@@ -109,14 +219,38 @@ public class SidePanelUI : MonoBehaviour
         return button;
     }
 
-    private void OpenPanel(string title)
+    private void OpenPanel(string title, VisualElement contentToShow)
     {
         _panelTitle.text = title;
+        _weaponContent.style.display = contentToShow == _weaponContent ? DisplayStyle.Flex : DisplayStyle.None;
+        _objectContent.style.display = contentToShow == _objectContent ? DisplayStyle.Flex : DisplayStyle.None;
         _panel.style.display = DisplayStyle.Flex;
     }
 
     private void ClosePanel()
     {
         _panel.style.display = DisplayStyle.None;
+    }
+
+    private void HandleWeaponChanged(WeaponData newWeapon)
+    {
+        RefreshWeaponLabel();
+    }
+
+    private void RefreshWeaponLabel()
+    {
+        if (_weaponNameLabel != null && WeaponManager.Instance != null)
+            _weaponNameLabel.text = WeaponManager.Instance.CurrentWeapon.weaponName;
+    }
+
+    private void HandleObjectChanged(ObjectData newObject)
+    {
+        RefreshObjectLabel();
+    }
+
+    private void RefreshObjectLabel()
+    {
+        if (_objectNameLabel != null && ObjectManager.Instance != null)
+            _objectNameLabel.text = ObjectManager.Instance.CurrentObject.objectName;
     }
 }
