@@ -7,7 +7,7 @@ public class Health : MonoBehaviour
 {
     [SerializeField] private int weaponTier = 1; // 이 오브젝트를 부수는 데 필요한 무기 티어 (1부터 시작)
     [SerializeField] private int objectIndexInTier = 1; // 같은 무기 티어 내에서 이 오브젝트의 순번 (1부터 시작)
-    [SerializeField] private float respawnDelay = 3f; // 죽고 나서 재생성까지 대기하는 시간(초)
+    [SerializeField] private float respawnDelay = 1f; // 죽고 나서 재생성까지 대기하는 시간(초)
     [SerializeField] private AudioClip breakSound; // 파괴될 때 재생할 사운드
     [SerializeField] private float dieFadeDuration = 0.25f; // 죽을 때 흐려지며 사라지는 연출 시간(초)
     [SerializeField] private float respawnFadeDuration = 0.25f; // 재생성될 때 서서히 나타나는 연출 시간(초)
@@ -67,6 +67,8 @@ public class Health : MonoBehaviour
 
         if (breakSound != null)
             _audioSource.PlayOneShot(breakSound);
+
+        DebrisPool.Instance?.AddPiece();
 
         // 클릭은 즉시 막되, 화면에서는 서서히 사라지도록 연출 후 숨김
         if (_collider != null) _collider.enabled = false;

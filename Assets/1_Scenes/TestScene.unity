@@ -156,8 +156,124 @@ Transform:
   - {fileID: 1345530259}
   - {fileID: 1091992921}
   - {fileID: 1982149701}
+  - {fileID: 289043388}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &289043387
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 289043388}
+  - component: {fileID: 289043389}
+  - component: {fileID: 289043390}
+  m_Layer: 0
+  m_Name: DebrisPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &289043388
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289043387}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3, y: -3.8, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 238836964}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &289043389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289043387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 354b1c094eb03d64a8db8b065b3ea8f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DebrisPool
+  spawnArea: {fileID: 289043390}
+  maxPieces: 20
+  pieceSize: 1
+  pieceSprites:
+  - {fileID: 1672344991818460588, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: -3219635348456624208, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 5216208868126369639, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 978207843652582364, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: -3296126523764806033, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 7854942015946696061, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 4850211726068591352, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 1862520789854370203, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: -4417867899786858280, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 649181563165693643, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 1691361022322083793, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 4712034869164140199, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 7685797700404421185, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: -5297358237344465471, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: -4397860454758039374, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 3730783503604620078, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 2875019864402170809, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: -2778129921249605006, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: -2428736905225828840, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  - {fileID: 5642861169720005430, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+--- !u!61 &289043390
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289043387}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 3, y: 1.5}
+  m_EdgeRadius: 0
 --- !u!1 &828344164
 GameObject:
   m_ObjectHideFlags: 0
@@ -1282,8 +1398,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05a7c62fccbafd342991629222351294, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityPlayModeSaver::Framework.Utils.UnityPlayModeSaverSceneUtils
-  _scenePrefabInstances:
-  - {_gameObject: {fileID: 7543598}, _prefab: Assets/5_Prefabs/Square.prefab}
 --- !u!4 &2034051044
 Transform:
   m_ObjectHideFlags: 11
@@ -1391,8 +1505,25 @@ PrefabInstance:
       propertyPath: breakSound
       value: 
       objectReference: {fileID: 8300000, guid: e9c65f7f677198342842517bd33b5ad9, type: 3}
+    - target: {fileID: 7933080958545455051, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
+      propertyPath: respawnDelay
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7933080958545455051, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
+      propertyPath: debrisColor.b
+      value: 0.8980392
+      objectReference: {fileID: 0}
+    - target: {fileID: 7933080958545455051, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
+      propertyPath: debrisColor.g
+      value: 0.84313726
+      objectReference: {fileID: 0}
+    - target: {fileID: 7933080958545455051, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
+      propertyPath: debrisColor.r
+      value: 0.8
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6785348604218817740, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
+    - {fileID: 335259808363581096, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -1407,10 +1538,10 @@ PrefabInstance:
       addedObject: {fileID: 1107166695}
     - targetCorrespondingSourceObject: {fileID: 1903886467290317053, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1107166696}
+      addedObject: {fileID: 1107166700}
     - targetCorrespondingSourceObject: {fileID: 1903886467290317053, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1107166700}
+      addedObject: {fileID: 1107166696}
     - targetCorrespondingSourceObject: {fileID: 1903886467290317053, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1107166702}
