@@ -461,7 +461,7 @@ PolygonCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 10.24, y: 10.24}
+    oldSize: {x: 12.54, y: 12.54}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -583,6 +583,23 @@ PolygonCollider2D:
       - {x: 0.74, y: -4.72}
       - {x: 1.25, y: -4.72}
   m_UseDelaunayMesh: 1
+--- !u!114 &1107166696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7543598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: faaffb5ca4081fc47a46292f7ec8db31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthSpriteSwitcher
+  healthStages:
+  - {fileID: 1275030799, guid: eca1a3dbbf0b3284e8449005d1a83626, type: 3}
+  - {fileID: -5934715673664778258, guid: c64897a5fdfe8054c822834bafa25115, type: 3}
+  - {fileID: -9220788892964207167, guid: 3729f18d6170ff2408614853ed75a711, type: 3}
+  - {fileID: 1379209726663985032, guid: 8b68f34a2cf50564783e1b82667a4dc3, type: 3}
 --- !u!1 &1345530258
 GameObject:
   m_ObjectHideFlags: 0
@@ -656,6 +673,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1601500295}
   - {fileID: 1874861327}
   - {fileID: 1634612736}
   m_Father: {fileID: 0}
@@ -744,12 +762,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1601500293}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.064, y: 1.064, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1423159779}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1634612735
 GameObject:
@@ -1034,6 +1052,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1903886467290317053, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1107166695}
+    - targetCorrespondingSourceObject: {fileID: 1903886467290317053, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1107166696}
   m_SourcePrefab: {fileID: 100100000, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -1044,5 +1065,4 @@ SceneRoots:
   - {fileID: 948665925}
   - {fileID: 7087193893910138078}
   - {fileID: 238836964}
-  - {fileID: 1601500295}
   - {fileID: 2034051044}
