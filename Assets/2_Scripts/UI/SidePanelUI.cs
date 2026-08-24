@@ -4,12 +4,20 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(UIDocument))]
 public class SidePanelUI : MonoBehaviour
 {
+    // 화살표로 둘러보는 중인 인덱스를 들고 있는 작은 상태 객체 (무기용/오브젝트용 각각 하나씩)
+    private class BrowseState
+    {
+        public int index; // 지금 화면에 미리보기로 표시 중인 인덱스 (Select를 눌러야 실제로 적용됨)
+    }
+
     private VisualElement _panel; // 튀어나오는 빈 팝업 패널
     private Label _panelTitle; // 팝업 좌상단 제목 ("Weapon" / "Object")
-    private VisualElement _weaponContent; // 무기 팝업일 때만 보이는 화살표+이름 영역
-    private Label _weaponNameLabel; // 현재 장착 중인 무기 이름 표시
-    private VisualElement _objectContent; // 오브젝트 팝업일 때만 보이는 화살표+이름 영역
-    private Label _objectNameLabel; // 현재 선택된 오브젝트 이름 표시
+    private VisualElement _weaponContent; // 무기 팝업일 때만 보이는 영역
+    private VisualElement _objectContent; // 오브젝트 팝업일 때만 보이는 영역
+    private BrowseState _weaponBrowse = new BrowseState(); // 무기 화살표 미리보기 상태
+    private BrowseState _objectBrowse = new BrowseState(); // 오브젝트 화살표 미리보기 상태
+    private System.Action _refreshWeaponSelector; // 무기 팝업의 이름/Select-Equipped 표시를 다시 그리는 함수
+    private System.Action _refreshObjectSelector; // 오브젝트 팝업의 이름/Select-Equipped 표시를 다시 그리는 함수
 
     void OnEnable()
     {
@@ -28,25 +36,14 @@ public class SidePanelUI : MonoBehaviour
     void Start()
     {
         if (WeaponManager.Instance != null)
-        {
-            WeaponManager.Instance.OnWeaponChanged += HandleWeaponChanged;
-            RefreshWeaponLabel();
-        }
+            _weaponBrowse.index = WeaponManager.Instance.EquippedIndex;
 
         if (ObjectManager.Instance != null)
-        {
-            ObjectManager.Instance.OnObjectChanged += HandleObjectChanged;
-            RefreshObjectLabel();
-        }
-    }
+            _objectBrowse.index = ObjectManager.Instance.EquippedIndex;
 
-    void OnDisable()
-    {
-        if (WeaponManager.Instance != null)
-            WeaponManager.Instance.OnWeaponChanged -= HandleWeaponChanged;
-
-        if (ObjectManager.Instance != null)
-            ObjectManager.Instance.OnObjectChanged -= HandleObjectChanged;
+        // Build() 시점엔 매니저 값을 아직 못 읽었을 수 있어서, 인덱스를 다시 맞춘 뒤 여기서 한 번 더 갱신
+        _refreshWeaponSelector?.Invoke();
+        _refreshObjectSelector?.Invoke();
     }
 
     private void Build(VisualElement root)
@@ -93,34 +90,30 @@ public class SidePanelUI : MonoBehaviour
         closeButton.style.color = Color.white;
         _panel.Add(closeButton);
 
-        _weaponNameLabel = new Label("Bare Hands");
-        _weaponContent = BuildArrowSection(
-            _weaponNameLabel,
-            () =>
+        _weaponContent = BuildSelectorSection(
+            _weaponBrowse,
+            () => WeaponManager.Instance != null ? WeaponManager.Instance.WeaponCount : 0,
+            index => WeaponManager.Instance != null ? WeaponManager.Instance.GetWeaponAt(index).weaponName : "",
+            () => WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : 0,
+            index =>
             {
-                Debug.Log("무기 이전 화살표 눌림");
-                WeaponManager.Instance?.SelectPrevious();
+                Debug.Log("무기 선택 버튼 눌림");
+                WeaponManager.Instance?.Equip(index);
             },
-            () =>
-            {
-                Debug.Log("무기 다음 화살표 눌림");
-                WeaponManager.Instance?.SelectNext();
-            });
+            out _refreshWeaponSelector);
         _panel.Add(_weaponContent);
 
-        _objectNameLabel = new Label("Plate");
-        _objectContent = BuildArrowSection(
-            _objectNameLabel,
-            () =>
+        _objectContent = BuildSelectorSection(
+            _objectBrowse,
+            () => ObjectManager.Instance != null ? ObjectManager.Instance.ObjectCount : 0,
+            index => ObjectManager.Instance != null ? ObjectManager.Instance.GetObjectAt(index).objectName : "",
+            () => ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : 0,
+            index =>
             {
-                Debug.Log("오브젝트 이전 화살표 눌림");
-                ObjectManager.Instance?.SelectPrevious();
+                Debug.Log("오브젝트 선택 버튼 눌림");
+                ObjectManager.Instance?.Equip(index);
             },
-            () =>
-            {
-                Debug.Log("오브젝트 다음 화살표 눌림");
-                ObjectManager.Instance?.SelectNext();
-            });
+            out _refreshObjectSelector);
         _panel.Add(_objectContent);
 
         root.Add(_panel);
@@ -158,37 +151,116 @@ public class SidePanelUI : MonoBehaviour
         root.Add(buttonColumn);
     }
 
-    // 팝업 안에 들어갈 화살표(<, >) + 이름 라벨 영역. 무기/오브젝트 팝업이 같은 모양을 공유하도록 공용화
-    private VisualElement BuildArrowSection(Label nameLabel, System.Action onPrev, System.Action onNext)
+    // 팝업 안에 들어갈 전체 영역: 화살표 사이에 이름, 그 아래 왼쪽엔 이미지 자리 / 오른쪽엔 설명 + Select 버튼.
+    // 무기/오브젝트 팝업이 완전히 같은 모양을 공유하도록 콜백만 받아서 공용으로 구성함.
+    private VisualElement BuildSelectorSection(
+        BrowseState browse,
+        System.Func<int> getCount,
+        System.Func<int, string> getName,
+        System.Func<int> getEquippedIndex,
+        System.Action<int> onSelect,
+        out System.Action refresh)
     {
         var content = new VisualElement();
         content.style.position = Position.Absolute;
-        content.style.left = 0;
-        content.style.right = 0;
-        content.style.top = 70; // 제목/닫기 버튼 바로 아래, 위쪽에 배치 (아래는 이미지 자리로 비워둠)
-        content.style.height = 60;
-        content.style.flexDirection = FlexDirection.Row;
-        content.style.justifyContent = Justify.Center;
-        content.style.alignItems = Align.Center;
+        content.style.left = 16;
+        content.style.right = 16;
+        content.style.top = 60;
+        content.style.bottom = 16;
         content.style.display = DisplayStyle.None;
 
-        var prevButton = new Button(onPrev) { text = "<" };
-        SetArrowButtonStyle(prevButton);
+        // 위쪽 줄: < 이름 >
+        var arrowRow = new VisualElement();
+        arrowRow.style.flexDirection = FlexDirection.Row;
+        arrowRow.style.justifyContent = Justify.Center;
+        arrowRow.style.alignItems = Align.Center;
+        arrowRow.style.height = 60;
 
-        nameLabel.style.width = 240;
+        var nameLabel = new Label();
+        nameLabel.style.width = 260;
         nameLabel.style.fontSize = 24;
         nameLabel.style.color = Color.white;
         nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
         nameLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
 
-        var nextButton = new Button(onNext) { text = ">" };
+        // Select 버튼 / Equipped 표시 - 중간보다 약간 아래, 오른쪽에 위치. 장착 여부에 따라 둘 중 하나만 보임
+        var selectButton = new Button() { text = "Select" };
+        selectButton.style.position = Position.Absolute;
+        selectButton.style.top = Length.Percent(55);
+        selectButton.style.right = 350; // 오른쪽 기준 30px 왼쪽으로 이동
+        selectButton.style.width = 140;
+        selectButton.style.height = 44;
+        selectButton.style.fontSize = 18;
+        selectButton.style.unityFontStyleAndWeight = FontStyle.Bold;
+        selectButton.style.backgroundColor = new Color(0.2f, 0.45f, 0.2f, 0.9f);
+        selectButton.style.color = Color.white;
+
+        var equippedLabel = new Label("Equipped");
+        equippedLabel.style.position = Position.Absolute;
+        equippedLabel.style.top = Length.Percent(55);
+        equippedLabel.style.right = 350; // Select 버튼과 같은 위치를 공유해야 하므로 동일하게 이동
+        equippedLabel.style.width = 140;
+        equippedLabel.style.height = 44;
+        equippedLabel.style.fontSize = 18;
+        equippedLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+        equippedLabel.style.color = new Color(0.5f, 0.9f, 0.5f);
+        equippedLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+
+        selectButton.clicked += () =>
+        {
+            onSelect(browse.index);
+            RefreshSelectorState(nameLabel, selectButton, equippedLabel, getName, getEquippedIndex, browse.index);
+        };
+
+        content.Add(selectButton);
+        content.Add(equippedLabel);
+
+        var prevButton = new Button(() =>
+        {
+            int count = getCount();
+            if (count <= 0) return;
+            browse.index = Mathf.Max(0, browse.index - 1);
+            RefreshSelectorState(nameLabel, selectButton, equippedLabel, getName, getEquippedIndex, browse.index);
+        })
+        { text = "<" };
+        SetArrowButtonStyle(prevButton);
+
+        var nextButton = new Button(() =>
+        {
+            int count = getCount();
+            if (count <= 0) return;
+            browse.index = Mathf.Min(count - 1, browse.index + 1);
+            RefreshSelectorState(nameLabel, selectButton, equippedLabel, getName, getEquippedIndex, browse.index);
+        })
+        { text = ">" };
         SetArrowButtonStyle(nextButton);
 
-        content.Add(prevButton);
-        content.Add(nameLabel);
-        content.Add(nextButton);
+        arrowRow.Add(prevButton);
+        arrowRow.Add(nameLabel);
+        arrowRow.Add(nextButton);
+
+        content.Add(arrowRow);
+
+        // 외부(Start, OpenPanel)에서 필요할 때마다 최신 상태로 다시 그릴 수 있도록 넘겨줌
+        refresh = () => RefreshSelectorState(nameLabel, selectButton, equippedLabel, getName, getEquippedIndex, browse.index);
 
         return content;
+    }
+
+    // 이름 라벨과, Select 버튼/Equipped 표시 중 무엇을 보여줄지 갱신
+    private void RefreshSelectorState(
+        Label nameLabel,
+        Button selectButton,
+        Label equippedLabel,
+        System.Func<int, string> getName,
+        System.Func<int> getEquippedIndex,
+        int index)
+    {
+        nameLabel.text = getName(index);
+
+        bool isEquipped = getEquippedIndex() == index;
+        selectButton.style.display = isEquipped ? DisplayStyle.None : DisplayStyle.Flex;
+        equippedLabel.style.display = isEquipped ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     private void SetArrowButtonStyle(Button button)
@@ -225,32 +297,14 @@ public class SidePanelUI : MonoBehaviour
         _weaponContent.style.display = contentToShow == _weaponContent ? DisplayStyle.Flex : DisplayStyle.None;
         _objectContent.style.display = contentToShow == _objectContent ? DisplayStyle.Flex : DisplayStyle.None;
         _panel.style.display = DisplayStyle.Flex;
+
+        // 열 때마다 항상 최신 상태로 다시 그려서, 이름이 비어 보이는 경우가 없게 함
+        _refreshWeaponSelector?.Invoke();
+        _refreshObjectSelector?.Invoke();
     }
 
     private void ClosePanel()
     {
         _panel.style.display = DisplayStyle.None;
-    }
-
-    private void HandleWeaponChanged(WeaponData newWeapon)
-    {
-        RefreshWeaponLabel();
-    }
-
-    private void RefreshWeaponLabel()
-    {
-        if (_weaponNameLabel != null && WeaponManager.Instance != null)
-            _weaponNameLabel.text = WeaponManager.Instance.CurrentWeapon.weaponName;
-    }
-
-    private void HandleObjectChanged(ObjectData newObject)
-    {
-        RefreshObjectLabel();
-    }
-
-    private void RefreshObjectLabel()
-    {
-        if (_objectNameLabel != null && ObjectManager.Instance != null)
-            _objectNameLabel.text = ObjectManager.Instance.CurrentObject.objectName;
     }
 }

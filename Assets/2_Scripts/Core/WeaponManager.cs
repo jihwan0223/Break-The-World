@@ -24,12 +24,14 @@ public class WeaponManager : MonoBehaviour
         new WeaponData(10, "Big Bang", 2542, 984150),
     };
 
-    private int currentWeaponIndex; // 현재 장착 중인 무기의 weapons 리스트 인덱스 (0부터 시작)
+    private int equippedIndex; // 실제로 장착되어 데미지에 반영되는 무기의 weapons 리스트 인덱스 (0부터 시작)
 
-    public WeaponData CurrentWeapon => weapons[currentWeaponIndex];
+    public int WeaponCount => weapons.Count; // UI에서 화살표로 둘러볼 때 범위 계산용
+    public int EquippedIndex => equippedIndex; // 지금 장착 중인 무기의 인덱스 (UI에서 "Equipped" 표시용)
+    public WeaponData CurrentWeapon => weapons[equippedIndex];
     public int CurrentClickDamage => CurrentWeapon.clickDamage;
 
-    // 장착 무기가 바뀔 때마다 새 무기 데이터를 전달 - 무기 UI 등이 구독
+    // 장착 무기가 바뀔 때마다(=Equip 호출 시) 새 무기 데이터를 전달 - 무기 UI 등이 구독
     public event Action<WeaponData> OnWeaponChanged;
 
     void Awake()
@@ -44,22 +46,14 @@ public class WeaponManager : MonoBehaviour
         Instance = this;
     }
 
-    // 지금은 해금 여부와 상관없이 자유롭게 다음/이전 무기로 전환 (제한 없음)
-    public void SelectNext()
+    // 인덱스로 무기 데이터를 조회만 함 (장착은 안 함) - UI가 화살표로 둘러볼 때 사용
+    public WeaponData GetWeaponAt(int index) => weapons[index];
+
+    // 지금은 해금 여부와 상관없이 자유롭게 장착 가능 (제한 없음)
+    public void Equip(int index)
     {
-        if (currentWeaponIndex >= weapons.Count - 1)
-            return;
-
-        currentWeaponIndex++;
-        OnWeaponChanged?.Invoke(CurrentWeapon);
-    }
-
-    public void SelectPrevious()
-    {
-        if (currentWeaponIndex <= 0)
-            return;
-
-        currentWeaponIndex--;
+        index = Mathf.Clamp(index, 0, weapons.Count - 1);
+        equippedIndex = index;
         OnWeaponChanged?.Invoke(CurrentWeapon);
     }
 }

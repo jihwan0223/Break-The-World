@@ -38,11 +38,13 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(10, 2, "Galaxy"),
     };
 
-    private int currentObjectIndex; // 현재 선택된 오브젝트의 objects 리스트 인덱스 (0부터 시작)
+    private int equippedIndex; // 실제로 선택된 오브젝트의 objects 리스트 인덱스 (0부터 시작)
 
-    public ObjectData CurrentObject => objects[currentObjectIndex];
+    public int ObjectCount => objects.Count; // UI에서 화살표로 둘러볼 때 범위 계산용
+    public int EquippedIndex => equippedIndex; // 지금 선택된 오브젝트의 인덱스 (UI에서 "Equipped" 표시용)
+    public ObjectData CurrentObject => objects[equippedIndex];
 
-    // 선택된 오브젝트가 바뀔 때마다 새 오브젝트 데이터를 전달 - 오브젝트 UI 등이 구독
+    // 선택된 오브젝트가 바뀔 때마다(=Equip 호출 시) 새 오브젝트 데이터를 전달 - 오브젝트 UI 등이 구독
     public event Action<ObjectData> OnObjectChanged;
 
     void Awake()
@@ -57,22 +59,14 @@ public class ObjectManager : MonoBehaviour
         Instance = this;
     }
 
-    // 지금은 제한 없이 자유롭게 다음/이전 오브젝트로 전환 (WeaponManager와 동일한 정책)
-    public void SelectNext()
+    // 인덱스로 오브젝트 데이터를 조회만 함 (선택은 안 함) - UI가 화살표로 둘러볼 때 사용
+    public ObjectData GetObjectAt(int index) => objects[index];
+
+    // 지금은 제한 없이 자유롭게 선택 가능 (WeaponManager와 동일한 정책)
+    public void Equip(int index)
     {
-        if (currentObjectIndex >= objects.Count - 1)
-            return;
-
-        currentObjectIndex++;
-        OnObjectChanged?.Invoke(CurrentObject);
-    }
-
-    public void SelectPrevious()
-    {
-        if (currentObjectIndex <= 0)
-            return;
-
-        currentObjectIndex--;
+        index = Mathf.Clamp(index, 0, objects.Count - 1);
+        equippedIndex = index;
         OnObjectChanged?.Invoke(CurrentObject);
     }
 }
