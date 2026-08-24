@@ -57,6 +57,10 @@ public class Click : MonoBehaviour
             // 고정 데미지 1 대신 현재 장착한 무기의 클릭 데미지를 적용
             int damage = WeaponManager.Instance != null ? WeaponManager.Instance.CurrentClickDamage : 1;
             _health.TakeDamage(damage);
+
+            // 맞은 콜라이더 테두리 위 랜덤한 지점에 현재 무기 이미지로 타격 연출 재생
+            if (WeaponManager.Instance != null)
+                WeaponSwingEffect.Instance?.PlaySwing(hit, WeaponManager.Instance.CurrentWeapon.icon);
         }
     }
 }

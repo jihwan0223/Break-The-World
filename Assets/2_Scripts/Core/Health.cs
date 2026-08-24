@@ -68,7 +68,7 @@ public class Health : MonoBehaviour
         if (breakSound != null)
             _audioSource.PlayOneShot(breakSound);
 
-        DebrisPool.Instance?.AddPiece();
+        DebrisPool.Instance?.AddPiece(transform.position);
 
         // 클릭은 즉시 막되, 화면에서는 서서히 사라지도록 연출 후 숨김
         if (_collider != null) _collider.enabled = false;

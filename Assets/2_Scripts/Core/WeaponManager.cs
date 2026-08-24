@@ -24,6 +24,8 @@ public class WeaponManager : MonoBehaviour
         new WeaponData(10, "Big Bang", 2542, 984150),
     };
 
+    [SerializeField] private Sprite[] weaponIcons; // 무기별 이미지 (weapons 리스트와 같은 순서로 채워야 함, 아직 없는 무기는 비워둬도 됨)
+
     private int equippedIndex; // 실제로 장착되어 데미지에 반영되는 무기의 weapons 리스트 인덱스 (0부터 시작)
 
     public int WeaponCount => weapons.Count; // UI에서 화살표로 둘러볼 때 범위 계산용
@@ -44,6 +46,10 @@ public class WeaponManager : MonoBehaviour
         }
 
         Instance = this;
+
+        // 인스펙터에 넣어둔 아이콘들을 같은 순서의 무기 데이터에 채워 넣음
+        for (int i = 0; i < weapons.Count && weaponIcons != null && i < weaponIcons.Length; i++)
+            weapons[i].icon = weaponIcons[i];
     }
 
     // 인덱스로 무기 데이터를 조회만 함 (장착은 안 함) - UI가 화살표로 둘러볼 때 사용

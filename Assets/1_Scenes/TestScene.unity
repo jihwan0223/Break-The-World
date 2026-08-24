@@ -124,6 +124,53 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1903886467290317053, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
   m_PrefabInstance: {fileID: 7087193893910138078}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &74229857
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 74229858}
+  - component: {fileID: 74229859}
+  m_Layer: 0
+  m_Name: WeaponSwingEffect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &74229858
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74229857}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1482502565}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &74229859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74229857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2c6780f8cd22f647a620283d9cba927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponSwingEffect
+  swingSize: 0.05
+  swingDuration: 0.15
+  rotationOffset: 0
 --- !u!1 &238836963
 GameObject:
   m_ObjectHideFlags: 0
@@ -205,11 +252,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DebrisPool
   spawnArea: {fileID: 289043390}
-  maxPieces: 20
+  maxPieces: 50
   pieceSize: 1
   pieceSprites:
   - {fileID: 1672344991818460588, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
-  - {fileID: -3219635348456624208, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
   - {fileID: 5216208868126369639, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
   - {fileID: 978207843652582364, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
   - {fileID: -3296126523764806033, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
@@ -228,6 +274,8 @@ MonoBehaviour:
   - {fileID: -2778129921249605006, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
   - {fileID: -2428736905225828840, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
   - {fileID: 5642861169720005430, guid: 372ca233db8af5543ab86bace3d749e9, type: 3}
+  fallDuration: 0.4
+  fadeOutDuration: 0.5
 --- !u!61 &289043390
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -534,6 +582,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f41ae088ac677464f99af2023d3f046b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
+  weaponIcons:
+  - {fileID: 6314785377950087458, guid: 9caec1790fdfdaf4896fffaf67c22a6a, type: 3}
 --- !u!114 &1107166688 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7933080958545455051, guid: 11c711dd72f7c254db41a55c61f54952, type: 3}
@@ -1092,6 +1142,38 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
+--- !u!1 &1482502564
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1482502565}
+  m_Layer: 0
+  m_Name: Effect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1482502565
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482502564}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 74229858}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1601500293
 GameObject:
   m_ObjectHideFlags: 0
@@ -1556,3 +1638,4 @@ SceneRoots:
   - {fileID: 1423159779}
   - {fileID: 238836964}
   - {fileID: 2034051044}
+  - {fileID: 1482502565}
