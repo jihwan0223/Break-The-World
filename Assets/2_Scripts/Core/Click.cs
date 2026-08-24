@@ -37,6 +37,10 @@ public class Click : MonoBehaviour
         if (Mouse.current == null || !Mouse.current.leftButton.wasPressedThisFrame)
             return;
 
+        // 포인터가 UI(무기/오브젝트 팝업 등) 위에 있으면 그 뒤의 월드 오브젝트는 클릭 처리하지 않음
+        if (UIPointerGuard.IsPointerOverUI)
+            return;
+
         Vector2 screenPos = Mouse.current.position.ReadValue();
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
 
@@ -50,7 +54,9 @@ public class Click : MonoBehaviour
             if (clickSound != null)
                 _audioSource.PlayOneShot(clickSound);
 
-            _health.TakeDamage(1);
+            // 고정 데미지 1 대신 현재 장착한 무기의 클릭 데미지를 적용
+            int damage = WeaponManager.Instance != null ? WeaponManager.Instance.CurrentClickDamage : 1;
+            _health.TakeDamage(damage);
         }
     }
 }
