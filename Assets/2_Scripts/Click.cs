@@ -3,15 +3,19 @@ using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Health))]
+[RequireComponent(typeof(AudioSource))]
 public class Click : MonoBehaviour
 {
     private Health _health;
+    private AudioSource _audioSource;
 
     [SerializeField] private int goldReward = 1;
+    [SerializeField] private AudioClip clickSound;
 
     void Start()
     {
         _health = GetComponent<Health>();
+        _audioSource = GetComponent<AudioSource>();
         _health.OnDied += HandleDied;
     }
 
@@ -42,6 +46,10 @@ public class Click : MonoBehaviour
         if (hit != null && hit.gameObject == gameObject)
         {
             Debug.Log("Click");
+
+            if (clickSound != null)
+                _audioSource.PlayOneShot(clickSound);
+
             _health.TakeDamage(1);
         }
     }
