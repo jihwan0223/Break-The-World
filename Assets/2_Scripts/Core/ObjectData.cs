@@ -12,6 +12,8 @@ public class ObjectData
     public Color pileColor; // 이 오브젝트를 부술 때 DebrisPool에 쌓이는 조각 색상 (지금은 placeholder, 나중에 조정)
     public AudioClip[] clickSounds; // 이 오브젝트를 클릭할 때 랜덤 재생할 사운드 목록 (ObjectManager 인스펙터에서 채워짐)
     public AudioClip breakSound; // 이 오브젝트가 파괴될 때 재생할 사운드 (ObjectManager 인스펙터에서 채워짐)
+    public Sprite[] healthStages; // 체력 100% -> 0% 순서의 스프라이트 단계 (ObjectManager 인스펙터에서 채워짐)
+    public float sizeMultiplier = 1f; // 자동 계산된 크기에 곱해지는 오브젝트별 미세 보정값 (ObjectManager 인스펙터에서 채워짐)
 
     public ObjectData(int tier, int indexInTier, string objectName, Color pileColor)
     {

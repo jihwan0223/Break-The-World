@@ -44,6 +44,29 @@ public class Health : MonoBehaviour
         _originalColor = _spriteRenderer != null ? _spriteRenderer.color : Color.white;
     }
 
+    // ObjectManager에서 다른 오브젝트로 선택이 바뀌었을 때 호출 - 티어를 바꾸고 체력을 꽉 채운 상태로 리셋
+    public void ApplyObjectTier(int newWeaponTier, int newIndexInTier)
+    {
+        StopAllCoroutines(); // 진행 중이던 사망/재생성 연출은 중단 (오브젝트 자체가 바뀌는 거라 의미 없음)
+
+        weaponTier = newWeaponTier;
+        objectIndexInTier = newIndexInTier;
+        maxHP = ObjectHealthCalculator.Calculate(weaponTier, objectIndexInTier);
+        CurrentHP = maxHP;
+        IsDead = false;
+        RespawnRemaining = 0f;
+
+        if (_spriteRenderer != null)
+        {
+            _spriteRenderer.enabled = true;
+            _spriteRenderer.color = _originalColor;
+        }
+
+        if (_collider != null) _collider.enabled = true;
+
+        OnDamaged?.Invoke(CurrentHP, maxHP);
+    }
+
     public void TakeDamage(int amount)
     {
         // 죽어서 재생성을 기다리는 동안은 데미지를 받지 않음

@@ -17,6 +17,16 @@ public class ObjectManager : MonoBehaviour
 
     [SerializeField] private ObjectSoundSet[] objectSounds; // objects 리스트와 같은 순서/개수로 채워야 함 (26개)
 
+    // 오브젝트 하나의 체력 단계별 스프라이트 묶음. 인스펙터에서 objects 리스트와 같은 순서로 채워 넣음
+    [Serializable]
+    public class ObjectVisualSet
+    {
+        public Sprite[] healthStages; // 체력 100% -> 0% 순서 (예: Object1, Object1-1, Object1-2, Object1-3)
+        public float sizeMultiplier = 1f; // 자동 계산된 크기에 곱해질 미세 보정값 (기본 1 = 보정 없음)
+    }
+
+    [SerializeField] private ObjectVisualSet[] objectVisuals; // objects 리스트와 같은 순서/개수로 채워야 함 (26개)
+
     // 파괴 대상 오브젝트 26종. WeaponManager의 티어 구조(3,3,3,3,3,3,2,2,2,2)와 1:1로 매칭됨
     private static readonly List<ObjectData> objects = new List<ObjectData>
     {
@@ -74,6 +84,16 @@ public class ObjectManager : MonoBehaviour
         {
             objects[i].clickSounds = objectSounds[i].clickSounds;
             objects[i].breakSound = objectSounds[i].breakSound;
+        }
+
+        // 인스펙터에 넣어둔 스프라이트 단계들을 같은 순서의 오브젝트 데이터에 채워 넣음
+        for (int i = 0; i < objects.Count && objectVisuals != null && i < objectVisuals.Length; i++)
+        {
+            objects[i].healthStages = objectVisuals[i].healthStages;
+
+            // 0 이하로 잘못 들어온 값은 무시하고 기본값(1, 보정 없음) 유지
+            if (objectVisuals[i].sizeMultiplier > 0f)
+                objects[i].sizeMultiplier = objectVisuals[i].sizeMultiplier;
         }
     }
 

@@ -11,7 +11,6 @@ public class HitFeedback : MonoBehaviour
 
     private SpriteRenderer _spriteRenderer;
     private Health _health;
-    private Vector3 _originalScale;
     private Color _originalColor;
     private Coroutine _feedbackRoutine;
 
@@ -19,7 +18,6 @@ public class HitFeedback : MonoBehaviour
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _health = GetComponent<Health>();
-        _originalScale = transform.localScale;
         _originalColor = _spriteRenderer.color;
     }
 
@@ -44,6 +42,10 @@ public class HitFeedback : MonoBehaviour
 
     private IEnumerator PlayFeedback()
     {
+        // 매번 호출 시점의 실제 크기를 기준으로 삼음 (HealthSpriteSwitcher가 이미지마다 스케일을 자동 보정하므로,
+        // 미리 캐싱해두면 오래된 크기로 되돌아가는 문제가 생김)
+        Vector3 originalScale = transform.localScale;
+
         float half = punchDuration / 2f;
         float t = 0f;
 
@@ -54,7 +56,7 @@ public class HitFeedback : MonoBehaviour
         {
             t += Time.deltaTime;
             float p = t / half;
-            transform.localScale = Vector3.Lerp(_originalScale, _originalScale * punchScale, p);
+            transform.localScale = Vector3.Lerp(originalScale, originalScale * punchScale, p);
             yield return null;
         }
 
@@ -65,12 +67,12 @@ public class HitFeedback : MonoBehaviour
         {
             t += Time.deltaTime;
             float p = t / half;
-            transform.localScale = Vector3.Lerp(_originalScale * punchScale, _originalScale, p);
+            transform.localScale = Vector3.Lerp(originalScale * punchScale, originalScale, p);
             _spriteRenderer.color = Color.Lerp(flashColor, _originalColor, p);
             yield return null;
         }
 
-        transform.localScale = _originalScale;
+        transform.localScale = originalScale;
         _spriteRenderer.color = _originalColor;
         _feedbackRoutine = null;
     }

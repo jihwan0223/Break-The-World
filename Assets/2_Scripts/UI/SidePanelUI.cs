@@ -18,6 +18,8 @@ public class SidePanelUI : MonoBehaviour
     private BrowseState _objectBrowse = new BrowseState(); // 오브젝트 화살표 미리보기 상태
     private System.Action _refreshWeaponSelector; // 무기 팝업의 이름/Select-Equipped 표시를 다시 그리는 함수
     private System.Action _refreshObjectSelector; // 오브젝트 팝업의 이름/Select-Equipped 표시를 다시 그리는 함수
+    private VisualElement _currentlyOpenContent; // 지금 열려있는 팝업 내용 (닫을 때 오브젝트 전환 여부 판단용)
+    private ObjectData _objectAtPanelOpen; // Object 팝업을 열었을 때 장착돼있던 오브젝트 (닫을 때와 비교해서 바뀌었는지 확인)
 
     void OnEnable()
     {
@@ -294,6 +296,7 @@ public class SidePanelUI : MonoBehaviour
     private void OpenPanel(string title, VisualElement contentToShow)
     {
         _panelTitle.text = title;
+        _currentlyOpenContent = contentToShow;
         _weaponContent.style.display = contentToShow == _weaponContent ? DisplayStyle.Flex : DisplayStyle.None;
         _objectContent.style.display = contentToShow == _objectContent ? DisplayStyle.Flex : DisplayStyle.None;
         _panel.style.display = DisplayStyle.Flex;
@@ -301,10 +304,24 @@ public class SidePanelUI : MonoBehaviour
         // 열 때마다 항상 최신 상태로 다시 그려서, 이름이 비어 보이는 경우가 없게 함
         _refreshWeaponSelector?.Invoke();
         _refreshObjectSelector?.Invoke();
+
+        // Object 팝업을 여는 시점의 오브젝트를 기억해뒀다가, 닫을 때 바뀌었는지 비교함
+        // (팝업이 화면을 거의 가리므로, 전환 애니메이션은 닫을 때 재생해야 보임)
+        if (contentToShow == _objectContent && ObjectManager.Instance != null)
+            _objectAtPanelOpen = ObjectManager.Instance.CurrentObject;
     }
 
     private void ClosePanel()
     {
         _panel.style.display = DisplayStyle.None;
+
+        // Object 팝업이 열려있는 동안 선택이 바뀌었다면, 닫히는 지금 전환 애니메이션 재생
+        if (_currentlyOpenContent == _objectContent && ObjectManager.Instance != null)
+        {
+            ObjectData current = ObjectManager.Instance.CurrentObject;
+
+            if (current != _objectAtPanelOpen)
+                ObjectSwapController.Instance?.TriggerSwap(_objectAtPanelOpen, current);
+        }
     }
 }

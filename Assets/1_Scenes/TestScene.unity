@@ -137,6 +137,7 @@ GameObject:
   - component: {fileID: 1107166694}
   - component: {fileID: 1107166696}
   - component: {fileID: 1107166702}
+  - component: {fileID: 1107166706}
   m_Layer: 0
   m_Name: Object
   m_TagString: Untagged
@@ -880,11 +881,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faaffb5ca4081fc47a46292f7ec8db31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthSpriteSwitcher
-  healthStages:
-  - {fileID: 1275030799, guid: eca1a3dbbf0b3284e8449005d1a83626, type: 3}
-  - {fileID: -5934715673664778258, guid: c64897a5fdfe8054c822834bafa25115, type: 3}
-  - {fileID: -9220788892964207167, guid: 3729f18d6170ff2408614853ed75a711, type: 3}
-  - {fileID: 1379209726663985032, guid: 8b68f34a2cf50564783e1b82667a4dc3, type: 3}
+  fallbackHealthStages: []
+  targetSize: 2
 --- !u!82 &1107166700
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1084,6 +1082,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1107166706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7543598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 925f1c0a19f526646b808b986c6fc182, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectSwapController
+  flyOutDuration: 0.3
+  flyInDuration: 0.3
+  flyOutDistance: 8
 --- !u!1 &1345530258
 GameObject:
   m_ObjectHideFlags: 0
@@ -1618,6 +1631,12 @@ MonoBehaviour:
     - {fileID: 8300000, guid: ef91d264a3bd702459690a0fd8b8c3e9, type: 3}
     - {fileID: 8300000, guid: 9198006ec617aa64eb0912e37202e1f5, type: 3}
     breakSound: {fileID: 8300000, guid: e9c65f7f677198342842517bd33b5ad9, type: 3}
+  - clickSounds:
+    - {fileID: 8300000, guid: 0765c988635a77b4ca36504970212322, type: 3}
+    - {fileID: 8300000, guid: bc9b0a86d23368a469e69bcc8a159f54, type: 3}
+    - {fileID: 8300000, guid: 2486c82bddbbfae4f8813c1ee224eed2, type: 3}
+    - {fileID: 8300000, guid: 732fad39bbe783244976a45f23f6c049, type: 3}
+    breakSound: {fileID: 8300000, guid: 1715a80de93ebd341ae14069d507240d, type: 3}
   - clickSounds: []
     breakSound: {fileID: 0}
   - clickSounds: []
@@ -1666,8 +1685,71 @@ MonoBehaviour:
     breakSound: {fileID: 0}
   - clickSounds: []
     breakSound: {fileID: 0}
-  - clickSounds: []
-    breakSound: {fileID: 0}
+  objectVisuals:
+  - healthStages:
+    - {fileID: 1275030799, guid: eca1a3dbbf0b3284e8449005d1a83626, type: 3}
+    - {fileID: -5934715673664778258, guid: c64897a5fdfe8054c822834bafa25115, type: 3}
+    - {fileID: -9220788892964207167, guid: 3729f18d6170ff2408614853ed75a711, type: 3}
+    - {fileID: 1379209726663985032, guid: 8b68f34a2cf50564783e1b82667a4dc3, type: 3}
+    sizeMultiplier: 1
+  - healthStages:
+    - {fileID: -2340292433013277512, guid: 92e942978e2e5584c82d296d11eeae78, type: 3}
+    - {fileID: 6578731144817686623, guid: 9bdfaa37f70a63745a36390172d28e7c, type: 3}
+    - {fileID: -1385604352584601288, guid: 89e6b07e62b9d68409723b6925b47e5f, type: 3}
+    - {fileID: -8288779678485480098, guid: 41756f6c744ff704e9537f5bd7e160d2, type: 3}
+    sizeMultiplier: 1
+  - healthStages:
+    - {fileID: 5378765685844372841, guid: 449a70378ca76d041a9afea5c1cdd735, type: 3}
+    - {fileID: -7309518164613636011, guid: 1a4e300f6fb127449a8e1c876b7ffabb, type: 3}
+    - {fileID: -1730377823473803685, guid: 5b725775c120ed64f81e90d30ea2784e, type: 3}
+    - {fileID: -4773684954617920154, guid: 79dc079cb202ed94797f23e8b0e47edc, type: 3}
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
+  - healthStages: []
+    sizeMultiplier: 1
 --- !u!1 &2034051042
 GameObject:
   m_ObjectHideFlags: 11
