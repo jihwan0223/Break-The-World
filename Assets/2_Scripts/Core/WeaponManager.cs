@@ -25,6 +25,8 @@ public class WeaponManager : MonoBehaviour
     };
 
     [SerializeField] private Sprite[] weaponIcons; // 무기별 이미지 (weapons 리스트와 같은 순서로 채워야 함, 아직 없는 무기는 비워둬도 됨)
+    [SerializeField] private float[] weaponSizeMultipliers; // 무기별 타격 연출 크기 배율 (weapons 리스트와 같은 순서, 0 이하는 무시하고 기본값 1 유지)
+    [SerializeField] private float[] weaponRotationOffsets; // 무기별 타격 연출 회전 보정 각도 (weapons 리스트와 같은 순서)
 
     private int equippedIndex; // 실제로 장착되어 데미지에 반영되는 무기의 weapons 리스트 인덱스 (0부터 시작)
 
@@ -50,10 +52,29 @@ public class WeaponManager : MonoBehaviour
         // 인스펙터에 넣어둔 아이콘들을 같은 순서의 무기 데이터에 채워 넣음
         for (int i = 0; i < weapons.Count && weaponIcons != null && i < weaponIcons.Length; i++)
             weapons[i].icon = weaponIcons[i];
+
     }
 
     // 인덱스로 무기 데이터를 조회만 함 (장착은 안 함) - UI가 화살표로 둘러볼 때 사용
     public WeaponData GetWeaponAt(int index) => weapons[index];
+
+    // Awake 시점에 한 번만 복사해두면 플레이 중 인스펙터 값을 바꿔도 반영이 안 되니까,
+    // 필요할 때마다(타격 연출 재생 시) 배열에서 직접 읽어오도록 함
+    public float GetSizeMultiplier(int index)
+    {
+        if (weaponSizeMultipliers != null && index >= 0 && index < weaponSizeMultipliers.Length && weaponSizeMultipliers[index] > 0f)
+            return weaponSizeMultipliers[index];
+
+        return 1f;
+    }
+
+    public float GetRotationOffset(int index)
+    {
+        if (weaponRotationOffsets != null && index >= 0 && index < weaponRotationOffsets.Length)
+            return weaponRotationOffsets[index];
+
+        return 0f;
+    }
 
     // 지금은 해금 여부와 상관없이 자유롭게 장착 가능 (제한 없음)
     public void Equip(int index)

@@ -11,7 +11,6 @@ public class WeaponSwingEffect : MonoBehaviour
 
     [SerializeField] private float swingSize = 0.05f; // 무기 이미지가 표시될 크기 (월드 유닛)
     [SerializeField] private float swingDuration = 0.15f; // 타격 연출이 재생되는 시간(초)
-    [SerializeField] private float rotationOffset = 0f; // 이미지 원본의 "위쪽"이 정확히 위를 향하지 않을 때 보정할 각도(도)
 
     private SpriteRenderer _spriteRenderer; // 무기 이미지를 보여주는 전용 렌더러 (재사용됨)
     private Coroutine _swingRoutine; // 현재 재생 중인 타격 연출 코루틴 (연타 시 갈아치우기 위해 보관)
@@ -47,16 +46,27 @@ public class WeaponSwingEffect : MonoBehaviour
         Vector2 towardCollider = (Vector2)(hitCollider.bounds.center - point);
         float angle = Mathf.Atan2(towardCollider.y, towardCollider.x) * Mathf.Rad2Deg - 90f;
 
+        // 현재 장착 중인 무기의 크기 배율/회전 보정값을 그때그때 조회 (플레이 중 인스펙터 값 수정이 바로 반영되도록)
+        float sizeMultiplier = 1f;
+        float rotationOffset = 0f;
+
+        if (WeaponManager.Instance != null)
+        {
+            int equippedIndex = WeaponManager.Instance.EquippedIndex;
+            sizeMultiplier = WeaponManager.Instance.GetSizeMultiplier(equippedIndex);
+            rotationOffset = WeaponManager.Instance.GetRotationOffset(equippedIndex);
+        }
+
         if (_swingRoutine != null)
             StopCoroutine(_swingRoutine);
 
-        _swingRoutine = StartCoroutine(SwingRoutine(point, angle, icon));
+        _swingRoutine = StartCoroutine(SwingRoutine(point, angle, icon, sizeMultiplier, rotationOffset));
     }
 
-    private IEnumerator SwingRoutine(Vector3 position, float angle, Sprite icon)
+    private IEnumerator SwingRoutine(Vector3 position, float angle, Sprite icon, float sizeMultiplier, float rotationOffset)
     {
         _spriteRenderer.transform.position = position;
-        _spriteRenderer.transform.localScale = Vector3.one * swingSize;
+        _spriteRenderer.transform.localScale = Vector3.one * swingSize * sizeMultiplier;
         _spriteRenderer.transform.rotation = Quaternion.Euler(0f, 0f, angle + rotationOffset);
         _spriteRenderer.sprite = icon;
         _spriteRenderer.enabled = true;

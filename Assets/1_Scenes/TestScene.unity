@@ -237,7 +237,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponSwingEffect
   swingSize: 0.05
   swingDuration: 0.15
-  rotationOffset: 0
 --- !u!1 &238836963
 GameObject:
   m_ObjectHideFlags: 0
@@ -651,7 +650,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
   weaponIcons:
+  - {fileID: 6561705663946727908, guid: 658ffe7eea9eccc4683f7c8acaed3e42, type: 3}
   - {fileID: 6314785377950087458, guid: 9caec1790fdfdaf4896fffaf67c22a6a, type: 3}
+  - {fileID: -5515118291277635447, guid: 78bcd41b704830e4c868cd8e3dcc6497, type: 3}
+  - {fileID: -5515118291277635447, guid: 78bcd41b704830e4c868cd8e3dcc6497, type: 3}
+  - {fileID: -5515118291277635447, guid: 78bcd41b704830e4c868cd8e3dcc6497, type: 3}
+  - {fileID: -5515118291277635447, guid: 78bcd41b704830e4c868cd8e3dcc6497, type: 3}
+  - {fileID: -5515118291277635447, guid: 78bcd41b704830e4c868cd8e3dcc6497, type: 3}
+  - {fileID: -5515118291277635447, guid: 78bcd41b704830e4c868cd8e3dcc6497, type: 3}
+  - {fileID: -5515118291277635447, guid: 78bcd41b704830e4c868cd8e3dcc6497, type: 3}
+  - {fileID: -5515118291277635447, guid: 78bcd41b704830e4c868cd8e3dcc6497, type: 3}
+  weaponSizeMultipliers:
+  - 0
+  - 1.5
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  weaponRotationOffsets:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
 --- !u!114 &1107166688
 MonoBehaviour:
   m_ObjectHideFlags: 0
