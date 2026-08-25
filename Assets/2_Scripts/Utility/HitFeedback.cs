@@ -23,12 +23,14 @@ public class HitFeedback : MonoBehaviour
 
     void OnEnable()
     {
-        _health.OnDamaged += HandleDamaged;
+        if (_health != null)
+            _health.OnDamaged += HandleDamaged;
     }
 
     void OnDisable()
     {
-        _health.OnDamaged -= HandleDamaged;
+        if (_health != null)
+            _health.OnDamaged -= HandleDamaged;
     }
 
     private void HandleDamaged(int current, int max)

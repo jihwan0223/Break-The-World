@@ -13,7 +13,8 @@ public class ObjectData
     public AudioClip[] clickSounds; // 이 오브젝트를 클릭할 때 랜덤 재생할 사운드 목록 (ObjectManager 인스펙터에서 채워짐)
     public AudioClip breakSound; // 이 오브젝트가 파괴될 때 재생할 사운드 (ObjectManager 인스펙터에서 채워짐)
     public Sprite[] healthStages; // 체력 100% -> 0% 순서의 스프라이트 단계 (ObjectManager 인스펙터에서 채워짐)
-    public float sizeMultiplier = 1f; // 자동 계산된 크기에 곱해지는 오브젝트별 미세 보정값 (ObjectManager 인스펙터에서 채워짐)
+    // 크기 보정값(오브젝트 전체/단계별)은 여기 저장하지 않고 ObjectManager.GetSizeMultiplier/GetStageScaleMultiplier로 그때그때 조회함
+    // (플레이 중 인스펙터 값 수정이 바로 반영되도록 하기 위함)
 
     public ObjectData(int tier, int indexInTier, string objectName, Color pileColor)
     {

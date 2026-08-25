@@ -23,7 +23,9 @@ public class Click : MonoBehaviour
     void OnDestroy()
     {
         // 이벤트 구독 해제 (오브젝트가 파괴될 때 CurrencyManager 쪽 참조가 남지 않도록)
-        _health.OnDied -= HandleDied;
+        // Start()가 실행되기 전에 파괴되는 경우(비활성 상태로 있다가 파괴 등) _health가 아직 null일 수 있음
+        if (_health != null)
+            _health.OnDied -= HandleDied;
     }
 
     private void HandleDied()
