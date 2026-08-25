@@ -28,4 +28,11 @@ public class CurrencyManager : MonoBehaviour
         Gold += amount;
         OnGoldChanged?.Invoke(Gold);
     }
+
+    // 저장 파일을 불러올 때 값을 직접 세팅하기 위한 함수 (증감이 아니라 절대값 지정)
+    public void SetGold(int amount)
+    {
+        Gold = amount;
+        OnGoldChanged?.Invoke(Gold);
+    }
 }
