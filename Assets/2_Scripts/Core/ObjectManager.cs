@@ -7,6 +7,16 @@ public class ObjectManager : MonoBehaviour
     // 씬 어디서든 ObjectManager.Instance로 접근하기 위한 싱글톤
     public static ObjectManager Instance { get; private set; }
 
+    // 오브젝트 하나가 낼 수 있는 사운드 묶음. 인스펙터에서 objects 리스트와 같은 순서로 채워 넣음
+    [Serializable]
+    public class ObjectSoundSet
+    {
+        public AudioClip[] clickSounds; // 클릭할 때 랜덤 재생할 사운드들
+        public AudioClip breakSound; // 파괴될 때 재생할 사운드
+    }
+
+    [SerializeField] private ObjectSoundSet[] objectSounds; // objects 리스트와 같은 순서/개수로 채워야 함 (26개)
+
     // 파괴 대상 오브젝트 26종. WeaponManager의 티어 구조(3,3,3,3,3,3,2,2,2,2)와 1:1로 매칭됨
     private static readonly List<ObjectData> objects = new List<ObjectData>
     {
@@ -58,6 +68,13 @@ public class ObjectManager : MonoBehaviour
         }
 
         Instance = this;
+
+        // 인스펙터에 넣어둔 사운드들을 같은 순서의 오브젝트 데이터에 채워 넣음
+        for (int i = 0; i < objects.Count && objectSounds != null && i < objectSounds.Length; i++)
+        {
+            objects[i].clickSounds = objectSounds[i].clickSounds;
+            objects[i].breakSound = objectSounds[i].breakSound;
+        }
     }
 
     // 인덱스로 오브젝트 데이터를 조회만 함 (선택은 안 함) - UI가 화살표로 둘러볼 때 사용

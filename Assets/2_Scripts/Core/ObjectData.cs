@@ -10,6 +10,8 @@ public class ObjectData
     public int indexInTier; // 같은 티어 내에서 이 오브젝트의 순번 (1부터 시작, ObjectHealthCalculator에 그대로 넘김)
     public string objectName; // 화면에 보일 오브젝트 이름 (영어)
     public Color pileColor; // 이 오브젝트를 부술 때 DebrisPool에 쌓이는 조각 색상 (지금은 placeholder, 나중에 조정)
+    public AudioClip[] clickSounds; // 이 오브젝트를 클릭할 때 랜덤 재생할 사운드 목록 (ObjectManager 인스펙터에서 채워짐)
+    public AudioClip breakSound; // 이 오브젝트가 파괴될 때 재생할 사운드 (ObjectManager 인스펙터에서 채워짐)
 
     public ObjectData(int tier, int indexInTier, string objectName, Color pileColor)
     {

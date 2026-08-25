@@ -10,7 +10,8 @@ public class Click : MonoBehaviour
     private AudioSource _audioSource;
 
     [SerializeField] private int goldReward = 1;
-    [SerializeField] private AudioClip clickSound;
+
+    private int _lastClickSoundIndex = -1; // 방금 재생한 사운드 인덱스 (바로 다음 클릭에서 같은 소리가 안 나오게 기억)
 
     void Start()
     {
@@ -29,6 +30,28 @@ public class Click : MonoBehaviour
     {
         if (CurrencyManager.Instance != null)
             CurrencyManager.Instance.AddGold(goldReward);
+    }
+
+    // 현재 선택된 오브젝트(ObjectManager)의 clickSounds 중 하나를 랜덤 재생하되,
+    // 바로 직전에 재생한 것과는 겹치지 않게 고름
+    private void PlayRandomClickSound()
+    {
+        if (ObjectManager.Instance == null)
+            return;
+
+        AudioClip[] clickSounds = ObjectManager.Instance.CurrentObject.clickSounds;
+
+        if (clickSounds == null || clickSounds.Length == 0)
+            return;
+
+        int index = Random.Range(0, clickSounds.Length);
+
+        // 후보가 2개 이상인데 방금 재생한 것과 같은 게 뽑혔다면 바로 다음 번호로 넘겨서 회피
+        if (clickSounds.Length > 1 && index == _lastClickSoundIndex)
+            index = (index + 1) % clickSounds.Length;
+
+        _lastClickSoundIndex = index;
+        _audioSource.PlayOneShot(clickSounds[index]);
     }
 
     void Update()
@@ -51,11 +74,14 @@ public class Click : MonoBehaviour
         {
             Debug.Log("Click");
 
-            if (clickSound != null)
-                _audioSource.PlayOneShot(clickSound);
-
             // 고정 데미지 1 대신 현재 장착한 무기의 클릭 데미지를 적용
             int damage = WeaponManager.Instance != null ? WeaponManager.Instance.CurrentClickDamage : 1;
+
+            // 이번 타격으로 죽는 게 아닐 때만 클릭 사운드 재생 (죽을 땐 파괴 사운드만 나오게)
+            bool willDie = damage >= _health.CurrentHP;
+            if (!willDie)
+                PlayRandomClickSound();
+
             _health.TakeDamage(damage);
 
             // 맞은 콜라이더 테두리 위 랜덤한 지점에 현재 무기 이미지로 타격 연출 재생
