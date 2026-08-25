@@ -96,6 +96,7 @@ public class SidePanelUI : MonoBehaviour
             _weaponBrowse,
             () => WeaponManager.Instance != null ? WeaponManager.Instance.WeaponCount : 0,
             index => WeaponManager.Instance != null ? WeaponManager.Instance.GetWeaponAt(index).weaponName : "",
+            index => WeaponManager.Instance != null ? WeaponManager.Instance.GetWeaponAt(index).icon : null,
             () => WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : 0,
             index =>
             {
@@ -109,6 +110,12 @@ public class SidePanelUI : MonoBehaviour
             _objectBrowse,
             () => ObjectManager.Instance != null ? ObjectManager.Instance.ObjectCount : 0,
             index => ObjectManager.Instance != null ? ObjectManager.Instance.GetObjectAt(index).objectName : "",
+            index =>
+            {
+                if (ObjectManager.Instance == null) return null;
+                Sprite[] stages = ObjectManager.Instance.GetObjectAt(index).healthStages;
+                return stages != null && stages.Length > 0 ? stages[0] : null;
+            },
             () => ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : 0,
             index =>
             {
@@ -159,6 +166,7 @@ public class SidePanelUI : MonoBehaviour
         BrowseState browse,
         System.Func<int> getCount,
         System.Func<int, string> getName,
+        System.Func<int, Sprite> getIcon,
         System.Func<int> getEquippedIndex,
         System.Action<int> onSelect,
         out System.Action refresh)
@@ -208,31 +216,52 @@ public class SidePanelUI : MonoBehaviour
         equippedLabel.style.color = new Color(0.5f, 0.9f, 0.5f);
         equippedLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
 
+        // 미리보기 이미지 - 맨 처음 크기(100)에서 7배인 700. 세로는 화면 중앙 정렬,
+        // 가로는 왼쪽 화살표의 실제 위치를 기준으로 그보다 살짝 왼쪽에 중심이 오도록 계산함 (아래 GeometryChangedEvent에서)
+        const float previewImageSize = 700f;
+        const float previewImageLeftOffsetFromArrow = 40f; // 화살표 중심에서 이만큼 더 왼쪽으로
+
+        var previewImage = new Image();
+        previewImage.style.position = Position.Absolute;
+        previewImage.style.top = Length.Percent(50);
+        previewImage.style.marginTop = -previewImageSize / 2f; // 이미지 높이의 절반만큼 올려서 세로 중앙 정렬
+        previewImage.style.width = previewImageSize;
+        previewImage.style.height = previewImageSize;
+        previewImage.scaleMode = ScaleMode.ScaleToFit;
+
         selectButton.clicked += () =>
         {
             onSelect(browse.index);
-            RefreshSelectorState(nameLabel, selectButton, equippedLabel, getName, getEquippedIndex, browse.index);
+            RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, getName, getIcon, getEquippedIndex, browse.index);
         };
 
         content.Add(selectButton);
         content.Add(equippedLabel);
+        content.Add(previewImage);
 
         var prevButton = new Button(() =>
         {
             int count = getCount();
             if (count <= 0) return;
             browse.index = Mathf.Max(0, browse.index - 1);
-            RefreshSelectorState(nameLabel, selectButton, equippedLabel, getName, getEquippedIndex, browse.index);
+            RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, getName, getIcon, getEquippedIndex, browse.index);
         })
         { text = "<" };
         SetArrowButtonStyle(prevButton);
+
+        // 왼쪽 화살표의 실제 레이아웃이 계산된 뒤, 그 중심보다 살짝 왼쪽에 미리보기 이미지 중심이 오도록 위치 계산
+        prevButton.RegisterCallback<GeometryChangedEvent>(_ =>
+        {
+            Vector2 arrowCenterInContent = content.WorldToLocal(prevButton.worldBound.center);
+            previewImage.style.left = arrowCenterInContent.x - previewImageLeftOffsetFromArrow - previewImageSize / 2f;
+        });
 
         var nextButton = new Button(() =>
         {
             int count = getCount();
             if (count <= 0) return;
             browse.index = Mathf.Min(count - 1, browse.index + 1);
-            RefreshSelectorState(nameLabel, selectButton, equippedLabel, getName, getEquippedIndex, browse.index);
+            RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, getName, getIcon, getEquippedIndex, browse.index);
         })
         { text = ">" };
         SetArrowButtonStyle(nextButton);
@@ -244,21 +273,24 @@ public class SidePanelUI : MonoBehaviour
         content.Add(arrowRow);
 
         // 외부(Start, OpenPanel)에서 필요할 때마다 최신 상태로 다시 그릴 수 있도록 넘겨줌
-        refresh = () => RefreshSelectorState(nameLabel, selectButton, equippedLabel, getName, getEquippedIndex, browse.index);
+        refresh = () => RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, getName, getIcon, getEquippedIndex, browse.index);
 
         return content;
     }
 
-    // 이름 라벨과, Select 버튼/Equipped 표시 중 무엇을 보여줄지 갱신
+    // 이름 라벨, 미리보기 이미지, Select 버튼/Equipped 표시 중 무엇을 보여줄지 갱신
     private void RefreshSelectorState(
         Label nameLabel,
         Button selectButton,
         Label equippedLabel,
+        Image previewImage,
         System.Func<int, string> getName,
+        System.Func<int, Sprite> getIcon,
         System.Func<int> getEquippedIndex,
         int index)
     {
         nameLabel.text = getName(index);
+        previewImage.sprite = getIcon(index);
 
         bool isEquipped = getEquippedIndex() == index;
         selectButton.style.display = isEquipped ? DisplayStyle.None : DisplayStyle.Flex;

@@ -32,7 +32,7 @@ public class ObjectManager : MonoBehaviour
     {
         // pileColor는 오브젝트 소재/테마를 대략 반영한 색 (요청 시 언제든 조정 가능)
         new ObjectData(1, 1, "Plate", new Color(0.95f, 0.95f, 0.92f)),
-        new ObjectData(1, 2, "Glass Cup", new Color(0.75f, 0.92f, 0.96f)),
+        new ObjectData(1, 2, "Glass Cup", new Color(0.93f, 0.95f, 0.96f)),
         new ObjectData(1, 3, "Flower Pot", new Color(0.80f, 0.42f, 0.25f)),
         new ObjectData(2, 1, "Window", new Color(0.60f, 0.80f, 0.90f)),
         new ObjectData(2, 2, "Wooden Chair", new Color(0.55f, 0.35f, 0.20f)),
