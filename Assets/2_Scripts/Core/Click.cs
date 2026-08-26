@@ -30,8 +30,20 @@ public class Click : MonoBehaviour
 
     private void HandleDied()
     {
-        if (CurrencyManager.Instance != null)
-            CurrencyManager.Instance.AddGold(goldReward);
+        if (CurrencyManager.Instance == null)
+            return;
+
+        // 골드 관련 업그레이드 배율(개별 보너스% × 전체 배율)을 기본 보상에 적용
+        float goldMultiplier = 1f; // 최종 골드 배율 (업그레이드 없으면 1배)
+        if (UpgradeManager.Instance != null)
+            goldMultiplier = UpgradeManager.Instance.GoldGainMultiplier * UpgradeManager.Instance.GlobalGoldMultiplierValue;
+
+        int finalGold = Mathf.Max(1, Mathf.RoundToInt(goldReward * goldMultiplier)); // 최종 지급 골드 (최소 1)
+        CurrencyManager.Instance.AddGold(finalGold);
+
+        // 죽은 시점에 장착돼있던 오브젝트가 곧 방금 파괴된 오브젝트 (Health 하나가 선택에 따라 티어만 바뀌는 구조)
+        if (StatsManager.Instance != null && ObjectManager.Instance != null)
+            StatsManager.Instance.AddDestroyed(ObjectManager.Instance.EquippedIndex);
     }
 
     // 현재 선택된 오브젝트(ObjectManager)의 clickSounds 중 하나를 랜덤 재생하되,
@@ -77,7 +89,16 @@ public class Click : MonoBehaviour
             Debug.Log("Click");
 
             // 고정 데미지 1 대신 현재 장착한 무기의 클릭 데미지를 적용
-            int damage = WeaponManager.Instance != null ? WeaponManager.Instance.CurrentClickDamage : 1;
+            int baseDamage = WeaponManager.Instance != null ? WeaponManager.Instance.CurrentClickDamage : 1;
+
+            // 클릭 데미지 업그레이드 보너스를 더함
+            int clickDamageBonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.ClickDamageBonus : 0;
+            int damage = baseDamage + clickDamageBonus;
+
+            // 크리티컬 확률 판정 - 성공하면 크리티컬 배율을 곱함
+            bool isCrit = UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.CritChanceValue;
+            if (isCrit)
+                damage = Mathf.RoundToInt(damage * UpgradeManager.Instance.CritMultiplierValue);
 
             // 이번 타격으로 죽는 게 아닐 때만 클릭 사운드 재생 (죽을 땐 파괴 사운드만 나오게)
             bool willDie = damage >= _health.CurrentHP;

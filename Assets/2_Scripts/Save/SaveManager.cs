@@ -42,6 +42,12 @@ public class SaveManager : MonoBehaviour
 
         if (ObjectManager.Instance != null)
             ObjectManager.Instance.OnObjectChanged += _ => MarkDirty();
+
+        if (UpgradeManager.Instance != null)
+            UpgradeManager.Instance.OnUpgradeChanged += (_, __) => MarkDirty();
+
+        if (StatsManager.Instance != null)
+            StatsManager.Instance.OnObjectDestroyCountChanged += (_, __) => MarkDirty();
     }
 
     void OnApplicationQuit()
@@ -69,11 +75,30 @@ public class SaveManager : MonoBehaviour
     // 각 매니저의 현재 상태를 모아서 즉시 파일에 저장
     public void SaveNow()
     {
+        // 업그레이드 레벨을 UpgradeType 순서대로 채운 배열 (매니저가 없으면 전부 0)
+        var upgradeLevels = new int[UpgradeManager.UpgradeCount];
+        if (UpgradeManager.Instance != null)
+        {
+            for (int i = 0; i < upgradeLevels.Length; i++)
+                upgradeLevels[i] = UpgradeManager.Instance.GetLevel((UpgradeManager.UpgradeType)i);
+        }
+
+        // 오브젝트별 파괴 횟수를 ObjectManager 리스트 순서대로 채운 배열 (매니저가 없으면 전부 0)
+        int objectCount = ObjectManager.Instance != null ? ObjectManager.Instance.ObjectCount : 0;
+        var destroyCounts = new int[objectCount];
+        if (StatsManager.Instance != null)
+        {
+            for (int i = 0; i < destroyCounts.Length; i++)
+                destroyCounts[i] = StatsManager.Instance.GetDestroyCount(i);
+        }
+
         var data = new SaveData
         {
             gold = CurrencyManager.Instance != null ? CurrencyManager.Instance.Gold : 0,
             weaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : 0,
             objectIndex = ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : 0,
+            upgradeLevels = upgradeLevels,
+            destroyCounts = destroyCounts,
         };
 
         string json = JsonUtility.ToJson(data, true);
@@ -93,5 +118,19 @@ public class SaveManager : MonoBehaviour
         CurrencyManager.Instance?.SetGold(data.gold);
         WeaponManager.Instance?.Equip(data.weaponIndex);
         ObjectManager.Instance?.Equip(data.objectIndex);
+
+        // 옛날 저장 파일(업그레이드 도입 전)에는 upgradeLevels가 없을 수 있으니 길이 확인 후 적용
+        if (UpgradeManager.Instance != null && data.upgradeLevels != null)
+        {
+            for (int i = 0; i < data.upgradeLevels.Length && i < UpgradeManager.UpgradeCount; i++)
+                UpgradeManager.Instance.SetLevel((UpgradeManager.UpgradeType)i, data.upgradeLevels[i]);
+        }
+
+        // 옛날 저장 파일(파괴 횟수 기록 도입 전)에는 destroyCounts가 없을 수 있으니 길이 확인 후 적용
+        if (StatsManager.Instance != null && data.destroyCounts != null)
+        {
+            for (int i = 0; i < data.destroyCounts.Length; i++)
+                StatsManager.Instance.SetDestroyCount(i, data.destroyCounts[i]);
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -20,6 +21,8 @@ public class SidePanelUI : MonoBehaviour
     private System.Action _refreshObjectSelector; // 오브젝트 팝업의 이름/Select-Equipped 표시를 다시 그리는 함수
     private VisualElement _currentlyOpenContent; // 지금 열려있는 팝업 내용 (닫을 때 오브젝트 전환 여부 판단용)
     private ObjectData _objectAtPanelOpen; // Object 팝업을 열었을 때 장착돼있던 오브젝트 (닫을 때와 비교해서 바뀌었는지 확인)
+    private VisualElement _upgradeContent; // 업그레이드 팝업일 때만 보이는 영역 (트리 형태)
+    private System.Action _refreshUpgradeTree; // 업그레이드 팝업의 레벨(N/Max) 표시를 다시 그리는 함수
 
     void OnEnable()
     {
@@ -46,6 +49,9 @@ public class SidePanelUI : MonoBehaviour
         // Build() 시점엔 매니저 값을 아직 못 읽었을 수 있어서, 인덱스를 다시 맞춘 뒤 여기서 한 번 더 갱신
         _refreshWeaponSelector?.Invoke();
         _refreshObjectSelector?.Invoke();
+
+        // 저장 파일 로드(UpgradeManager.SetLevel)가 Build() 이후에 끝날 수 있어서 여기서 한 번 더 갱신
+        _refreshUpgradeTree?.Invoke();
     }
 
     private void Build(VisualElement root)
@@ -125,6 +131,9 @@ public class SidePanelUI : MonoBehaviour
             out _refreshObjectSelector);
         _panel.Add(_objectContent);
 
+        _upgradeContent = BuildUpgradeTreeSection(out _refreshUpgradeTree);
+        _panel.Add(_upgradeContent);
+
         root.Add(_panel);
 
         // 버튼 2개가 들어갈 오른쪽 컬럼. 폭이 화면 가로의 1/4
@@ -155,9 +164,122 @@ public class SidePanelUI : MonoBehaviour
             OpenPanel("Object", _objectContent);
         });
 
+        var upgradeButton = CreateButton("Upgrade", () =>
+        {
+            Debug.Log("업그레이드 버튼 눌림");
+            OpenPanel("Upgrade", _upgradeContent);
+        });
+
         buttonColumn.Add(weaponButton);
         buttonColumn.Add(objectButton);
+        buttonColumn.Add(upgradeButton);
         root.Add(buttonColumn);
+    }
+
+    // 업그레이드 팝업 내용: 브랜치 2개(클릭 / 골드)를 가로로 나열하고, 각 브랜치 안에서 네모(버튼)들을 세로 막대(선)로 연결.
+    // 네모를 누르면 UpgradeManager.TryUpgrade로 실제 구매가 이뤄지고, 레벨(N/Max)이 즉시 갱신됨
+    private VisualElement BuildUpgradeTreeSection(out System.Action refresh)
+    {
+        const float nodeSize = 300f; // 네모 한 변의 길이
+        const float connectorLength = 40f; // 네모 사이 연결선 길이
+        const float connectorThickness = 4f; // 연결선 두께
+
+        // 브랜치별로 어떤 업그레이드 노드가 세로로 이어지는지 순서 정의
+        var branches = new[]
+        {
+            new[] { UpgradeManager.UpgradeType.ClickDamage, UpgradeManager.UpgradeType.CritChance, UpgradeManager.UpgradeType.CritMultiplier },
+            new[] { UpgradeManager.UpgradeType.GoldGainPercent, UpgradeManager.UpgradeType.GlobalGoldMultiplier },
+        };
+
+        var content = new VisualElement();
+        content.style.position = Position.Absolute;
+        content.style.left = 16;
+        content.style.right = 16;
+        content.style.top = 60;
+        content.style.bottom = 16;
+        content.style.display = DisplayStyle.None;
+        content.style.flexDirection = FlexDirection.Row; // 브랜치들을 가로로 나열
+        content.style.justifyContent = Justify.SpaceEvenly;
+        content.style.alignItems = Align.FlexStart;
+
+        // 나중에 레벨/골드 상태가 바뀔 때마다 모든 노드를 다시 그리기 위해 (버튼, 업그레이드 타입) 쌍을 모아둠
+        var nodeButtons = new List<(Button button, UpgradeManager.UpgradeType type)>();
+
+        foreach (var branchTypes in branches)
+        {
+            var branchColumn = new VisualElement(); // 브랜치 하나(네모+선 세로 스택)
+            branchColumn.style.flexDirection = FlexDirection.Column;
+            branchColumn.style.alignItems = Align.Center;
+            branchColumn.style.marginTop = 20;
+
+            for (int node = 0; node < branchTypes.Length; node++)
+            {
+                UpgradeManager.UpgradeType type = branchTypes[node]; // 이 네모가 나타내는 업그레이드 종류
+
+                var nodeButton = new Button(); // 업그레이드 노드 하나
+                nodeButton.style.width = nodeSize;
+                nodeButton.style.height = nodeSize;
+                nodeButton.style.fontSize = 32;
+                nodeButton.style.whiteSpace = WhiteSpace.Normal;
+                nodeButton.style.unityTextAlign = TextAnchor.MiddleCenter;
+                nodeButton.style.color = Color.white;
+                nodeButton.clicked += () =>
+                {
+                    UpgradeManager.Instance?.TryUpgrade(type);
+                    RefreshUpgradeNodes(nodeButtons);
+                };
+                branchColumn.Add(nodeButton);
+                nodeButtons.Add((nodeButton, type));
+
+                bool isLastNode = node == branchTypes.Length - 1;
+                if (!isLastNode)
+                {
+                    var connector = new VisualElement(); // 위/아래 네모를 잇는 세로 선
+                    connector.style.width = connectorThickness;
+                    connector.style.height = connectorLength;
+                    connector.style.backgroundColor = Color.white;
+                    branchColumn.Add(connector);
+                }
+            }
+
+            content.Add(branchColumn);
+        }
+
+        refresh = () => RefreshUpgradeNodes(nodeButtons);
+        RefreshUpgradeNodes(nodeButtons); // 초기 상태(0/5 등)를 바로 표시
+
+        return content;
+    }
+
+    // 업그레이드 노드 버튼들의 텍스트/색상을 UpgradeManager의 현재 레벨에 맞게 다시 그림
+    private void RefreshUpgradeNodes(List<(Button button, UpgradeManager.UpgradeType type)> nodeButtons)
+    {
+        foreach (var (button, type) in nodeButtons)
+        {
+            if (UpgradeManager.Instance == null)
+            {
+                button.text = $"{type}\n0/{UpgradeManager.MaxLevel}";
+                continue;
+            }
+
+            bool locked = UpgradeManager.Instance.IsLocked(type); // 선행 업그레이드가 없어서 아직 못 사는 상태
+            int level = UpgradeManager.Instance.GetLevel(type); // 현재 레벨
+            bool maxed = level >= UpgradeManager.MaxLevel; // 이미 최대 레벨인 상태
+            int nextCost = UpgradeManager.Instance.GetNextCost(type); // 다음 레벨 비용 (최대 레벨이면 -1)
+
+            string name = UpgradeManager.Instance.GetDisplayName(type);
+            string levelLine = $"{level}/{UpgradeManager.MaxLevel}"; // N/Max 표시
+            string costLine = locked ? "" : maxed ? "MAX" : $"{nextCost}G"; // 잠김이면 비용 대신 Locked만 표시
+
+            button.text = locked ? $"{name}\nLocked" : $"{name}\n{levelLine}\n{costLine}";
+
+            if (locked)
+                button.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.6f); // 잠김: 어둡게
+            else if (maxed)
+                button.style.backgroundColor = new Color(0.2f, 0.45f, 0.2f, 0.9f); // 최대 레벨: 초록
+            else
+                button.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.85f); // 기본
+        }
     }
 
     // 팝업 안에 들어갈 전체 영역: 화살표 사이에 이름, 그 아래 왼쪽엔 이미지 자리 / 오른쪽엔 설명 + Select 버튼.
@@ -331,11 +453,13 @@ public class SidePanelUI : MonoBehaviour
         _currentlyOpenContent = contentToShow;
         _weaponContent.style.display = contentToShow == _weaponContent ? DisplayStyle.Flex : DisplayStyle.None;
         _objectContent.style.display = contentToShow == _objectContent ? DisplayStyle.Flex : DisplayStyle.None;
+        _upgradeContent.style.display = contentToShow == _upgradeContent ? DisplayStyle.Flex : DisplayStyle.None;
         _panel.style.display = DisplayStyle.Flex;
 
         // 열 때마다 항상 최신 상태로 다시 그려서, 이름이 비어 보이는 경우가 없게 함
         _refreshWeaponSelector?.Invoke();
         _refreshObjectSelector?.Invoke();
+        _refreshUpgradeTree?.Invoke();
 
         // Object 팝업을 여는 시점의 오브젝트를 기억해뒀다가, 닫을 때 바뀌었는지 비교함
         // (팝업이 화면을 거의 가리므로, 전환 애니메이션은 닫을 때 재생해야 보임)

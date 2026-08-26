@@ -27,10 +27,10 @@ public class ObjectManager : MonoBehaviour
 
     [SerializeField] private ObjectVisualSet[] objectVisuals; // objects 리스트와 같은 순서/개수로 채워야 함 (26개)
 
-    // 파괴 대상 오브젝트 26종. WeaponManager의 티어 구조(3,3,3,3,3,3,2,2,2,2)와 1:1로 매칭됨
+    // 파괴 대상 오브젝트 
     private static readonly List<ObjectData> objects = new List<ObjectData>
     {
-        // pileColor는 오브젝트 소재/테마를 대략 반영한 색 (요청 시 언제든 조정 가능)
+        // 오브젝트 색 조절
         new ObjectData(1, 1, "Plate", new Color(0.95f, 0.95f, 0.92f)),
         new ObjectData(1, 2, "Glass Cup", new Color(0.93f, 0.95f, 0.96f)),
         new ObjectData(1, 3, "Flower Pot", new Color(0.80f, 0.42f, 0.25f)),

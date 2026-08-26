@@ -245,6 +245,7 @@ Transform:
   - {fileID: 1982149701}
   - {fileID: 289043388}
   - {fileID: 65068122}
+  - {fileID: 449528751}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &289043387
@@ -363,6 +364,95 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 3, y: 1.5}
   m_EdgeRadius: 0
+--- !u!1 &449528750
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 449528751}
+  - component: {fileID: 449528752}
+  m_Layer: 0
+  m_Name: UpgradeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &449528751
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 449528750}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 238836964}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &449528752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 449528750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31bb416e0c18f8d499cd44265e6111e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeManager
+  clickDamage:
+    displayName: Click Damage
+    costs: 0f0000003c000000c80000005802000008070000
+    values:
+    - 1
+    - 3
+    - 7
+    - 15
+    - 30
+  critChance:
+    displayName: Crit Chance
+    costs: 320000009600000090010000e8030000c4090000
+    values:
+    - 5
+    - 10
+    - 15
+    - 20
+    - 25
+  critMultiplier:
+    displayName: Crit Multiplier
+    costs: 640000002c01000020030000d007000088130000
+    values:
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+  goldGainPercent:
+    displayName: Gold Gain %
+    costs: 28000000780000005e0100008403000098080000
+    values:
+    - 10
+    - 25
+    - 45
+    - 70
+    - 100
+  globalGoldMultiplier:
+    displayName: Gold Multiplier
+    costs: 2c01000084030000c40900007c15000010270000
+    values:
+    - 2
+    - 3
+    - 5
+    - 8
+    - 12
 --- !u!1 &828344164
 GameObject:
   m_ObjectHideFlags: 0

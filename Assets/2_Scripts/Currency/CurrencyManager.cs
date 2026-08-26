@@ -35,4 +35,15 @@ public class CurrencyManager : MonoBehaviour
         Gold = amount;
         OnGoldChanged?.Invoke(Gold);
     }
+
+    // 골드가 충분할 때만 차감하고 true 반환 (부족하면 아무것도 안 하고 false 반환) - 업그레이드 구매 등에 사용
+    public bool TrySpendGold(int amount)
+    {
+        if (Gold < amount)
+            return false;
+
+        Gold -= amount;
+        OnGoldChanged?.Invoke(Gold);
+        return true;
+    }
 }
