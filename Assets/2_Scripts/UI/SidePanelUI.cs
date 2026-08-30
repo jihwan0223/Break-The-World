@@ -11,7 +11,16 @@ public class SidePanelUI : MonoBehaviour
         public int index; // 지금 화면에 미리보기로 표시 중인 인덱스 (Select를 눌러야 실제로 적용됨)
     }
 
-    private VisualElement _panel; // 튀어나오는 빈 팝업 패널
+    [SerializeField] private Sprite upgradeTreeBackground; // 업그레이드 트리 배경 이미지 (3_Image/GBImage/Upgradebgimage)
+
+    // 팬(드래그 이동) 가능한 범위 - 캔버스가 이 범위 밖으로 너무 멀리 밀려나가지 않도록 제한
+    [SerializeField] private float upgradePanLimit = 1500f;
+    [SerializeField] private float upgradeMinZoom = 0.5f; // 최소 축소 배율
+    [SerializeField] private float upgradeMaxZoom = 2.5f; // 최대 확대 배율
+    [SerializeField] private float upgradeZoomStep = 0.05f; // 스크롤 한 틱(delta)당 줄어드는/늘어나는 목표 배율 감도
+    [SerializeField] private float upgradeZoomSmoothSpeed = 12f; // 목표 배율을 따라잡는 속도 (클수록 빠르게/뚝뚝 끊기게, 작을수록 부드럽게)
+
+    private VisualElement _panel; // 튀어나오는 빈 팝업 패널 (Weapon/Object 전용)
     private Label _panelTitle; // 팝업 좌상단 제목 ("Weapon" / "Object")
     private VisualElement _weaponContent; // 무기 팝업일 때만 보이는 영역
     private VisualElement _objectContent; // 오브젝트 팝업일 때만 보이는 영역
@@ -21,8 +30,16 @@ public class SidePanelUI : MonoBehaviour
     private System.Action _refreshObjectSelector; // 오브젝트 팝업의 이름/Select-Equipped 표시를 다시 그리는 함수
     private VisualElement _currentlyOpenContent; // 지금 열려있는 팝업 내용 (닫을 때 오브젝트 전환 여부 판단용)
     private ObjectData _objectAtPanelOpen; // Object 팝업을 열었을 때 장착돼있던 오브젝트 (닫을 때와 비교해서 바뀌었는지 확인)
-    private VisualElement _upgradeContent; // 업그레이드 팝업일 때만 보이는 영역 (트리 형태)
-    private System.Action _refreshUpgradeTree; // 업그레이드 팝업의 레벨(N/Max) 표시를 다시 그리는 함수
+
+    private VisualElement _upgradeOverlay; // 업그레이드 전용 풀스크린 검은 오버레이
+    private VisualElement _upgradeCanvas; // 오버레이 안에서 팬/줌이 실제로 적용되는 콘텐츠(배경+트리) 컨테이너
+    private System.Action _refreshUpgradeTree; // 업그레이드 트리의 레벨(N/Max) 표시를 다시 그리는 함수
+    private bool _isDraggingUpgradeCanvas; // 지금 마우스로 캔버스를 드래그하는 중인지
+    private Vector2 _dragStartMousePos; // 드래그 시작한 순간의 마우스 화면 좌표
+    private Vector2 _dragStartPan; // 드래그 시작한 순간의 팬 오프셋
+    private Vector2 _upgradePan; // 현재 팬 오프셋(px)
+    private float _upgradeZoom = 1f; // 현재(화면에 실제로 적용되는, 매끄럽게 보간되는) 줌 배율
+    private float _upgradeZoomTarget = 1f; // 스크롤 입력이 가리키는 목표 줌 배율 - _upgradeZoom이 매 프레임 이 값을 따라감
 
     void OnEnable()
     {
@@ -52,6 +69,20 @@ public class SidePanelUI : MonoBehaviour
 
         // 저장 파일 로드(UpgradeManager.SetLevel)가 Build() 이후에 끝날 수 있어서 여기서 한 번 더 갱신
         _refreshUpgradeTree?.Invoke();
+    }
+
+    void Update()
+    {
+        // 업그레이드 오버레이가 열려있는 동안만, 현재 줌을 목표 줌 쪽으로 매 프레임 부드럽게 보간
+        // (휠 이벤트가 뚝뚝 끊기게 들어와도 실제 확대/축소는 매끄럽게 이어지도록)
+        if (_upgradeOverlay == null || _upgradeOverlay.style.display != DisplayStyle.Flex)
+            return;
+
+        if (Mathf.Approximately(_upgradeZoom, _upgradeZoomTarget))
+            return;
+
+        _upgradeZoom = Mathf.Lerp(_upgradeZoom, _upgradeZoomTarget, Time.deltaTime * upgradeZoomSmoothSpeed);
+        ApplyUpgradeCanvasTransform();
     }
 
     private void Build(VisualElement root)
@@ -131,10 +162,12 @@ public class SidePanelUI : MonoBehaviour
             out _refreshObjectSelector);
         _panel.Add(_objectContent);
 
-        _upgradeContent = BuildUpgradeTreeSection(out _refreshUpgradeTree);
-        _panel.Add(_upgradeContent);
-
         root.Add(_panel);
+
+        // 업그레이드는 Weapon/Object 팝업과 별개로, 화면을 완전히 채우는 전용 오버레이로 구성
+        // (root에 붙이는 건 아래 buttonColumn 다음에 함 - 화면 전체를 덮으므로 오른쪽 버튼 컬럼보다 위에 쌓여야
+        //  오버레이가 열려있을 때 우상단 X가 buttonColumn한테 클릭을 뺏기지 않음)
+        _upgradeOverlay = BuildUpgradeOverlay();
 
         // 버튼 2개가 들어갈 오른쪽 컬럼. 폭이 화면 가로의 1/4
         var buttonColumn = new VisualElement();
@@ -167,22 +200,128 @@ public class SidePanelUI : MonoBehaviour
         var upgradeButton = CreateButton("Upgrade", () =>
         {
             Debug.Log("업그레이드 버튼 눌림");
-            OpenPanel("Upgrade", _upgradeContent);
+            OpenUpgradeOverlay();
         });
 
         buttonColumn.Add(weaponButton);
         buttonColumn.Add(objectButton);
         buttonColumn.Add(upgradeButton);
         root.Add(buttonColumn);
+
+        // buttonColumn보다 나중에 붙여야 오버레이(와 그 안의 X 버튼)가 위에 쌓여서 클릭을 받을 수 있음
+        root.Add(_upgradeOverlay);
     }
 
-    // 업그레이드 팝업 내용: 브랜치 2개(클릭 / 골드)를 가로로 나열하고, 각 브랜치 안에서 네모(버튼)들을 세로 막대(선)로 연결.
-    // 네모를 누르면 UpgradeManager.TryUpgrade로 실제 구매가 이뤄지고, 레벨(N/Max)이 즉시 갱신됨
+    // 업그레이드 전용 풀스크린 오버레이: 검은 배경 + 우상단 닫기(X) + 팬/줌 가능한 스킬트리 캔버스
+    private VisualElement BuildUpgradeOverlay()
+    {
+        var overlay = new VisualElement();
+        overlay.style.position = Position.Absolute;
+        overlay.style.left = 0;
+        overlay.style.right = 0;
+        overlay.style.top = 0;
+        overlay.style.bottom = 0;
+        overlay.style.backgroundColor = Color.black;
+        overlay.style.display = DisplayStyle.None;
+        overlay.style.overflow = Overflow.Hidden; // 캔버스가 팬으로 밀려나도 화면 밖은 안 보이게 잘라냄
+
+        // 오버레이가 떠있는 동안은 뒤쪽 월드 오브젝트가 클릭되지 않도록 플래그를 켜고 끔
+        overlay.RegisterCallback<PointerEnterEvent>(_ => UIPointerGuard.IsPointerOverUI = true);
+        overlay.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
+
+        // 팬/줌이 실제로 적용되는 콘텐츠 컨테이너 (배경 이미지 + 트리가 이 안에 들어감)
+        _upgradeCanvas = BuildUpgradeTreeSection(out _refreshUpgradeTree);
+        overlay.Add(_upgradeCanvas);
+
+        // 마우스 왼쪽 버튼을 누른 채 드래그하면 캔버스를 이동(팬)시킴.
+        // 단, 버튼(닫기 X, 업그레이드 노드) 위에서 누른 거면 포인터를 가로채면 안 됨 - 안 그러면 Button의 클릭 판정이 씹힘
+        overlay.RegisterCallback<PointerDownEvent>(evt =>
+        {
+            if (evt.button != 0) return; // 왼쪽 버튼만 드래그로 취급
+            if (evt.target != overlay && evt.target != _upgradeCanvas) return; // 버튼 위에서는 드래그 시작 안 함
+            _isDraggingUpgradeCanvas = true;
+            _dragStartMousePos = evt.position;
+            _dragStartPan = _upgradePan;
+            overlay.CapturePointer(evt.pointerId); // 오버레이 밖으로 마우스가 나가도 계속 드래그로 인식
+        });
+
+        overlay.RegisterCallback<PointerMoveEvent>(evt =>
+        {
+            if (!_isDraggingUpgradeCanvas) return;
+
+            Vector2 delta = (Vector2)evt.position - _dragStartMousePos; // 드래그 시작 지점 대비 마우스 이동량
+            _upgradePan = _dragStartPan + delta;
+            _upgradePan.x = Mathf.Clamp(_upgradePan.x, -upgradePanLimit, upgradePanLimit);
+            _upgradePan.y = Mathf.Clamp(_upgradePan.y, -upgradePanLimit, upgradePanLimit);
+            ApplyUpgradeCanvasTransform();
+        });
+
+        overlay.RegisterCallback<PointerUpEvent>(evt =>
+        {
+            if (!_isDraggingUpgradeCanvas) return;
+            _isDraggingUpgradeCanvas = false;
+            overlay.ReleasePointer(evt.pointerId);
+        });
+
+        // 마우스 스크롤로 확대/축소 (휠을 위로 굴리면 delta.y가 음수로 들어옴 -> 확대)
+        overlay.RegisterCallback<WheelEvent>(evt =>
+        {
+            // 즉시 적용하지 않고 목표 값만 갱신 - 실제 적용은 Update()에서 매 프레임 보간(부드럽게)
+            _upgradeZoomTarget = Mathf.Clamp(_upgradeZoomTarget - evt.delta.y * upgradeZoomStep, upgradeMinZoom, upgradeMaxZoom);
+        });
+
+        var closeButton = new Button(CloseUpgradeOverlay) { text = "X" }; // 흰색 X, 배경 없음
+        closeButton.style.position = Position.Absolute;
+        closeButton.style.top = 16;
+        closeButton.style.right = 16;
+        closeButton.style.width = 44;
+        closeButton.style.height = 44;
+        closeButton.style.fontSize = 26;
+        closeButton.style.unityFontStyleAndWeight = FontStyle.Bold;
+        closeButton.style.backgroundColor = new Color(0, 0, 0, 0); // 배경 완전 투명
+        closeButton.style.borderTopWidth = 0;
+        closeButton.style.borderBottomWidth = 0;
+        closeButton.style.borderLeftWidth = 0;
+        closeButton.style.borderRightWidth = 0;
+        closeButton.style.color = Color.white;
+        overlay.Add(closeButton);
+
+        return overlay;
+    }
+
+    private void OpenUpgradeOverlay()
+    {
+        _upgradeOverlay.style.display = DisplayStyle.Flex;
+        _refreshUpgradeTree?.Invoke(); // 열 때마다 최신 레벨/골드 상태로 다시 그림
+
+        // 열 때마다 화면 중앙 기본 배율로 리셋 (전에 확대/이동해둔 상태를 기억하지 않음)
+        _upgradePan = Vector2.zero;
+        _upgradeZoom = 1f;
+        _upgradeZoomTarget = 1f;
+        ApplyUpgradeCanvasTransform();
+    }
+
+    private void CloseUpgradeOverlay()
+    {
+        _upgradeOverlay.style.display = DisplayStyle.None;
+    }
+
+    // 현재 팬 오프셋/줌 배율을 캔버스에 실제로 적용
+    private void ApplyUpgradeCanvasTransform()
+    {
+        _upgradeCanvas.style.translate = new Translate(_upgradePan.x, _upgradePan.y);
+        _upgradeCanvas.style.scale = new Scale(new Vector3(_upgradeZoom, _upgradeZoom, 1f));
+    }
+
+    // 업그레이드 트리 콘텐츠: 배경 이미지 위에 브랜치 2개(클릭 / 골드)를 가로로 나열하고,
+    // 각 브랜치 안에서 네모(버튼)들을 세로 막대(선)로 연결. 네모를 누르면 UpgradeManager.TryUpgrade로 실제 구매가 이뤄짐
     private VisualElement BuildUpgradeTreeSection(out System.Action refresh)
     {
         const float nodeSize = 300f; // 네모 한 변의 길이
         const float connectorLength = 40f; // 네모 사이 연결선 길이
         const float connectorThickness = 4f; // 연결선 두께
+        const float canvasWidth = 2200f; // 배경 이미지 + 트리를 담는 캔버스 폭 (팬/줌의 기준 크기)
+        const float canvasHeight = 1500f; // 캔버스 높이
 
         // 브랜치별로 어떤 업그레이드 노드가 세로로 이어지는지 순서 정의
         var branches = new[]
@@ -191,16 +330,20 @@ public class SidePanelUI : MonoBehaviour
             new[] { UpgradeManager.UpgradeType.GoldGainPercent, UpgradeManager.UpgradeType.GlobalGoldMultiplier },
         };
 
+        // 캔버스: 화면 중앙에 고정된 크기로 배치되고, translate/scale(ApplyUpgradeCanvasTransform)로만 움직임/확대됨
         var content = new VisualElement();
         content.style.position = Position.Absolute;
-        content.style.left = 16;
-        content.style.right = 16;
-        content.style.top = 60;
-        content.style.bottom = 16;
-        content.style.display = DisplayStyle.None;
+        content.style.width = canvasWidth;
+        content.style.height = canvasHeight;
+        content.style.left = Length.Percent(50);
+        content.style.top = Length.Percent(50);
+        content.style.marginLeft = -canvasWidth / 2f;
+        content.style.marginTop = -canvasHeight / 2f;
         content.style.flexDirection = FlexDirection.Row; // 브랜치들을 가로로 나열
         content.style.justifyContent = Justify.SpaceEvenly;
-        content.style.alignItems = Align.FlexStart;
+        content.style.alignItems = Align.Center;
+
+        // 캔버스 전체 배경은 오버레이의 검은색을 그대로 씀 (이미지는 네모 버튼 안에만 적용)
 
         // 나중에 레벨/골드 상태가 바뀔 때마다 모든 노드를 다시 그리기 위해 (버튼, 업그레이드 타입) 쌍을 모아둠
         var nodeButtons = new List<(Button button, UpgradeManager.UpgradeType type)>();
@@ -223,6 +366,15 @@ public class SidePanelUI : MonoBehaviour
                 nodeButton.style.whiteSpace = WhiteSpace.Normal;
                 nodeButton.style.unityTextAlign = TextAnchor.MiddleCenter;
                 nodeButton.style.color = Color.white;
+
+                // 네모 칸 자체에도 배경 이미지를 깔아줌 (색 오버레이는 RefreshUpgradeNodes에서 반투명하게 덧씌워 상태만 표시)
+                if (upgradeTreeBackground != null)
+                {
+                    nodeButton.style.backgroundImage = new StyleBackground(upgradeTreeBackground);
+                    nodeButton.style.unityBackgroundScaleMode = ScaleMode.StretchToFill;
+                    nodeButton.style.backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat);
+                }
+
                 nodeButton.clicked += () =>
                 {
                     UpgradeManager.Instance?.TryUpgrade(type);
@@ -273,12 +425,13 @@ public class SidePanelUI : MonoBehaviour
 
             button.text = locked ? $"{name}\nLocked" : $"{name}\n{levelLine}\n{costLine}";
 
+            // 배경 이미지가 비쳐 보이도록 색은 얇게만 덧씌움 (상태 구분용 틴트)
             if (locked)
-                button.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.6f); // 잠김: 어둡게
+                button.style.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.55f); // 잠김: 어둡게
             else if (maxed)
-                button.style.backgroundColor = new Color(0.2f, 0.45f, 0.2f, 0.9f); // 최대 레벨: 초록
+                button.style.backgroundColor = new Color(0.2f, 0.55f, 0.2f, 0.45f); // 최대 레벨: 초록
             else
-                button.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.85f); // 기본
+                button.style.backgroundColor = new Color(0f, 0f, 0f, 0.35f); // 기본: 텍스트 가독성용 살짝만
         }
     }
 
@@ -453,13 +606,11 @@ public class SidePanelUI : MonoBehaviour
         _currentlyOpenContent = contentToShow;
         _weaponContent.style.display = contentToShow == _weaponContent ? DisplayStyle.Flex : DisplayStyle.None;
         _objectContent.style.display = contentToShow == _objectContent ? DisplayStyle.Flex : DisplayStyle.None;
-        _upgradeContent.style.display = contentToShow == _upgradeContent ? DisplayStyle.Flex : DisplayStyle.None;
         _panel.style.display = DisplayStyle.Flex;
 
         // 열 때마다 항상 최신 상태로 다시 그려서, 이름이 비어 보이는 경우가 없게 함
         _refreshWeaponSelector?.Invoke();
         _refreshObjectSelector?.Invoke();
-        _refreshUpgradeTree?.Invoke();
 
         // Object 팝업을 여는 시점의 오브젝트를 기억해뒀다가, 닫을 때 바뀌었는지 비교함
         // (팝업이 화면을 거의 가리므로, 전환 애니메이션은 닫을 때 재생해야 보임)

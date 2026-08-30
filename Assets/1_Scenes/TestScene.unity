@@ -952,6 +952,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ae6b207eee5bd4ca8923a200161aea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SidePanelUI
+  upgradeTreeBackground: {fileID: 0}
+  upgradePanLimit: 1500
+  upgradeMinZoom: 0.5
+  upgradeMaxZoom: 2.5
+  upgradeZoomStep: 0.001
 --- !u!114 &1469551037
 MonoBehaviour:
   m_ObjectHideFlags: 0
