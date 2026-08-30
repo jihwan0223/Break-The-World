@@ -9,6 +9,7 @@ public class HealthBarUI : MonoBehaviour
     [SerializeField] private float barHeight = 24f;
     [SerializeField] private float topOffset = 20f;
 
+    private VisualElement _root; // 이 UIDocument의 최상위 요소 - 업그레이드 오버레이가 떠있는 동안 숨기기 위해 저장해둠
     private VisualElement _fill;
 
     void OnEnable()
@@ -25,7 +26,8 @@ public class HealthBarUI : MonoBehaviour
             uiDocument.panelSettings = settings;
         }
 
-        BuildBar(uiDocument.rootVisualElement);
+        _root = uiDocument.rootVisualElement;
+        BuildBar(_root);
 
         if (targetHealth != null)
         {
@@ -33,6 +35,10 @@ public class HealthBarUI : MonoBehaviour
             targetHealth.OnDied += HandleDied;
             UpdateBar(targetHealth.CurrentHP, targetHealth.MaxHP);
         }
+
+        // 체력바는 별도 UIDocument라서 SidePanelUI의 업그레이드 오버레이(다른 UIDocument) 뒤/앞에 걸쳐 보일 수 있음.
+        // 그래서 오버레이가 열리고 닫힐 때 이 이벤트로 직접 숨기고 보여줌
+        SidePanelUI.OnUpgradeOverlayToggled += SetVisible;
     }
 
     void OnDisable()
@@ -42,6 +48,15 @@ public class HealthBarUI : MonoBehaviour
             targetHealth.OnDamaged -= UpdateBar;
             targetHealth.OnDied -= HandleDied;
         }
+
+        SidePanelUI.OnUpgradeOverlayToggled -= SetVisible;
+    }
+
+    // 업그레이드 오버레이가 열리면(true) 숨기고, 닫히면(false) 다시 보여줌
+    private void SetVisible(bool upgradeOverlayOpen)
+    {
+        if (_root != null)
+            _root.style.display = upgradeOverlayOpen ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
     // UXML/USS 없이 코드로 직접 체력바(배경 + 빨간 fill)를 구성

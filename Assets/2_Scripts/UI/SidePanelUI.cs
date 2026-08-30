@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UT = UpgradeManager.UpgradeType; // 업그레이드 트리 정의(BuildUpgradeTreeSection)를 짧게 쓰기 위한 별칭
 
 [RequireComponent(typeof(UIDocument))]
 public class SidePanelUI : MonoBehaviour
@@ -34,6 +36,11 @@ public class SidePanelUI : MonoBehaviour
     private VisualElement _upgradeOverlay; // 업그레이드 전용 풀스크린 검은 오버레이
     private VisualElement _upgradeCanvas; // 오버레이 안에서 팬/줌이 실제로 적용되는 콘텐츠(배경+트리) 컨테이너
     private System.Action _refreshUpgradeTree; // 업그레이드 트리의 레벨(N/Max) 표시를 다시 그리는 함수
+    private System.Action _resetUpgradeTree; // 업그레이드 트리를 전부 초기화(레벨 0, 공개 상태도 리셋)하는 함수
+
+    // 업그레이드 오버레이가 열리면 true, 닫히면 false로 전달 - HealthBarUI처럼 별도 UIDocument로 뜨는 UI들이
+    // 오버레이 위/아래로 비쳐 보이지 않게 스스로 숨기고 보여주는 데 사용
+    public static event System.Action<bool> OnUpgradeOverlayToggled;
     private bool _isDraggingUpgradeCanvas; // 지금 마우스로 캔버스를 드래그하는 중인지
     private Vector2 _dragStartMousePos; // 드래그 시작한 순간의 마우스 화면 좌표
     private Vector2 _dragStartPan; // 드래그 시작한 순간의 팬 오프셋
@@ -43,6 +50,10 @@ public class SidePanelUI : MonoBehaviour
 
     void OnEnable()
     {
+        // 업그레이드 네모 배경 이미지가 인스펙터에 비어있으면 콘솔에 바로 알려줌 (원인 확인용)
+        if (upgradeTreeBackground == null)
+            Debug.LogWarning("SidePanelUI: Upgrade Tree Background가 비어있어서 업그레이드 네모에 이미지가 안 뜸 - 인스펙터에서 다시 드래그해서 넣어줘.");
+
         var uiDocument = GetComponent<UIDocument>();
 
         if (uiDocument.panelSettings == null)
@@ -81,7 +92,8 @@ public class SidePanelUI : MonoBehaviour
         if (Mathf.Approximately(_upgradeZoom, _upgradeZoomTarget))
             return;
 
-        _upgradeZoom = Mathf.Lerp(_upgradeZoom, _upgradeZoomTarget, Time.deltaTime * upgradeZoomSmoothSpeed);
+        // 업그레이드 페이지가 열려있는 동안 Time.timeScale이 0이라 deltaTime 대신 unscaledDeltaTime을 써야 줌 보간이 계속 동작함
+        _upgradeZoom = Mathf.Lerp(_upgradeZoom, _upgradeZoomTarget, Time.unscaledDeltaTime * upgradeZoomSmoothSpeed);
         ApplyUpgradeCanvasTransform();
     }
 
@@ -230,7 +242,7 @@ public class SidePanelUI : MonoBehaviour
         overlay.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
 
         // 팬/줌이 실제로 적용되는 콘텐츠 컨테이너 (배경 이미지 + 트리가 이 안에 들어감)
-        _upgradeCanvas = BuildUpgradeTreeSection(out _refreshUpgradeTree);
+        _upgradeCanvas = BuildUpgradeTreeSection(out _refreshUpgradeTree, out _resetUpgradeTree);
         overlay.Add(_upgradeCanvas);
 
         // 마우스 왼쪽 버튼을 누른 채 드래그하면 캔버스를 이동(팬)시킴.
@@ -286,12 +298,37 @@ public class SidePanelUI : MonoBehaviour
         closeButton.style.color = Color.white;
         overlay.Add(closeButton);
 
+        // 테스트용 - 좌상단에 업그레이드 트리 전체 초기화 버튼
+        var resetButton = new Button(() => _resetUpgradeTree?.Invoke()) { text = "Reset" };
+        resetButton.style.position = Position.Absolute;
+        resetButton.style.top = 76; // 16 대신 76 - 좌상단 Shards 표시(ShardUI, 별도 UIDocument)와 겹치지 않게 그 아래로 내림
+        resetButton.style.left = 16;
+        resetButton.style.width = 90;
+        resetButton.style.height = 44;
+        resetButton.style.fontSize = 16;
+        resetButton.style.unityFontStyleAndWeight = FontStyle.Bold;
+        resetButton.style.backgroundColor = new Color(0.3f, 0.1f, 0.1f, 0.9f);
+        resetButton.style.color = Color.white;
+        overlay.Add(resetButton);
+
         return overlay;
     }
 
     private void OpenUpgradeOverlay()
     {
         _upgradeOverlay.style.display = DisplayStyle.Flex;
+
+        // PointerEnterEvent는 마우스가 "움직여야" 발생하는데, 버튼을 누른 자리에서 마우스를 안 움직이면
+        // 오버레이가 떠 있어도 이벤트가 안 와서 가드가 꺼진 채로 남아 뒤쪽 오브젝트가 클릭되는 문제가 있었음.
+        // 오버레이는 화면 전체를 덮는 모달이니 여기서 바로 켜버림
+        UIPointerGuard.IsPointerOverUI = true;
+
+        // 업그레이드 보는 동안 게임(자동클릭 등)이 계속 진행되면서 뒤에서 체력바가 줄어드는 게 보이는 문제가 있어서 시간을 멈춤.
+        // 0으로 만들면 Time.deltaTime을 쓰는 모든 스크립트(자동클릭 타이머, 콤보, 체력 회복 연출 등)가 자연히 멈춤
+        Time.timeScale = 0f;
+
+        OnUpgradeOverlayToggled?.Invoke(true); // HealthBarUI 등 다른 UIDocument들에게 숨으라고 알림
+
         _refreshUpgradeTree?.Invoke(); // 열 때마다 최신 레벨/골드 상태로 다시 그림
 
         // 열 때마다 화면 중앙 기본 배율로 리셋 (전에 확대/이동해둔 상태를 기억하지 않음)
@@ -304,6 +341,14 @@ public class SidePanelUI : MonoBehaviour
     private void CloseUpgradeOverlay()
     {
         _upgradeOverlay.style.display = DisplayStyle.None;
+
+        // 닫는 순간 마우스가 다른 UI 위에 있지 않다면 다시 월드 클릭이 되도록 꺼줌
+        // (버튼 컬럼처럼 그 자리에 다른 UI가 있으면 그쪽 PointerEnter가 다시 켜줄 것)
+        UIPointerGuard.IsPointerOverUI = false;
+
+        Time.timeScale = 1f; // 멈춰뒀던 게임 시간을 다시 정상 속도로
+
+        OnUpgradeOverlayToggled?.Invoke(false); // HealthBarUI 등 다른 UIDocument들에게 다시 보이라고 알림
     }
 
     // 현재 팬 오프셋/줌 배율을 캔버스에 실제로 적용
@@ -313,22 +358,37 @@ public class SidePanelUI : MonoBehaviour
         _upgradeCanvas.style.scale = new Scale(new Vector3(_upgradeZoom, _upgradeZoom, 1f));
     }
 
-    // 업그레이드 트리 콘텐츠: 배경 이미지 위에 브랜치 2개(클릭 / 골드)를 가로로 나열하고,
-    // 각 브랜치 안에서 네모(버튼)들을 세로 막대(선)로 연결. 네모를 누르면 UpgradeManager.TryUpgrade로 실제 구매가 이뤄짐
-    private VisualElement BuildUpgradeTreeSection(out System.Action refresh)
+    // 업그레이드 노드들의 격자 좌표(열, 행). 격자 칸 하나 크기(cellWidth/cellHeight) 단위이고, 실제 픽셀 위치는
+    // BuildUpgradeTreeSection에서 셀 크기를 곱해서 계산함. UpgradeManager.GetPrerequisite로 정의된 부모-자식 관계를
+    // 사방(위/아래/좌/우)으로 자유롭게 배치해서, 사진 속 참고 이미지처럼 직선 격자망 모양으로 보이게 함
+    private static readonly Dictionary<UT, Vector2Int> UpgradeGridPositions = new Dictionary<UT, Vector2Int>
+    {
+        { UT.ClickDamage, new Vector2Int(3, 0) },
+        { UT.CritDamage, new Vector2Int(1, 1) },
+        { UT.ShardGain, new Vector2Int(5, 1) },
+        { UT.CritChanceUp, new Vector2Int(1, 2) },
+        { UT.ShardMultiplier, new Vector2Int(5, 2) },
+        { UT.AutoClickUnlock, new Vector2Int(1, 3) },
+        { UT.ComboUnlock, new Vector2Int(5, 3) },
+        { UT.AutoClickSpeed, new Vector2Int(0, 4) },
+        { UT.AutoClickCount, new Vector2Int(2, 4) },
+        { UT.ComboCooldown, new Vector2Int(4, 4) },
+        { UT.ComboDuration, new Vector2Int(6, 4) },
+        { UT.LuckyClick, new Vector2Int(2, 5) },
+        { UT.DoubleClick, new Vector2Int(6, 5) },
+    };
+
+    // 업그레이드 트리 콘텐츠: Click Damage 하나에서 시작해서 끊기지 않고 끝까지 이어지는 트리 하나를,
+    // 위 격자 좌표에 맞춰 배치하고 부모-자식 사이를 직선(가로/세로, 필요하면 꺾어서)으로 연결함.
+    // 네모를 누르면 UpgradeManager.TryUpgrade로 실제 구매가 이뤄짐
+    private VisualElement BuildUpgradeTreeSection(out System.Action refresh, out System.Action reset)
     {
         const float nodeSize = 300f; // 네모 한 변의 길이
-        const float connectorLength = 40f; // 네모 사이 연결선 길이
-        const float connectorThickness = 4f; // 연결선 두께
-        const float canvasWidth = 2200f; // 배경 이미지 + 트리를 담는 캔버스 폭 (팬/줌의 기준 크기)
-        const float canvasHeight = 1500f; // 캔버스 높이
-
-        // 브랜치별로 어떤 업그레이드 노드가 세로로 이어지는지 순서 정의
-        var branches = new[]
-        {
-            new[] { UpgradeManager.UpgradeType.ClickDamage, UpgradeManager.UpgradeType.CritChance, UpgradeManager.UpgradeType.CritMultiplier },
-            new[] { UpgradeManager.UpgradeType.GoldGainPercent, UpgradeManager.UpgradeType.GlobalGoldMultiplier },
-        };
+        const float cellWidth = 380f; // 격자 한 칸의 가로 크기 (네모 크기 + 여백)
+        const float cellHeight = 380f; // 격자 한 칸의 세로 크기
+        const float connectorThickness = 6f; // 연결선 두께
+        const float canvasWidth = 2800f; // 배경 이미지 + 트리를 담는 캔버스 폭 (팬/줌의 기준 크기)
+        const float canvasHeight = 2400f; // 캔버스 높이
 
         // 캔버스: 화면 중앙에 고정된 크기로 배치되고, translate/scale(ApplyUpgradeCanvasTransform)로만 움직임/확대됨
         var content = new VisualElement();
@@ -339,100 +399,233 @@ public class SidePanelUI : MonoBehaviour
         content.style.top = Length.Percent(50);
         content.style.marginLeft = -canvasWidth / 2f;
         content.style.marginTop = -canvasHeight / 2f;
-        content.style.flexDirection = FlexDirection.Row; // 브랜치들을 가로로 나열
-        content.style.justifyContent = Justify.SpaceEvenly;
-        content.style.alignItems = Align.Center;
 
-        // 캔버스 전체 배경은 오버레이의 검은색을 그대로 씀 (이미지는 네모 버튼 안에만 적용)
-
-        // 나중에 레벨/골드 상태가 바뀔 때마다 모든 노드를 다시 그리기 위해 (버튼, 업그레이드 타입) 쌍을 모아둠
-        var nodeButtons = new List<(Button button, UpgradeManager.UpgradeType type)>();
-
-        foreach (var branchTypes in branches)
+        // 노드 하나의 격자 좌표 -> 캔버스 안에서의 중심 픽셀 좌표로 변환
+        Vector2 GetNodeCenter(UT type)
         {
-            var branchColumn = new VisualElement(); // 브랜치 하나(네모+선 세로 스택)
-            branchColumn.style.flexDirection = FlexDirection.Column;
-            branchColumn.style.alignItems = Align.Center;
-            branchColumn.style.marginTop = 20;
-
-            for (int node = 0; node < branchTypes.Length; node++)
-            {
-                UpgradeManager.UpgradeType type = branchTypes[node]; // 이 네모가 나타내는 업그레이드 종류
-
-                var nodeButton = new Button(); // 업그레이드 노드 하나
-                nodeButton.style.width = nodeSize;
-                nodeButton.style.height = nodeSize;
-                nodeButton.style.fontSize = 32;
-                nodeButton.style.whiteSpace = WhiteSpace.Normal;
-                nodeButton.style.unityTextAlign = TextAnchor.MiddleCenter;
-                nodeButton.style.color = Color.white;
-
-                // 네모 칸 자체에도 배경 이미지를 깔아줌 (색 오버레이는 RefreshUpgradeNodes에서 반투명하게 덧씌워 상태만 표시)
-                if (upgradeTreeBackground != null)
-                {
-                    nodeButton.style.backgroundImage = new StyleBackground(upgradeTreeBackground);
-                    nodeButton.style.unityBackgroundScaleMode = ScaleMode.StretchToFill;
-                    nodeButton.style.backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat);
-                }
-
-                nodeButton.clicked += () =>
-                {
-                    UpgradeManager.Instance?.TryUpgrade(type);
-                    RefreshUpgradeNodes(nodeButtons);
-                };
-                branchColumn.Add(nodeButton);
-                nodeButtons.Add((nodeButton, type));
-
-                bool isLastNode = node == branchTypes.Length - 1;
-                if (!isLastNode)
-                {
-                    var connector = new VisualElement(); // 위/아래 네모를 잇는 세로 선
-                    connector.style.width = connectorThickness;
-                    connector.style.height = connectorLength;
-                    connector.style.backgroundColor = Color.white;
-                    branchColumn.Add(connector);
-                }
-            }
-
-            content.Add(branchColumn);
+            Vector2Int grid = UpgradeGridPositions[type];
+            float cellLeft = grid.x * cellWidth + (cellWidth - nodeSize) / 2f;
+            float cellTop = grid.y * cellHeight + (cellHeight - nodeSize) / 2f;
+            return new Vector2(cellLeft + nodeSize / 2f, cellTop + nodeSize / 2f);
         }
 
-        refresh = () => RefreshUpgradeNodes(nodeButtons);
-        RefreshUpgradeNodes(nodeButtons); // 초기 상태(0/5 등)를 바로 표시
+        // 나중에 레벨/파편 상태가 바뀔 때마다 모든 노드를 다시 그리기 위해 (버튼, 업그레이드 타입) 쌍을 모아둠
+        var nodeButtons = new List<(Button button, UpgradeManager.UpgradeType type)>();
+
+        // 부모-자식 연결선들: (연결선, 그 연결선이 속한 부모의 타입) - 부모가 1레벨 이상이면 보여줌
+        var connectors = new List<(VisualElement connector, UpgradeManager.UpgradeType parentType)>();
+
+        // 이미 한 번 공개(reveal) 애니메이션을 재생한 노드는 다시 재생하지 않도록 기록
+        var revealedTypes = new HashSet<UpgradeManager.UpgradeType>();
+
+        // 버튼 클릭 콜백이 정의되기 전에 미리 참조해야 해서 null로 먼저 선언해두고, 트리를 다 만든 뒤에 실제 구현을 대입함
+        // (지역 변수라도 클로저는 "그 변수가 나중에 무엇을 가리키는지"를 보고 실행되므로 이렇게 해도 안전함)
+        System.Action refreshAll = null;
+
+        // 연결선을 먼저 그려서 버튼들 뒤에 깔리게 함 (VisualElement는 나중에 Add한 게 위에 그려짐)
+        foreach (UT type in System.Enum.GetValues(typeof(UT)))
+        {
+            UT? parentType = UpgradeManager.GetPrerequisite(type);
+            if (parentType == null) continue; // 루트(ClickDamage)는 연결선 없음
+
+            VisualElement connector = BuildGridConnector(GetNodeCenter(parentType.Value), GetNodeCenter(type), connectorThickness);
+            connector.style.display = DisplayStyle.None;
+            connectors.Add((connector, parentType.Value));
+            content.Add(connector);
+        }
+
+        // 그 위에 노드 버튼들을 격자 좌표대로 절대 배치
+        foreach (UT type in System.Enum.GetValues(typeof(UT)))
+        {
+            Button nodeButton = CreateUpgradeNodeButton(type, nodeSize, nodeButtons, () => refreshAll());
+            Vector2 center = GetNodeCenter(type);
+            nodeButton.style.position = Position.Absolute;
+            nodeButton.style.left = center.x - nodeSize / 2f;
+            nodeButton.style.top = center.y - nodeSize / 2f;
+            content.Add(nodeButton);
+        }
+
+        refreshAll = () => RefreshUpgradeNodes(nodeButtons, revealedTypes, connectors);
+        refresh = refreshAll;
+        reset = () =>
+        {
+            UpgradeManager.Instance?.ResetAll();
+            revealedTypes.Clear(); // 다음에 다시 공개될 때 튀어나오는 연출이 재생되도록 기록도 같이 초기화
+            refreshAll();
+        };
+        refreshAll(); // 초기 상태(0/5, 공개 여부 등)를 바로 표시
 
         return content;
     }
 
-    // 업그레이드 노드 버튼들의 텍스트/색상을 UpgradeManager의 현재 레벨에 맞게 다시 그림
-    private void RefreshUpgradeNodes(List<(Button button, UpgradeManager.UpgradeType type)> nodeButtons)
+    // 부모 중심 -> 자식 중심을 잇는 격자형 연결선. 같은 열/행이면 직선 하나, 아니면 세로로 내려간 뒤 가로로 꺾는 ㄱ자(직각) 2단
+    private VisualElement BuildGridConnector(Vector2 parentCenter, Vector2 childCenter, float thickness)
+    {
+        var wrapper = new VisualElement(); // 세그먼트 1~2개를 감싸서 표시 여부를 한 번에 토글하기 위한 껍데기
+        wrapper.pickingMode = PickingMode.Ignore;
+        wrapper.style.position = Position.Absolute;
+        wrapper.style.left = 0;
+        wrapper.style.top = 0;
+
+        bool sameColumn = Mathf.Approximately(parentCenter.x, childCenter.x);
+        bool sameRow = Mathf.Approximately(parentCenter.y, childCenter.y);
+
+        if (sameColumn)
+        {
+            wrapper.Add(BuildConnectorBar(parentCenter.x - thickness / 2f, Mathf.Min(parentCenter.y, childCenter.y), thickness, Mathf.Abs(childCenter.y - parentCenter.y)));
+        }
+        else if (sameRow)
+        {
+            wrapper.Add(BuildConnectorBar(Mathf.Min(parentCenter.x, childCenter.x), parentCenter.y - thickness / 2f, Mathf.Abs(childCenter.x - parentCenter.x), thickness));
+        }
+        else
+        {
+            // 부모 위치에서 자식의 행까지 먼저 내려간 다음(세로), 자식의 열까지 옆으로 이동(가로)
+            wrapper.Add(BuildConnectorBar(parentCenter.x - thickness / 2f, Mathf.Min(parentCenter.y, childCenter.y), thickness, Mathf.Abs(childCenter.y - parentCenter.y)));
+            wrapper.Add(BuildConnectorBar(Mathf.Min(parentCenter.x, childCenter.x), childCenter.y - thickness / 2f, Mathf.Abs(childCenter.x - parentCenter.x), thickness));
+        }
+
+        return wrapper;
+    }
+
+    // 연결선 한 조각(가로 또는 세로 막대)
+    private VisualElement BuildConnectorBar(float left, float top, float width, float height)
+    {
+        var bar = new VisualElement();
+        bar.pickingMode = PickingMode.Ignore;
+        bar.style.position = Position.Absolute;
+        bar.style.left = left;
+        bar.style.top = top;
+        bar.style.width = width;
+        bar.style.height = height;
+        bar.style.backgroundColor = Color.white;
+        return bar;
+    }
+
+    // 업그레이드 노드 버튼 하나를 만들어서 nodeButtons 목록에 등록까지 해줌 (트리 전체 공용)
+    private Button CreateUpgradeNodeButton(UpgradeManager.UpgradeType type, float nodeSize, List<(Button button, UpgradeManager.UpgradeType type)> nodeButtons, System.Action onClicked)
+    {
+        var nodeButton = new Button(); // 업그레이드 노드 하나
+        nodeButton.style.width = nodeSize;
+        nodeButton.style.height = nodeSize;
+        nodeButton.style.fontSize = 32;
+        nodeButton.style.whiteSpace = WhiteSpace.Normal;
+        nodeButton.style.unityTextAlign = TextAnchor.MiddleCenter;
+        nodeButton.style.color = Color.white;
+
+        // 네모 칸 자체에 배경 이미지를 깔아줌 (색 오버레이는 RefreshUpgradeNodes에서 반투명하게 덧씌워 상태만 표시)
+        if (upgradeTreeBackground != null)
+        {
+            nodeButton.style.backgroundImage = new StyleBackground(upgradeTreeBackground);
+            nodeButton.style.unityBackgroundScaleMode = ScaleMode.StretchToFill;
+            nodeButton.style.backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat);
+        }
+
+        nodeButton.clicked += () =>
+        {
+            bool success = UpgradeManager.Instance != null && UpgradeManager.Instance.TryUpgrade(type);
+
+            // 실제로 레벨이 올라간 경우에만 연출 재생 (파편 부족/잠김 등으로 실패했을 땐 재생 안 함)
+            if (success)
+                StartCoroutine(PlayUpgradeRevealAnimation(nodeButton));
+
+            onClicked();
+        };
+
+        nodeButtons.Add((nodeButton, type));
+        return nodeButton;
+    }
+
+    // 업그레이드 노드 버튼들의 텍스트/색상/공개 여부, 그리고 각 연결선의 표시 여부를 UpgradeManager의 현재 레벨에 맞게 다시 그림
+    private void RefreshUpgradeNodes(
+        List<(Button button, UpgradeManager.UpgradeType type)> nodeButtons,
+        HashSet<UpgradeManager.UpgradeType> revealedTypes,
+        List<(VisualElement connector, UpgradeManager.UpgradeType parentType)> connectors)
     {
         foreach (var (button, type) in nodeButtons)
         {
             if (UpgradeManager.Instance == null)
             {
-                button.text = $"{type}\n0/{UpgradeManager.MaxLevel}";
+                button.text = $"{type}\n0/5";
                 continue;
             }
 
-            bool locked = UpgradeManager.Instance.IsLocked(type); // 선행 업그레이드가 없어서 아직 못 사는 상태
+            bool isRevealed = !UpgradeManager.Instance.IsLocked(type); // 부모 업그레이드가 1레벨 이상이면 공개됨
+
+            if (!isRevealed)
+            {
+                button.style.display = DisplayStyle.None; // 아직 공개 전이면 아예 안 보이게 숨김
+                continue;
+            }
+
+            bool justRevealed = revealedTypes.Add(type); // 이번에 처음 공개되는 순간인지 (HashSet.Add가 처음이면 true 반환)
+            button.style.display = DisplayStyle.Flex;
+
+            if (justRevealed)
+                StartCoroutine(PlayUpgradeRevealAnimation(button));
+
+            int maxLevel = UpgradeManager.Instance.GetMaxLevel(type); // 단일 구매 업그레이드는 1, 나머지는 5
             int level = UpgradeManager.Instance.GetLevel(type); // 현재 레벨
-            bool maxed = level >= UpgradeManager.MaxLevel; // 이미 최대 레벨인 상태
+            bool maxed = level >= maxLevel; // 이미 최대 레벨인 상태
             int nextCost = UpgradeManager.Instance.GetNextCost(type); // 다음 레벨 비용 (최대 레벨이면 -1)
 
             string name = UpgradeManager.Instance.GetDisplayName(type);
-            string levelLine = $"{level}/{UpgradeManager.MaxLevel}"; // N/Max 표시
-            string costLine = locked ? "" : maxed ? "MAX" : $"{nextCost}G"; // 잠김이면 비용 대신 Locked만 표시
+            string levelLine = $"{level}/{maxLevel}"; // N/Max 표시
+            string costLine = maxed ? "MAX" : $"{nextCost}"; // 파편 비용 (최대면 MAX만 표시)
 
-            button.text = locked ? $"{name}\nLocked" : $"{name}\n{levelLine}\n{costLine}";
+            button.text = $"{name}\n{levelLine}\n{costLine}";
 
             // 배경 이미지가 비쳐 보이도록 색은 얇게만 덧씌움 (상태 구분용 틴트)
-            if (locked)
-                button.style.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.55f); // 잠김: 어둡게
-            else if (maxed)
-                button.style.backgroundColor = new Color(0.2f, 0.55f, 0.2f, 0.45f); // 최대 레벨: 초록
-            else
-                button.style.backgroundColor = new Color(0f, 0f, 0f, 0.35f); // 기본: 텍스트 가독성용 살짝만
+            button.style.backgroundColor = maxed
+                ? new Color(0.2f, 0.55f, 0.2f, 0.45f) // 최대 레벨: 초록
+                : new Color(0f, 0f, 0f, 0.35f); // 기본: 텍스트 가독성용 살짝만
         }
+
+        foreach (var (connector, parentType) in connectors)
+        {
+            bool parentLeveled = UpgradeManager.Instance != null && UpgradeManager.Instance.GetLevel(parentType) >= 1;
+            connector.style.display = parentLeveled ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+    }
+
+    // 새로 공개된 업그레이드 노드가 튀어나올 때 재생하는 연출: 왼쪽으로 살짝 기울었다가 정자세로 돌아오면서 반짝임
+    private IEnumerator PlayUpgradeRevealAnimation(VisualElement node)
+    {
+        const float duration = 0.35f; // 연출 총 시간(초)
+        const float startAngleDegrees = -18f; // 시작 회전 각도 (왼쪽으로 기울어짐)
+        const float flashPeakAlpha = 0.35f; // 반짝임 최대 밝기 (기존 0.9는 너무 쌔서 낮춤)
+
+        // 반짝임 효과용 흰색 오버레이 - 클릭을 막으면 안 되므로 Ignore로 설정
+        var flash = new VisualElement();
+        flash.pickingMode = PickingMode.Ignore;
+        flash.style.position = Position.Absolute;
+        flash.style.left = 0;
+        flash.style.right = 0;
+        flash.style.top = 0;
+        flash.style.bottom = 0;
+        flash.style.backgroundColor = new Color(1f, 1f, 1f, flashPeakAlpha);
+        node.Add(flash);
+
+        float elapsed = 0f; // 연출 시작 후 흐른 시간
+
+        while (elapsed < duration)
+        {
+            // 업그레이드 페이지가 열려있는 동안 Time.timeScale이 0이라 deltaTime 대신 unscaledDeltaTime을 써야 연출이 재생됨
+            elapsed += Time.unscaledDeltaTime;
+            float progress = Mathf.Clamp01(elapsed / duration); // 0~1 진행률
+            float eased = 1f - Mathf.Pow(1f - progress, 3f); // ease-out(처음엔 빠르게, 끝에서 천천히)
+
+            float angle = Mathf.Lerp(startAngleDegrees, 0f, eased);
+            node.style.rotate = new Rotate(new Angle(angle, AngleUnit.Degree));
+
+            float flashAlpha = Mathf.Lerp(flashPeakAlpha, 0f, progress);
+            flash.style.backgroundColor = new Color(1f, 1f, 1f, flashAlpha);
+
+            yield return null;
+        }
+
+        node.style.rotate = new Rotate(new Angle(0f, AngleUnit.Degree));
+        node.Remove(flash);
     }
 
     // 팝업 안에 들어갈 전체 영역: 화살표 사이에 이름, 그 아래 왼쪽엔 이미지 자리 / 오른쪽엔 설명 + Select 버튼.

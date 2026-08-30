@@ -417,42 +417,24 @@ MonoBehaviour:
     - 7
     - 15
     - 30
-  critChance:
-    displayName: Crit Chance
-    costs: 320000009600000090010000e8030000c4090000
+  critDamage:
+    displayName: Crit Damage
+    costs: 140000003c000000960000005e010000bc020000
     values:
-    - 5
     - 10
-    - 15
     - 20
-    - 25
-  critMultiplier:
-    displayName: Crit Multiplier
-    costs: 640000002c01000020030000d007000088130000
+    - 30
+    - 40
+    - 50
+  shardGain:
+    displayName: Shard Gain
+    costs: 0f0000002d0000006e0000000401000026020000
     values:
-    - 4
-    - 5
-    - 6
-    - 7
-    - 8
-  goldGainPercent:
-    displayName: Gold Gain %
-    costs: 28000000780000005e0100008403000098080000
-    values:
-    - 10
-    - 25
-    - 45
-    - 70
-    - 100
-  globalGoldMultiplier:
-    displayName: Gold Multiplier
-    costs: 2c01000084030000c40900007c15000010270000
-    values:
+    - 1
     - 2
     - 3
+    - 4
     - 5
-    - 8
-    - 12
 --- !u!1 &828344164
 GameObject:
   m_ObjectHideFlags: 0
@@ -801,6 +783,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18eb4008ce51ebf48bd3e8454e413dcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CurrencyManager
+  debugAlwaysMaxShards: 1
 --- !u!1 &1423159778
 GameObject:
   m_ObjectHideFlags: 0
@@ -952,11 +935,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ae6b207eee5bd4ca8923a200161aea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SidePanelUI
-  upgradeTreeBackground: {fileID: 0}
+  upgradeTreeBackground: {fileID: 6282523637575575841, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
   upgradePanLimit: 1500
   upgradeMinZoom: 0.5
   upgradeMaxZoom: 2.5
-  upgradeZoomStep: 0.001
+  upgradeZoomStep: 0.05
+  upgradeZoomSmoothSpeed: 12
 --- !u!114 &1469551037
 MonoBehaviour:
   m_ObjectHideFlags: 0
