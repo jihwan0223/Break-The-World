@@ -12,16 +12,16 @@ public class WeaponManager : MonoBehaviour
     // unlockCost는 지금 당장 쓰이진 않지만, 나중에 골드 해금 붙일 때 쓸 자리표시 값(대략 x3씩 증가)
     private static readonly List<WeaponData> weapons = new List<WeaponData>
     {
-        new WeaponData(1, "Bare Hands", 1, 0),
-        new WeaponData(2, "Hammer", 6, 150),
-        new WeaponData(3, "Pickaxe", 16, 450),
-        new WeaponData(4, "Power Drill", 36, 1350),
-        new WeaponData(5, "Hydraulic Breaker", 76, 4050),
-        new WeaponData(6, "Dynamite", 156, 12150),
-        new WeaponData(7, "Bomb", 316, 36450),
-        new WeaponData(8, "Missile", 634, 109350),
-        new WeaponData(9, "Meteor", 1270, 328050),
-        new WeaponData(10, "Big Bang", 2542, 984150),
+        new WeaponData(1, "맨손", 1, 0),
+        new WeaponData(2, "망치", 6, 150),
+        new WeaponData(3, "곡괭이", 16, 450),
+        new WeaponData(4, "전동 드릴", 36, 1350),
+        new WeaponData(5, "유압 브레이커", 76, 4050),
+        new WeaponData(6, "다이너마이트", 156, 12150),
+        new WeaponData(7, "폭탄", 316, 36450),
+        new WeaponData(8, "미사일", 634, 109350),
+        new WeaponData(9, "운석", 1270, 328050),
+        new WeaponData(10, "빅뱅", 2542, 984150),
     };
 
     [SerializeField] private Sprite[] weaponIcons; // 무기별 이미지 (weapons 리스트와 같은 순서로 채워야 함, 아직 없는 무기는 비워둬도 됨)

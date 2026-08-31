@@ -11,11 +11,12 @@ public class Click : MonoBehaviour
     private AudioSource _audioSource;
     private Collider2D _collider; // 자동클릭/더블클릭처럼 실제 마우스 클릭이 없는 히트에서도 타격 연출 위치로 씀
 
-    [SerializeField] private int shardReward = 1; // 이 오브젝트를 파괴했을 때 기본으로 지급되는 파편 개수
+    [SerializeField] private int pieceReward = 1; // 이 오브젝트를 파괴했을 때 기본으로 지급되는 조각 개수 (그 오브젝트 종류의 조각)
     [SerializeField] private float doubleClickDelaySeconds = 0.08f; // 더블클릭의 두 번째 타격이 첫 타격보다 이만큼 늦게 나옴
 
     private int _lastClickSoundIndex = -1; // 방금 재생한 사운드 인덱스 (바로 다음 클릭에서 같은 소리가 안 나오게 기억)
     private float _autoClickTimer; // 자동클릭 업그레이드의 다음 발동까지 누적된 시간(초)
+    private float _autoMineTimer; // 자동채굴 업그레이드의 다음 발동까지 누적된 시간(초)
 
     void Start()
     {
@@ -35,16 +36,19 @@ public class Click : MonoBehaviour
 
     private void HandleDied()
     {
-        if (CurrencyManager.Instance == null)
+        // 바로 아래에서 ObjectManager.Instance도 참조하니 둘 다 확인해야 함 (CurrencyManager만 확인하면 널 참조 위험)
+        if (CurrencyManager.Instance == null || ObjectManager.Instance == null)
             return;
 
-        // 파편 강화(고정 보너스) + 파편 배율 + 콤보 배율을 순서대로 적용
-        int shardBonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.ShardGainBonus : 0;
-        float shardMultiplier = UpgradeManager.Instance != null ? UpgradeManager.Instance.ShardMultiplierValue : 1f;
+        // 죽은 시점에 장착돼있던 오브젝트가 곧 방금 파괴된 오브젝트 (Health 하나가 선택에 따라 티어만 바뀌는 구조)
+        int objectIndex = ObjectManager.Instance.EquippedIndex;
+
+        // 그 오브젝트의 "획득량 증가" 업그레이드 보너스 + 콤보 배율을 적용
+        long gainBonus = ObjectManager.Instance.GetGainBonus(objectIndex);
         float comboMultiplier = ComboManager.Instance != null ? ComboManager.Instance.ShardMultiplier : 1f;
 
-        int finalShards = Mathf.Max(1, Mathf.RoundToInt((shardReward + shardBonus) * shardMultiplier * comboMultiplier));
-        CurrencyManager.Instance.AddShards(finalShards);
+        long finalPieces = Mathf.Max(1, Mathf.RoundToInt((pieceReward + gainBonus) * comboMultiplier));
+        CurrencyManager.Instance.AddPieces(objectIndex, finalPieces);
     }
 
     // 현재 선택된 오브젝트(ObjectManager)의 clickSounds 중 하나를 랜덤 재생하되,
@@ -124,9 +128,39 @@ public class Click : MonoBehaviour
             PerformClickHit();
     }
 
+    // 자동채굴 업그레이드가 켜져있으면 일정 주기마다, 지금 캐는 오브젝트보다 몇 단계 전 오브젝트를 자동으로 캐서 조각을 지급함
+    // (눈에 보이는 오브젝트/체력 시스템과는 무관하게, 뒤에서 조용히 조각만 채워주는 방식)
+    private void UpdateAutoMine()
+    {
+        if (UpgradeManager.Instance == null || !UpgradeManager.Instance.AutoMineIsUnlocked)
+            return;
+
+        _autoMineTimer += Time.deltaTime;
+        float interval = UpgradeManager.Instance.AutoMineIntervalSeconds;
+
+        if (_autoMineTimer < interval)
+            return;
+
+        _autoMineTimer -= interval; // 0으로 딱 자르지 않고 남은 오차만 빼서 주기가 조금씩 밀리는 걸 방지
+
+        if (ObjectManager.Instance == null || CurrencyManager.Instance == null)
+            return;
+
+        int targetIndex = ObjectManager.Instance.EquippedIndex - UpgradeManager.Instance.AutoMineTierOffset;
+
+        // 그만큼 전 단계 오브젝트가 없거나(0 미만) 아직 해금 전이면 이번 틱은 아무 일도 안 일어남
+        if (targetIndex < 0 || !ObjectManager.Instance.IsUnlocked(targetIndex))
+            return;
+
+        long gainBonus = ObjectManager.Instance.GetGainBonus(targetIndex); // 항상 0 이상이라 별도로 최솟값 보정 안 해도 됨
+        long amount = 1 + gainBonus;
+        CurrencyManager.Instance.AddPieces(targetIndex, amount);
+    }
+
     void Update()
     {
         UpdateAutoClick();
+        UpdateAutoMine();
 
         // 새 Input System 기반 마우스 좌클릭 감지
         if (Mouse.current == null || !Mouse.current.leftButton.wasPressedThisFrame)

@@ -64,6 +64,10 @@ public class Health : MonoBehaviour
 
         if (_collider != null) _collider.enabled = true;
 
+        // 오브젝트를 바꿀 때 크기를 원래(1배)로 되돌림 - HitFeedback의 클릭 펀치 연출이 연타 중에 끊겨서
+        // 커진 채로 멈춰있는 상태로 오브젝트가 바뀌면, 새 오브젝트도 그 커진 크기를 그대로 물려받는 문제가 있었음
+        transform.localScale = Vector3.one;
+
         OnDamaged?.Invoke(CurrentHP, maxHP);
     }
 

@@ -1,8 +1,9 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-// 파편/무기/오브젝트 선택 상태를 JSON 파일로 저장하고 불러오는 매니저.
+// 조각/무기/오브젝트 선택 상태를 JSON 파일로 저장하고 불러오는 매니저.
 // 값이 바뀔 때마다 바로 쓰지 않고, 일정 시간 동안 변경이 없을 때 한 번만 저장(디바운스)해서
 // 연속 클릭 중에 매번 디스크에 쓰는 걸 방지함.
 public class SaveManager : MonoBehaviour
@@ -35,13 +36,17 @@ public class SaveManager : MonoBehaviour
         Load();
 
         if (CurrencyManager.Instance != null)
-            CurrencyManager.Instance.OnShardsChanged += _ => MarkDirty();
+            CurrencyManager.Instance.OnPiecesChanged += (_, __) => MarkDirty();
 
         if (WeaponManager.Instance != null)
             WeaponManager.Instance.OnWeaponChanged += _ => MarkDirty();
 
         if (ObjectManager.Instance != null)
+        {
             ObjectManager.Instance.OnObjectChanged += _ => MarkDirty();
+            ObjectManager.Instance.OnUnlockChanged += _ => MarkDirty();
+            ObjectManager.Instance.OnGainLevelChanged += (_, __) => MarkDirty();
+        }
 
         if (UpgradeManager.Instance != null)
             UpgradeManager.Instance.OnUpgradeChanged += (_, __) => MarkDirty();
@@ -80,9 +85,32 @@ public class SaveManager : MonoBehaviour
                 upgradeLevels[i] = UpgradeManager.Instance.GetLevel((UpgradeManager.UpgradeType)i);
         }
 
+        // 보유 조각(0개가 아닌 것만)을 배열로 채움
+        var pieces = new List<SavedPiece>();
+        if (CurrencyManager.Instance != null)
+        {
+            foreach (var entry in CurrencyManager.Instance.GetAllPieces())
+                pieces.Add(new SavedPiece { objectIndex = entry.Key, amount = entry.Value });
+        }
+
+        // 오브젝트별 해금 상태 / 획득량 업그레이드 레벨
+        int objectCount = ObjectManager.Instance != null ? ObjectManager.Instance.ObjectCount : 0;
+        var unlockedObjects = new bool[objectCount];
+        var gainLevels = new int[objectCount];
+        if (ObjectManager.Instance != null)
+        {
+            for (int i = 0; i < objectCount; i++)
+            {
+                unlockedObjects[i] = ObjectManager.Instance.IsUnlocked(i);
+                gainLevels[i] = ObjectManager.Instance.GetGainLevel(i);
+            }
+        }
+
         var data = new SaveData
         {
-            shards = CurrencyManager.Instance != null ? CurrencyManager.Instance.Shards : 0,
+            pieces = pieces.ToArray(),
+            unlockedObjects = unlockedObjects,
+            gainLevels = gainLevels,
             weaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : 0,
             objectIndex = ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : 0,
             upgradeLevels = upgradeLevels,
@@ -102,7 +130,25 @@ public class SaveManager : MonoBehaviour
         string json = File.ReadAllText(SavePath);
         SaveData data = JsonUtility.FromJson<SaveData>(json);
 
-        CurrencyManager.Instance?.SetShards(data.shards);
+        if (CurrencyManager.Instance != null && data.pieces != null)
+        {
+            foreach (SavedPiece piece in data.pieces)
+                CurrencyManager.Instance.SetPieces(piece.objectIndex, piece.amount);
+        }
+
+        // 해금 상태를 먼저 복원해야 그 다음 Equip()이 막히지 않음
+        if (ObjectManager.Instance != null && data.unlockedObjects != null)
+        {
+            for (int i = 0; i < data.unlockedObjects.Length; i++)
+                ObjectManager.Instance.SetUnlocked(i, data.unlockedObjects[i]);
+        }
+
+        if (ObjectManager.Instance != null && data.gainLevels != null)
+        {
+            for (int i = 0; i < data.gainLevels.Length; i++)
+                ObjectManager.Instance.SetGainLevel(i, data.gainLevels[i]);
+        }
+
         WeaponManager.Instance?.Equip(data.weaponIndex);
         ObjectManager.Instance?.Equip(data.objectIndex);
 
