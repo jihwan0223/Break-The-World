@@ -12,7 +12,7 @@ public class UpgradeManager : MonoBehaviour
         ClickDamage = 0, // 클릭 강화: 클릭 데미지 +N (루트)
         CritDamage = 1, // 크리티컬 강화: 크리티컬 데미지 배율 증가 (ClickDamage 자식)
         ShardGain = 2, // 파편 강화: 파괴 시 얻는 파편 +N (ClickDamage 자식)
-        CritChanceUp = 3, // 크리티컬 확률 강화 (CritDamage 자식)
+        CritChanceUp = 3, // 크리티컬 확률 강화 (단일 - 초반이라 1/1까지만, CritDamage 자식)
         ShardMultiplier = 4, // 파편 배율 강화 (ShardGain 자식)
         AutoClickUnlock = 5, // 자동클릭 (단일 - 이걸 사야 자동클릭 자체가 켜짐)
         AutoClickSpeed = 6, // 자동클릭 주기 단축 (AutoClickUnlock 자식)
@@ -22,9 +22,13 @@ public class UpgradeManager : MonoBehaviour
         ComboDuration = 10, // 콤보 지속시간 증가 (ComboUnlock 자식)
         LuckyClick = 11, // 럭키 클릭 (단일 - 0.1% 확률 즉시 파괴)
         DoubleClick = 12, // 더블클릭 (단일 - 클릭 한 번에 2번 처리)
+        CritChanceUp2 = 13, // 크리티컬 확률 강화 2차 - CritChanceUp을 "돌려쓰는" 더 비싼 후속 버전 (CritChanceUp 자식)
+        ClickDamageUp2 = 14, // 클릭 강화 2차 - 기본(ClickDamage) 효과를 중반부에서 "돌려쓰는" 더 비싼 후속 버전 (AutoClickUnlock 자식)
+        CritDamageUp2 = 15, // 크리티컬 강화 2차 - 기본(CritDamage) 효과를 중반부에서 "돌려쓰는" 더 비싼 후속 버전 (AutoClickUnlock 자식)
+        ShardGainUp2 = 16, // 파편 강화 2차 - 기본(ShardGain) 효과를 중반부에서 "돌려쓰는" 더 비싼 후속 버전 (ComboUnlock 자식)
     }
 
-    public const int UpgradeCount = 13; // 업그레이드 종류 수 (위 enum 개수와 일치해야 함)
+    public const int UpgradeCount = 17; // 업그레이드 종류 수 (위 enum 개수와 일치해야 함)
     public const int MaxLevel = 5; // 여러 단계로 성장하는 업그레이드의 최대 단계 (단일 업그레이드는 GetMaxLevel에서 1로 별도 처리)
 
     private const float BaseCritChance = 0.1f; // 크리티컬 발동 확률(10%) - CritDamage가 1레벨 이상이면 항상 이 확률로 고정
@@ -53,7 +57,7 @@ public class UpgradeManager : MonoBehaviour
     private UpgradeDef clickDamage = new UpgradeDef
     {
         displayName = "Click Damage",
-        costs = new int[] { 10, 30, 80, 200, 450 },
+        costs = new int[] { 10, 25, 60, 150, 350 },
         values = new float[] { 1, 2, 3, 4, 5 },
     };
 
@@ -61,7 +65,7 @@ public class UpgradeManager : MonoBehaviour
     private UpgradeDef critDamage = new UpgradeDef
     {
         displayName = "Crit Damage",
-        costs = new int[] { 20, 60, 150, 350, 700 },
+        costs = new int[] { 50, 120, 280, 600, 1200 },
         values = new float[] { 10, 20, 30, 40, 50 },
     };
 
@@ -69,23 +73,33 @@ public class UpgradeManager : MonoBehaviour
     private UpgradeDef shardGain = new UpgradeDef
     {
         displayName = "Shard Gain",
-        costs = new int[] { 15, 45, 110, 260, 550 },
+        costs = new int[] { 40, 100, 220, 480, 900 },
         values = new float[] { 1, 2, 3, 4, 5 },
     };
 
+    // 단일 구매(1/1) - 초반 크리티컬 확률 보너스. 더 키우고 싶으면 CritChanceUp2("돌려쓴" 후속 버전)를 사야 함
     [SerializeField]
     private UpgradeDef critChanceUp = new UpgradeDef
     {
         displayName = "Crit Chance",
-        costs = new int[] { 40, 100, 220, 450, 800 },
-        values = new float[] { 5, 10, 15, 20, 25 }, // % 추가치
+        costs = new int[] { 150 },
+        values = new float[] { 5 }, // % 추가치
+    };
+
+    // CritChanceUp을 다 쓴 뒤 더 비싼 값으로 "돌려쓰는" 2차 버전 - 여기서부터 다시 5단계로 성장함
+    [SerializeField]
+    private UpgradeDef critChanceUp2 = new UpgradeDef
+    {
+        displayName = "Crit Chance II",
+        costs = new int[] { 4000, 8000, 15000, 28000, 50000 },
+        values = new float[] { 10, 20, 30, 40, 50 }, // % 추가치 (CritChanceUp 보너스 위에 더해짐)
     };
 
     [SerializeField]
     private UpgradeDef shardMultiplier = new UpgradeDef
     {
         displayName = "Shard Multiplier",
-        costs = new int[] { 50, 120, 260, 500, 900 },
+        costs = new int[] { 120, 280, 550, 1100, 2000 },
         values = new float[] { 10, 20, 30, 40, 50 }, // % 배율 보너스
     };
 
@@ -93,7 +107,7 @@ public class UpgradeManager : MonoBehaviour
     private UpgradeDef autoClickUnlock = new UpgradeDef
     {
         displayName = "Auto Click",
-        costs = new int[] { 200 },
+        costs = new int[] { 3000 }, // 단일 구매 중 제일 저렴함 (Combo -> Lucky Click -> Double Click 순으로 큰 폭으로 비싸짐)
         values = new float[] { 1 },
     };
 
@@ -101,7 +115,7 @@ public class UpgradeManager : MonoBehaviour
     private UpgradeDef autoClickSpeed = new UpgradeDef
     {
         displayName = "Auto Click Speed",
-        costs = new int[] { 50, 120, 250, 450, 700 },
+        costs = new int[] { 500, 1000, 2000, 3800, 7000 },
         values = new float[] { 0.5f, 1f, 1.5f, 2f, 2.5f }, // 초당 감소량
     };
 
@@ -109,7 +123,7 @@ public class UpgradeManager : MonoBehaviour
     private UpgradeDef autoClickCount = new UpgradeDef
     {
         displayName = "Auto Click Count",
-        costs = new int[] { 60, 150, 300, 550, 900 },
+        costs = new int[] { 600, 1200, 2400, 4500, 8500 },
         values = new float[] { 1, 2, 3, 4, 5 }, // 1회 발동당 추가 클릭 수
     };
 
@@ -117,7 +131,7 @@ public class UpgradeManager : MonoBehaviour
     private UpgradeDef comboUnlock = new UpgradeDef
     {
         displayName = "Combo",
-        costs = new int[] { 300 },
+        costs = new int[] { 25000 }, // 단일 구매 + Auto Click보다 한참 비싸게 (단일 업그레이드끼리 가격 차를 크게 둠)
         values = new float[] { 1 },
     };
 
@@ -125,7 +139,7 @@ public class UpgradeManager : MonoBehaviour
     private UpgradeDef comboCooldown = new UpgradeDef
     {
         displayName = "Combo Cooldown",
-        costs = new int[] { 80, 180, 350, 600, 950 },
+        costs = new int[] { 800, 1600, 3200, 6000, 11000 },
         values = new float[] { 3, 6, 9, 12, 15 }, // 초당 감소량
     };
 
@@ -133,7 +147,7 @@ public class UpgradeManager : MonoBehaviour
     private UpgradeDef comboDuration = new UpgradeDef
     {
         displayName = "Combo Duration",
-        costs = new int[] { 80, 180, 350, 600, 950 },
+        costs = new int[] { 800, 1600, 3200, 6000, 11000 },
         values = new float[] { 1, 2, 3, 4, 5 }, // 초당 증가량
     };
 
@@ -141,7 +155,7 @@ public class UpgradeManager : MonoBehaviour
     private UpgradeDef luckyClick = new UpgradeDef
     {
         displayName = "Lucky Click",
-        costs = new int[] { 500 },
+        costs = new int[] { 200000 }, // 단일 구매 + Combo보다 한참 비싸게
         values = new float[] { 1 },
     };
 
@@ -149,8 +163,35 @@ public class UpgradeManager : MonoBehaviour
     private UpgradeDef doubleClick = new UpgradeDef
     {
         displayName = "Double Click",
-        costs = new int[] { 800 },
+        costs = new int[] { 1600000 }, // 단일 구매 + Lucky Click보다 한참 비싸게 (지금 트리의 마지막 단일 업그레이드)
         values = new float[] { 1 },
+    };
+
+    // ClickDamage를 중반부(AutoClickUnlock 자식)에서 더 비싸게 "돌려쓰는" 후속 버전 - 다시 5단계로 성장함
+    [SerializeField]
+    private UpgradeDef clickDamageUp2 = new UpgradeDef
+    {
+        displayName = "Click Damage II",
+        costs = new int[] { 2000, 4000, 7500, 14000, 25000 },
+        values = new float[] { 10, 20, 30, 40, 50 }, // ClickDamage 보너스 위에 더해지는 고정 추가 데미지
+    };
+
+    // CritDamage를 중반부(AutoClickUnlock 자식)에서 더 비싸게 "돌려쓰는" 후속 버전 - 다시 5단계로 성장함
+    [SerializeField]
+    private UpgradeDef critDamageUp2 = new UpgradeDef
+    {
+        displayName = "Crit Damage II",
+        costs = new int[] { 3000, 6000, 11000, 20000, 35000 },
+        values = new float[] { 10, 20, 30, 40, 50 }, // 크리티컬 배율에 추가로 더해지는 % 보너스
+    };
+
+    // ShardGain을 중반부(ComboUnlock 자식)에서 더 비싸게 "돌려쓰는" 후속 버전 - 다시 5단계로 성장함
+    [SerializeField]
+    private UpgradeDef shardGainUp2 = new UpgradeDef
+    {
+        displayName = "Shard Gain II",
+        costs = new int[] { 2500, 5000, 9000, 16000, 28000 },
+        values = new float[] { 10, 20, 30, 40, 50 }, // ShardGain 보너스 위에 더해지는 고정 추가 파편
     };
 
     private readonly int[] _levels = new int[UpgradeCount]; // 각 업그레이드의 현재 레벨 (0 = 미구매)
@@ -187,6 +228,10 @@ public class UpgradeManager : MonoBehaviour
             case UpgradeType.ComboDuration: return comboDuration;
             case UpgradeType.LuckyClick: return luckyClick;
             case UpgradeType.DoubleClick: return doubleClick;
+            case UpgradeType.CritChanceUp2: return critChanceUp2;
+            case UpgradeType.ClickDamageUp2: return clickDamageUp2;
+            case UpgradeType.CritDamageUp2: return critDamageUp2;
+            case UpgradeType.ShardGainUp2: return shardGainUp2;
             default: return null;
         }
     }
@@ -203,6 +248,7 @@ public class UpgradeManager : MonoBehaviour
             case UpgradeType.ComboUnlock:
             case UpgradeType.LuckyClick:
             case UpgradeType.DoubleClick:
+            case UpgradeType.CritChanceUp: // 초반 크리티컬 확률 - 지금은 1/1까지만, 더 키우려면 CritChanceUp2를 사야 함
                 return 1;
             default:
                 return MaxLevel;
@@ -219,7 +265,9 @@ public class UpgradeManager : MonoBehaviour
 
     // 이 업그레이드가 트리에서 아직 공개되기 전인지(=부모 업그레이드를 1레벨도 안 올렸는지) 판단하기 위한 부모 조회.
     // 트리 전체가 ClickDamage 하나에서 시작해서 끊기지 않고 쭉 이어지도록 구성함 (독립된 트리 없음):
-    // ClickDamage -> CritDamage -> CritChanceUp -> AutoClickUnlock -> (AutoClickSpeed, AutoClickCount -> LuckyClick)
+    // ClickDamage -> CritDamage -> CritChanceUp -> CritChanceUp2 (같은 걸 더 비싸게 "돌려쓰는" 후속 버전)
+    //                            -> AutoClickUnlock -> (AutoClickSpeed, AutoClickCount -> LuckyClick,
+    //                                                   ClickDamageUp2 - ClickDamage를 중반부에서 "돌려쓰는" 후속 버전)
     //             -> ShardGain  -> ShardMultiplier -> ComboUnlock -> (ComboCooldown, ComboDuration -> DoubleClick)
     // 인스턴스 상태를 안 쓰는 순수 함수라 static으로 둠 - UI가 UpgradeManager.Instance 없이도(빌드 시점 등) 트리 모양을 조회할 수 있게
     public static UpgradeType? GetPrerequisite(UpgradeType type)
@@ -229,14 +277,18 @@ public class UpgradeManager : MonoBehaviour
             case UpgradeType.CritDamage: return UpgradeType.ClickDamage;
             case UpgradeType.ShardGain: return UpgradeType.ClickDamage;
             case UpgradeType.CritChanceUp: return UpgradeType.CritDamage;
+            case UpgradeType.CritChanceUp2: return UpgradeType.CritChanceUp;
             case UpgradeType.ShardMultiplier: return UpgradeType.ShardGain;
             case UpgradeType.AutoClickUnlock: return UpgradeType.CritChanceUp;
             case UpgradeType.AutoClickSpeed: return UpgradeType.AutoClickUnlock;
             case UpgradeType.AutoClickCount: return UpgradeType.AutoClickUnlock;
+            case UpgradeType.ClickDamageUp2: return UpgradeType.AutoClickUnlock;
+            case UpgradeType.CritDamageUp2: return UpgradeType.AutoClickUnlock;
             case UpgradeType.LuckyClick: return UpgradeType.AutoClickCount;
             case UpgradeType.ComboUnlock: return UpgradeType.ShardMultiplier;
             case UpgradeType.ComboCooldown: return UpgradeType.ComboUnlock;
             case UpgradeType.ComboDuration: return UpgradeType.ComboUnlock;
+            case UpgradeType.ShardGainUp2: return UpgradeType.ComboUnlock;
             case UpgradeType.DoubleClick: return UpgradeType.ComboDuration;
             default: return null; // ClickDamage만 트리의 루트
         }
@@ -302,8 +354,16 @@ public class UpgradeManager : MonoBehaviour
     {
         get
         {
+            int bonus = 0;
+
             int level = GetLevel(UpgradeType.ClickDamage);
-            return level > 0 ? (int)clickDamage.values[level - 1] : 0;
+            if (level > 0) bonus += (int)clickDamage.values[level - 1];
+
+            // 중반부에 "돌려쓴" 2차 버전의 보너스를 추가로 더함
+            int level2 = GetLevel(UpgradeType.ClickDamageUp2);
+            if (level2 > 0) bonus += (int)clickDamageUp2.values[level2 - 1];
+
+            return bonus;
         }
     }
 
@@ -315,8 +375,13 @@ public class UpgradeManager : MonoBehaviour
             if (GetLevel(UpgradeType.CritDamage) <= 0) return 0f;
 
             float bonus = 0f;
+
             int upLevel = GetLevel(UpgradeType.CritChanceUp);
-            if (upLevel > 0) bonus = critChanceUp.values[upLevel - 1] / 100f;
+            if (upLevel > 0) bonus += critChanceUp.values[upLevel - 1] / 100f;
+
+            // CritChanceUp을 다 쓰고(1/1) 다시 산 2차 버전의 보너스를 추가로 더함
+            int up2Level = GetLevel(UpgradeType.CritChanceUp2);
+            if (up2Level > 0) bonus += critChanceUp2.values[up2Level - 1] / 100f;
 
             return Mathf.Clamp01(BaseCritChance + bonus);
         }
@@ -328,7 +393,15 @@ public class UpgradeManager : MonoBehaviour
         get
         {
             int level = GetLevel(UpgradeType.CritDamage);
-            return level > 0 ? BaseCritMultiplier + critDamage.values[level - 1] / 100f : 1f;
+            if (level <= 0) return 1f;
+
+            float multiplier = BaseCritMultiplier + critDamage.values[level - 1] / 100f;
+
+            // 중반부에 "돌려쓴" 2차 버전의 보너스를 추가로 더함
+            int level2 = GetLevel(UpgradeType.CritDamageUp2);
+            if (level2 > 0) multiplier += critDamageUp2.values[level2 - 1] / 100f;
+
+            return multiplier;
         }
     }
 
@@ -337,8 +410,16 @@ public class UpgradeManager : MonoBehaviour
     {
         get
         {
+            int bonus = 0;
+
             int level = GetLevel(UpgradeType.ShardGain);
-            return level > 0 ? (int)shardGain.values[level - 1] : 0;
+            if (level > 0) bonus += (int)shardGain.values[level - 1];
+
+            // 중반부에 "돌려쓴" 2차 버전의 보너스를 추가로 더함
+            int level2 = GetLevel(UpgradeType.ShardGainUp2);
+            if (level2 > 0) bonus += (int)shardGainUp2.values[level2 - 1];
+
+            return bonus;
         }
     }
 

@@ -72,6 +72,6 @@ public class ShardUI : MonoBehaviour
 
     private void UpdateLabel(int shards)
     {
-        _label.text = $"Shards: {shards}";
+        _label.text = $"Shards: {NumberFormatUtil.Format(shards)}";
     }
 }

@@ -9,7 +9,7 @@ public class CurrencyManager : MonoBehaviour
     // 테스트용: 켜두면 파편이 항상 최대치로 유지됨 (업그레이드 테스트할 때 파편 모으는 시간 아끼려고).
     // 실제 재화 밸런스를 테스트할 땐 꺼두면 됨
     [SerializeField] private bool debugAlwaysMaxShards = true;
-    private const int DebugMaxShardsAmount = 999999; // 테스트용 최대 파편 값
+    private const int DebugMaxShardsAmount = 999999999; // 테스트용 최대 파편 값 - 가장 비싼 업그레이드(현재 Double Click 1,600,000)보다 넉넉히 높게
 
     public int Shards { get; private set; } // 보유 파편(재화) 개수
 

@@ -246,6 +246,7 @@ Transform:
   - {fileID: 289043388}
   - {fileID: 65068122}
   - {fileID: 449528751}
+  - {fileID: 1826042375}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &289043387
@@ -410,16 +411,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeManager
   clickDamage:
     displayName: Click Damage
-    costs: 0f0000003c000000c80000005802000008070000
+    costs: 0a000000190000003c000000960000005e010000
     values:
     - 1
+    - 2
     - 3
-    - 7
-    - 15
-    - 30
+    - 4
+    - 5
   critDamage:
     displayName: Crit Damage
-    costs: 140000003c000000960000005e010000bc020000
+    costs: 32000000780000001801000058020000b0040000
     values:
     - 10
     - 20
@@ -428,13 +429,119 @@ MonoBehaviour:
     - 50
   shardGain:
     displayName: Shard Gain
-    costs: 0f0000002d0000006e0000000401000026020000
+    costs: 2800000064000000dc000000e001000084030000
     values:
     - 1
     - 2
     - 3
     - 4
     - 5
+  critChanceUp:
+    displayName: Crit Chance
+    costs: 96000000
+    values:
+    - 5
+  critChanceUp2:
+    displayName: Crit Chance II
+    costs: a00f0000401f0000983a0000606d000050c30000
+    values:
+    - 10
+    - 20
+    - 30
+    - 40
+    - 50
+  shardMultiplier:
+    displayName: Shard Multiplier
+    costs: 7800000018010000260200004c040000d0070000
+    values:
+    - 10
+    - 20
+    - 30
+    - 40
+    - 50
+  autoClickUnlock:
+    displayName: Auto Click
+    costs: b80b0000
+    values:
+    - 1
+  autoClickSpeed:
+    displayName: Auto Click Speed
+    costs: f4010000e8030000d0070000d80e0000581b0000
+    values:
+    - 0.5
+    - 1
+    - 1.5
+    - 2
+    - 2.5
+  autoClickCount:
+    displayName: Auto Click Count
+    costs: 58020000b0040000600900009411000034210000
+    values:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  comboUnlock:
+    displayName: Combo
+    costs: a8610000
+    values:
+    - 1
+  comboCooldown:
+    displayName: Combo Cooldown
+    costs: 2003000040060000800c000070170000f82a0000
+    values:
+    - 3
+    - 6
+    - 9
+    - 12
+    - 15
+  comboDuration:
+    displayName: Combo Duration
+    costs: 2003000040060000800c000070170000f82a0000
+    values:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  luckyClick:
+    displayName: Lucky Click
+    costs: 400d0300
+    values:
+    - 1
+  doubleClick:
+    displayName: Double Click
+    costs: 006a1800
+    values:
+    - 1
+  clickDamageUp2:
+    displayName: Click Damage II
+    costs: d0070000a00f00004c1d0000b0360000a8610000
+    values:
+    - 10
+    - 20
+    - 30
+    - 40
+    - 50
+  critDamageUp2:
+    displayName: Crit Damage II
+    costs: b80b000070170000f82a0000204e0000b8880000
+    values:
+    - 10
+    - 20
+    - 30
+    - 40
+    - 50
+  shardGainUp2:
+    displayName: Shard Gain II
+    costs: c40900008813000028230000803e0000606d0000
+    values:
+    - 10
+    - 20
+    - 30
+    - 40
+    - 50
 --- !u!1 &828344164
 GameObject:
   m_ObjectHideFlags: 0
@@ -1157,6 +1264,50 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
+--- !u!1 &1826042374
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1826042375}
+  - component: {fileID: 1826042376}
+  m_Layer: 0
+  m_Name: ComboManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1826042375
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826042374}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 238836964}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1826042376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826042374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b6d4335dcfb25c47ace6202b594f115, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ComboManager
 --- !u!1 &1874861324
 GameObject:
   m_ObjectHideFlags: 0

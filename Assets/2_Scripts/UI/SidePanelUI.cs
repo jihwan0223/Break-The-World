@@ -367,13 +367,17 @@ public class SidePanelUI : MonoBehaviour
         { UT.CritDamage, new Vector2Int(1, 1) },
         { UT.ShardGain, new Vector2Int(5, 1) },
         { UT.CritChanceUp, new Vector2Int(1, 2) },
+        { UT.CritChanceUp2, new Vector2Int(2, 2) }, // CritChanceUp 옆으로 갈라지는 "돌려쓰기" 후속 노드 (같은 행, 가로 연결선)
         { UT.ShardMultiplier, new Vector2Int(5, 2) },
         { UT.AutoClickUnlock, new Vector2Int(1, 3) },
         { UT.ComboUnlock, new Vector2Int(5, 3) },
         { UT.AutoClickSpeed, new Vector2Int(0, 4) },
         { UT.AutoClickCount, new Vector2Int(2, 4) },
+        { UT.ClickDamageUp2, new Vector2Int(3, 4) }, // AutoClickUnlock에서 열/행이 둘 다 달라서 ㄱ자로 꺾이는 연결선이 생김
+        { UT.CritDamageUp2, new Vector2Int(-1, 4) }, // 마찬가지로 AutoClickUnlock 자식 - 반대편(왼쪽)으로 ㄴ자로 꺾임
         { UT.ComboCooldown, new Vector2Int(4, 4) },
         { UT.ComboDuration, new Vector2Int(6, 4) },
+        { UT.ShardGainUp2, new Vector2Int(7, 4) }, // ComboUnlock 자식 - 열/행이 둘 다 달라서 ㄴ자로 꺾이는 연결선이 생김
         { UT.LuckyClick, new Vector2Int(2, 5) },
         { UT.DoubleClick, new Vector2Int(6, 5) },
     };
@@ -387,7 +391,7 @@ public class SidePanelUI : MonoBehaviour
         const float cellWidth = 380f; // 격자 한 칸의 가로 크기 (네모 크기 + 여백)
         const float cellHeight = 380f; // 격자 한 칸의 세로 크기
         const float connectorThickness = 6f; // 연결선 두께
-        const float canvasWidth = 2800f; // 배경 이미지 + 트리를 담는 캔버스 폭 (팬/줌의 기준 크기)
+        const float canvasWidth = 3400f; // 배경 이미지 + 트리를 담는 캔버스 폭 (팬/줌의 기준 크기) - 격자가 좌우로 더 넓어져서 늘림
         const float canvasHeight = 2400f; // 캔버스 높이
 
         // 캔버스: 화면 중앙에 고정된 크기로 배치되고, translate/scale(ApplyUpgradeCanvasTransform)로만 움직임/확대됨
@@ -571,7 +575,7 @@ public class SidePanelUI : MonoBehaviour
 
             string name = UpgradeManager.Instance.GetDisplayName(type);
             string levelLine = $"{level}/{maxLevel}"; // N/Max 표시
-            string costLine = maxed ? "MAX" : $"{nextCost}"; // 파편 비용 (최대면 MAX만 표시)
+            string costLine = maxed ? "MAX" : NumberFormatUtil.Format(nextCost); // 파편 비용 (최대면 MAX만 표시)
 
             button.text = $"{name}\n{levelLine}\n{costLine}";
 

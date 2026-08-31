@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,6 +12,7 @@ public class Click : MonoBehaviour
     private Collider2D _collider; // 자동클릭/더블클릭처럼 실제 마우스 클릭이 없는 히트에서도 타격 연출 위치로 씀
 
     [SerializeField] private int shardReward = 1; // 이 오브젝트를 파괴했을 때 기본으로 지급되는 파편 개수
+    [SerializeField] private float doubleClickDelaySeconds = 0.08f; // 더블클릭의 두 번째 타격이 첫 타격보다 이만큼 늦게 나옴
 
     private int _lastClickSoundIndex = -1; // 방금 재생한 사운드 인덱스 (바로 다음 클릭에서 같은 소리가 안 나오게 기억)
     private float _autoClickTimer; // 자동클릭 업그레이드의 다음 발동까지 누적된 시간(초)
@@ -145,9 +147,16 @@ public class Click : MonoBehaviour
             Debug.Log("Click");
             PerformClickHit();
 
-            // 더블클릭 업그레이드 - 클릭 한 번에 한 번 더 처리 (첫 타격에 죽었으면 PerformClickHit이 알아서 무시함)
+            // 더블클릭 업그레이드 - 첫 타격과 겹쳐 보이지 않도록 살짝 늦게 두 번째 타격을 처리
+            // (첫 타격에 죽었으면 지연된 PerformClickHit이 알아서 무시함 - IsDead 체크가 있음)
             if (UpgradeManager.Instance != null && UpgradeManager.Instance.DoubleClickIsUnlocked)
-                PerformClickHit();
+                StartCoroutine(PerformDelayedDoubleClickHit());
         }
+    }
+
+    private IEnumerator PerformDelayedDoubleClickHit()
+    {
+        yield return new WaitForSeconds(doubleClickDelaySeconds);
+        PerformClickHit();
     }
 }
