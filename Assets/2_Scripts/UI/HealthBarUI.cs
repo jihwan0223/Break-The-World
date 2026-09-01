@@ -36,9 +36,9 @@ public class HealthBarUI : MonoBehaviour
             UpdateBar(targetHealth.CurrentHP, targetHealth.MaxHP);
         }
 
-        // 체력바는 별도 UIDocument라서 SidePanelUI의 업그레이드 오버레이(다른 UIDocument) 뒤/앞에 걸쳐 보일 수 있음.
-        // 그래서 오버레이가 열리고 닫힐 때 이 이벤트로 직접 숨기고 보여줌
-        SidePanelUI.OnUpgradeOverlayToggled += SetVisible;
+        // 체력바는 UI 툴킷 UIDocument라서, Canvas로 만든 업그레이드 화면(다른 렌더링 시스템)과 겹쳐 보일 수 있음.
+        // 그래서 업그레이드 화면이 열리고 닫힐 때 이 이벤트로 직접 숨기고 보여줌
+        UpgradeTreeUI.OnTreeToggled += SetVisible;
     }
 
     void OnDisable()
@@ -49,7 +49,7 @@ public class HealthBarUI : MonoBehaviour
             targetHealth.OnDied -= HandleDied;
         }
 
-        SidePanelUI.OnUpgradeOverlayToggled -= SetVisible;
+        UpgradeTreeUI.OnTreeToggled -= SetVisible;
     }
 
     // 업그레이드 오버레이가 열리면(true) 숨기고, 닫히면(false) 다시 보여줌

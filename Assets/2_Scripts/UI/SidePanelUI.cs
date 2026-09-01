@@ -12,6 +12,11 @@ public class SidePanelUI : MonoBehaviour
         public int index; // 지금 화면에 미리보기로 표시 중인 인덱스 (Select를 눌러야 실제로 적용됨)
     }
 
+    // Canvas로 만든 업그레이드 화면 전체 오브젝트 - 처음엔 인스펙터에서 꺼둔(비활성) 상태로 시작해야 함.
+    // "업그레이드" 버튼을 누르면 이 오브젝트를 직접 SetActive(true)로 켬 - UpgradeTreeUI.Instance를 거치지 않는 이유는
+    // 비활성 오브젝트에서는 Awake가 안 돌아서, 맨 처음 열 때는 Instance가 아직 null이라 그걸로 열려고 하면 에러가 나기 때문
+    [SerializeField] private GameObject upgradeTreePanel;
+
     private VisualElement _panel; // 튀어나오는 빈 팝업 패널 (Weapon/Object 전용)
     private Label _panelTitle; // 팝업 좌상단 제목 ("Weapon" / "Object")
     private VisualElement _weaponContent; // 무기 팝업일 때만 보이는 영역
@@ -23,10 +28,7 @@ public class SidePanelUI : MonoBehaviour
     private VisualElement _currentlyOpenContent; // 지금 열려있는 팝업 내용 (닫을 때 오브젝트 전환 여부 판단용)
     private ObjectData _objectAtPanelOpen; // Object 팝업을 열었을 때 장착돼있던 오브젝트 (닫을 때와 비교해서 바뀌었는지 확인)
 
-    // 업그레이드 페이지는 UI 툴킷으로 만들었던 걸 지웠음(유저가 Canvas로 직접 새로 만들 예정) - 이 이벤트 자체는
-    // PieceUI/HealthBarUI가 계속 구독하고 있어서 남겨둠(그쪽 스크립트를 안 건드리려고). 지금은 아무도 Invoke 안 해서
-    // 항상 안 숨겨진(보이는) 상태로 유지됨 - 나중에 새 업그레이드 페이지에서 필요하면 여기 이벤트를 다시 Invoke하면 됨
-    public static event System.Action<bool> OnUpgradeOverlayToggled;
+    // (업그레이드 화면이 열리고 닫히는 건 이제 Canvas 쪽 UpgradeTreeUI.OnTreeToggled가 담당함 - PieceUI/HealthBarUI도 그쪽을 구독함)
 
     // Weapon/Object 팝업(_panel)이 열리면 true, 닫히면 false로 전달 - 화면 우상단을 가릴 수 있는 다른
     // UIDocument(PieceUI 등)가 스스로 숨고 보여주는 데 사용
@@ -140,8 +142,8 @@ public class SidePanelUI : MonoBehaviour
 
         root.Add(_panel);
 
-        // Weapon/Object 버튼 2개가 화면 좌상단에 일렬로 나오는 가로줄
-        // (업그레이드 페이지는 유저가 Canvas로 직접 새로 만들 예정이라 버튼도 같이 지웠음)
+        // Upgrade/Weapon/Object 버튼 3개가 화면 좌상단에 일렬로 나오는 가로줄
+        // (업그레이드 페이지 자체는 유저가 Canvas로 새로 만든 UpgradeTreeUI가 담당 - 여기선 그걸 여는 버튼만 있음)
         var buttonRow = new VisualElement();
         buttonRow.style.position = Position.Absolute;
         buttonRow.style.left = 20;
@@ -152,6 +154,14 @@ public class SidePanelUI : MonoBehaviour
         // 버튼 줄 위에 포인터가 있는 동안도 마찬가지로 월드 클릭을 막음
         buttonRow.RegisterCallback<PointerEnterEvent>(_ => UIPointerGuard.IsPointerOverUI = true);
         buttonRow.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
+
+        var upgradeButton = CreateButton("업그레이드", () =>
+        {
+            Debug.Log("업그레이드 버튼 눌림");
+            // Canvas로 만든 업그레이드 화면을 직접 켬 (닫기는 그 화면 안의 X 버튼 -> UpgradeTreeUI.Close()가 담당)
+            if (upgradeTreePanel != null) upgradeTreePanel.SetActive(true);
+            else Debug.LogWarning("SidePanelUI: Upgrade Tree Panel이 인스펙터에 비어있어서 업그레이드 화면을 못 엶");
+        });
 
         var weaponButton = CreateButton("무기", () =>
         {
@@ -165,8 +175,10 @@ public class SidePanelUI : MonoBehaviour
             OpenPanel("오브젝트", _objectContent);
         });
 
+        upgradeButton.style.marginRight = 8;
         weaponButton.style.marginRight = 8;
 
+        buttonRow.Add(upgradeButton);
         buttonRow.Add(weaponButton);
         buttonRow.Add(objectButton);
         root.Add(buttonRow);

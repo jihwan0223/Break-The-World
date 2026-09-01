@@ -17,8 +17,8 @@ public class PieceUI : MonoBehaviour
     private readonly Dictionary<int, Coroutine> _pulseCoroutines = new Dictionary<int, Coroutine>(); // objectIndex -> 지금 재생 중인 펄스 연출 (연속으로 늘어날 때 중첩 재생 방지용)
 
     // Weapon/Object 팝업이 이제 우상단까지 안 가려서(패널 오른쪽에 여백을 둠) 더 이상 숨길 필요가 없어짐 -
-    // 팝업이 열려있는 동안에도 조각 개수가 계속 보여야(눌렀을 때도 보이게) 하기 때문. 이벤트 구독 자체는
-    // 남겨둠(나중에 Canvas로 새로 만들 업그레이드 페이지 등에서 다시 필요할 수 있어서)
+    // 팝업이 열려있는 동안에도 조각 개수가 계속 보여야(눌렀을 때도 보이게) 하기 때문.
+    // 업그레이드 화면(Canvas, UpgradeTreeUI)은 화면 전체를 덮고 우상단에 닫기(X) 버튼도 있어서, 그거 열려있는 동안은 계속 숨김
     private bool _upgradeOverlayOpen;
     private bool _selectorPanelOpen;
 
@@ -37,9 +37,8 @@ public class PieceUI : MonoBehaviour
         _root = uiDocument.rootVisualElement;
         BuildContainer(_root);
 
-        // 업그레이드 오버레이와 Weapon/Object 팝업 둘 다 우상단에 닫기(X) 버튼이 있어서, 이 표시가 우상단에
-        // 계속 떠있으면 위치가 겹쳐서 X 버튼 클릭을 가로채 버림 - 둘 중 하나라도 열려있는 동안은 아예 숨김
-        SidePanelUI.OnUpgradeOverlayToggled += HandleUpgradeOverlayToggled;
+        // 업그레이드 화면(Canvas)이 열리면 우상단 X 버튼과 겹치니까 숨김 - Canvas 쪽 UpgradeTreeUI가 이벤트를 쏨
+        UpgradeTreeUI.OnTreeToggled += HandleUpgradeOverlayToggled;
         SidePanelUI.OnSelectorPanelToggled += HandleSelectorPanelToggled;
     }
 
@@ -69,7 +68,7 @@ public class PieceUI : MonoBehaviour
         if (CurrencyManager.Instance != null)
             CurrencyManager.Instance.OnPiecesChanged -= UpdatePieceLabel;
 
-        SidePanelUI.OnUpgradeOverlayToggled -= HandleUpgradeOverlayToggled;
+        UpgradeTreeUI.OnTreeToggled -= HandleUpgradeOverlayToggled;
         SidePanelUI.OnSelectorPanelToggled -= HandleSelectorPanelToggled;
     }
 
