@@ -83,8 +83,9 @@ public class Click : MonoBehaviour
         // 고정 데미지 1 대신 현재 장착한 무기의 클릭 데미지를 적용
         int baseDamage = WeaponManager.Instance != null ? WeaponManager.Instance.CurrentClickDamage : 1;
 
-        // 클릭 데미지 업그레이드 보너스를 더함
-        int clickDamageBonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.ClickDamageBonus : 0;
+        // 클릭 데미지 업그레이드 보너스를 더함 (전역 + 지금 장착한 오브젝트 전용 강화 합산)
+        int equippedObjectIndex = ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : -1;
+        int clickDamageBonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetClickDamageBonus(equippedObjectIndex) : 0;
         int damage = baseDamage + clickDamageBonus;
 
         // 크리티컬 확률 판정 - 성공하면 크리티컬 배율을 곱함
@@ -159,6 +160,11 @@ public class Click : MonoBehaviour
 
     void Update()
     {
+        // 게임이 진행 중이 아니면(시작 전 화면 / 결과창) 클릭·자동클릭·자동채굴을 전부 멈춤.
+        // GameSessionManager가 아직 씬에 없으면(구버전 씬 등) 종전처럼 항상 동작하도록 통과시킴
+        if (GameSessionManager.Instance != null && !GameSessionManager.Instance.IsRunActive)
+            return;
+
         UpdateAutoClick();
         UpdateAutoMine();
 

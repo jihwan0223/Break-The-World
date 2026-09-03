@@ -19,6 +19,11 @@ public class CurrencyManager : MonoBehaviour
     // 특정 오브젝트의 조각 보유량이 바뀔 때마다 (objectIndex, 새 보유량) 전달 - UI 등이 구독
     public event Action<int, long> OnPiecesChanged;
 
+    // 조각을 "새로 얻을" 때마다 (objectIndex, 더해진 양) 전달 - GameSessionManager가 이번 판 획득량을 집계할 때 사용.
+    // OnPiecesChanged와 다른 점: (1) 지급(증가)일 때만 발행 (2) 새 잔액이 아니라 이번에 더해진 양을 넘김.
+    // 그래서 debugAlwaysMaxPieces가 켜져 있어(잔액이 항상 최대치라 차이로 계산 불가)도 정확하게 잡힘
+    public event Action<int, long> OnPiecesGained;
+
     void Awake()
     {
         // 씬에 CurrencyManager가 중복으로 존재하지 않도록 방지
@@ -44,6 +49,9 @@ public class CurrencyManager : MonoBehaviour
         long newValue = debugAlwaysMaxPieces ? DebugMaxPieceAmount : GetPieces(objectIndex) + amount;
         _pieces[objectIndex] = newValue;
         OnPiecesChanged?.Invoke(objectIndex, newValue);
+
+        if (amount > 0)
+            OnPiecesGained?.Invoke(objectIndex, amount); // 이번 판 획득량 집계용 (GameSessionManager)
     }
 
     // 저장 파일을 불러올 때 값을 직접 세팅하기 위한 함수 (증감이 아니라 절대값 지정)

@@ -21,6 +21,7 @@ public class PieceUI : MonoBehaviour
     // 업그레이드 화면(Canvas, UpgradeTreeUI)은 화면 전체를 덮고 우상단에 닫기(X) 버튼도 있어서, 그거 열려있는 동안은 계속 숨김
     private bool _upgradeOverlayOpen;
     private bool _selectorPanelOpen;
+    private bool _runHudHidden; // 게임 런이 진행/카운트다운 중인지 (GameSessionManager.OnHudHiddenChanged) - 이 동안 조각 표시를 숨김
 
     void OnEnable()
     {
@@ -40,6 +41,7 @@ public class PieceUI : MonoBehaviour
         // 업그레이드 화면(Canvas)이 열리면 우상단 X 버튼과 겹치니까 숨김 - Canvas 쪽 UpgradeTreeUI가 이벤트를 쏨
         UpgradeTreeUI.OnTreeToggled += HandleUpgradeOverlayToggled;
         SidePanelUI.OnSelectorPanelToggled += HandleSelectorPanelToggled;
+        GameSessionManager.OnHudHiddenChanged += HandleRunHudHiddenChanged;
     }
 
     void Start()
@@ -70,11 +72,18 @@ public class PieceUI : MonoBehaviour
 
         UpgradeTreeUI.OnTreeToggled -= HandleUpgradeOverlayToggled;
         SidePanelUI.OnSelectorPanelToggled -= HandleSelectorPanelToggled;
+        GameSessionManager.OnHudHiddenChanged -= HandleRunHudHiddenChanged;
     }
 
     private void HandleUpgradeOverlayToggled(bool open)
     {
         _upgradeOverlayOpen = open;
+        RefreshVisibility();
+    }
+
+    private void HandleRunHudHiddenChanged(bool hidden)
+    {
+        _runHudHidden = hidden;
         RefreshVisibility();
     }
 
@@ -90,7 +99,7 @@ public class PieceUI : MonoBehaviour
     private void RefreshVisibility()
     {
         if (_root != null)
-            _root.style.display = _upgradeOverlayOpen ? DisplayStyle.None : DisplayStyle.Flex;
+            _root.style.display = (_upgradeOverlayOpen || _runHudHidden) ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
     // UXML/USS 없이 코드로 직접 오브젝트별 조각 라벨 + 반투명 배경을 구성 (화면 우상단)

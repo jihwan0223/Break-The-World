@@ -77,12 +77,16 @@ public class SaveManager : MonoBehaviour
     // 각 매니저의 현재 상태를 모아서 즉시 파일에 저장
     public void SaveNow()
     {
-        // 업그레이드 레벨을 UpgradeType 순서대로 채운 배열 (매니저가 없으면 전부 0)
-        var upgradeLevels = new int[UpgradeManager.UpgradeCount];
+        // 업그레이드 노드별 레벨을 id로 저장 (레벨 0인 건 생략)
+        var upgrades = new List<SavedUpgrade>();
         if (UpgradeManager.Instance != null)
         {
-            for (int i = 0; i < upgradeLevels.Length; i++)
-                upgradeLevels[i] = UpgradeManager.Instance.GetLevel((UpgradeManager.UpgradeType)i);
+            foreach (UpgradeManager.UpgradeNode node in UpgradeManager.Instance.Nodes)
+            {
+                int level = UpgradeManager.Instance.GetLevel(node.id);
+                if (level > 0)
+                    upgrades.Add(new SavedUpgrade { id = node.id, level = level });
+            }
         }
 
         // 보유 조각(0개가 아닌 것만)을 배열로 채움
@@ -113,7 +117,7 @@ public class SaveManager : MonoBehaviour
             gainLevels = gainLevels,
             weaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : 0,
             objectIndex = ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : 0,
-            upgradeLevels = upgradeLevels,
+            upgrades = upgrades.ToArray(),
         };
 
         string json = JsonUtility.ToJson(data, true);
@@ -152,11 +156,12 @@ public class SaveManager : MonoBehaviour
         WeaponManager.Instance?.Equip(data.weaponIndex);
         ObjectManager.Instance?.Equip(data.objectIndex);
 
-        // 옛날 저장 파일(업그레이드 구조 변경 전)에는 길이가 다를 수 있으니 확인 후 적용
-        if (UpgradeManager.Instance != null && data.upgradeLevels != null)
+        // 업그레이드 레벨을 id로 복원 (지금 존재하지 않는 id는 SetLevel 내부에서 무시됨).
+        // 옛 세이브에는 upgrades가 없어서 업그레이드만 전부 0부터 시작함 (조각/오브젝트/무기는 그대로 로드됨)
+        if (UpgradeManager.Instance != null && data.upgrades != null)
         {
-            for (int i = 0; i < data.upgradeLevels.Length && i < UpgradeManager.UpgradeCount; i++)
-                UpgradeManager.Instance.SetLevel((UpgradeManager.UpgradeType)i, data.upgradeLevels[i]);
+            foreach (SavedUpgrade u in data.upgrades)
+                UpgradeManager.Instance.SetLevel(u.id, u.level);
         }
     }
 }

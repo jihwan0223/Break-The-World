@@ -120,6 +120,21 @@ public class ObjectManager : MonoBehaviour
     // 인덱스로 오브젝트 데이터를 조회만 함 (선택은 안 함) - UI가 화살표로 둘러볼 때 사용
     public ObjectData GetObjectAt(int index) => objects[index];
 
+    // objectName으로 인덱스를 찾음. 없으면 -1. Instance 없이도 동작(objects가 static이라) - UpgradeManager가
+    // 템플릿의 targetObjectName을 인덱스로 바꿀 때 사용. 공백 차이는 무시하고 대소문자 구분 없이 비교
+    public static int StaticIndexOfName(string objectName)
+    {
+        if (string.IsNullOrWhiteSpace(objectName)) return -1;
+
+        string wanted = objectName.Trim();
+        for (int i = 0; i < objects.Count; i++)
+        {
+            if (string.Equals(objects[i].objectName.Trim(), wanted, System.StringComparison.OrdinalIgnoreCase))
+                return i;
+        }
+        return -1;
+    }
+
     // 잠긴 오브젝트는 장착 불가
     public void Equip(int index)
     {

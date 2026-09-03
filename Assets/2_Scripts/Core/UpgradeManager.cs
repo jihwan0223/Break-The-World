@@ -2,209 +2,163 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// 업그레이드를 "코드에 박힌 enum"이 아니라 "인스펙터에서 짜는 템플릿"으로 다루는 매니저.
+// 템플릿 하나 = 같은 업그레이드를 트리에 여러 번(repeatCount) 펼치는 설계도이고,
+// 펼쳐진 각 tier가 실제 노드(UpgradeNode) 하나가 됨. 노드 id로 레벨/비용/공개여부를 조회한다.
+//  - 같은 종류의 업그레이드를 몇 개 만들든(돌려쓰든) templates 데이터만 늘리면 됨
+//  - 새로운 "효과 종류"를 추가할 때만 UpgradeEffect enum + 아래 효과 게터에 코드 한 줄 추가
 public class UpgradeManager : MonoBehaviour
 {
     // 씬 어디서든 UpgradeManager.Instance로 접근하기 위한 싱글톤
     public static UpgradeManager Instance { get; private set; }
 
-    // 업그레이드 종류. 순서를 바꾸면 안 됨 (SaveData.upgradeLevels 배열 인덱스와 대응)
-    public enum UpgradeType
+    // 업그레이드가 실제로 건드리는 게임 수치의 종류
+    public enum UpgradeEffect
     {
-        ClickDamage = 0, // 클릭 강화: 클릭 데미지 +N (루트)
-        CritDamage = 1, // 크리티컬 강화: 크리티컬 데미지 배율 증가 (ClickDamage 자식)
-        CritChanceUp = 2, // 크리티컬 확률 강화 (단일 - 초반이라 1/1까지만, CritDamage 자식)
-        AutoClickUnlock = 3, // 자동클릭 (단일 - 이걸 사야 자동클릭 자체가 켜짐)
-        AutoClickSpeed = 4, // 자동클릭 주기 단축 (AutoClickUnlock 자식)
-        AutoClickCount = 5, // 자동클릭 1회당 클릭 수 증가 (AutoClickUnlock 자식)
-        ComboUnlock = 6, // 콤보 (단일 - 이걸 사야 콤보 시스템 자체가 켜짐)
-        ComboCooldown = 7, // 콤보 쿨타임 단축 (ComboUnlock 자식)
-        ComboDuration = 8, // 콤보 지속시간 증가 (ComboUnlock 자식)
-        LuckyClick = 9, // 럭키 클릭 (단일 - 0.1% 확률 즉시 파괴)
-        DoubleClick = 10, // 더블클릭 (단일 - 클릭 한 번에 2번 처리)
-        CritChanceUp2 = 11, // 크리티컬 확률 강화 2차 - "돌려쓰는" 후속 버전 (CritChanceUp 자식)
-        ClickDamageUp2 = 12, // 클릭 강화 2차 - "돌려쓰는" 후속 버전 (AutoClickUnlock 자식)
-        CritDamageUp2 = 13, // 크리티컬 강화 2차 - "돌려쓰는" 후속 버전 (AutoClickUnlock 자식)
-        AutoMineUnlock = 14, // 자동채굴 (단일 - 현재 오브젝트보다 몇 단계 전 오브젝트를 자동으로 캐줌, AutoClickUnlock 자식)
-        AutoMineSpeed = 15, // 자동채굴 주기 단축 (AutoMineUnlock 자식)
+        ClickDamage,       // 전역 클릭 데미지 +값 (정수 반올림)
+        ClickDamageObject, // targetObjectName 오브젝트를 장착하고 클릭할 때만 데미지 +값
+        CritChance,        // 크리티컬 확률 +값 % (기본 10% 위에 더함)
+        CritDamage,        // 크리티컬 배율 +값 % (기본 150% 위에 더함)
+        AutoClickUnlock,   // 자동 클릭 기능 해금 (레벨 1이면 켜짐)
+        AutoClickSpeed,    // 자동 클릭 주기 -값 초
+        AutoClickCount,    // 자동 클릭 1회당 +값 번
+        ComboUnlock,       // 콤보 기능 해금
+        ComboCooldown,     // 콤보 쿨타임 -값 초
+        ComboDuration,     // 콤보 지속시간 +값 초
+        LuckyClick,        // 럭키 클릭 해금
+        DoubleClick,       // 더블 클릭 해금
+        AutoMineUnlock,    // 자동 채굴 해금
+        AutoMineSpeed,     // 자동 채굴 주기 -값 초
     }
 
-    public const int UpgradeCount = 16; // 업그레이드 종류 수 (위 enum 개수와 일치해야 함)
-    public const int MaxLevel = 5; // 여러 단계로 성장하는 업그레이드의 최대 단계 (단일 업그레이드는 GetMaxLevel에서 1로 별도 처리)
-
-    private const float BaseCritChance = 0.1f; // 크리티컬 발동 확률(10%) - CritDamage가 1레벨 이상이면 항상 이 확률로 고정
-    private const float BaseCritMultiplier = 1.5f; // CritDamage 1레벨 시점의 기본 크리티컬 배율 - 레벨마다 이 위에 값이 더해짐
-
-    private const float BaseAutoClickIntervalSeconds = 5f; // 자동클릭 기본 주기(초) - AutoClickSpeed 레벨만큼 줄어듦
-    private const float MinAutoClickIntervalSeconds = 1.5f; // 자동클릭 주기 하한
-    private const int BaseAutoClickCount = 1; // 자동클릭 1회 발동 시 기본 클릭 횟수 - AutoClickCount 레벨만큼 늘어남
-
-    private const float BaseComboCooldownSeconds = 30f; // 콤보 발동 간 기본 대기시간(초) - ComboCooldown 레벨만큼 줄어듦
-    private const float MinComboCooldownSeconds = 10f; // 콤보 쿨타임 하한
-    private const float BaseComboDurationSeconds = 5f; // 콤보 기본 지속시간(초) - ComboDuration 레벨만큼 늘어남
-
-    private const float LuckyClickChanceValue = 0.001f; // 럭키 클릭 확률 (0.1%)
-
-    private const float BaseAutoMineIntervalSeconds = 8f; // 자동채굴 기본 주기(초) - AutoMineSpeed 레벨만큼 줄어듦
-    private const float MinAutoMineIntervalSeconds = 2f; // 자동채굴 주기 하한
-    [SerializeField] private int autoMineTierOffset = 3; // 지금 캐는 오브젝트보다 몇 단계 전 오브젝트를 자동으로 캐줄지
-
-    // 조각 하나(오브젝트 인덱스 objectIndex)로만 내는 비용을, 레벨 수만큼 만들어주는 헬퍼
-    private static UpgradeLevelCost[] SingleCurrency(int objectIndex, params long[] amounts)
+    // 선행 노드와 잇는 선의 모양 (UpgradeTreeLink가 이 값을 보고 세그먼트를 배치함)
+    public enum LinkRouting
     {
-        var result = new UpgradeLevelCost[amounts.Length];
-        for (int i = 0; i < amounts.Length; i++)
-            result[i] = new UpgradeLevelCost { pieces = new[] { new PieceCost(objectIndex, amounts[i]) } };
-        return result;
+        Straight,            // 직선
+        ElbowVerticalFirst,  // ㄱ자: 세로로 내려간 뒤 가로
+        ElbowHorizontalFirst,// ㄴ자: 가로로 간 뒤 세로
+        Stepped,             // 계단(Z): 중간에서 한 번 꺾어 3세그먼트
     }
 
-    // 조각 두 종류(objectA, objectB)를 동시에 요구하는 비용을 레벨 수만큼 만들어주는 헬퍼 - 중반 업그레이드용
-    private static UpgradeLevelCost[] DualCurrency(int objectA, int objectB, params (long a, long b)[] amounts)
+    // ---- 인스펙터에서 작성하는 데이터 ----
+
+    [Serializable]
+    public class CostEntry
     {
-        var result = new UpgradeLevelCost[amounts.Length];
-        for (int i = 0; i < amounts.Length; i++)
+        public string costObjectName; // 비용으로 낼 조각의 오브젝트 이름 (빈칸이면 대상 오브젝트, 그것도 없으면 0번)
+        public long baseCost = 10;    // tier1의 레벨0->1 비용
+    }
+
+    [Serializable]
+    public class PieceCostConfig
+    {
+        public CostEntry[] entries = { new CostEntry() }; // 동시에 요구하는 조각들 (보통 1개)
+        public float levelGrowth = 2f;  // tier 안에서 레벨이 오를 때마다 비용에 곱해지는 배율
+        public float tierGrowth = 4f;   // tier가 올라갈 때마다 비용에 곱해지는 배율
+    }
+
+    [Serializable]
+    public class UpgradeTemplate
+    {
+        public string id;                        // 고유 식별자(영문 권장) - 세이브 키의 베이스. 예: "click_dmg", "click_dmg_glass"
+        public string displayName;               // 노드에 표시할 이름 (돌려써도 같은 이름 그대로)
+        public UpgradeEffect effect;             // 이 업그레이드가 건드리는 수치
+        public string targetObjectName;          // ClickDamageObject 등에서 대상 오브젝트 (ObjectData.objectName과 일치). 전역이면 빈칸
+        [Min(1)] public int repeatCount = 1;     // 이 템플릿을 트리에 몇 tier로 펼칠지 (돌려쓰기 횟수)
+        [Min(1)] public int levelsPerTier = 5;   // tier 하나의 최대 레벨 (해금류는 1)
+        public float[] valuePerLevel = { 1f };   // 레벨별 효과 값(증가량). 배열이 짧으면 마지막 값을 반복 사용
+        public float tierValueMultiplier = 1f;   // tier가 올라갈 때마다 효과 값에 곱해지는 배율 (돌려쓸수록 세지게)
+        public string prerequisiteId;            // 선행 템플릿 id (그 템플릿 마지막 tier가 조건을 만족하면 이 템플릿 tier1 공개). 빈칸 = 루트
+        public bool requirePrereqMaxed;          // true면 선행 tier를 "끝까지" 채워야 다음이 열림. (돌려쓰기 tier 사이는 이 옵션과 무관하게 항상 최대레벨 요구)
+        public PieceCostConfig cost = new PieceCostConfig();
+        public Vector2 nodeOffset;               // 트리 자동배치 시 기준 위치에서의 미세조정 (에디터에서 노드를 직접 드래그해도 됨)
+        public LinkRouting linkRouting = LinkRouting.Straight; // 선행 노드와 잇는 선 모양
+    }
+
+    [SerializeField] private UpgradeTemplate[] templates; // 여기에 업그레이드를 채운다. 비어있으면 아래 예시 템플릿으로 자동 대체됨
+    [SerializeField] private bool useExampleTemplatesWhenEmpty = true; // templates가 비었을 때 예시로 게임을 돌려볼지
+
+    // 효과 계산에 쓰는 기준값들 (예전엔 const였지만 인스펙터에서 조절할 수 있게 필드로 뺌)
+    [Header("기준값")]
+    [SerializeField] private float baseCritChance = 0.1f;        // 크리티컬 기본 확률 (CritDamage 노드가 1레벨 이상일 때만 적용)
+    [SerializeField] private float baseCritMultiplier = 1.5f;    // 크리티컬 기본 배율
+    [SerializeField] private float baseAutoClickInterval = 5f;   // 자동 클릭 기본 주기(초)
+    [SerializeField] private float minAutoClickInterval = 1.5f;  // 자동 클릭 주기 하한
+    [SerializeField] private int baseAutoClickCount = 1;         // 자동 클릭 1회당 기본 클릭 수
+    [SerializeField] private float baseComboCooldown = 30f;      // 콤보 기본 쿨타임(초)
+    [SerializeField] private float minComboCooldown = 10f;       // 콤보 쿨타임 하한
+    [SerializeField] private float baseComboDuration = 5f;       // 콤보 기본 지속시간(초)
+    [SerializeField] private float luckyClickChanceValue = 0.001f; // 럭키 클릭 확률 (0.1%)
+    [SerializeField] private float baseAutoMineInterval = 8f;    // 자동 채굴 기본 주기(초)
+    [SerializeField] private float minAutoMineInterval = 2f;     // 자동 채굴 주기 하한
+    [SerializeField] private int autoMineTierOffset = 3;         // 지금 캐는 오브젝트보다 몇 단계 전을 자동으로 캘지
+
+    // ---- 템플릿을 펼쳐 만든 실제 노드 ----
+
+    // tier 하나 = 노드 하나. 세이브/트리/UI가 node.id로 다룬다
+    public class UpgradeNode
+    {
+        public string id;                 // "{template.id}#{tier}" - 세이브 키이자 트리 노드 식별자
+        public string displayName;
+        public UpgradeEffect effect;
+        public int targetObjectIndex;     // -1이면 전역
+        public int tier;                  // 1부터
+        public int maxLevel;
+        public string prerequisiteId;     // 이 노드가 공개되려면 필요한 다른 노드 id (빈칸 = 루트)
+        public bool prerequisiteMustBeMaxed;
+        public LinkRouting linkRouting;
+        public Vector2 nodeOffset;
+        public UpgradeTemplate template;  // 값/비용 계산에 참조
+
+        // 이 노드의 level(1..maxLevel)에서 "그 레벨을 올렸을 때 추가되는" 효과 값
+        public float ValueAtLevel(int level)
         {
-            result[i] = new UpgradeLevelCost
-            {
-                pieces = new[] { new PieceCost(objectA, amounts[i].a), new PieceCost(objectB, amounts[i].b) },
-            };
+            float[] v = template.valuePerLevel;
+            if (v == null || v.Length == 0) return 0f;
+
+            int idx = Mathf.Clamp(level - 1, 0, v.Length - 1); // 배열이 짧으면 마지막 값 반복
+            float tierScale = Mathf.Pow(Mathf.Max(0.0001f, template.tierValueMultiplier), tier - 1);
+            return v[idx] * tierScale;
         }
-        return result;
+
+        // currentLevel(0..maxLevel-1)에서 다음 레벨로 올리는 비용. 이미 최대면 null
+        public PieceCost[] CostForLevel(int currentLevel)
+        {
+            if (currentLevel >= maxLevel) return null;
+
+            PieceCostConfig c = template.cost;
+            if (c == null || c.entries == null || c.entries.Length == 0) return Array.Empty<PieceCost>();
+
+            float levelFactor = Mathf.Pow(c.levelGrowth, currentLevel);
+            float tierFactor = Mathf.Pow(c.tierGrowth, tier - 1);
+
+            var result = new List<PieceCost>(c.entries.Length);
+            foreach (CostEntry e in c.entries)
+            {
+                int costIndex = ResolveCostObjectIndex(e.costObjectName, targetObjectIndex);
+                long amount = (long)Mathf.Max(1f, e.baseCost * levelFactor * tierFactor);
+                result.Add(new PieceCost(costIndex, amount));
+            }
+            return result.ToArray();
+        }
     }
 
-    // 업그레이드 하나의 데이터: 이름 + 레벨별 비용/효과값
-    [Serializable]
-    public class UpgradeDef
+    private readonly List<UpgradeNode> _nodes = new List<UpgradeNode>(); // 펼쳐진 전체 노드 (Awake에서 구성)
+    private readonly Dictionary<string, UpgradeNode> _nodeById = new Dictionary<string, UpgradeNode>();
+    private readonly Dictionary<string, int> _levels = new Dictionary<string, int>(); // node.id -> 현재 레벨 (없으면 0)
+
+    // 어떤 노드의 레벨이 바뀔 때마다 (node.id, 새 레벨) 전달 - 트리 UI, SaveManager 등이 구독
+    public event Action<string, int> OnUpgradeChanged;
+
+    public IReadOnlyList<UpgradeNode> Nodes => _nodes; // 트리 자동생성/세이브가 순회함
+
+    // 에디터에서(플레이 안 하고) 트리를 생성할 때 노드 목록이 필요함 - 그 자리에서 templates를 펼쳐 반환.
+    // 레벨 상태는 건드리지 않으므로 플레이 중 호출해도 안전
+    public IReadOnlyList<UpgradeNode> GetNodesForEditor()
     {
-        public string displayName; // 네모(버튼)에 표시할 이름 - 유저 요청으로 한국어로 표시 (2026-08-31)
-        public UpgradeLevelCost[] costsPerLevel; // costsPerLevel[i] = i레벨에서 (i+1)레벨로 올릴 때 드는 조각들
-        public float[] values; // values[i] = (i+1)레벨일 때 적용되는 효과 값 (단일 업그레이드는 values[0]만 사용)
+        BuildNodes();
+        return _nodes;
     }
-
-    // 업그레이드 레벨 하나를 올리는 데 필요한 조각들 (한 종류 이상)
-    [Serializable]
-    public class UpgradeLevelCost
-    {
-        public PieceCost[] pieces;
-    }
-
-    // 전부 0번 오브젝트(Plate) 조각으로 사는 초반 업그레이드들
-    private readonly UpgradeDef clickDamage = new UpgradeDef
-    {
-        displayName = "클릭 데미지",
-        costsPerLevel = SingleCurrency(0, 10, 25, 60, 150, 350),
-        values = new float[] { 1, 2, 3, 4, 5 },
-    };
-
-    private readonly UpgradeDef critDamage = new UpgradeDef
-    {
-        displayName = "크리티컬 데미지",
-        costsPerLevel = SingleCurrency(0, 50, 120, 280, 600, 1200),
-        values = new float[] { 10, 20, 30, 40, 50 },
-    };
-
-    private readonly UpgradeDef critChanceUp = new UpgradeDef
-    {
-        displayName = "크리티컬 확률",
-        costsPerLevel = SingleCurrency(0, 150),
-        values = new float[] { 5 }, // % 추가치
-    };
-
-    private readonly UpgradeDef autoClickUnlock = new UpgradeDef
-    {
-        displayName = "자동 클릭",
-        costsPerLevel = SingleCurrency(0, 3000),
-        values = new float[] { 1 },
-    };
-
-    private readonly UpgradeDef autoClickSpeed = new UpgradeDef
-    {
-        displayName = "자동 클릭 속도",
-        costsPerLevel = SingleCurrency(0, 500, 1000, 2000, 3800, 7000),
-        values = new float[] { 0.5f, 1f, 1.5f, 2f, 2.5f }, // 초당 감소량
-    };
-
-    private readonly UpgradeDef autoClickCount = new UpgradeDef
-    {
-        displayName = "자동 클릭 횟수",
-        costsPerLevel = SingleCurrency(0, 600, 1200, 2400, 4500, 8500),
-        values = new float[] { 1, 2, 3, 4, 5 }, // 1회 발동당 추가 클릭 수
-    };
-
-    private readonly UpgradeDef comboUnlock = new UpgradeDef
-    {
-        displayName = "콤보",
-        costsPerLevel = SingleCurrency(0, 25000),
-        values = new float[] { 1 },
-    };
-
-    private readonly UpgradeDef comboCooldown = new UpgradeDef
-    {
-        displayName = "콤보 쿨타임",
-        costsPerLevel = SingleCurrency(0, 800, 1600, 3200, 6000, 11000),
-        values = new float[] { 3, 6, 9, 12, 15 }, // 초당 감소량
-    };
-
-    private readonly UpgradeDef comboDuration = new UpgradeDef
-    {
-        displayName = "콤보 지속시간",
-        costsPerLevel = SingleCurrency(0, 800, 1600, 3200, 6000, 11000),
-        values = new float[] { 1, 2, 3, 4, 5 }, // 초당 증가량
-    };
-
-    private readonly UpgradeDef luckyClick = new UpgradeDef
-    {
-        displayName = "럭키 클릭",
-        costsPerLevel = SingleCurrency(0, 200000),
-        values = new float[] { 1 },
-    };
-
-    private readonly UpgradeDef doubleClick = new UpgradeDef
-    {
-        displayName = "더블 클릭",
-        costsPerLevel = SingleCurrency(0, 1600000),
-        values = new float[] { 1 },
-    };
-
-    // 중반부 "돌려쓰기" 후속 업그레이드들 - 0번(Plate) + 1번(Glass Cup) 조각을 동시에 요구함
-    private readonly UpgradeDef critChanceUp2 = new UpgradeDef
-    {
-        displayName = "크리티컬 확률 II",
-        costsPerLevel = DualCurrency(0, 1, (4000, 50), (8000, 100), (15000, 200), (28000, 400), (50000, 700)),
-        values = new float[] { 10, 20, 30, 40, 50 }, // % 추가치
-    };
-
-    private readonly UpgradeDef clickDamageUp2 = new UpgradeDef
-    {
-        displayName = "클릭 데미지 II",
-        costsPerLevel = DualCurrency(0, 1, (2000, 40), (4000, 80), (7500, 150), (14000, 280), (25000, 500)),
-        values = new float[] { 10, 20, 30, 40, 50 },
-    };
-
-    private readonly UpgradeDef critDamageUp2 = new UpgradeDef
-    {
-        displayName = "크리티컬 데미지 II",
-        costsPerLevel = DualCurrency(0, 1, (3000, 60), (6000, 120), (11000, 220), (20000, 400), (35000, 700)),
-        values = new float[] { 10, 20, 30, 40, 50 },
-    };
-
-    private readonly UpgradeDef autoMineUnlock = new UpgradeDef
-    {
-        displayName = "자동 채굴",
-        costsPerLevel = DualCurrency(0, 1, (50000, 800)),
-        values = new float[] { 1 },
-    };
-
-    private readonly UpgradeDef autoMineSpeed = new UpgradeDef
-    {
-        displayName = "자동 채굴 속도",
-        costsPerLevel = SingleCurrency(0, 2000, 4000, 7500, 14000, 25000),
-        values = new float[] { 0.5f, 1f, 1.5f, 2f, 2.5f }, // 초당 감소량
-    };
-
-    private readonly int[] _levels = new int[UpgradeCount]; // 각 업그레이드의 현재 레벨 (0 = 미구매)
-
-    // 업그레이드 레벨이 바뀔 때마다 (타입, 새 레벨) 전달 - 업그레이드 UI, SaveManager 등이 구독
-    public event Action<UpgradeType, int> OnUpgradeChanged;
 
     void Awake()
     {
@@ -216,258 +170,321 @@ public class UpgradeManager : MonoBehaviour
         }
 
         Instance = this;
+        BuildNodes();
     }
 
-    private UpgradeDef GetDef(UpgradeType type)
+    // templates(또는 예시)를 펼쳐 _nodes를 구성. 오브젝트 이름은 여기서 인덱스로 확정함
+    private void BuildNodes()
     {
-        switch (type)
+        _nodes.Clear();
+        _nodeById.Clear();
+
+        UpgradeTemplate[] source = (templates != null && templates.Length > 0)
+            ? templates
+            : (useExampleTemplatesWhenEmpty ? BuildExampleTemplates() : Array.Empty<UpgradeTemplate>());
+
+        foreach (UpgradeTemplate t in source)
         {
-            case UpgradeType.ClickDamage: return clickDamage;
-            case UpgradeType.CritDamage: return critDamage;
-            case UpgradeType.CritChanceUp: return critChanceUp;
-            case UpgradeType.AutoClickUnlock: return autoClickUnlock;
-            case UpgradeType.AutoClickSpeed: return autoClickSpeed;
-            case UpgradeType.AutoClickCount: return autoClickCount;
-            case UpgradeType.ComboUnlock: return comboUnlock;
-            case UpgradeType.ComboCooldown: return comboCooldown;
-            case UpgradeType.ComboDuration: return comboDuration;
-            case UpgradeType.LuckyClick: return luckyClick;
-            case UpgradeType.DoubleClick: return doubleClick;
-            case UpgradeType.CritChanceUp2: return critChanceUp2;
-            case UpgradeType.ClickDamageUp2: return clickDamageUp2;
-            case UpgradeType.CritDamageUp2: return critDamageUp2;
-            case UpgradeType.AutoMineUnlock: return autoMineUnlock;
-            case UpgradeType.AutoMineSpeed: return autoMineSpeed;
-            default: return null;
+            if (t == null || string.IsNullOrEmpty(t.id)) continue;
+
+            int targetIndex = ObjectManager.StaticIndexOfName(t.targetObjectName); // 전역이면 -1
+            int tiers = Mathf.Max(1, t.repeatCount);
+
+            for (int tier = 1; tier <= tiers; tier++)
+            {
+                var node = new UpgradeNode
+                {
+                    id = $"{t.id}#{tier}",
+                    displayName = t.displayName,
+                    effect = t.effect,
+                    targetObjectIndex = targetIndex,
+                    tier = tier,
+                    maxLevel = Mathf.Max(1, t.levelsPerTier),
+                    template = t,
+                    linkRouting = t.linkRouting,
+                    nodeOffset = t.nodeOffset,
+                    // tier2 이상은 같은 템플릿의 이전 tier가 최대레벨이어야 공개. tier1은 다른 템플릿을 선행으로
+                    prerequisiteId = tier > 1 ? $"{t.id}#{tier - 1}" : (string.IsNullOrEmpty(t.prerequisiteId) ? null : ResolveLastTierId(source, t.prerequisiteId)),
+                    prerequisiteMustBeMaxed = tier > 1 || t.requirePrereqMaxed,
+                };
+
+                _nodes.Add(node);
+                _nodeById[node.id] = node;
+            }
         }
     }
 
-    public string GetDisplayName(UpgradeType type) => GetDef(type).displayName;
-    public int GetLevel(UpgradeType type) => _levels[(int)type];
-
-    // 단일 구매(1/1) 업그레이드인지에 따라 최대 레벨이 다름
-    public int GetMaxLevel(UpgradeType type)
+    // 선행 템플릿 id("click_dmg")를 그 템플릿의 마지막 tier 노드 id("click_dmg#2")로 바꿔줌
+    private static string ResolveLastTierId(UpgradeTemplate[] source, string prerequisiteTemplateId)
     {
-        switch (type)
+        foreach (UpgradeTemplate t in source)
         {
-            case UpgradeType.AutoClickUnlock:
-            case UpgradeType.ComboUnlock:
-            case UpgradeType.LuckyClick:
-            case UpgradeType.DoubleClick:
-            case UpgradeType.CritChanceUp:
-            case UpgradeType.AutoMineUnlock:
-                return 1;
-            default:
-                return MaxLevel;
+            if (t != null && t.id == prerequisiteTemplateId)
+                return $"{t.id}#{Mathf.Max(1, t.repeatCount)}";
         }
+        Debug.LogWarning($"UpgradeManager: prerequisiteId '{prerequisiteTemplateId}' 에 해당하는 템플릿이 없음 (오타 확인). 이 노드는 트리에서 안 열림");
+        return $"{prerequisiteTemplateId}#1";
     }
 
-    // 다음 레벨로 올리는 데 필요한 조각들 (이미 최대 레벨이면 null)
-    public PieceCost[] GetNextCost(UpgradeType type)
+    // 비용 조각 오브젝트 인덱스 결정: 명시된 이름 > 대상 오브젝트 > 0번
+    private static int ResolveCostObjectIndex(string costObjectName, int targetObjectIndex)
     {
-        int level = GetLevel(type);
-        if (level >= GetMaxLevel(type)) return null;
-        return GetDef(type).costsPerLevel[level].pieces;
+        int byName = ObjectManager.StaticIndexOfName(costObjectName);
+        if (byName >= 0) return byName;
+        if (targetObjectIndex >= 0) return targetObjectIndex;
+        return 0;
     }
 
-    // 이 업그레이드가 트리에서 아직 공개되기 전인지(=부모 업그레이드를 1레벨도 안 올렸는지) 판단하기 위한 부모 조회.
-    // 트리 전체가 ClickDamage 하나에서 시작해서 끊기지 않고 쭉 이어지도록 구성함:
-    // ClickDamage -> CritDamage -> CritChanceUp -> CritChanceUp2 ("돌려쓰기" 후속)
-    //                            -> AutoClickUnlock -> (AutoClickSpeed -> ClickDamageUp2,
-    //                                                   AutoClickCount -> (LuckyClick, CritDamageUp2 -> AutoMineUnlock -> AutoMineSpeed))
-    //             -> ComboUnlock -> (ComboCooldown, ComboDuration -> DoubleClick)
-    // (한 노드가 한 번에 공개하는 자식은 평균 1~2개, 최대 4개를 넘지 않게 맞춰둠 - 너무 많은 버튼이 한꺼번에 안 튀어나오게)
-    // 인스턴스 상태를 안 쓰는 순수 함수라 static으로 둠 - UI가 Instance 없이도(빌드 시점 등) 트리 모양을 조회할 수 있게
-    public static UpgradeType? GetPrerequisite(UpgradeType type)
+    // ---- 노드 단위 조회/구매 (트리 UI가 사용) ----
+
+    public UpgradeNode GetNode(string nodeId)
     {
-        switch (type)
+        if (string.IsNullOrEmpty(nodeId)) return null;
+        return _nodeById.TryGetValue(nodeId, out UpgradeNode node) ? node : null;
+    }
+
+    public int GetLevel(string nodeId) => _levels.TryGetValue(nodeId, out int level) ? level : 0;
+
+    public int GetMaxLevel(string nodeId)
+    {
+        UpgradeNode node = GetNode(nodeId);
+        return node != null ? node.maxLevel : 0;
+    }
+
+    public string GetDisplayName(string nodeId)
+    {
+        UpgradeNode node = GetNode(nodeId);
+        return node != null ? node.displayName : "";
+    }
+
+    // 다음 레벨 비용 (없거나 최대면 null)
+    public PieceCost[] GetNextCost(string nodeId)
+    {
+        UpgradeNode node = GetNode(nodeId);
+        return node?.CostForLevel(GetLevel(nodeId));
+    }
+
+    // 이 노드가 트리에 공개(보이고 구매 가능)됐는지
+    public bool IsRevealed(string nodeId)
+    {
+        UpgradeNode node = GetNode(nodeId);
+        if (node == null) return false;
+        if (string.IsNullOrEmpty(node.prerequisiteId)) return true; // 루트
+
+        int prereqLevel = GetLevel(node.prerequisiteId);
+        if (node.prerequisiteMustBeMaxed)
         {
-            case UpgradeType.CritDamage: return UpgradeType.ClickDamage;
-            case UpgradeType.ComboUnlock: return UpgradeType.ClickDamage;
-            case UpgradeType.CritChanceUp: return UpgradeType.CritDamage;
-            case UpgradeType.CritChanceUp2: return UpgradeType.CritChanceUp;
-            case UpgradeType.AutoClickUnlock: return UpgradeType.CritChanceUp;
-            case UpgradeType.AutoClickSpeed: return UpgradeType.AutoClickUnlock;
-            case UpgradeType.AutoClickCount: return UpgradeType.AutoClickUnlock;
-            case UpgradeType.ClickDamageUp2: return UpgradeType.AutoClickSpeed; // AutoClickUnlock 자식이 너무 많아져서 한 단계 더 들어감
-            case UpgradeType.CritDamageUp2: return UpgradeType.AutoClickCount; // 위와 같은 이유
-            case UpgradeType.AutoMineUnlock: return UpgradeType.CritDamageUp2; // AutoClickUnlock은 이미 자식이 4개라 더 안 늘리려고 옮김
-            case UpgradeType.AutoMineSpeed: return UpgradeType.AutoMineUnlock;
-            case UpgradeType.LuckyClick: return UpgradeType.AutoClickCount;
-            case UpgradeType.ComboCooldown: return UpgradeType.ComboUnlock;
-            case UpgradeType.ComboDuration: return UpgradeType.ComboUnlock;
-            case UpgradeType.DoubleClick: return UpgradeType.ComboDuration;
-            default: return null; // ClickDamage만 트리의 루트
+            UpgradeNode pn = GetNode(node.prerequisiteId);
+            return pn != null && prereqLevel >= pn.maxLevel;
         }
+        return prereqLevel >= 1;
     }
 
-    public bool IsLocked(UpgradeType type)
+    // 조각을 소모해서 한 레벨 올림. 실패(미공개/최대레벨/조각부족) 시 false
+    public bool TryUpgrade(string nodeId)
     {
-        UpgradeType? prerequisite = GetPrerequisite(type);
-        if (prerequisite == null) return false;
+        UpgradeNode node = GetNode(nodeId);
+        if (node == null) return false;
 
-        return GetLevel(prerequisite.Value) <= 0;
-    }
-
-    // 조각을 소모해서 한 레벨 올림. 실패(잠김/최대레벨/조각부족) 시 false 반환
-    public bool TryUpgrade(UpgradeType type)
-    {
-        if (IsLocked(type))
+        if (!IsRevealed(nodeId))
         {
-            Debug.Log($"{type} 업그레이드는 아직 잠겨있음 (선행 업그레이드 필요)");
+            Debug.Log($"{nodeId} 업그레이드는 아직 잠겨있음 (선행 조건 미충족)");
             return false;
         }
 
-        int level = GetLevel(type);
-        int maxLevel = GetMaxLevel(type);
-        if (level >= maxLevel)
+        int level = GetLevel(nodeId);
+        if (level >= node.maxLevel)
         {
-            Debug.Log($"{type} 업그레이드는 이미 최대 레벨");
+            Debug.Log($"{nodeId} 업그레이드는 이미 최대 레벨");
             return false;
         }
 
-        PieceCost[] cost = GetDef(type).costsPerLevel[level].pieces;
-        if (CurrencyManager.Instance == null || !CurrencyManager.Instance.TrySpendPieces(cost))
+        PieceCost[] cost = node.CostForLevel(level);
+        if (cost != null && cost.Length > 0)
         {
-            Debug.Log($"{type} 업그레이드 조각 부족");
-            return false;
+            if (CurrencyManager.Instance == null || !CurrencyManager.Instance.TrySpendPieces(cost))
+            {
+                Debug.Log($"{nodeId} 업그레이드 조각 부족");
+                return false;
+            }
         }
 
-        _levels[(int)type] = level + 1;
-        OnUpgradeChanged?.Invoke(type, _levels[(int)type]);
+        SetLevelInternal(nodeId, level + 1);
         return true;
     }
 
-    // 저장 파일 로드 시 구매 로직 없이 레벨을 그대로 대입
-    public void SetLevel(UpgradeType type, int level)
+    // 저장 파일 로드 시 구매 로직 없이 레벨을 그대로 대입 (없는 id는 무시)
+    public void SetLevel(string nodeId, int level)
     {
-        _levels[(int)type] = Mathf.Clamp(level, 0, GetMaxLevel(type));
-        OnUpgradeChanged?.Invoke(type, _levels[(int)type]);
+        UpgradeNode node = GetNode(nodeId);
+        if (node == null) return;
+        SetLevelInternal(nodeId, Mathf.Clamp(level, 0, node.maxLevel));
     }
 
-    // 테스트용 - 모든 업그레이드 레벨을 0으로 되돌림 (조각은 환불하지 않음)
+    private void SetLevelInternal(string nodeId, int level)
+    {
+        _levels[nodeId] = level;
+        OnUpgradeChanged?.Invoke(nodeId, level);
+    }
+
+    // 테스트용 - 모든 업그레이드 레벨을 0으로 (조각 환불은 없음)
     public void ResetAll()
     {
-        for (int i = 0; i < UpgradeCount; i++)
+        foreach (UpgradeNode node in _nodes)
         {
-            _levels[i] = 0;
-            OnUpgradeChanged?.Invoke((UpgradeType)i, 0);
+            _levels[node.id] = 0;
+            OnUpgradeChanged?.Invoke(node.id, 0);
         }
     }
 
-    // ---- 실제 효과 값 (Click.cs, ComboManager 등에서 사용) ----
+    // ---- 효과 값 (Click.cs, ComboManager 등에서 사용) ----
 
-    public int ClickDamageBonus
+    // 특정 효과의 "구매한 레벨들의 값 총합" (선택적으로 대상 오브젝트가 일치하는 노드만)
+    private float SumEffect(UpgradeEffect effect, int objectIndexFilter = int.MinValue)
     {
-        get
+        float total = 0f;
+        foreach (UpgradeNode node in _nodes)
         {
-            int bonus = 0;
+            if (node.effect != effect) continue;
+            if (objectIndexFilter != int.MinValue && node.targetObjectIndex != objectIndexFilter) continue;
 
-            int level = GetLevel(UpgradeType.ClickDamage);
-            if (level > 0) bonus += (int)clickDamage.values[level - 1];
-
-            int level2 = GetLevel(UpgradeType.ClickDamageUp2);
-            if (level2 > 0) bonus += (int)clickDamageUp2.values[level2 - 1];
-
-            return bonus;
+            int level = GetLevel(node.id);
+            for (int L = 1; L <= level; L++)
+                total += node.ValueAtLevel(L);
         }
+        return total;
     }
 
-    // 크리티컬 발동 확률 (0~1). CritDamage를 한 번도 안 샀으면 크리티컬 자체가 발동하지 않음
+    // 해금류 - 그 효과를 가진 노드 중 하나라도 1레벨 이상이면 true
+    private bool AnyUnlocked(UpgradeEffect effect)
+    {
+        foreach (UpgradeNode node in _nodes)
+            if (node.effect == effect && GetLevel(node.id) >= 1) return true;
+        return false;
+    }
+
+    // 장착한 오브젝트를 클릭할 때의 데미지 보너스 (전역 + 그 오브젝트 대상 모두 합산)
+    public int GetClickDamageBonus(int equippedObjectIndex)
+    {
+        float total = SumEffect(UpgradeEffect.ClickDamage);
+        total += SumEffect(UpgradeEffect.ClickDamageObject, equippedObjectIndex);
+        return Mathf.RoundToInt(total);
+    }
+
     public float CritChanceValue
     {
         get
         {
-            if (GetLevel(UpgradeType.CritDamage) <= 0) return 0f;
-
-            float bonus = 0f;
-
-            int upLevel = GetLevel(UpgradeType.CritChanceUp);
-            if (upLevel > 0) bonus += critChanceUp.values[upLevel - 1] / 100f;
-
-            int up2Level = GetLevel(UpgradeType.CritChanceUp2);
-            if (up2Level > 0) bonus += critChanceUp2.values[up2Level - 1] / 100f;
-
-            return Mathf.Clamp01(BaseCritChance + bonus);
+            if (SumEffectRawCount(UpgradeEffect.CritDamage) <= 0) return 0f; // 크리티컬 강화를 한 번도 안 샀으면 크리티컬 자체가 발동 안 함
+            float bonus = SumEffect(UpgradeEffect.CritChance) / 100f;
+            return Mathf.Clamp01(baseCritChance + bonus);
         }
     }
 
-    // 크리티컬 발동 시 데미지에 곱해지는 배율
     public float CritMultiplierValue
     {
         get
         {
-            int level = GetLevel(UpgradeType.CritDamage);
-            if (level <= 0) return 1f;
-
-            float multiplier = BaseCritMultiplier + critDamage.values[level - 1] / 100f;
-
-            int level2 = GetLevel(UpgradeType.CritDamageUp2);
-            if (level2 > 0) multiplier += critDamageUp2.values[level2 - 1] / 100f;
-
-            return multiplier;
+            if (SumEffectRawCount(UpgradeEffect.CritDamage) <= 0) return 1f;
+            return baseCritMultiplier + SumEffect(UpgradeEffect.CritDamage) / 100f;
         }
     }
 
-    public bool AutoClickIsUnlocked => GetLevel(UpgradeType.AutoClickUnlock) > 0;
-
-    public float AutoClickIntervalSeconds
+    // "그 효과 노드들의 레벨 합" - CritDamage를 한 번이라도 올렸는지 판단용
+    private int SumEffectRawCount(UpgradeEffect effect)
     {
-        get
-        {
-            int level = GetLevel(UpgradeType.AutoClickSpeed);
-            float reduction = level > 0 ? autoClickSpeed.values[level - 1] : 0f;
-            return Mathf.Max(MinAutoClickIntervalSeconds, BaseAutoClickIntervalSeconds - reduction);
-        }
+        int total = 0;
+        foreach (UpgradeNode node in _nodes)
+            if (node.effect == effect) total += GetLevel(node.id);
+        return total;
     }
 
-    public int AutoClickClicksPerTrigger
+    public bool AutoClickIsUnlocked => AnyUnlocked(UpgradeEffect.AutoClickUnlock);
+
+    public float AutoClickIntervalSeconds =>
+        Mathf.Max(minAutoClickInterval, baseAutoClickInterval - SumEffect(UpgradeEffect.AutoClickSpeed));
+
+    public int AutoClickClicksPerTrigger =>
+        baseAutoClickCount + Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoClickCount));
+
+    public bool ComboIsUnlocked => AnyUnlocked(UpgradeEffect.ComboUnlock);
+
+    public float ComboCooldownSeconds =>
+        Mathf.Max(minComboCooldown, baseComboCooldown - SumEffect(UpgradeEffect.ComboCooldown));
+
+    public float ComboDurationSeconds =>
+        baseComboDuration + SumEffect(UpgradeEffect.ComboDuration);
+
+    public bool LuckyClickIsUnlocked => AnyUnlocked(UpgradeEffect.LuckyClick);
+    public float LuckyClickChance => LuckyClickIsUnlocked ? luckyClickChanceValue : 0f;
+
+    public bool DoubleClickIsUnlocked => AnyUnlocked(UpgradeEffect.DoubleClick);
+
+    public bool AutoMineIsUnlocked => AnyUnlocked(UpgradeEffect.AutoMineUnlock);
+    public int AutoMineTierOffset => autoMineTierOffset;
+
+    public float AutoMineIntervalSeconds =>
+        Mathf.Max(minAutoMineInterval, baseAutoMineInterval - SumEffect(UpgradeEffect.AutoMineSpeed));
+
+    // ---- 예시 템플릿 ----
+
+    // templates가 비었을 때 게임이 돌아가도록 넣어주는 최소 예시. 인스펙터 "예시 템플릿 채우기"로 이 내용을
+    // templates 배열에 복사해서 편집 시작할 수 있음 (이건 어디까지나 출발점 - 실제 카탈로그는 직접 작성)
+    // ponytail: 스캐폴딩. 실제 templates 카탈로그를 채우면 이 메서드 + useExampleTemplatesWhenEmpty 삭제
+    private UpgradeTemplate[] BuildExampleTemplates()
     {
-        get
+        return new[]
         {
-            int level = GetLevel(UpgradeType.AutoClickCount);
-            int bonus = level > 0 ? (int)autoClickCount.values[level - 1] : 0;
-            return BaseAutoClickCount + bonus;
-        }
+            new UpgradeTemplate
+            {
+                id = "click_dmg", displayName = "클릭 데미지", effect = UpgradeEffect.ClickDamage,
+                repeatCount = 3, levelsPerTier = 5, valuePerLevel = new[] { 1f, 2f, 3f, 4f, 5f },
+                tierValueMultiplier = 4f,
+                cost = new PieceCostConfig { entries = new[] { new CostEntry { baseCost = 10 } }, levelGrowth = 2.2f, tierGrowth = 30f },
+            },
+            new UpgradeTemplate
+            {
+                id = "crit_dmg", displayName = "크리티컬 데미지", effect = UpgradeEffect.CritDamage,
+                repeatCount = 2, levelsPerTier = 5, valuePerLevel = new[] { 10f, 20f, 30f, 40f, 50f },
+                tierValueMultiplier = 1.5f, prerequisiteId = "click_dmg",
+                cost = new PieceCostConfig { entries = new[] { new CostEntry { baseCost = 50 } }, levelGrowth = 2.3f, tierGrowth = 40f },
+            },
+            new UpgradeTemplate
+            {
+                id = "crit_chance", displayName = "크리티컬 확률", effect = UpgradeEffect.CritChance,
+                repeatCount = 2, levelsPerTier = 5, valuePerLevel = new[] { 5f, 6f, 7f, 8f, 9f },
+                prerequisiteId = "crit_dmg",
+                cost = new PieceCostConfig { entries = new[] { new CostEntry { baseCost = 150 } }, levelGrowth = 2.5f, tierGrowth = 25f },
+            },
+            new UpgradeTemplate
+            {
+                id = "autoclick", displayName = "자동 클릭", effect = UpgradeEffect.AutoClickUnlock,
+                repeatCount = 1, levelsPerTier = 1, valuePerLevel = new[] { 1f }, prerequisiteId = "crit_chance",
+                cost = new PieceCostConfig { entries = new[] { new CostEntry { baseCost = 3000 } } },
+            },
+            new UpgradeTemplate
+            {
+                id = "autoclick_spd", displayName = "자동 클릭 속도", effect = UpgradeEffect.AutoClickSpeed,
+                repeatCount = 2, levelsPerTier = 5, valuePerLevel = new[] { 0.4f, 0.8f, 1.2f, 1.6f, 2f },
+                prerequisiteId = "autoclick",
+                cost = new PieceCostConfig { entries = new[] { new CostEntry { baseCost = 500 } }, levelGrowth = 2f, tierGrowth = 20f },
+            },
+            new UpgradeTemplate
+            {
+                id = "combo", displayName = "콤보", effect = UpgradeEffect.ComboUnlock,
+                repeatCount = 1, levelsPerTier = 1, valuePerLevel = new[] { 1f }, prerequisiteId = "click_dmg",
+                cost = new PieceCostConfig { entries = new[] { new CostEntry { baseCost = 25000 } } },
+            },
+        };
     }
 
-    public bool ComboIsUnlocked => GetLevel(UpgradeType.ComboUnlock) > 0;
-
-    public float ComboCooldownSeconds
+#if UNITY_EDITOR
+    // 인스펙터 우클릭 -> "예시 템플릿 채우기" : templates가 비어있을 때 출발점을 넣어줌
+    [ContextMenu("예시 템플릿 채우기")]
+    private void FillExampleTemplates()
     {
-        get
-        {
-            int level = GetLevel(UpgradeType.ComboCooldown);
-            float reduction = level > 0 ? comboCooldown.values[level - 1] : 0f;
-            return Mathf.Max(MinComboCooldownSeconds, BaseComboCooldownSeconds - reduction);
-        }
+        templates = BuildExampleTemplates();
+        UnityEditor.EditorUtility.SetDirty(this);
     }
-
-    public float ComboDurationSeconds
-    {
-        get
-        {
-            int level = GetLevel(UpgradeType.ComboDuration);
-            float bonus = level > 0 ? comboDuration.values[level - 1] : 0f;
-            return BaseComboDurationSeconds + bonus;
-        }
-    }
-
-    public bool LuckyClickIsUnlocked => GetLevel(UpgradeType.LuckyClick) > 0;
-    public float LuckyClickChance => LuckyClickIsUnlocked ? LuckyClickChanceValue : 0f;
-
-    public bool DoubleClickIsUnlocked => GetLevel(UpgradeType.DoubleClick) > 0;
-
-    public bool AutoMineIsUnlocked => GetLevel(UpgradeType.AutoMineUnlock) > 0;
-    public int AutoMineTierOffset => autoMineTierOffset; // 지금 캐는 오브젝트보다 몇 단계 전을 자동으로 캘지
-
-    public float AutoMineIntervalSeconds
-    {
-        get
-        {
-            int level = GetLevel(UpgradeType.AutoMineSpeed);
-            float reduction = level > 0 ? autoMineSpeed.values[level - 1] : 0f;
-            return Mathf.Max(MinAutoMineIntervalSeconds, BaseAutoMineIntervalSeconds - reduction);
-        }
-    }
+#endif
 }

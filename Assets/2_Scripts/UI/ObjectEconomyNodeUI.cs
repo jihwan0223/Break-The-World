@@ -24,6 +24,8 @@ public class ObjectEconomyNodeUI : MonoBehaviour
     private Button _button;
     private RectTransform _rect;
     private Coroutine _flashRoutine;
+    private bool _wasRevealed; // 직전 Refresh 때 이 노드가 공개 상태였는지 - hidden→revealed로 바뀌는 "등장 순간"을 한 번만 잡으려고 추적
+    private bool _refreshedOnce; // Refresh가 최소 한 번 돌았는지 - 첫 호출 때는 등장 흔들림을 재생 안 함(이미 열려있던 노드로 취급)
 
     public int ObjectIndex => objectIndex;
     public bool IsGain => isGain;
@@ -44,6 +46,10 @@ public class ObjectEconomyNodeUI : MonoBehaviour
             flashOverlay.raycastTarget = false;
             SetOverlayAlpha(flashOverlay, 0f);
         }
+
+        // 해금 완료/최대 레벨일 때 켜지는 오버레이도 클릭을 가로채면 안 됨
+        if (doneOverlay != null)
+            doneOverlay.raycastTarget = false;
     }
 
     private void HandleClicked()
@@ -56,11 +62,12 @@ public class ObjectEconomyNodeUI : MonoBehaviour
         bool justMaxed = success && (!isGain || ObjectManager.Instance.GetGainLevel(objectIndex) >= 5);
         PlayFlash(success, playShake: !justMaxed);
 
-        UpgradeTreeUI.Instance?.RefreshAll();
+        UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true); // 방금 해금된 자식 노드들이 나타나도록 트리 전체를 새로고침 (등장 흔들림 재생)
     }
 
-    // UpgradeTreeUI가 전체를 새로고침할 때마다 호출함
-    public void Refresh()
+    // UpgradeTreeUI가 전체를 새로고침할 때마다 호출함.
+    // animateReveal: 구매로 인한 새로고침이면 true - 이 노드가 이번에 처음 공개됐다면 등장 흔들림을 재생함
+    public void Refresh(bool animateReveal = false)
     {
         if (ObjectManager.Instance == null)
         {
@@ -72,8 +79,17 @@ public class ObjectEconomyNodeUI : MonoBehaviour
         // Gain 노드는 자기 오브젝트가 실제로 해금 완료됐을 때 나타남 (부모가 자기 자신뿐이라 anchor 불필요)
         bool anchorLeveled = anchorMainNode != null ? anchorMainNode.IsLeveled() : (anchorEconomyNode != null && anchorEconomyNode.IsLeveled());
         bool isRevealed = isGain ? ObjectManager.Instance.IsUnlocked(objectIndex) : anchorLeveled;
+
+        // hidden→revealed로 처음 바뀌는 순간 + 구매로 인한 새로고침(animateReveal)일 때만 등장 흔들림.
+        // 첫 Refresh(_refreshedOnce=false)는 제외 - 페이지를 처음 열 때 이미 공개돼있던 노드는 흔들지 않음
+        bool justRevealed = animateReveal && _refreshedOnce && isRevealed && !_wasRevealed;
+        _wasRevealed = isRevealed;
+        _refreshedOnce = true;
+
         gameObject.SetActive(isRevealed);
         if (!isRevealed) return;
+
+        if (justRevealed) PlayRevealShake();
 
         string objectName = ObjectManager.Instance.GetObjectAt(objectIndex).objectName;
 
@@ -152,6 +168,38 @@ public class ObjectEconomyNodeUI : MonoBehaviour
         }
 
         SetOverlayAlpha(flashOverlay, 0f);
+        _rect.localRotation = Quaternion.identity;
+        _flashRoutine = null;
+    }
+
+    // 노드가 새로 공개될 때 재생 - 색 반짝임 없이 좌우로 살짝 기울었다 돌아오는 흔들림만 (구매 성공 때와 같은 느낌)
+    private void PlayRevealShake()
+    {
+        if (_flashRoutine != null)
+            StopCoroutine(_flashRoutine);
+
+        _rect.localRotation = Quaternion.identity;
+        _flashRoutine = StartCoroutine(RevealShakeRoutine());
+    }
+
+    private IEnumerator RevealShakeRoutine()
+    {
+        const float duration = 0.25f; // 등장 흔들림 총 시간(초) - 구매(0.2)보다 살짝 길게
+        const float shakeAmplitudeDegrees = 5f; // 흔들림 최대 각도 (구매 때와 동일)
+        const float shakeOscillations = 1.5f; // 연출 시간 동안 좌우로 흔들리는 횟수
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime; // 업그레이드 화면이 게임을 멈춰도(Time.timeScale=0) 재생되도록
+            float progress = Mathf.Clamp01(elapsed / duration);
+
+            float angle = shakeAmplitudeDegrees * Mathf.Sin(progress * shakeOscillations * Mathf.PI * 2f) * (1f - progress);
+            _rect.localRotation = Quaternion.Euler(0f, 0f, angle);
+
+            yield return null;
+        }
+
         _rect.localRotation = Quaternion.identity;
         _flashRoutine = null;
     }
