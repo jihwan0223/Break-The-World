@@ -83,9 +83,9 @@ public class Click : MonoBehaviour
         // 고정 데미지 1 대신 현재 장착한 무기의 클릭 데미지를 적용
         int baseDamage = WeaponManager.Instance != null ? WeaponManager.Instance.CurrentClickDamage : 1;
 
-        // 클릭 데미지 업그레이드 보너스를 더함 (전역 + 지금 장착한 오브젝트 전용 강화 합산)
-        int equippedObjectIndex = ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : -1;
-        int clickDamageBonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetClickDamageBonus(equippedObjectIndex) : 0;
+        // 클릭 데미지 업그레이드 보너스를 더함 (전역 + 지금 장착한 무기 전용 강화 합산)
+        int equippedWeaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : -1;
+        int clickDamageBonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetClickDamageBonus(equippedWeaponIndex) : 0;
         int damage = baseDamage + clickDamageBonus;
 
         // 크리티컬 확률 판정 - 성공하면 크리티컬 배율을 곱함
@@ -110,21 +110,23 @@ public class Click : MonoBehaviour
             WeaponSwingEffect.Instance?.PlaySwing(_collider, WeaponManager.Instance.CurrentWeapon.icon);
     }
 
-    // 자동클릭 업그레이드가 켜져있으면 일정 주기마다 자동으로 PerformClickHit을 호출
+    // 자동클릭 업그레이드가 켜져있으면 일정 주기마다 자동으로 PerformClickHit을 호출.
+    // 자동클릭은 오브젝트별로 따로 설정하는 거라, 지금 장착 중인 오브젝트를 대상으로 하는 노드가 있을 때만 작동함
     private void UpdateAutoClick()
     {
-        if (UpgradeManager.Instance == null || !UpgradeManager.Instance.AutoClickIsUnlocked)
+        int equippedObjectIndex = ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : -1;
+        if (UpgradeManager.Instance == null || equippedObjectIndex < 0 || !UpgradeManager.Instance.AutoClickIsUnlockedFor(equippedObjectIndex))
             return;
 
         _autoClickTimer += Time.deltaTime;
-        float interval = UpgradeManager.Instance.AutoClickIntervalSeconds;
+        float interval = UpgradeManager.Instance.AutoClickIntervalSecondsFor(equippedObjectIndex);
 
         if (_autoClickTimer < interval)
             return;
 
         _autoClickTimer -= interval; // 0으로 딱 자르지 않고 남은 오차만 빼서 주기가 조금씩 밀리는 걸 방지
 
-        int clicks = UpgradeManager.Instance.AutoClickClicksPerTrigger;
+        int clicks = UpgradeManager.Instance.AutoClickClicksPerTriggerFor(equippedObjectIndex);
         for (int i = 0; i < clicks; i++)
             PerformClickHit();
     }

@@ -27,6 +27,7 @@ public class HealthBarUI : MonoBehaviour
         }
 
         _root = uiDocument.rootVisualElement;
+        GameFonts.Apply(_root);
         BuildBar(_root);
 
         if (targetHealth != null)

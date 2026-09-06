@@ -36,6 +36,7 @@ public class PieceUI : MonoBehaviour
         }
 
         _root = uiDocument.rootVisualElement;
+        GameFonts.Apply(_root);
         BuildContainer(_root);
 
         // 업그레이드 화면(Canvas)이 열리면 우상단 X 버튼과 겹치니까 숨김 - Canvas 쪽 UpgradeTreeUI가 이벤트를 쏨

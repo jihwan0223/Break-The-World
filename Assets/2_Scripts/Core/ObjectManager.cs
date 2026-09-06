@@ -120,6 +120,10 @@ public class ObjectManager : MonoBehaviour
     // 인덱스로 오브젝트 데이터를 조회만 함 (선택은 안 함) - UI가 화살표로 둘러볼 때 사용
     public ObjectData GetObjectAt(int index) => objects[index];
 
+    // 인덱스로 오브젝트 이름 조회 (Instance 없이도). UpgradeManager CSV의 target=* 확장에 씀
+    public static string StaticObjectNameAt(int index) =>
+        index >= 0 && index < objects.Count ? objects[index].objectName : "";
+
     // objectName으로 인덱스를 찾음. 없으면 -1. Instance 없이도 동작(objects가 static이라) - UpgradeManager가
     // 템플릿의 targetObjectName을 인덱스로 바꿀 때 사용. 공백 차이는 무시하고 대소문자 구분 없이 비교
     public static int StaticIndexOfName(string objectName)

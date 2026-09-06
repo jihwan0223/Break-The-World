@@ -99,6 +99,7 @@ public class GameSessionUI : MonoBehaviour
     private void Build(VisualElement root)
     {
         root.Clear();
+        GameFonts.Apply(root);
         root.pickingMode = PickingMode.Ignore; // 빈 영역이 뒤쪽(다른 UIDocument/월드) 클릭을 먹지 않도록 - 실제 버튼/결과창 배경만 클릭을 받음
 
         BuildStartScreen(root);

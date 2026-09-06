@@ -27,6 +27,7 @@ public class RespawnTimerUI : MonoBehaviour
     private void Build(VisualElement root)
     {
         root.Clear();
+        GameFonts.Apply(root);
 
         _background = new VisualElement();
         _background.style.position = Position.Absolute;

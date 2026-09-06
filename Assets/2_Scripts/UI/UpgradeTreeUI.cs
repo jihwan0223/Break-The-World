@@ -1,9 +1,5 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 // 업그레이드 화면 전체를 관리하는 총괄 매니저. 이 스크립트가 붙은 오브젝트(화면 전체를 덮는 패널)를
 // 통째로 SetActive(false)로 꺼둔 채 시작하고, "업그레이드" 버튼을 누르면 SidePanelUI가 이 오브젝트를 직접
@@ -11,8 +7,9 @@ using UnityEditor;
 // 절대 안 돌기 때문에, "업그레이드" 버튼이 Instance를 통해 열려고 했으면 첫 실행 때 Instance가 아직
 // null이라 에러가 났을 것 - 그래서 여는 동작만큼은 SidePanelUI가 GameObject 참조로 직접 처리함.
 // 반대로 닫기(X 버튼)는 이 화면이 이미 열려있는(=Awake가 이미 돈) 상태에서만 눌릴 수 있으니 Instance를 써도 안전함.
-// - 노드는 content 아래에서 자동으로 찾아 매 구매마다 한 번에 새로고침함. 메인 트리 노드는 인스펙터 우클릭
-//   "트리 생성/갱신"으로 UpgradeManager 템플릿에서 자동 생성함 (생성 후 위치는 씬 뷰에서 직접 드래그)
+// - 노드/연결선은 전부 손으로 배치함 (UpgradeNodeUI 프리팹을 복사해서 이름/설명/효과/비용을 인스펙터에 적고,
+//   UpgradeTreeLink로 선행 노드와 이어주면 끝). 이 스크립트는 그렇게 배치된 걸 content 아래에서 자동으로
+//   찾아 매 구매마다 새로고침만 함.
 // - 팬(드래그)은 이 오브젝트에 같이 붙인 ScrollRect가 처리함 (Content만 연결하면 됨, Movement Type은
 //   Unrestricted로 설정해서 이동 거리 제한이 없게 하고, Scroll Sensitivity는 0으로 꺼서 휠 스크롤과 안 겹치게 함)
 // - 줌(마우스 휠)은 이 스크립트가 처리함 (이 오브젝트에 raycastTarget=true인 Image가 있어야 휠 입력을 받음)
@@ -27,18 +24,13 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
 
     [SerializeField] private RectTransform content; // 팬/줌이 실제로 적용되는 콘텐츠 (모든 노드/선의 부모, ScrollRect의 Content와 같은 걸 넣으면 됨)
 
-    [Header("트리 자동생성")]
-    [SerializeField] private UpgradeNodeUI nodePrefab; // "트리 생성/갱신" 시 복제해서 노드로 쓸 프리팹 (UpgradeNode.prefab)
-    [SerializeField] private float columnSpacing = 420f; // 선행 깊이가 1 늘 때마다 오른쪽으로 벌어지는 간격(px)
-    [SerializeField] private float rowSpacing = 240f; // 같은 깊이의 노드들이 세로로 벌어지는 간격(px)
-
     [Header("줌")]
     [SerializeField] private float minZoom = 0.2f; // 최소 축소 배율
     [SerializeField] private float maxZoom = 1.5f; // 최대 확대 배율
     [SerializeField] private float zoomStep = 0.1f; // 휠 한 틱당 목표 배율이 곱해지는 비율 (0.1 = 틱당 ±10%, 곱셈이라 어느 배율에서든 체감이 균일함)
     [SerializeField] private float zoomSmoothSpeed = 8f; // 목표 배율을 따라잡는 속도 (클수록 빠르게/뚝뚝 끊기게, 작을수록 부드럽게)
 
-    // 씬에 있는 노드들 - Awake와 트리 생성 직후에 content 아래에서 자동으로 찾음 (자동생성/수동배치 상관없이 잡힘)
+    // 씬에 있는 노드들 - Awake 시 content 아래에서 자동으로 찾음 (손으로 배치한 노드 그대로 잡힘)
     private UpgradeNodeUI[] _upgradeNodes = System.Array.Empty<UpgradeNodeUI>();
     private ObjectEconomyNodeUI[] _economyNodes = System.Array.Empty<ObjectEconomyNodeUI>();
 
@@ -65,7 +57,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         CacheNodes();
     }
 
-    // content 아래의 모든 업그레이드/이코노미 노드를 찾아 캐시 (자동생성 노드도 여기서 잡힘)
+    // content 아래의 모든 업그레이드/이코노미 노드를 찾아 캐시 (손으로 배치한 노드도 여기서 잡힘)
     private void CacheNodes()
     {
         Transform root = content != null ? content : transform;
@@ -152,9 +144,13 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
 
         // 그냥 localScale만 바꾸면 Content의 피벗 기준으로 확대/축소되면서 노드 전체가 화면에서 쭉 밀려 보임
         // (피벗이 화면 중앙이나 커서 위치가 아니라서). 커서 아래의 지점이 확대/축소돼도 화면에서 안 움직이도록
-        // 스크롤 시점에 저장해둔 커서 위치(_zoomFocalPoint)를 기준으로 anchoredPosition도 같이 보정함
+        // 스크롤 시점에 저장해둔 커서 위치(_zoomFocalPoint)를 기준으로 위치도 같이 보정함.
+        // anchoredPosition은 Content의 anchor 기준점(지금은 부모 좌상단)에서 잰 값이라 _zoomFocalPoint(부모 pivot 기준)랑
+        // 원점이 달라서 안 맞음 - localPosition은 항상 부모 pivot 기준이라 원점이 같음
         float ratio = newScale / currentScale;
-        content.anchoredPosition = _zoomFocalPoint - (_zoomFocalPoint - content.anchoredPosition) * ratio;
+        Vector2 localPos = content.localPosition;
+        Vector2 newLocalPos = _zoomFocalPoint - (_zoomFocalPoint - localPos) * ratio;
+        content.localPosition = new Vector3(newLocalPos.x, newLocalPos.y, content.localPosition.z);
 
         content.localScale = new Vector3(newScale, newScale, 1f);
     }
@@ -180,115 +176,4 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
     // 열려있는 동안은 뒤쪽 월드 오브젝트(Click.cs)가 클릭되지 않도록 플래그를 켜고 끔
     public void OnPointerEnter(PointerEventData eventData) => UIPointerGuard.IsPointerOverUI = true;
     public void OnPointerExit(PointerEventData eventData) => UIPointerGuard.IsPointerOverUI = false;
-
-#if UNITY_EDITOR
-    // 인스펙터 우클릭 -> "트리 생성/갱신" : UpgradeManager의 템플릿을 펼쳐, 아직 씬에 없는 노드/연결선만
-    // content 아래에 실제 GameObject로 생성함. 이미 있는 노드는 그대로 둠(직접 옮겨둔 위치 유지).
-    // 삭제된 템플릿의 노드는 자동으로 지우지 않음 - 필요하면 씬에서 손으로 지울 것.
-    [MenuItem("Tools/Break The World/업그레이드 트리 생성·갱신")]
-    private static void GenerateTreeMenu()
-    {
-        var tree = FindFirstObjectByType<UpgradeTreeUI>(FindObjectsInactive.Include);
-        if (tree != null) tree.GenerateTree();
-        else Debug.LogError("씬에 UpgradeTreeUI가 없음");
-    }
-
-    [ContextMenu("트리 생성/갱신")]
-    public void GenerateTree()
-    {
-        if (content == null) { Debug.LogError("UpgradeTreeUI: content가 비어있음"); return; }
-        if (nodePrefab == null) { Debug.LogError("UpgradeTreeUI: nodePrefab이 비어있음"); return; }
-
-        UpgradeManager manager = FindFirstObjectByType<UpgradeManager>();
-        if (manager == null) { Debug.LogError("UpgradeTreeUI: 씬에 UpgradeManager가 없음"); return; }
-
-        IReadOnlyList<UpgradeManager.UpgradeNode> nodes = manager.GetNodesForEditor();
-
-        // 이미 씬에 있는 노드/링크 수집
-        var existingNodes = new Dictionary<string, UpgradeNodeUI>();
-        foreach (UpgradeNodeUI ui in content.GetComponentsInChildren<UpgradeNodeUI>(true))
-            if (!string.IsNullOrEmpty(ui.NodeId)) existingNodes[ui.NodeId] = ui;
-
-        var byId = new Dictionary<string, UpgradeManager.UpgradeNode>();
-        foreach (var n in nodes) byId[n.id] = n;
-
-        var depthMemo = new Dictionary<string, int>();
-        var rowCursor = new Dictionary<int, int>(); // 깊이별로 지금까지 몇 개 놓았는지
-
-        // 깊이별 노드 수를 먼저 세서 세로 중앙정렬에 씀
-        var depthCount = new Dictionary<int, int>();
-        foreach (var n in nodes)
-        {
-            int d = Depth(n.id, byId, depthMemo);
-            depthCount[d] = depthCount.TryGetValue(d, out int c) ? c + 1 : 1;
-        }
-
-        int created = 0;
-        foreach (var n in nodes)
-        {
-            if (existingNodes.ContainsKey(n.id)) continue;
-
-            var ui = (UpgradeNodeUI)PrefabUtility.InstantiatePrefab(nodePrefab, content);
-            ui.name = "Node " + n.id;
-            ui.Bind(n.id);
-
-            int d = Depth(n.id, byId, depthMemo);
-            int row = rowCursor.TryGetValue(d, out int r) ? r : 0;
-            rowCursor[d] = row + 1;
-            float y = -(row - (depthCount[d] - 1) * 0.5f) * rowSpacing;
-
-            var rt = ui.Rect;
-            rt.anchoredPosition = new Vector2(d * columnSpacing, y) + n.nodeOffset;
-            rt.localScale = Vector3.one;
-
-            existingNodes[n.id] = ui;
-            Undo.RegisterCreatedObjectUndo(ui.gameObject, "Generate Upgrade Node");
-            created++;
-        }
-
-        var existingLinks = new HashSet<string>();
-        foreach (UpgradeTreeLink link in content.GetComponentsInChildren<UpgradeTreeLink>(true))
-            existingLinks.Add(link.PairKey);
-
-        int linksCreated = 0;
-        foreach (var n in nodes)
-        {
-            if (string.IsNullOrEmpty(n.prerequisiteId)) continue;
-            if (!existingNodes.TryGetValue(n.prerequisiteId, out UpgradeNodeUI fromUi)) continue;
-            if (!existingNodes.TryGetValue(n.id, out UpgradeNodeUI toUi)) continue;
-
-            string key = fromUi.name + "->" + toUi.name;
-            if (existingLinks.Contains(key)) continue;
-
-            var go = new GameObject("Link " + n.prerequisiteId + " -> " + n.id, typeof(RectTransform), typeof(UpgradeTreeLink));
-            var rt = (RectTransform)go.transform;
-            rt.SetParent(content, false);
-            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-            rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.sizeDelta = Vector2.zero;
-            rt.anchoredPosition = Vector2.zero;
-            rt.localScale = Vector3.one;
-            rt.SetAsFirstSibling(); // 노드보다 뒤에 그려지도록
-
-            go.GetComponent<UpgradeTreeLink>().Bind(fromUi.Rect, toUi.Rect, n.linkRouting);
-            Undo.RegisterCreatedObjectUndo(go, "Generate Upgrade Link");
-            linksCreated++;
-        }
-
-        CacheNodes();
-        EditorUtility.SetDirty(this);
-        Debug.Log($"업그레이드 트리 생성/갱신: 노드 {created}개, 연결선 {linksCreated}개 추가 (전체 노드 {nodes.Count}개)");
-    }
-
-    // 선행 체인의 길이 = 트리에서의 깊이 (열 인덱스)
-    private static int Depth(string id, Dictionary<string, UpgradeManager.UpgradeNode> byId, Dictionary<string, int> memo)
-    {
-        if (string.IsNullOrEmpty(id) || !byId.TryGetValue(id, out var node)) return 0;
-        if (memo.TryGetValue(id, out int cached)) return cached;
-
-        int d = string.IsNullOrEmpty(node.prerequisiteId) ? 0 : Depth(node.prerequisiteId, byId, memo) + 1;
-        memo[id] = d;
-        return d;
-    }
-#endif
 }

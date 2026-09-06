@@ -1,194 +1,136 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using TMPro;
 
-// 업그레이드 트리(메인 트리) 노드 하나. nodeId(UpgradeManager가 템플릿을 펼쳐 만든 노드의 id)만 지정하면
-// 나머지(이름/레벨/비용/공개여부/구매)는 UpgradeManager를 조회해서 알아서 처리됨.
-// 부모-자식 연결선은 이 스크립트가 아니라 UILineConnector가 따로 담당함 (이 노드의 RectTransform을 참조해서 그림).
+// 업그레이드 트리 노드 하나. 이름/설명/횟수/효과/비용을 전부 이 컴포넌트에서 직접 인스펙터로 설정함
+// (템플릿/CSV 없음). 선행조건은 별도 필드가 아니라, 이 노드로 들어오는 UpgradeTreeLink의 시작 노드로
+// UpgradeManager가 자동으로 판단함 - 선 하나 그으면 그게 곧 선행 설정이 됨.
+// id는 이 오브젝트의 이름을 그대로 씀 (세이브 키로도 쓰이니 씬 안에서 겹치지 않게 할 것).
 [RequireComponent(typeof(Button))]
-public class UpgradeNodeUI : MonoBehaviour
+public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private string nodeId; // 이 노드가 나타내는 UpgradeManager 노드 id ("{템플릿id}#{tier}"). 트리 자동생성 시 Bind로 채워짐
-    [SerializeField] private TextMeshProUGUI label; // 이름/레벨/비용을 표시할 텍스트 (3줄: 이름 / N-Max / 비용)
-    [SerializeField] private Image flashOverlay; // 구매 성공(초록)/실패(빨강) 시 잠깐 반짝이는 오버레이 - 평소엔 알파 0
-    [SerializeField] private Image maxedOverlay; // 최대 레벨이면 계속 켜두는 초록 오버레이 (선택 사항, 없으면 비워둬도 됨)
+    [Header("업그레이드 설정")]
+    [SerializeField] private string displayName;                   // 표시용 이름 (지금은 노드 자체엔 안 그림, 참고용)
+    [TextArea] [SerializeField] private string description;        // 호버 툴팁에 뜨는 설명. 예: "공격력이 +1 증가합니다."
+    [SerializeField] private UpgradeManager.UpgradeEffect effect;   // 이 업그레이드가 건드리는 수치
+    [Tooltip("Click Damage 효과 전용 - 특정 무기 전용이면 그 무기, 전역이면 \"전체 (전역)\"")]
+    [ObjectNameField(ObjectNameFieldSource.Weapon)] [SerializeField] private string targetWeaponName;
+    [Tooltip("AutoClick 계열(해금/속도/횟수) 효과 전용 - 특정 오브젝트 장착 중일 때만 작동, 전역이면 \"전체 (전역)\"")]
+    [ObjectNameField] [SerializeField] private string targetObjectName;
+    [Min(1)] [SerializeField] private int maxLevel = 5;             // 업그레이드 가능 횟수
+    [SerializeField] private float[] valuePerLevel = { 1f };        // 레벨별 효과값 (배열이 짧으면 마지막 값 반복)
+
+    [Tooltip("이 업그레이드 한 번 올리는 데 드는 조각들. 여러 종류를 동시에 요구할 수 있음 (전부 있어야 구매됨)")]
+    [SerializeField] private NodeCost[] costs = { new NodeCost() };
+
+    // 조각 비용 한 줄 = 조각 한 종류 + 레벨별 증가 공식. 노드 하나가 여러 줄을 가질 수 있음
+    [Serializable]
+    public class NodeCost
+    {
+        [Tooltip("비우면 Target Object Name 걸로 따라감, 그것도 비었으면 0번 오브젝트 조각")]
+        [ObjectNameField(emptyOptionLabel: "비움 (대상 오브젝트 따라감)")]
+        public string objectName;
+        [Min(1)] public long baseAmount = 10;   // 0->1레벨 비용
+        public float levelGrowth = 2f;          // 레벨 오를 때마다 이 조각 요구량에 곱해지는 배율
+    }
 
     private Button _button;
     private RectTransform _rect;
-    private Coroutine _flashRoutine; // 지금 재생 중인 반짝임/흔들림 연출 (중첩 재생 방지용)
-    private bool _wasRevealed; // 직전 Refresh 때 이 노드가 공개 상태였는지 - hidden→revealed로 바뀌는 "등장 순간"을 한 번만 잡으려고 추적
-    private bool _refreshedOnce; // Refresh가 최소 한 번 돌았는지 - 첫 호출 때는 등장 흔들림을 재생 안 함(이미 열려있던 노드로 취급)
+    private Coroutine _shakeRoutine; // 지금 재생 중인 흔들림 (중첩 방지)
+    private bool _wasRevealed;   // 직전 Refresh 때 공개 상태였는지 - 등장 순간 1회 감지용
+    private bool _refreshedOnce; // Refresh가 최소 한 번 돌았는지 - 첫 호출 땐 등장 흔들림 안 함
 
-    public string NodeId => nodeId; // 트리 자동생성/연결선이 참조
-    public RectTransform Rect => _rect != null ? _rect : (_rect = (RectTransform)transform); // 연결선 스크립트가 참조할 RectTransform
+    public string Id => name; // 세이브/트리 조회 키 - 오브젝트 이름을 그대로 씀
+    public string DisplayName => displayName;
+    public string Description => description;
+    public UpgradeManager.UpgradeEffect Effect => effect;
+    public string TargetWeaponName => targetWeaponName;
+    public string TargetObjectName => targetObjectName;
+    public int MaxLevel => maxLevel;
+    public float[] ValuePerLevel => valuePerLevel;
+    public NodeCost[] Costs => costs;
+    public RectTransform Rect => _rect != null ? _rect : (_rect = (RectTransform)transform);
 
-    // 트리 자동생성 시 어떤 업그레이드 노드를 나타내는지 지정 (에디터에서 직접 넣어도 됨)
-    public void Bind(string id) => nodeId = id;
-
-    // 이 노드를 anchor로 삼는 다른 노드(ObjectEconomyNodeUI 등)가 "부모가 1레벨 이상인지" 확인할 때 씀
-    public bool IsLeveled() => UpgradeManager.Instance != null && UpgradeManager.Instance.GetLevel(nodeId) >= 1;
+    // ObjectEconomyNodeUI 등이 "부모가 1레벨 이상인지" 확인할 때 씀
+    public bool IsLeveled() => UpgradeManager.Instance != null && UpgradeManager.Instance.GetLevel(Id) >= 1;
 
     void Awake()
     {
         _rect = (RectTransform)transform;
         _button = GetComponent<Button>();
         _button.onClick.AddListener(HandleClicked);
-
-        if (flashOverlay != null)
-        {
-            flashOverlay.raycastTarget = false; // 클릭을 가로채면 안 됨
-            SetOverlayAlpha(flashOverlay, 0f);
-        }
-
-        // 최대 레벨일 때 켜지는 오버레이도 클릭을 가로채면 안 됨 (활성화되는 순간 버튼 위를 덮어버리니까)
-        if (maxedOverlay != null)
-            maxedOverlay.raycastTarget = false;
     }
 
     private void HandleClicked()
     {
-        bool success = UpgradeManager.Instance != null && UpgradeManager.Instance.TryUpgrade(nodeId);
-
-        // 이번 구매로 최대 레벨(N/Max 또는 1/1)까지 다 채웠으면 흔들지 않고 초록 반짝임만 재생
-        bool justMaxed = success && UpgradeManager.Instance.GetLevel(nodeId) >= UpgradeManager.Instance.GetMaxLevel(nodeId);
-        PlayFlash(success, playShake: !justMaxed);
-
-        UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true); // 방금 해금된 자식 노드들이 나타나도록 트리 전체를 새로고침 (등장 흔들림 재생)
+        // 성공하면 대각선 흔들림만. 실패(최대레벨/조각부족/미공개)면 아무 반응 없음 (툴팁은 호버로 이미 떠있음)
+        if (UpgradeManager.Instance != null && UpgradeManager.Instance.TryUpgrade(Id))
+        {
+            PlayShake();
+            UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true);
+        }
     }
 
-    // 현재 상태(공개 여부/텍스트/최대 레벨 표시)를 갱신 - UpgradeTreeUI가 전체를 새로고침할 때마다 호출함.
-    // animateReveal: 구매로 인한 새로고침이면 true - 이 노드가 이번에 처음 공개됐다면 등장 흔들림을 재생함
+    // 공개 여부만 갱신 (노드 자체엔 표시할 게 없음). UpgradeTreeUI가 새로고침할 때마다 호출.
+    // animateReveal: 구매로 인한 새로고침이면 true - 이번에 처음 공개됐으면 등장 흔들림 재생
     public void Refresh(bool animateReveal = false)
     {
-        if (UpgradeManager.Instance == null || string.IsNullOrEmpty(nodeId) || UpgradeManager.Instance.GetNode(nodeId) == null)
+        if (UpgradeManager.Instance == null || UpgradeManager.Instance.GetNode(Id) == null)
         {
             gameObject.SetActive(false);
             return;
         }
 
-        bool isRevealed = UpgradeManager.Instance.IsRevealed(nodeId); // 선행 노드 조건을 만족하면 공개됨
+        bool isRevealed = UpgradeManager.Instance.IsRevealed(Id);
 
-        // hidden→revealed로 처음 바뀌는 순간 + 구매로 인한 새로고침(animateReveal)일 때만 등장 흔들림.
-        // 첫 Refresh(_refreshedOnce=false)는 제외 - 페이지를 처음 열 때 이미 공개돼있던 노드는 흔들지 않음
         bool justRevealed = animateReveal && _refreshedOnce && isRevealed && !_wasRevealed;
         _wasRevealed = isRevealed;
         _refreshedOnce = true;
 
         gameObject.SetActive(isRevealed);
-        if (!isRevealed) return;
-
-        if (justRevealed) PlayRevealShake();
-
-        int level = UpgradeManager.Instance.GetLevel(nodeId);
-        int maxLevel = UpgradeManager.Instance.GetMaxLevel(nodeId);
-        bool maxed = level >= maxLevel;
-
-        if (label != null)
-        {
-            string name = UpgradeManager.Instance.GetDisplayName(nodeId);
-            string costLine = maxed ? "최대" : FormatCost(UpgradeManager.Instance.GetNextCost(nodeId));
-            label.text = $"{name}\n{level}/{maxLevel}\n{costLine}";
-        }
-
-        if (maxedOverlay != null)
-            maxedOverlay.gameObject.SetActive(maxed);
+        if (isRevealed && justRevealed) PlayShake();
     }
 
-    // 조각 비용 배열(여러 종류일 수 있음)을 "{개수} {오브젝트 이름}"을 줄바꿈으로 나열한 문자열로 만듦
-    private string FormatCost(PieceCost[] costs)
+    // ---- 호버 툴팁 ----
+
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        if (costs == null || costs.Length == 0) return "";
+        if (UpgradeManager.Instance == null) return;
 
-        var lines = new string[costs.Length];
-        for (int i = 0; i < costs.Length; i++)
-        {
-            string objectName = ObjectManager.Instance != null ? ObjectManager.Instance.GetObjectAt(costs[i].objectIndex).objectName : $"오브젝트 {costs[i].objectIndex}";
-            lines[i] = $"{NumberFormatUtil.Format(costs[i].amount)} {objectName}";
-        }
-
-        return string.Join("\n", lines);
+        int level = UpgradeManager.Instance.GetLevel(Id);
+        UpgradeTooltip.Instance?.Show($"{description}\n{level}/{maxLevel}", _rect);
     }
 
-    private void PlayFlash(bool success, bool playShake)
+    public void OnPointerExit(PointerEventData eventData) => UpgradeTooltip.Instance?.Hide();
+
+    // ---- 대각선 흔들림 (구매 성공 / 등장 공용) ----
+
+    private void PlayShake()
     {
-        if (flashOverlay == null) return;
-
-        if (_flashRoutine != null)
-            StopCoroutine(_flashRoutine);
-
-        _flashRoutine = StartCoroutine(FlashRoutine(success, playShake));
-    }
-
-    // 성공하면 초록, 실패하면 빨강으로 잠깐 반짝임. 성공 + playShake일 때만 좌우로 살짝 흔들림
-    private IEnumerator FlashRoutine(bool success, bool playShake)
-    {
-        const float duration = 0.2f; // 연출 총 시간(초)
-        const float peakAlpha = 0.6f; // 반짝임 최대 밝기
-        const float shakeAmplitudeDegrees = 5f; // 흔들림 최대 각도
-        const float shakeOscillations = 1.5f; // 연출 시간 동안 좌우로 흔들리는 횟수
-
-        Color color = success ? new Color(0.1f, 1f, 0.1f, peakAlpha) : new Color(1f, 0.1f, 0.1f, peakAlpha);
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.unscaledDeltaTime; // 업그레이드 화면이 게임을 멈춰도(Time.timeScale=0) 재생되도록
-            float progress = Mathf.Clamp01(elapsed / duration);
-
-            color.a = Mathf.Lerp(peakAlpha, 0f, progress);
-            flashOverlay.color = color;
-
-            if (success && playShake)
-            {
-                float angle = shakeAmplitudeDegrees * Mathf.Sin(progress * shakeOscillations * Mathf.PI * 2f) * (1f - progress);
-                _rect.localRotation = Quaternion.Euler(0f, 0f, angle);
-            }
-
-            yield return null;
-        }
-
-        SetOverlayAlpha(flashOverlay, 0f);
+        if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
         _rect.localRotation = Quaternion.identity;
-        _flashRoutine = null;
+        _shakeRoutine = StartCoroutine(ShakeRoutine());
     }
 
-    // 노드가 새로 공개될 때 재생 - 색 반짝임 없이 좌우로 살짝 기울었다 돌아오는 흔들림만 (구매 성공 때와 같은 느낌)
-    private void PlayRevealShake()
+    private IEnumerator ShakeRoutine()
     {
-        if (_flashRoutine != null)
-            StopCoroutine(_flashRoutine);
-
-        _rect.localRotation = Quaternion.identity;
-        _flashRoutine = StartCoroutine(RevealShakeRoutine());
-    }
-
-    private IEnumerator RevealShakeRoutine()
-    {
-        const float duration = 0.25f; // 등장 흔들림 총 시간(초) - 구매(0.2)보다 살짝 길게
-        const float shakeAmplitudeDegrees = 5f; // 흔들림 최대 각도 (구매 때와 동일)
-        const float shakeOscillations = 1.5f; // 연출 시간 동안 좌우로 흔들리는 횟수
+        const float duration = 0.22f;            // 흔들림 총 시간(초)
+        const float amplitudeDegrees = 5f;       // 최대 각도
+        const float oscillations = 1.5f;         // 좌우 왕복 횟수
 
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            elapsed += Time.unscaledDeltaTime; // 업그레이드 화면이 게임을 멈춰도(Time.timeScale=0) 재생되도록
-            float progress = Mathf.Clamp01(elapsed / duration);
-
-            float angle = shakeAmplitudeDegrees * Mathf.Sin(progress * shakeOscillations * Mathf.PI * 2f) * (1f - progress);
+            elapsed += Time.unscaledDeltaTime;   // 업그레이드 화면이 timeScale 0이라 unscaled
+            float p = Mathf.Clamp01(elapsed / duration);
+            float angle = amplitudeDegrees * Mathf.Sin(p * oscillations * Mathf.PI * 2f) * (1f - p);
             _rect.localRotation = Quaternion.Euler(0f, 0f, angle);
-
             yield return null;
         }
 
         _rect.localRotation = Quaternion.identity;
-        _flashRoutine = null;
-    }
-
-    private void SetOverlayAlpha(Image image, float alpha)
-    {
-        Color c = image.color;
-        c.a = alpha;
-        image.color = c;
+        _shakeRoutine = null;
     }
 }

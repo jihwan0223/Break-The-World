@@ -22,17 +22,9 @@ public class UpgradeTreeLink : MonoBehaviour
     private Vector2 _lastA, _lastB; // 직전에 그린 from/to 위치 - 안 움직였으면 Rebuild 생략 (매 프레임 RectTransform 더럽히지 않게)
     private bool _dirty = true;
 
-    // "부모노드id->자식노드id" - 트리 생성기가 링크 중복 생성을 피할 때 비교용
-    public string PairKey => (fromNode != null ? fromNode.name : "?") + "->" + (toNode != null ? toNode.name : "?");
-
-    // 트리 생성기가 호출 - 어떤 두 노드를 어떤 모양으로 이을지 지정
-    public void Bind(RectTransform from, RectTransform to, UpgradeManager.LinkRouting linkRouting)
-    {
-        fromNode = from;
-        toNode = to;
-        routing = linkRouting;
-        _dirty = true;
-    }
+    // UpgradeManager가 선행관계(누가 누구의 선행인지)를 이 선으로 판단함
+    public RectTransform FromNode => fromNode;
+    public RectTransform ToNode => toNode;
 
     void OnValidate() => _dirty = true; // 인스펙터에서 두께/색/routing 바꾸면 다시 그림
 

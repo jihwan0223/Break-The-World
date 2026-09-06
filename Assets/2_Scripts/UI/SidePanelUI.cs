@@ -102,6 +102,7 @@ public class SidePanelUI : MonoBehaviour
     private void Build(VisualElement root)
     {
         root.Clear();
+        GameFonts.Apply(root);
 
         // 투명한 루트가 화면 전체 클릭을 먹어서 뒤쪽 Canvas(업그레이드 트리)의 노드 클릭이 안 되는 문제 방지 -
         // 실제 버튼/팝업 패널은 각자 picking 모드를 그대로 유지하므로 그 위 클릭은 정상 동작함

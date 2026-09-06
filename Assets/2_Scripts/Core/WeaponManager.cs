@@ -35,6 +35,26 @@ public class WeaponManager : MonoBehaviour
     public WeaponData CurrentWeapon => weapons[equippedIndex];
     public int CurrentClickDamage => CurrentWeapon.clickDamage;
 
+    // Instance 없이도(에디터 등에서) 무기 이름 조회 - UpgradeManager/드롭다운 필드가 씀
+    public static int StaticWeaponCount => weapons.Count;
+
+    public static string StaticWeaponNameAt(int index) =>
+        index >= 0 && index < weapons.Count ? weapons[index].weaponName : "";
+
+    // weaponName으로 인덱스를 찾음. 없으면 -1. 공백 차이는 무시하고 대소문자 구분 없이 비교
+    public static int StaticIndexOfWeaponName(string weaponName)
+    {
+        if (string.IsNullOrWhiteSpace(weaponName)) return -1;
+
+        string wanted = weaponName.Trim();
+        for (int i = 0; i < weapons.Count; i++)
+        {
+            if (string.Equals(weapons[i].weaponName.Trim(), wanted, StringComparison.OrdinalIgnoreCase))
+                return i;
+        }
+        return -1;
+    }
+
     // 장착 무기가 바뀔 때마다(=Equip 호출 시) 새 무기 데이터를 전달 - 무기 UI 등이 구독
     public event Action<WeaponData> OnWeaponChanged;
 
