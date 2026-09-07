@@ -8,13 +8,22 @@ public class ComboManager : MonoBehaviour
     // 씬 어디서든 ComboManager.Instance로 접근하기 위한 싱글톤
     public static ComboManager Instance { get; private set; }
 
-    private const float ComboShardMultiplier = 2f; // 콤보 활성 중 파편 획득 배율
+    private const float FallbackComboMultiplier = 2f; // UpgradeManager가 없을 때만 쓰는 기본 배율
 
     private float _cooldownRemaining; // 다음 콤보 발동까지 남은 대기시간(초)
     private float _activeRemaining; // 지금 활성화된 콤보가 끝날 때까지 남은 시간(초)
 
     public bool IsComboActive => _activeRemaining > 0f;
-    public float ShardMultiplier => IsComboActive ? ComboShardMultiplier : 1f;
+
+    // 콤보 활성 중 파편 배율. 기본값 + "콤보 배율 증가" 업그레이드는 UpgradeManager가 계산함
+    public float ShardMultiplier
+    {
+        get
+        {
+            if (!IsComboActive) return 1f;
+            return UpgradeManager.Instance != null ? UpgradeManager.Instance.ComboShardMultiplierValue : FallbackComboMultiplier;
+        }
+    }
 
     // 콤보가 켜지거나 꺼질 때(true/false) 전달 - 연출 등에 나중에 쓸 수 있게 미리 만들어둠
     public event Action<bool> OnComboStateChanged;

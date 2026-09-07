@@ -27,6 +27,8 @@ public class ObjectManager : MonoBehaviour
 
     [SerializeField] private ObjectVisualSet[] objectVisuals; // objects 리스트와 같은 순서/개수로 채워야 함 (26개)
 
+    [SerializeField] private bool debugUnlockAll = true; // 테스트용 - 켜면 모든 오브젝트가 처음부터 해금됨 (업그레이드 무관)
+
     // 파괴 대상 오브젝트 
     private static readonly List<ObjectData> objects = new List<ObjectData>
     {
@@ -113,6 +115,8 @@ public class ObjectManager : MonoBehaviour
 
         _unlocked = new bool[objects.Count];
         _unlocked[0] = true; // 첫 오브젝트는 항상 해금된 상태로 시작
+        if (debugUnlockAll)
+            for (int i = 0; i < _unlocked.Length; i++) _unlocked[i] = true;
 
         _gainLevel = new int[objects.Count];
     }
@@ -179,6 +183,7 @@ public class ObjectManager : MonoBehaviour
     public void SetUnlocked(int index, bool unlocked)
     {
         if (index < 0 || index >= _unlocked.Length) return;
+        if (debugUnlockAll) unlocked = true; // 테스트 모드에서는 세이브가 뭐든 무조건 해금
         _unlocked[index] = unlocked;
         if (unlocked) OnUnlockChanged?.Invoke(index);
     }
@@ -236,7 +241,7 @@ public class ObjectManager : MonoBehaviour
     public void ResetAll()
     {
         for (int i = 1; i < _unlocked.Length; i++)
-            _unlocked[i] = false;
+            _unlocked[i] = debugUnlockAll; // 테스트 모드면 리셋해도 계속 다 해금
 
         for (int i = 0; i < _gainLevel.Length; i++)
         {

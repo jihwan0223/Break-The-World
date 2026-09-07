@@ -61,6 +61,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour
         // Unlock은 한 번 사면 그걸로 끝(항상 완료 상태)이고, Gain은 5/5를 찍은 순간이면 흔들지 않고 초록 반짝임만 재생
         bool justMaxed = success && (!isGain || ObjectManager.Instance.GetGainLevel(objectIndex) >= 5);
         PlayFlash(success, playShake: !justMaxed);
+        if (success) UpgradeTooltip.Instance?.PlayShake(); // 호버로 떠있는 툴팁도 같이 흔들림
 
         UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true); // 방금 해금된 자식 노드들이 나타나도록 트리 전체를 새로고침 (등장 흔들림 재생)
     }
@@ -144,7 +145,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour
     {
         const float duration = 0.2f;
         const float peakAlpha = 0.6f;
-        const float shakeAmplitudeDegrees = 5f;
+        const float shakeAmplitudeDegrees = 7f;
         const float shakeOscillations = 1.5f;
 
         Color color = success ? new Color(0.1f, 1f, 0.1f, peakAlpha) : new Color(1f, 0.1f, 0.1f, peakAlpha);
@@ -185,7 +186,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour
     private IEnumerator RevealShakeRoutine()
     {
         const float duration = 0.25f; // 등장 흔들림 총 시간(초) - 구매(0.2)보다 살짝 길게
-        const float shakeAmplitudeDegrees = 5f; // 흔들림 최대 각도 (구매 때와 동일)
+        const float shakeAmplitudeDegrees = 7f; // 흔들림 최대 각도 (구매 때와 동일)
         const float shakeOscillations = 1.5f; // 연출 시간 동안 좌우로 흔들리는 횟수
 
         float elapsed = 0f;

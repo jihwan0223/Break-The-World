@@ -7,6 +7,7 @@ public class Health : MonoBehaviour
 {
     [SerializeField] private int weaponTier = 1; // 이 오브젝트를 부수는 데 필요한 무기 티어 (1부터 시작)
     [SerializeField] private int objectIndexInTier = 1; // 같은 무기 티어 내에서 이 오브젝트의 순번 (1부터 시작)
+    [SerializeField] private int fixedObjectIndex = -1; // -1이면 지금 장착 중인 오브젝트. 0 이상이면 파괴 사운드를 그 오브젝트 걸로
     [SerializeField] private float respawnDelay = 1f; // 죽고 나서 재생성까지 대기하는 시간(초)
     [SerializeField] private float dieFadeDuration = 0.25f; // 죽을 때 흐려지며 사라지는 연출 시간(초)
     [SerializeField] private float respawnFadeDuration = 0.25f; // 재생성될 때 서서히 나타나는 연출 시간(초)
@@ -91,8 +92,14 @@ public class Health : MonoBehaviour
         IsDead = true;
         OnDied?.Invoke();
 
-        // 현재 선택된 오브젝트(ObjectManager)의 파괴 사운드 재생
-        AudioClip breakSound = ObjectManager.Instance != null ? ObjectManager.Instance.CurrentObject.breakSound : null;
+        // 파괴 사운드 재생 - 고정 오브젝트면 그 오브젝트 걸로, 아니면 지금 장착 중인 것
+        AudioClip breakSound = null;
+        if (ObjectManager.Instance != null)
+        {
+            breakSound = (fixedObjectIndex >= 0 && fixedObjectIndex < ObjectManager.StaticObjectCount)
+                ? ObjectManager.Instance.GetObjectAt(fixedObjectIndex).breakSound
+                : ObjectManager.Instance.CurrentObject.breakSound;
+        }
         if (breakSound != null)
             _audioSource.PlayOneShot(breakSound);
 

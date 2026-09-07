@@ -26,6 +26,15 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("더블 클릭 해금")] DoubleClick,             // 더블 클릭 해금
         [InspectorName("자동 채굴 해금")] AutoMineUnlock,          // 자동 채굴 해금
         [InspectorName("자동 채굴 주기 단축")] AutoMineSpeed,      // 자동 채굴 주기 -값 초
+        // 아래는 나중에 추가된 것들 - enum은 int로 직렬화되니 새 값은 항상 맨 뒤에만 붙일 것
+        [InspectorName("자동 채굴 획득량 증가")] AutoMineYield,    // 자동 채굴 1틱당 획득 파편 +값
+        [InspectorName("콤보 배율 증가")] ComboMultiplier,        // 콤보 활성 중 파편 배율 +값
+        [InspectorName("럭키클릭 확률 증가")] LuckyClickChanceUp,  // 럭키클릭 확률 +값 %
+        [InspectorName("더블클릭 확률 증가")] DoubleClickChanceUp, // 더블클릭 발동 확률 +값 %
+        [InspectorName("전역 파편 획득 증가")] PieceGainGlobal,    // 모든 오브젝트 파편 획득 +값 %
+        [InspectorName("오브젝트 파편 획득 증가")] PieceGainObject, // Target Object Name 오브젝트 파편 획득 +값 %
+        [InspectorName("오브젝트 2배 드랍 확률")] ObjectDoubleDrop, // Target Object Name 오브젝트 처치 시 파편 2배 확률 +값 %
+        [InspectorName("무기 처치 보너스 파편")] WeaponKillBonus,   // Target Weapon Name 무기로 처치 시 보너스 파편 +값
     }
 
     // 선행 노드와 잇는 선의 모양 (UpgradeTreeLink가 이 값을 보고 세그먼트를 배치함)
@@ -47,7 +56,9 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private float baseComboCooldown = 30f;      // 콤보 기본 쿨타임(초)
     [SerializeField] private float minComboCooldown = 10f;       // 콤보 쿨타임 하한
     [SerializeField] private float baseComboDuration = 5f;       // 콤보 기본 지속시간(초)
-    [SerializeField] private float luckyClickChanceValue = 0.001f; // 럭키 클릭 확률 (0.1%)
+    [SerializeField] private float luckyClickChanceValue = 0.001f; // 럭키 클릭 기본 확률 (0.1%) - LuckyClickChanceUp이 위에 더함
+    [SerializeField] private float baseComboMultiplier = 2f;     // 콤보 활성 중 기본 파편 배율 - ComboMultiplier가 위에 더함
+    [SerializeField] private float baseDoubleClickChance = 0.25f;// 더블클릭 해금 직후 발동 확률 - DoubleClickChanceUp이 위에 더함
     [SerializeField] private float baseAutoMineInterval = 8f;    // 자동 채굴 기본 주기(초)
     [SerializeField] private float minAutoMineInterval = 2f;     // 자동 채굴 주기 하한
     [SerializeField] private int autoMineTierOffset = 3;         // 지금 캐는 오브젝트보다 몇 단계 전을 자동으로 캘지
@@ -209,7 +220,8 @@ public class UpgradeManager : MonoBehaviour
         return node?.CostForLevel(GetLevel(nodeId));
     }
 
-    // 이 노드가 트리에 공개(보이고 구매 가능)됐는지 - 선행이 1레벨 이상이면 열림
+    // 이 노드가 트리에 공개(보이고 구매 가능)됐는지 - 루트는 항상, 그 외엔 선행 노드를 1레벨 이상 찍어야 공개.
+    // (선행 노드가 한 번이라도 업그레이드되면 이 노드와 잇는 선이 뜸)
     public bool IsRevealed(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId);
@@ -368,14 +380,52 @@ public class UpgradeManager : MonoBehaviour
     public float ComboDurationSeconds =>
         baseComboDuration + SumEffect(UpgradeEffect.ComboDuration);
 
+    // 콤보 활성 중 파편 배율 (ComboManager가 콤보 켜져있을 때 이 값을 씀)
+    public float ComboShardMultiplierValue => baseComboMultiplier + SumEffect(UpgradeEffect.ComboMultiplier);
+
     public bool LuckyClickIsUnlocked => AnyUnlocked(UpgradeEffect.LuckyClick);
-    public float LuckyClickChance => LuckyClickIsUnlocked ? luckyClickChanceValue : 0f;
+    public float LuckyClickChance =>
+        LuckyClickIsUnlocked ? Mathf.Clamp01(luckyClickChanceValue + SumEffect(UpgradeEffect.LuckyClickChanceUp) / 100f) : 0f;
 
     public bool DoubleClickIsUnlocked => AnyUnlocked(UpgradeEffect.DoubleClick);
+    public float DoubleClickChanceValue =>
+        DoubleClickIsUnlocked ? Mathf.Clamp01(baseDoubleClickChance + SumEffect(UpgradeEffect.DoubleClickChanceUp) / 100f) : 0f;
 
     public bool AutoMineIsUnlocked => AnyUnlocked(UpgradeEffect.AutoMineUnlock);
     public int AutoMineTierOffset => autoMineTierOffset;
 
     public float AutoMineIntervalSeconds =>
         Mathf.Max(minAutoMineInterval, baseAutoMineInterval - SumEffect(UpgradeEffect.AutoMineSpeed));
+
+    // 자동 채굴 1틱당 추가로 주는 파편 (기본 지급량 위에 더함)
+    public int AutoMineYieldBonus => Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoMineYield));
+
+    // ---- 파편 획득 관련 (Click.HandleDied에서 사용) ----
+
+    // 파편 획득 배율 = 1 + (전역% + 이 오브젝트 대상%) / 100
+    public float PieceGainMultiplier(int objectIndex)
+    {
+        float pct = SumEffect(UpgradeEffect.PieceGainGlobal) + SumEffect(UpgradeEffect.PieceGainObject, objectIndex);
+        return 1f + pct / 100f;
+    }
+
+    // 이 오브젝트 처치 시 파편이 2배로 나올 확률 (0~1)
+    public float ObjectDoubleDropChance(int objectIndex) =>
+        Mathf.Clamp01(SumEffect(UpgradeEffect.ObjectDoubleDrop, objectIndex) / 100f);
+
+    // 이 무기를 장착하고 오브젝트를 처치했을 때 추가로 주는 파편 (전역 노드는 targetWeaponIndex -1이라 항상 포함)
+    public long WeaponKillBonusPieces(int equippedWeaponIndex)
+    {
+        float total = 0f;
+        foreach (UpgradeNode node in _nodes)
+        {
+            if (node.effect != UpgradeEffect.WeaponKillBonus) continue;
+            if (node.targetWeaponIndex >= 0 && node.targetWeaponIndex != equippedWeaponIndex) continue;
+
+            int level = GetLevel(node.id);
+            for (int L = 1; L <= level; L++)
+                total += node.ValueAtLevel(L);
+        }
+        return (long)total;
+    }
 }

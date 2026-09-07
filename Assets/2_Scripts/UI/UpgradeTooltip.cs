@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -9,14 +10,16 @@ public class UpgradeTooltip : MonoBehaviour
 {
     public static UpgradeTooltip Instance { get; private set; }
 
-    [SerializeField] private float maxWidth = 320f;    // 텍스트 줄바꿈 폭
-    [SerializeField] private float gapAboveNode = 12f;  // 노드 위 여백(px)
-    [SerializeField] private Vector2 padding = new Vector2(14f, 10f);
+    [SerializeField] private float maxWidth = 560f;    // 텍스트 줄바꿈 폭
+    [SerializeField] private float gapAboveNode = 18f;  // 노드 위 여백(px)
+    [SerializeField] private Vector2 padding = new Vector2(22f, 16f);
+    [SerializeField] private float fontSize = 32f;      // 툴팁 글자 크기 (줌 아웃해도 잘 보이게 크게)
     [SerializeField] private Color backgroundColor = new Color(0.06f, 0.06f, 0.08f, 0.95f);
 
     private RectTransform _rect;
     private RectTransform _bg;
     private TextMeshProUGUI _text;
+    private Coroutine _shakeRoutine;
 
     void Awake()
     {
@@ -54,7 +57,8 @@ public class UpgradeTooltip : MonoBehaviour
         tr.offsetMin = new Vector2(padding.x, padding.y);
         tr.offsetMax = new Vector2(-padding.x, -padding.y);
         _text = textGo.GetComponent<TextMeshProUGUI>();
-        _text.fontSize = 20;
+        _text.fontSize = fontSize;
+        _text.enableAutoSizing = false;
         _text.color = Color.white;
         _text.alignment = TextAlignmentOptions.TopLeft;
         _text.textWrappingMode = TextWrappingModes.Normal;
@@ -66,6 +70,7 @@ public class UpgradeTooltip : MonoBehaviour
     public void Show(string content, RectTransform anchor)
     {
         gameObject.SetActive(true);
+        _rect.localRotation = Quaternion.identity; // 직전 흔들림이 멈춰서 기울어진 채 남아있을 수 있음
         _text.text = content;
 
         // 텍스트가 필요로 하는 크기로 박스 맞춤 (최대 폭 제한)
@@ -85,6 +90,47 @@ public class UpgradeTooltip : MonoBehaviour
     public void Hide()
     {
         if (this != null) gameObject.SetActive(false);
+    }
+
+    // 이미 떠있는 툴팁의 텍스트만 갈아끼움 (위치/회전은 안 건드림) - 구매로 레벨이 바뀌었을 때 씀
+    public void UpdateContent(string content)
+    {
+        if (!gameObject.activeSelf) return;
+
+        _text.text = content;
+        Vector2 pref = _text.GetPreferredValues(content, maxWidth - padding.x * 2f, 0f);
+        float w = Mathf.Min(maxWidth, pref.x + padding.x * 2f);
+        float h = pref.y + padding.y * 2f;
+        _rect.sizeDelta = new Vector2(w, h);
+    }
+
+    // 노드에서 구매/해금 성공 시 호출 - 떠있는 툴팁도 노드처럼 대각선으로 흔들림
+    public void PlayShake()
+    {
+        if (!gameObject.activeSelf) return; // 안 떠 있으면 무시
+        if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
+        _rect.localRotation = Quaternion.identity;
+        _shakeRoutine = StartCoroutine(ShakeRoutine());
+    }
+
+    private IEnumerator ShakeRoutine()
+    {
+        const float duration = 0.22f;       // 흔들림 총 시간(초)
+        const float amplitudeDegrees = 7f;  // 최대 각도
+        const float oscillations = 1.5f;    // 좌우 왕복 횟수
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime; // 업그레이드 화면이 timeScale 0이라 unscaled
+            float p = Mathf.Clamp01(elapsed / duration);
+            float angle = amplitudeDegrees * Mathf.Sin(p * oscillations * Mathf.PI * 2f) * (1f - p);
+            _rect.localRotation = Quaternion.Euler(0f, 0f, angle);
+            yield return null;
+        }
+
+        _rect.localRotation = Quaternion.identity;
+        _shakeRoutine = null;
     }
 
     // 부모(패널) 바깥으로 삐져나가면 안쪽으로 밀어넣음

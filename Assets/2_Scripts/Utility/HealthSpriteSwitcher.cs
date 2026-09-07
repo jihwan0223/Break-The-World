@@ -6,6 +6,7 @@ public class HealthSpriteSwitcher : MonoBehaviour
 {
     // ObjectManager가 없을 때를 대비한 로컬 스프라이트 목록 (체력 100% -> 0% 순서)
     [SerializeField] private Sprite[] fallbackHealthStages;
+    [SerializeField] private int fixedObjectIndex = -1; // -1이면 지금 장착 중인 오브젝트. 0 이상이면 그 오브젝트의 스프라이트 단계를 씀 (해금돼서 옆에 놓인 것)
 
     private SpriteRenderer _spriteRenderer;
     private Health _health;
@@ -48,7 +49,12 @@ public class HealthSpriteSwitcher : MonoBehaviour
     private Sprite[] GetHealthStages()
     {
         if (ObjectManager.Instance != null)
+        {
+            if (fixedObjectIndex >= 0 && fixedObjectIndex < ObjectManager.StaticObjectCount)
+                return ObjectManager.Instance.GetObjectAt(fixedObjectIndex).healthStages;
+
             return ObjectManager.Instance.CurrentObject.healthStages;
+        }
 
         return fallbackHealthStages;
     }

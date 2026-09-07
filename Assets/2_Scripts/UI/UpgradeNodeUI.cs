@@ -15,9 +15,9 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] private string displayName;                   // 표시용 이름 (지금은 노드 자체엔 안 그림, 참고용)
     [TextArea] [SerializeField] private string description;        // 호버 툴팁에 뜨는 설명. 예: "공격력이 +1 증가합니다."
     [SerializeField] private UpgradeManager.UpgradeEffect effect;   // 이 업그레이드가 건드리는 수치
-    [Tooltip("Click Damage 효과 전용 - 특정 무기 전용이면 그 무기, 전역이면 \"전체 (전역)\"")]
+    [Tooltip("무기 대상 효과(클릭 데미지 / 무기 처치 보너스)에서 씀. 특정 무기 전용이면 그 무기, 전역이면 \"전체 (전역)\"")]
     [ObjectNameField(ObjectNameFieldSource.Weapon)] [SerializeField] private string targetWeaponName;
-    [Tooltip("AutoClick 계열(해금/속도/횟수) 효과 전용 - 특정 오브젝트 장착 중일 때만 작동, 전역이면 \"전체 (전역)\"")]
+    [Tooltip("오브젝트 대상 효과(자동클릭 계열 / 오브젝트 파편 획득 / 2배 드랍 확률)에서 씀. 그 오브젝트 장착 중일 때만 작동")]
     [ObjectNameField] [SerializeField] private string targetObjectName;
     [Min(1)] [SerializeField] private int maxLevel = 5;             // 업그레이드 가능 횟수
     [SerializeField] private float[] valuePerLevel = { 1f };        // 레벨별 효과값 (배열이 짧으면 마지막 값 반복)
@@ -68,9 +68,18 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         // 성공하면 대각선 흔들림만. 실패(최대레벨/조각부족/미공개)면 아무 반응 없음 (툴팁은 호버로 이미 떠있음)
         if (UpgradeManager.Instance != null && UpgradeManager.Instance.TryUpgrade(Id))
         {
+            UpgradeTooltip.Instance?.UpdateContent(TooltipText()); // 마우스 계속 대고 있어도 레벨 숫자 즉시 갱신
             PlayShake();
+            UpgradeTooltip.Instance?.PlayShake(); // 호버로 떠있는 툴팁도 같이 흔들림
             UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true);
         }
+    }
+
+    // 툴팁에 보여줄 문구 - 설명 + 현재레벨/최대레벨
+    private string TooltipText()
+    {
+        int level = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetLevel(Id) : 0;
+        return $"{description}\n{level}/{maxLevel}";
     }
 
     // 공개 여부만 갱신 (노드 자체엔 표시할 게 없음). UpgradeTreeUI가 새로고침할 때마다 호출.
@@ -99,8 +108,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         if (UpgradeManager.Instance == null) return;
 
-        int level = UpgradeManager.Instance.GetLevel(Id);
-        UpgradeTooltip.Instance?.Show($"{description}\n{level}/{maxLevel}", _rect);
+        UpgradeTooltip.Instance?.Show(TooltipText(), _rect);
     }
 
     public void OnPointerExit(PointerEventData eventData) => UpgradeTooltip.Instance?.Hide();
@@ -117,7 +125,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     private IEnumerator ShakeRoutine()
     {
         const float duration = 0.22f;            // 흔들림 총 시간(초)
-        const float amplitudeDegrees = 5f;       // 최대 각도
+        const float amplitudeDegrees = 7f;       // 최대 각도
         const float oscillations = 1.5f;         // 좌우 왕복 횟수
 
         float elapsed = 0f;
