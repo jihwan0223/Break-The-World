@@ -7,16 +7,24 @@ public class Health : MonoBehaviour
 {
     [SerializeField] private int weaponTier = 1; // 이 오브젝트를 부수는 데 필요한 무기 티어 (1부터 시작)
     [SerializeField] private int objectIndexInTier = 1; // 같은 무기 티어 내에서 이 오브젝트의 순번 (1부터 시작)
+    [SerializeField] private float hpMultiplier = 1f; // 계산된 체력에 곱하는 배수 - 마일스톤(지형 전환) 오브젝트만 높임
     [SerializeField] private int fixedObjectIndex = -1; // -1이면 지금 장착 중인 오브젝트. 0 이상이면 파괴 사운드를 그 오브젝트 걸로
     [SerializeField] private float respawnDelay = 1f; // 죽고 나서 재생성까지 대기하는 시간(초)
     [SerializeField] private float dieFadeDuration = 0.25f; // 죽을 때 흐려지며 사라지는 연출 시간(초)
     [SerializeField] private float respawnFadeDuration = 0.25f; // 재생성될 때 서서히 나타나는 연출 시간(초)
 
-    private int maxHP; // weaponTier/objectIndexInTier로부터 자동 계산된 최대 체력
+    private int maxHP; // weaponTier/objectIndexInTier(×hpMultiplier)로부터 자동 계산된 최대 체력
+
+    // 계산된 기본 체력에 배수를 곱해 반올림
+    private static int ComputeMaxHP(int tier, int indexInTier, float multiplier) =>
+        Mathf.Max(1, Mathf.RoundToInt(ObjectHealthCalculator.Calculate(tier, indexInTier) * multiplier));
 
     public int MaxHP => maxHP;
     public int CurrentHP { get; private set; }
     public bool IsDead { get; private set; }
+
+    // 재생성 대기 시간이 있는지 (0 이하면 "부수자마자 바로 부활"형이라, 연타 중 클릭이 씹히지 않게 즉시 부활 처리함)
+    public bool HasRespawnDelay => respawnDelay > 0f;
 
     // 재생성까지 남은 시간 (죽은 상태가 아니면 0) - RespawnTimerUI가 매 프레임 읽어감
     public float RespawnRemaining { get; private set; }
@@ -37,7 +45,7 @@ public class Health : MonoBehaviour
 
     void Awake()
     {
-        maxHP = ObjectHealthCalculator.Calculate(weaponTier, objectIndexInTier);
+        maxHP = ComputeMaxHP(weaponTier, objectIndexInTier, hpMultiplier);
         CurrentHP = maxHP;
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _collider = GetComponent<Collider2D>();
@@ -46,13 +54,14 @@ public class Health : MonoBehaviour
     }
 
     // ObjectManager에서 다른 오브젝트로 선택이 바뀌었을 때 호출 - 티어를 바꾸고 체력을 꽉 채운 상태로 리셋
-    public void ApplyObjectTier(int newWeaponTier, int newIndexInTier)
+    public void ApplyObjectTier(int newWeaponTier, int newIndexInTier, float newHpMultiplier = 1f)
     {
         StopAllCoroutines(); // 진행 중이던 사망/재생성 연출은 중단 (오브젝트 자체가 바뀌는 거라 의미 없음)
 
         weaponTier = newWeaponTier;
         objectIndexInTier = newIndexInTier;
-        maxHP = ObjectHealthCalculator.Calculate(weaponTier, objectIndexInTier);
+        hpMultiplier = newHpMultiplier;
+        maxHP = ComputeMaxHP(weaponTier, objectIndexInTier, hpMultiplier);
         CurrentHP = maxHP;
         IsDead = false;
         RespawnRemaining = 0f;
@@ -103,12 +112,35 @@ public class Health : MonoBehaviour
         if (breakSound != null)
             _audioSource.PlayOneShot(breakSound);
 
-        DebrisPool.Instance?.AddPiece(transform.position);
+        // 파편은 Click.HandleDied가 "획득한 조각 수만큼" 떨어뜨림 (여기서 안 함)
 
-        // 클릭은 즉시 막되, 화면에서는 서서히 사라지도록 연출 후 숨김
-        if (_collider != null) _collider.enabled = false;
+        // 재생성 대기가 있는 오브젝트만 즉시 클릭을 막음. 바로 부활형(delay<=0)은 콜라이더를 켜둬서
+        // 페이드아웃 도중 클릭해도 씹히지 않고 Click이 즉시 부활시키며 맞게 함
+        if (_collider != null && HasRespawnDelay) _collider.enabled = false;
 
         StartCoroutine(DieAndRespawnRoutine());
+    }
+
+    // 재생성 대기 중인(또는 페이드 중인) 오브젝트를 즉시 되살림 - 연타 중 클릭이 씹히지 않도록 Click이 호출.
+    // 대기 시간이 있는 오브젝트는 그대로 두고, 바로 부활형만 즉시 처리함
+    public void ForceRespawnNow()
+    {
+        if (!IsDead || HasRespawnDelay) return;
+
+        StopAllCoroutines(); // 진행 중이던 페이드아웃/재생성 연출 중단
+        RespawnRemaining = 0f;
+        CurrentHP = maxHP;
+        IsDead = false;
+
+        if (_spriteRenderer != null)
+        {
+            _spriteRenderer.enabled = true;
+            _spriteRenderer.color = _originalColor;
+        }
+        if (_collider != null) _collider.enabled = true;
+
+        OnDamaged?.Invoke(CurrentHP, maxHP); // 스프라이트를 온전한 단계로 되돌림
+        OnRespawned?.Invoke();
     }
 
     private IEnumerator DieAndRespawnRoutine()

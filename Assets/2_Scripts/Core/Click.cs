@@ -69,6 +69,9 @@ public class Click : MonoBehaviour
             finalPieces *= 2;
 
         CurrencyManager.Instance.AddPieces(objectIndex, finalPieces);
+
+        // 획득한 조각 수만큼 파편을 떨어뜨림 (연출). 너무 많으면 DebrisPool이 알아서 상한을 걸음
+        DebrisPool.Instance?.AddPiece(transform.position, objectIndex, (int)System.Math.Min(finalPieces, 100000L));
     }
 
     // 현재 선택된 오브젝트(ObjectManager)의 clickSounds 중 하나를 랜덤 재생하되,
@@ -99,8 +102,12 @@ public class Click : MonoBehaviour
     // 이미 죽어서 리스폰을 기다리는 중이면 아무것도 하지 않음 (더블클릭/자동클릭이 중복으로 때리는 걸 방지)
     private void PerformClickHit()
     {
+        // 바로 부활형 오브젝트가 페이드아웃/부활 대기 중이면, 이 클릭이 씹히지 않게 즉시 되살림
         if (_health.IsDead)
-            return;
+        {
+            _health.ForceRespawnNow();
+            if (_health.IsDead) return; // 대기 시간이 있는 오브젝트는 그대로 스킵
+        }
 
         // 고정 데미지 1 대신 현재 장착한 무기의 클릭 데미지를 적용
         int baseDamage = WeaponManager.Instance != null ? WeaponManager.Instance.CurrentClickDamage : 1;

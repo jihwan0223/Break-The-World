@@ -62,7 +62,7 @@ public class ObjectSwapController : MonoBehaviour
         transform.position = GetScreenCenterWorldPosition();
 
         // 새 오브젝트의 체력/스프라이트로 교체
-        _health.ApplyObjectTier(newObject.tier, newObject.indexInTier);
+        _health.ApplyObjectTier(newObject.tier, newObject.indexInTier, newObject.hpMultiplier);
 
         yield return MoveOverTime(transform.position, _restPosition, flyInDuration);
 

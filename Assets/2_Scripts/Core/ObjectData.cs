@@ -8,6 +8,7 @@ public class ObjectData
 {
     public int tier; // 이 오브젝트가 속한 무기 티어 (1부터 시작, WeaponData.tier와 대응)
     public int indexInTier; // 같은 티어 내에서 이 오브젝트의 순번 (1부터 시작, ObjectHealthCalculator에 그대로 넘김)
+    public float hpMultiplier = 1f; // 계산된 체력에 곱하는 배수 - 마일스톤(지형 전환) 오브젝트만 2 정도로 올림
     public string objectName; // 화면에 보일 오브젝트 이름 (영어)
     public Color pileColor; // 이 오브젝트를 부술 때 DebrisPool에 쌓이는 조각 색상 (지금은 placeholder, 나중에 조정)
     public AudioClip[] clickSounds; // 이 오브젝트를 클릭할 때 랜덤 재생할 사운드 목록 (ObjectManager 인스펙터에서 채워짐)

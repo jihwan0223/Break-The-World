@@ -3,8 +3,8 @@
 // "현재 도구로는 감당 안 되는 벽" 게이트 메커닉을 수치로 표현함.
 public static class ObjectHealthCalculator
 {
-    // 무기 티어(1~10)별 오브젝트 개수. 총합 26개 (기획 기준 6개 티어는 3개씩, 4개 티어는 2개씩)
-    private static readonly int[] tierSizes = { 3, 3, 3, 3, 3, 3, 2, 2, 2, 2 };
+    // 무기 티어(1~10)별 오브젝트 개수. 총합 20개 (ObjectManager.objects 순서/개수와 정확히 일치해야 함)
+    private static readonly int[] tierSizes = { 3, 3, 3, 2, 3, 2, 1, 1, 1, 1 };
 
     private const int baseHP = 10; // 1티어 첫 오브젝트(접시)의 체력
     private const int stepPerObject = 4; // 같은 티어 내에서 오브젝트 하나 넘어갈 때마다 늘어나는 체력

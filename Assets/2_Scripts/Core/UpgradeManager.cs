@@ -75,7 +75,8 @@ public class UpgradeManager : MonoBehaviour
         public int targetObjectIndex;     // AutoClick 계열이 씀 - -1이면 전역
         public int targetWeaponIndex;     // ClickDamage가 씀 - -1이면 전역
         public int maxLevel;
-        public string prerequisiteId;     // 이 노드가 공개되려면 필요한 다른 노드 id (빈칸 = 루트) - 들어오는 링크로 결정됨
+        public string prerequisiteId;     // 이 노드가 공개되려면 필요한 다른 노드 id (빈칸 = 루트) - 들어오는 링크로 결정됨. 표시/디버그용
+        public System.Func<bool> prerequisiteSatisfied; // 선행 충족 검사 (null = 루트). 일반 노드면 레벨>=1, 오브젝트 해금/획득 노드면 그 노드 IsLeveled()
         public float[] valuePerLevel;
         public (int objectIndex, long baseAmount, float levelGrowth)[] costs; // 조각 종류별 비용 공식 (여러 종류 동시 가능)
 
@@ -137,17 +138,29 @@ public class UpgradeManager : MonoBehaviour
         var nodeUis = FindObjectsByType<UpgradeNodeUI>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         var links = FindObjectsByType<UpgradeTreeLink>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
-        var prereqByToRect = new Dictionary<RectTransform, UpgradeNodeUI>();
+        // 각 노드로 들어오는 링크의 시작 노드를 선행으로 기록. 시작이 일반 업그레이드 노드면 그 노드 레벨로,
+        // 오브젝트 해금/획득 노드(ObjectEconomyNodeUI)면 그 노드의 IsLeveled()로 이 노드 공개 여부를 판단함
+        var prereqByToRect = new Dictionary<RectTransform, (string id, System.Func<bool> satisfied)>();
         foreach (UpgradeTreeLink link in links)
         {
             if (link.FromNode == null || link.ToNode == null) continue;
+
             UpgradeNodeUI fromUi = link.FromNode.GetComponent<UpgradeNodeUI>();
-            if (fromUi != null) prereqByToRect[link.ToNode] = fromUi;
+            if (fromUi != null)
+            {
+                string fromId = fromUi.Id;
+                prereqByToRect[link.ToNode] = (fromId, () => GetLevel(fromId) >= 1);
+                continue;
+            }
+
+            ObjectEconomyNodeUI fromEconomy = link.FromNode.GetComponent<ObjectEconomyNodeUI>();
+            if (fromEconomy != null)
+                prereqByToRect[link.ToNode] = (fromEconomy.name, fromEconomy.IsLeveled);
         }
 
         foreach (UpgradeNodeUI ui in nodeUis)
         {
-            prereqByToRect.TryGetValue(ui.Rect, out UpgradeNodeUI prereqUi);
+            prereqByToRect.TryGetValue(ui.Rect, out var prereq);
 
             int targetObjectIndex = ObjectManager.StaticIndexOfName(ui.TargetObjectName);
 
@@ -160,7 +173,8 @@ public class UpgradeManager : MonoBehaviour
                 targetObjectIndex = targetObjectIndex,
                 targetWeaponIndex = WeaponManager.StaticIndexOfWeaponName(ui.TargetWeaponName),
                 maxLevel = Mathf.Max(1, ui.MaxLevel),
-                prerequisiteId = prereqUi != null ? prereqUi.Id : null,
+                prerequisiteId = prereq.id,
+                prerequisiteSatisfied = prereq.satisfied,
                 valuePerLevel = ui.ValuePerLevel,
                 costs = ResolveCosts(ui.Costs, targetObjectIndex),
             };
@@ -226,9 +240,9 @@ public class UpgradeManager : MonoBehaviour
     {
         UpgradeNode node = GetNode(nodeId);
         if (node == null) return false;
-        if (string.IsNullOrEmpty(node.prerequisiteId)) return true; // 루트
+        if (node.prerequisiteSatisfied == null) return true; // 들어오는 링크 없음 = 루트
 
-        return GetLevel(node.prerequisiteId) >= 1;
+        return node.prerequisiteSatisfied();
     }
 
     // 조각을 소모해서 한 레벨 올림. 실패(미공개/최대레벨/조각부족) 시 false

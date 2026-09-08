@@ -12,20 +12,21 @@ public class ObjectEconomyNodeUI : MonoBehaviour
     [SerializeField] private int objectIndex; // 대상 오브젝트 인덱스 (1번부터 - 0번은 처음부터 해금이라 대상 아님)
     [SerializeField] private bool isGain; // false면 해금(Unlock) 노드, true면 획득량 증가(Gain) 노드
     [SerializeField] private TextMeshProUGUI label; // 이름/레벨(또는 완료)/비용을 표시할 텍스트
-    [SerializeField] private Image flashOverlay; // 구매 성공(초록)/실패(빨강) 시 잠깐 반짝이는 오버레이 - 평소엔 알파 0
-    [SerializeField] private Image doneOverlay; // 해금 완료(또는 획득량 최대 레벨)면 계속 켜두는 초록 오버레이 (선택 사항)
+    [SerializeField] private Image doneOverlay; // (미사용) 예전엔 해금 완료/최대 레벨이면 켜두던 초록 오버레이 - 지금은 항상 꺼둠
 
-    // 이 노드(Unlock 노드에서만 씀 - Gain 노드는 자기 오브젝트 해금 여부로 공개되니 앵커가 필요 없음)가 매달릴 부모.
-    // 둘 중 하나만 인스펙터에서 지정함: 부모가 일반 업그레이드 노드면 anchorMainNode, 다른 오브젝트의
-    // 해금/획득량 노드면 anchorEconomyNode. (UILineConnector의 from도 같은 노드의 RectTransform으로 맞춰줄 것)
-    [SerializeField] private UpgradeNodeUI anchorMainNode;
-    [SerializeField] private ObjectEconomyNodeUI anchorEconomyNode;
+    // 선행(부모) 노드는 이 노드로 들어오는 UpgradeTreeLink로 정함 (선 하나 = 선행 하나). 일반 업그레이드 노드에서 오든
+    // 다른 해금/획득 노드에서 오든 상관없음. 아래 anchor 필드는 링크가 없을 때만 쓰는 옛날 방식 폴백.
+    [SerializeField] private UpgradeNodeUI anchorMainNode;       // (폴백) 들어오는 링크가 없을 때 선행으로 볼 일반 업그레이드 노드
+    [SerializeField] private ObjectEconomyNodeUI anchorEconomyNode; // (폴백) 들어오는 링크가 없을 때 선행으로 볼 해금/획득 노드
 
     private Button _button;
     private RectTransform _rect;
-    private Coroutine _flashRoutine;
+    private Coroutine _shakeRoutine; // 지금 재생 중인 흔들림 (중첩 방지)
     private bool _wasRevealed; // 직전 Refresh 때 이 노드가 공개 상태였는지 - hidden→revealed로 바뀌는 "등장 순간"을 한 번만 잡으려고 추적
     private bool _refreshedOnce; // Refresh가 최소 한 번 돌았는지 - 첫 호출 때는 등장 흔들림을 재생 안 함(이미 열려있던 노드로 취급)
+
+    private MonoBehaviour _prereqNode;   // 들어오는 링크의 시작 노드 (UpgradeNodeUI 또는 ObjectEconomyNodeUI). null이면 링크 없음
+    private bool _prereqResolved;        // _prereqNode를 한 번 찾았는지 (씬의 링크는 안 바뀌니 최초 1회만 탐색)
 
     public int ObjectIndex => objectIndex;
     public bool IsGain => isGain;
@@ -35,21 +36,43 @@ public class ObjectEconomyNodeUI : MonoBehaviour
     public bool IsLeveled() => ObjectManager.Instance != null &&
         (isGain ? ObjectManager.Instance.GetGainLevel(objectIndex) >= 1 : ObjectManager.Instance.IsUnlocked(objectIndex));
 
+    // 선행 노드가 충족됐는지 - 이 노드로 들어오는 UpgradeTreeLink의 시작 노드가 1레벨 이상/해금 완료면 true.
+    // 들어오는 링크가 없으면 옛날 anchor 필드로 폴백, 그것도 없으면 루트로 보고 항상 true.
+    private bool PrerequisiteSatisfied()
+    {
+        if (!_prereqResolved)
+        {
+            _prereqResolved = true;
+            foreach (UpgradeTreeLink link in FindObjectsByType<UpgradeTreeLink>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (link.FromNode == null || link.ToNode != Rect) continue;
+                _prereqNode = (MonoBehaviour)link.FromNode.GetComponent<UpgradeNodeUI>()
+                              ?? link.FromNode.GetComponent<ObjectEconomyNodeUI>();
+                break;
+            }
+        }
+
+        if (_prereqNode is UpgradeNodeUI upgradeNode) return upgradeNode.IsLeveled();
+        if (_prereqNode is ObjectEconomyNodeUI economyNode) return economyNode.IsLeveled();
+
+        // 링크 없음 - 옛날 방식 폴백
+        if (anchorMainNode != null) return anchorMainNode.IsLeveled();
+        if (anchorEconomyNode != null) return anchorEconomyNode.IsLeveled();
+        return true; // 선행 자체가 없으면 루트
+    }
+
     void Awake()
     {
         _rect = (RectTransform)transform;
         _button = GetComponent<Button>();
         _button.onClick.AddListener(HandleClicked);
 
-        if (flashOverlay != null)
-        {
-            flashOverlay.raycastTarget = false;
-            SetOverlayAlpha(flashOverlay, 0f);
-        }
-
-        // 해금 완료/최대 레벨일 때 켜지는 오버레이도 클릭을 가로채면 안 됨
+        // 미사용 오버레이 - 클릭을 가로채지 않도록만 처리
         if (doneOverlay != null)
+        {
             doneOverlay.raycastTarget = false;
+            doneOverlay.gameObject.SetActive(false);
+        }
     }
 
     private void HandleClicked()
@@ -57,11 +80,10 @@ public class ObjectEconomyNodeUI : MonoBehaviour
         if (ObjectManager.Instance == null) return;
 
         bool success = isGain ? ObjectManager.Instance.TryUpgradeGain(objectIndex) : ObjectManager.Instance.TryUnlock(objectIndex);
+        if (!success) return; // 실패(조각 부족 등) 시 아무 반응 없음 - 일반 업그레이드 노드와 동일
 
-        // Unlock은 한 번 사면 그걸로 끝(항상 완료 상태)이고, Gain은 5/5를 찍은 순간이면 흔들지 않고 초록 반짝임만 재생
-        bool justMaxed = success && (!isGain || ObjectManager.Instance.GetGainLevel(objectIndex) >= 5);
-        PlayFlash(success, playShake: !justMaxed);
-        if (success) UpgradeTooltip.Instance?.PlayShake(); // 호버로 떠있는 툴팁도 같이 흔들림
+        PlayShake(); // 색 반짝임 없이 흔들림만 (일반 업그레이드 노드와 동일)
+        UpgradeTooltip.Instance?.PlayShake(); // 호버로 떠있는 툴팁도 같이 흔들림
 
         UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true); // 방금 해금된 자식 노드들이 나타나도록 트리 전체를 새로고침 (등장 흔들림 재생)
     }
@@ -76,10 +98,9 @@ public class ObjectEconomyNodeUI : MonoBehaviour
             return;
         }
 
-        // 공개 조건: Unlock 노드는 매달린 anchor가 1레벨 이상(또는 해금 완료)이면 나타남.
-        // Gain 노드는 자기 오브젝트가 실제로 해금 완료됐을 때 나타남 (부모가 자기 자신뿐이라 anchor 불필요)
-        bool anchorLeveled = anchorMainNode != null ? anchorMainNode.IsLeveled() : (anchorEconomyNode != null && anchorEconomyNode.IsLeveled());
-        bool isRevealed = isGain ? ObjectManager.Instance.IsUnlocked(objectIndex) : anchorLeveled;
+        // 공개 조건: Unlock 노드는 선행(들어오는 링크의 시작) 노드가 1레벨 이상(또는 해금 완료)이면 나타남.
+        // Gain 노드는 자기 오브젝트가 실제로 해금 완료됐을 때 나타남 (선행이 자기 오브젝트라 링크 불필요)
+        bool isRevealed = isGain ? ObjectManager.Instance.IsUnlocked(objectIndex) : PrerequisiteSatisfied();
 
         // hidden→revealed로 처음 바뀌는 순간 + 구매로 인한 새로고침(animateReveal)일 때만 등장 흔들림.
         // 첫 Refresh(_refreshedOnce=false)는 제외 - 페이지를 처음 열 때 이미 공개돼있던 노드는 흔들지 않음
@@ -90,7 +111,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour
         gameObject.SetActive(isRevealed);
         if (!isRevealed) return;
 
-        if (justRevealed) PlayRevealShake();
+        if (justRevealed) PlayShake();
 
         string objectName = ObjectManager.Instance.GetObjectAt(objectIndex).objectName;
 
@@ -113,7 +134,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour
             }
 
             if (doneOverlay != null)
-                doneOverlay.gameObject.SetActive(unlocked);
+                doneOverlay.gameObject.SetActive(false); // 해금 완료돼도 초록 오버레이는 안 켬 (요청)
         }
         else
         {
@@ -127,88 +148,37 @@ public class ObjectEconomyNodeUI : MonoBehaviour
             }
 
             if (doneOverlay != null)
-                doneOverlay.gameObject.SetActive(maxed);
+                doneOverlay.gameObject.SetActive(false); // 최대 레벨이어도 초록 오버레이는 안 켬 (요청)
         }
     }
 
-    private void PlayFlash(bool success, bool playShake)
+    // 구매 성공 / 노드 등장 공용 흔들림 - 색 반짝임 없이 좌우로 살짝 기울었다 돌아옴 (일반 업그레이드 노드와 동일)
+    private void PlayShake()
     {
-        if (flashOverlay == null) return;
-
-        if (_flashRoutine != null)
-            StopCoroutine(_flashRoutine);
-
-        _flashRoutine = StartCoroutine(FlashRoutine(success, playShake));
-    }
-
-    private IEnumerator FlashRoutine(bool success, bool playShake)
-    {
-        const float duration = 0.2f;
-        const float peakAlpha = 0.6f;
-        const float shakeAmplitudeDegrees = 7f;
-        const float shakeOscillations = 1.5f;
-
-        Color color = success ? new Color(0.1f, 1f, 0.1f, peakAlpha) : new Color(1f, 0.1f, 0.1f, peakAlpha);
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float progress = Mathf.Clamp01(elapsed / duration);
-
-            color.a = Mathf.Lerp(peakAlpha, 0f, progress);
-            flashOverlay.color = color;
-
-            if (success && playShake)
-            {
-                float angle = shakeAmplitudeDegrees * Mathf.Sin(progress * shakeOscillations * Mathf.PI * 2f) * (1f - progress);
-                _rect.localRotation = Quaternion.Euler(0f, 0f, angle);
-            }
-
-            yield return null;
-        }
-
-        SetOverlayAlpha(flashOverlay, 0f);
+        if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
         _rect.localRotation = Quaternion.identity;
-        _flashRoutine = null;
+        _shakeRoutine = StartCoroutine(ShakeRoutine());
     }
 
-    // 노드가 새로 공개될 때 재생 - 색 반짝임 없이 좌우로 살짝 기울었다 돌아오는 흔들림만 (구매 성공 때와 같은 느낌)
-    private void PlayRevealShake()
+    private IEnumerator ShakeRoutine()
     {
-        if (_flashRoutine != null)
-            StopCoroutine(_flashRoutine);
-
-        _rect.localRotation = Quaternion.identity;
-        _flashRoutine = StartCoroutine(RevealShakeRoutine());
-    }
-
-    private IEnumerator RevealShakeRoutine()
-    {
-        const float duration = 0.25f; // 등장 흔들림 총 시간(초) - 구매(0.2)보다 살짝 길게
-        const float shakeAmplitudeDegrees = 7f; // 흔들림 최대 각도 (구매 때와 동일)
-        const float shakeOscillations = 1.5f; // 연출 시간 동안 좌우로 흔들리는 횟수
+        const float duration = 0.25f;            // 흔들림 총 시간(초)
+        const float amplitudeDegrees = 7f;       // 최대 각도
+        const float oscillations = 1.5f;         // 좌우 왕복 횟수
 
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            elapsed += Time.unscaledDeltaTime; // 업그레이드 화면이 게임을 멈춰도(Time.timeScale=0) 재생되도록
+            elapsed += Time.unscaledDeltaTime;   // 업그레이드 화면이 timeScale 0이라 unscaled
             float progress = Mathf.Clamp01(elapsed / duration);
 
-            float angle = shakeAmplitudeDegrees * Mathf.Sin(progress * shakeOscillations * Mathf.PI * 2f) * (1f - progress);
+            float angle = amplitudeDegrees * Mathf.Sin(progress * oscillations * Mathf.PI * 2f) * (1f - progress);
             _rect.localRotation = Quaternion.Euler(0f, 0f, angle);
 
             yield return null;
         }
 
         _rect.localRotation = Quaternion.identity;
-        _flashRoutine = null;
-    }
-
-    private void SetOverlayAlpha(Image image, float alpha)
-    {
-        Color c = image.color;
-        c.a = alpha;
-        image.color = c;
+        _shakeRoutine = null;
     }
 }

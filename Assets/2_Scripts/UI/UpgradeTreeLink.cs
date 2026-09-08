@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 // 업그레이드 트리에서 선행(부모) 노드 -> 이 노드를 잇는 선. 자식으로 1~3개의 축정렬 사각형(Image)을 만들어
 // 직선 / ㄱ자 / ㄴ자 / 계단(Z) 모양으로 꺾어 그림. from/to 노드의 RectTransform 위치를 매 프레임 읽어 따라감.
-// 선은 "자식(To) 노드가 화면에 보이면" 나타남 (자식이 공개되면 부모도 이미 공개돼 있어서 양끝이 둘 다 보임).
+// 선은 부모(From)와 자식(To) 노드가 둘 다 화면에 보일 때만 나타남 (한쪽만 보이면 반쪽짜리 선이 되므로).
 // 링크 GameObject는 노드와 같은 부모(Content) 아래에 있고, RectTransform은 anchor(0.5,0.5)/pivot(0.5,0.5)/offset0 이어야 함
 // (그래야 세그먼트 anchoredPosition을 노드 anchoredPosition과 같은 좌표계로 계산할 수 있음).
 [ExecuteAlways]
@@ -44,8 +44,10 @@ public class UpgradeTreeLink : MonoBehaviour
 
     void LateUpdate()
     {
-        // 자식(To) 노드가 보이면 선을 그림 (자식이 공개되는 순간 = 부모도 이미 공개된 상태라 선 양끝이 둘 다 보임)
-        bool visible = fromNode != null && toNode != null && toNode.gameObject.activeInHierarchy;
+        // 부모(From)와 자식(To) 노드가 둘 다 보일 때만 선을 그림
+        // (한쪽만 보이면 허공에서 시작/끝나는 반쪽짜리 선이 됨)
+        bool visible = fromNode != null && toNode != null
+            && fromNode.gameObject.activeInHierarchy && toNode.gameObject.activeInHierarchy;
 
         if (!visible)
         {

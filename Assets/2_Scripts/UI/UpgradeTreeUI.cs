@@ -39,8 +39,9 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
 
     // "카메라 초기화" 버튼을 눌렀을 때 되돌아갈 기본 팬/줌 값 - Play 모드에서 원하는 위치로 맞춘 뒤
     // 그 값을 여기에 그대로 적어넣으면 됨 (content.anchoredPosition / localScale을 Inspector에서 확인 가능)
-    [SerializeField] private Vector2 defaultAnchoredPosition;
-    [SerializeField] private float defaultZoom = 1f;
+    // 기본값: 줌 0.5, 팬 (-280, 700) = 0번 업그레이드 노드가 뷰포트 정중앙에 오는 위치
+    [SerializeField] private Vector2 defaultAnchoredPosition = new Vector2(-280f, 700f);
+    [SerializeField] private float defaultZoom = 0.5f;
 
     [SerializeField] private bool pauseGameWhileOpen = true; // 열려있는 동안 Time.timeScale을 0으로 멈출지
 

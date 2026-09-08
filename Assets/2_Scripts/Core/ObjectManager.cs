@@ -27,38 +27,36 @@ public class ObjectManager : MonoBehaviour
 
     [SerializeField] private ObjectVisualSet[] objectVisuals; // objects 리스트와 같은 순서/개수로 채워야 함 (26개)
 
-    [SerializeField] private bool debugUnlockAll = true; // 테스트용 - 켜면 모든 오브젝트가 처음부터 해금됨 (업그레이드 무관)
+    [SerializeField] private bool debugUnlockAll = false; // 테스트용 - 켜면 모든 오브젝트가 처음부터 해금됨 (업그레이드 무관)
 
-    // 파괴 대상 오브젝트 
+    // 파괴 대상 오브젝트 20종 - 책상 위 소품에서 시작해 지형(책상/길바닥/공사장 지반)을 부수며 우주 스케일까지. ★=마일스톤(체력 x2)
+    // 티어 구성은 ObjectHealthCalculator.tierSizes = {3,3,3,2,3,2,1,1,1,1} 와 순서/개수가 정확히 일치해야 함
     private static readonly List<ObjectData> objects = new List<ObjectData>
     {
-        // 오브젝트 색 조절
+        // --- 존1: 책상 위 (맨손 t1 / 망치 t2) ---
         new ObjectData(1, 1, "접시", new Color(0.95f, 0.95f, 0.92f)),
         new ObjectData(1, 2, "유리컵", new Color(0.93f, 0.95f, 0.96f)),
         new ObjectData(1, 3, "화분", new Color(0.80f, 0.42f, 0.25f)),
-        new ObjectData(2, 1, "창문", new Color(0.60f, 0.80f, 0.90f)),
-        new ObjectData(2, 2, "나무 의자", new Color(0.55f, 0.35f, 0.20f)),
-        new ObjectData(2, 3, "나무 책상", new Color(0.50f, 0.30f, 0.15f)),
-        new ObjectData(3, 1, "벽돌 벽", new Color(0.70f, 0.30f, 0.20f)),
-        new ObjectData(3, 2, "문", new Color(0.40f, 0.25f, 0.15f)),
-        new ObjectData(3, 3, "협탁", new Color(0.60f, 0.45f, 0.30f)),
-        new ObjectData(4, 1, "옷장", new Color(0.35f, 0.22f, 0.12f)),
-        new ObjectData(4, 2, "냉장고", new Color(0.90f, 0.90f, 0.90f)),
-        new ObjectData(4, 3, "소파", new Color(0.40f, 0.45f, 0.55f)),
-        new ObjectData(5, 1, "욕실", new Color(0.80f, 0.90f, 0.95f)),
-        new ObjectData(5, 2, "원룸", new Color(0.75f, 0.70f, 0.60f)),
-        new ObjectData(5, 3, "아파트", new Color(0.60f, 0.60f, 0.60f)),
-        new ObjectData(6, 1, "저층 건물", new Color(0.55f, 0.55f, 0.58f)),
-        new ObjectData(6, 2, "고층 건물", new Color(0.45f, 0.50f, 0.60f)),
-        new ObjectData(6, 3, "도시 블록", new Color(0.50f, 0.50f, 0.50f)),
-        new ObjectData(7, 1, "도시 전체", new Color(0.40f, 0.40f, 0.45f)),
-        new ObjectData(7, 2, "대도시", new Color(0.30f, 0.30f, 0.40f)),
-        new ObjectData(8, 1, "산맥", new Color(0.50f, 0.45f, 0.40f)),
-        new ObjectData(8, 2, "대륙", new Color(0.40f, 0.50f, 0.30f)),
-        new ObjectData(9, 1, "행성(지구형)", new Color(0.30f, 0.50f, 0.70f)),
-        new ObjectData(9, 2, "가스 행성", new Color(0.80f, 0.60f, 0.30f)),
-        new ObjectData(10, 1, "항성계", new Color(0.90f, 0.80f, 0.30f)),
-        new ObjectData(10, 2, "은하", new Color(0.40f, 0.20f, 0.60f)),
+        new ObjectData(2, 1, "머그컵", new Color(0.85f, 0.80f, 0.75f)),
+        new ObjectData(2, 2, "계산기", new Color(0.30f, 0.32f, 0.35f)),
+        new ObjectData(2, 3, "책상", new Color(0.55f, 0.38f, 0.22f)) { hpMultiplier = 2f }, // ★ -> 존2
+        // --- 존2: 길거리 (곡괭이 t3 / 전동드릴 t4) ---
+        new ObjectData(3, 1, "가로등", new Color(0.30f, 0.35f, 0.32f)),
+        new ObjectData(3, 2, "자전거", new Color(0.45f, 0.50f, 0.58f)),
+        new ObjectData(3, 3, "가로수", new Color(0.35f, 0.50f, 0.28f)),
+        new ObjectData(4, 1, "자동차", new Color(0.55f, 0.58f, 0.62f)),
+        new ObjectData(4, 2, "보도블록", new Color(0.62f, 0.60f, 0.58f)) { hpMultiplier = 2f }, // ★ -> 존3
+        // --- 존3: 공사장 / 건물 (유압 브레이커 t5 / 다이너마이트 t6) ---
+        new ObjectData(5, 1, "컨테이너 박스", new Color(0.55f, 0.45f, 0.35f)),
+        new ObjectData(5, 2, "포크레인", new Color(0.85f, 0.70f, 0.20f)),
+        new ObjectData(5, 3, "저층 건물", new Color(0.60f, 0.58f, 0.55f)),
+        new ObjectData(6, 1, "고층 빌딩", new Color(0.50f, 0.55f, 0.62f)),
+        new ObjectData(6, 2, "콘크리트 바닥", new Color(0.55f, 0.55f, 0.55f)) { hpMultiplier = 2f }, // ★ -> 존4
+        // --- 존4: 우주 (폭탄 t7 / 미사일 t8 / 운석 t9 / 빅뱅 t10) ---
+        new ObjectData(7, 1, "지구", new Color(0.30f, 0.50f, 0.70f)),
+        new ObjectData(8, 1, "달", new Color(0.80f, 0.80f, 0.78f)),
+        new ObjectData(9, 1, "태양", new Color(1.00f, 0.75f, 0.20f)),
+        new ObjectData(10, 1, "우주", new Color(0.20f, 0.15f, 0.35f)),
     };
 
     private int equippedIndex; // 실제로 선택된 오브젝트의 objects 리스트 인덱스 (0부터 시작)
