@@ -30,9 +30,8 @@ public class SidePanelUI : MonoBehaviour
 
     private VisualElement _buttonRow; // 좌상단 Upgrade/Weapon/Object 버튼 줄 - 셋 중 아무거나 하나라도 열려있으면 전부 숨김
     private bool _upgradeTreeOpen; // Canvas 업그레이드 화면이 지금 열려있는지 (UpgradeTreeUI.OnTreeToggled로 갱신됨)
-    private bool _hudHiddenForRun; // 게임 런이 진행/카운트다운 중인지 (GameSessionManager.OnHudHiddenChanged로 갱신됨) - 이 동안 버튼 줄 숨김
 
-    // (업그레이드 화면이 열리고 닫히는 건 이제 Canvas 쪽 UpgradeTreeUI.OnTreeToggled가 담당함 - PieceUI/HealthBarUI도 그쪽을 구독함)
+    // (업그레이드 화면이 열리고 닫히는 건 이제 Canvas 쪽 UpgradeTreeUI.OnTreeToggled가 담당함 - PieceUI도 그쪽을 구독함)
 
     // Weapon/Object 팝업(_panel)이 열리면 true, 닫히면 false로 전달 - 화면 우상단을 가릴 수 있는 다른
     // UIDocument(PieceUI 등)가 스스로 숨고 보여주는 데 사용
@@ -53,15 +52,11 @@ public class SidePanelUI : MonoBehaviour
 
         // Canvas 업그레이드 화면이 열리고 닫힐 때도 버튼 줄을 같이 숨기고 보여주기 위해 구독
         UpgradeTreeUI.OnTreeToggled += HandleUpgradeTreeToggled;
-
-        // 게임 런이 시작되면(카운트다운 포함) 좌상단 버튼 줄도 숨김 - 판 도중엔 오브젝트/배경만 보이게
-        GameSessionManager.OnHudHiddenChanged += HandleHudHiddenChanged;
     }
 
     void OnDisable()
     {
         UpgradeTreeUI.OnTreeToggled -= HandleUpgradeTreeToggled;
-        GameSessionManager.OnHudHiddenChanged -= HandleHudHiddenChanged;
     }
 
     private void HandleUpgradeTreeToggled(bool open)
@@ -70,19 +65,13 @@ public class SidePanelUI : MonoBehaviour
         RefreshButtonRowVisibility();
     }
 
-    private void HandleHudHiddenChanged(bool hidden)
-    {
-        _hudHiddenForRun = hidden;
-        RefreshButtonRowVisibility();
-    }
-
-    // Weapon/Object 팝업 / Canvas 업그레이드 화면 / 게임 런 진행 중 - 이 중 하나라도 해당되면 버튼 줄 전체를 숨김.
-    // 다른 버튼을 또 눌러서 팝업이 겹쳐 열리는 걸 막고, 판 도중엔 화면을 깔끔하게 유지함
+    // Weapon/Object 팝업이나 Canvas 업그레이드 화면 - 이 중 하나라도 열려있으면 버튼 줄 전체를 숨김.
+    // 다른 버튼을 또 눌러서 팝업이 겹쳐 열리는 걸 막음
     private void RefreshButtonRowVisibility()
     {
         if (_buttonRow == null) return;
 
-        bool hide = (_panel != null && _panel.style.display == DisplayStyle.Flex) || _upgradeTreeOpen || _hudHiddenForRun;
+        bool hide = (_panel != null && _panel.style.display == DisplayStyle.Flex) || _upgradeTreeOpen;
         _buttonRow.style.display = hide ? DisplayStyle.None : DisplayStyle.Flex;
     }
 

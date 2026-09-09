@@ -18,7 +18,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
 {
     public static UpgradeTreeUI Instance { get; private set; }
 
-    // 이 화면이 열리면 true, 닫히면 false로 전달 - PieceUI(우상단 조각 표시)/HealthBarUI 등이 구독해서
+    // 이 화면이 열리면 true, 닫히면 false로 전달 - PieceUI(우상단 조각 표시)/SidePanelUI(좌상단 버튼 줄)가 구독해서
     // 이 화면이 열려있는 동안은 스스로 숨어서 화면 안의 닫기(X) 버튼과 겹치지 않게 함
     public static event System.Action<bool> OnTreeToggled;
 
