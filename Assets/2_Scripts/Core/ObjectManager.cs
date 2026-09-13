@@ -161,12 +161,12 @@ public class ObjectManager : MonoBehaviour
         return (long)(UnlockCostBase * Mathf.Pow(UnlockCostGrowth, index - 1));
     }
 
-    // (index-1)번째 오브젝트의 조각으로 index번째 오브젝트를 해금 시도
+    // (index-1)번째 오브젝트의 조각으로 index번째 오브젝트를 해금 시도.
+    // 전 단계 해금 여부는 더 이상 안 따짐(트리 UI 링크가 선행조건을 대신함) - 조각만 있으면 순서 상관없이 해금 가능
     public bool TryUnlock(int index)
     {
         if (index <= 0 || index >= objects.Count) return false;
         if (_unlocked[index]) return true; // 이미 해금됨
-        if (!_unlocked[index - 1]) return false; // 전 단계가 아직 안 열렸으면 순서상 해금 불가
 
         var cost = new List<PieceCost> { new PieceCost(index - 1, GetUnlockCost(index)) };
         if (CurrencyManager.Instance == null || !CurrencyManager.Instance.TrySpendPieces(cost))

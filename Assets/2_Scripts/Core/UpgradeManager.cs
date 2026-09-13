@@ -138,29 +138,36 @@ public class UpgradeManager : MonoBehaviour
         var nodeUis = FindObjectsByType<UpgradeNodeUI>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         var links = FindObjectsByType<UpgradeTreeLink>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
-        // 각 노드로 들어오는 링크의 시작 노드를 선행으로 기록. 시작이 일반 업그레이드 노드면 그 노드 레벨로,
-        // 오브젝트 해금/획득 노드(ObjectEconomyNodeUI)면 그 노드의 IsLeveled()로 이 노드 공개 여부를 판단함
-        var prereqByToRect = new Dictionary<RectTransform, (string id, System.Func<bool> satisfied)>();
+        // 각 노드로 들어오는 링크(들)의 선행 노드(들)를 전부 모아둠 - 링크 하나가 선행을 여러 개(fromNode+extraFromNodes)
+        // 가질 수 있고, 같은 toNode를 가리키는 링크가 여러 개일 수도 있으므로 전부 합쳐서 모두(AND) 충족돼야 공개됨.
+        // 시작이 일반 업그레이드 노드면 그 노드 레벨로, 오브젝트 해금/획득 노드(ObjectEconomyNodeUI)면 IsLeveled()로 판단함
+        var prereqsByToRect = new Dictionary<RectTransform, List<(string id, System.Func<bool> satisfied)>>();
         foreach (UpgradeTreeLink link in links)
         {
-            if (link.FromNode == null || link.ToNode == null) continue;
+            if (link.ToNode == null) continue;
 
-            UpgradeNodeUI fromUi = link.FromNode.GetComponent<UpgradeNodeUI>();
-            if (fromUi != null)
+            if (!prereqsByToRect.TryGetValue(link.ToNode, out List<(string id, System.Func<bool> satisfied)> list))
+                prereqsByToRect[link.ToNode] = list = new List<(string, System.Func<bool>)>();
+
+            foreach (RectTransform from in link.FromNodes)
             {
-                string fromId = fromUi.Id;
-                prereqByToRect[link.ToNode] = (fromId, () => GetLevel(fromId) >= 1);
-                continue;
-            }
+                UpgradeNodeUI fromUi = from.GetComponent<UpgradeNodeUI>();
+                if (fromUi != null)
+                {
+                    string fromId = fromUi.Id;
+                    list.Add((fromId, () => GetLevel(fromId) >= 1));
+                    continue;
+                }
 
-            ObjectEconomyNodeUI fromEconomy = link.FromNode.GetComponent<ObjectEconomyNodeUI>();
-            if (fromEconomy != null)
-                prereqByToRect[link.ToNode] = (fromEconomy.name, fromEconomy.IsLeveled);
+                ObjectEconomyNodeUI fromEconomy = from.GetComponent<ObjectEconomyNodeUI>();
+                if (fromEconomy != null)
+                    list.Add((fromEconomy.name, fromEconomy.IsLeveled));
+            }
         }
 
         foreach (UpgradeNodeUI ui in nodeUis)
         {
-            prereqByToRect.TryGetValue(ui.Rect, out var prereq);
+            prereqsByToRect.TryGetValue(ui.Rect, out List<(string id, System.Func<bool> satisfied)> prereqs);
 
             int targetObjectIndex = ObjectManager.StaticIndexOfName(ui.TargetObjectName);
 
@@ -173,8 +180,10 @@ public class UpgradeManager : MonoBehaviour
                 targetObjectIndex = targetObjectIndex,
                 targetWeaponIndex = WeaponManager.StaticIndexOfWeaponName(ui.TargetWeaponName),
                 maxLevel = Mathf.Max(1, ui.MaxLevel),
-                prerequisiteId = prereq.id,
-                prerequisiteSatisfied = prereq.satisfied,
+                prerequisiteId = prereqs != null ? string.Join(", ", prereqs.ConvertAll(p => p.id)) : null,
+                prerequisiteSatisfied = prereqs != null && prereqs.Count > 0
+                    ? () => prereqs.TrueForAll(p => p.satisfied())
+                    : null,
                 valuePerLevel = ui.ValuePerLevel,
                 costs = ResolveCosts(ui.Costs, targetObjectIndex),
             };

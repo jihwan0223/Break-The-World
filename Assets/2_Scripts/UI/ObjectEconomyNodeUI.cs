@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 
@@ -7,7 +9,7 @@ using TMPro;
 // objectIndex와 isGain만 인스펙터에서 지정하면 나머지는 알아서 처리됨.
 // (예: objectIndex=2, isGain=false면 "2번 오브젝트 해금" 버튼, isGain=true면 "2번 오브젝트 획득량 증가" 버튼)
 [RequireComponent(typeof(Button))]
-public class ObjectEconomyNodeUI : MonoBehaviour
+public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private int objectIndex; // 대상 오브젝트 인덱스 (1번부터 - 0번은 처음부터 해금이라 대상 아님)
     [SerializeField] private bool isGain; // false면 해금(Unlock) 노드, true면 획득량 증가(Gain) 노드
@@ -25,8 +27,9 @@ public class ObjectEconomyNodeUI : MonoBehaviour
     private bool _wasRevealed; // 직전 Refresh 때 이 노드가 공개 상태였는지 - hidden→revealed로 바뀌는 "등장 순간"을 한 번만 잡으려고 추적
     private bool _refreshedOnce; // Refresh가 최소 한 번 돌았는지 - 첫 호출 때는 등장 흔들림을 재생 안 함(이미 열려있던 노드로 취급)
 
-    private MonoBehaviour _prereqNode;   // 들어오는 링크의 시작 노드 (UpgradeNodeUI 또는 ObjectEconomyNodeUI). null이면 링크 없음
-    private bool _prereqResolved;        // _prereqNode를 한 번 찾았는지 (씬의 링크는 안 바뀌니 최초 1회만 탐색)
+    private readonly List<MonoBehaviour> _prereqNodes = new List<MonoBehaviour>(); // 들어오는 링크(들)의 선행 노드 전부 (UpgradeNodeUI 또는 ObjectEconomyNodeUI). 비어있으면 링크 없음
+    private bool _prereqResolved;        // _prereqNodes를 한 번 찾았는지 (씬의 링크는 안 바뀌니 최초 1회만 탐색)
+    private string _tooltipText;         // Refresh()가 label에 쓴 것과 같은 문구 - 마우스 호버 툴팁에도 그대로 씀
 
     public int ObjectIndex => objectIndex;
     public bool IsGain => isGain;
@@ -36,8 +39,8 @@ public class ObjectEconomyNodeUI : MonoBehaviour
     public bool IsLeveled() => ObjectManager.Instance != null &&
         (isGain ? ObjectManager.Instance.GetGainLevel(objectIndex) >= 1 : ObjectManager.Instance.IsUnlocked(objectIndex));
 
-    // 선행 노드가 충족됐는지 - 이 노드로 들어오는 UpgradeTreeLink의 시작 노드가 1레벨 이상/해금 완료면 true.
-    // 들어오는 링크가 없으면 옛날 anchor 필드로 폴백, 그것도 없으면 루트로 보고 항상 true.
+    // 선행 노드(들)가 전부 충족됐는지 - 이 노드로 들어오는 UpgradeTreeLink(들)의 선행 노드가 전부(AND) 1레벨 이상/해금
+    // 완료면 true. 들어오는 링크가 없으면 옛날 anchor 필드로 폴백, 그것도 없으면 루트로 보고 항상 true.
     private bool PrerequisiteSatisfied()
     {
         if (!_prereqResolved)
@@ -45,15 +48,27 @@ public class ObjectEconomyNodeUI : MonoBehaviour
             _prereqResolved = true;
             foreach (UpgradeTreeLink link in FindObjectsByType<UpgradeTreeLink>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
-                if (link.FromNode == null || link.ToNode != Rect) continue;
-                _prereqNode = (MonoBehaviour)link.FromNode.GetComponent<UpgradeNodeUI>()
-                              ?? link.FromNode.GetComponent<ObjectEconomyNodeUI>();
-                break;
+                if (link.ToNode != Rect) continue;
+                foreach (RectTransform from in link.FromNodes)
+                {
+                    MonoBehaviour prereq = (MonoBehaviour)from.GetComponent<UpgradeNodeUI>()
+                                           ?? from.GetComponent<ObjectEconomyNodeUI>();
+                    if (prereq != null) _prereqNodes.Add(prereq);
+                }
             }
         }
 
-        if (_prereqNode is UpgradeNodeUI upgradeNode) return upgradeNode.IsLeveled();
-        if (_prereqNode is ObjectEconomyNodeUI economyNode) return economyNode.IsLeveled();
+        if (_prereqNodes.Count > 0)
+        {
+            foreach (MonoBehaviour prereq in _prereqNodes)
+            {
+                bool leveled = prereq is UpgradeNodeUI upgradeNode ? upgradeNode.IsLeveled()
+                             : prereq is ObjectEconomyNodeUI economyNode ? economyNode.IsLeveled()
+                             : true;
+                if (!leveled) return false;
+            }
+            return true;
+        }
 
         // 링크 없음 - 옛날 방식 폴백
         if (anchorMainNode != null) return anchorMainNode.IsLeveled();
@@ -119,19 +134,17 @@ public class ObjectEconomyNodeUI : MonoBehaviour
         {
             bool unlocked = ObjectManager.Instance.IsUnlocked(objectIndex);
 
-            if (label != null)
+            if (unlocked)
             {
-                if (unlocked)
-                {
-                    label.text = $"해금\n{objectName}\n완료";
-                }
-                else
-                {
-                    long cost = ObjectManager.Instance.GetUnlockCost(objectIndex);
-                    string prevName = ObjectManager.Instance.GetObjectAt(objectIndex - 1).objectName;
-                    label.text = $"해금\n{objectName}\n{NumberFormatUtil.Format(cost)} {prevName}";
-                }
+                _tooltipText = $"해금\n{objectName}\n완료";
             }
+            else
+            {
+                long cost = ObjectManager.Instance.GetUnlockCost(objectIndex);
+                string prevName = ObjectManager.Instance.GetObjectAt(objectIndex - 1).objectName;
+                _tooltipText = $"해금\n{objectName}\n{NumberFormatUtil.Format(cost)} {prevName}";
+            }
+            if (label != null) label.text = _tooltipText;
 
             if (doneOverlay != null)
                 doneOverlay.gameObject.SetActive(false); // 해금 완료돼도 초록 오버레이는 안 켬 (요청)
@@ -141,16 +154,19 @@ public class ObjectEconomyNodeUI : MonoBehaviour
             int level = ObjectManager.Instance.GetGainLevel(objectIndex);
             bool maxed = level >= 5;
 
-            if (label != null)
-            {
-                string costLine = maxed ? "최대" : $"{NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))} {ObjectManager.Instance.GetObjectAt(objectIndex - 1).objectName}";
-                label.text = $"{objectName} 획득량\n{level}/5\n{costLine}";
-            }
+            string costLine = maxed ? "최대" : $"{NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))} {ObjectManager.Instance.GetObjectAt(objectIndex - 1).objectName}";
+            _tooltipText = $"{objectName} 획득량\n{level}/5\n{costLine}";
+            if (label != null) label.text = _tooltipText;
 
             if (doneOverlay != null)
                 doneOverlay.gameObject.SetActive(false); // 최대 레벨이어도 초록 오버레이는 안 켬 (요청)
         }
     }
+
+    // ---- 호버 툴팁 (일반 업그레이드 노드와 동일하게 동작) ----
+
+    public void OnPointerEnter(PointerEventData eventData) => UpgradeTooltip.Instance?.Show(_tooltipText, Rect);
+    public void OnPointerExit(PointerEventData eventData) => UpgradeTooltip.Instance?.Hide();
 
     // 구매 성공 / 노드 등장 공용 흔들림 - 색 반짝임 없이 좌우로 살짝 기울었다 돌아옴 (일반 업그레이드 노드와 동일)
     private void PlayShake()

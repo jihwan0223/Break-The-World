@@ -37,9 +37,10 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
     private float _zoomTarget = 1f; // 스크롤 입력이 가리키는 목표 배율 - 실제 적용은 Update()에서 매 프레임 이 값을 향해 부드럽게 보간됨
     private Vector2 _zoomFocalPoint; // 스크롤할 때의 커서 위치(Viewport 로컬 좌표) - 보간되는 동안 이 지점이 화면에서 안 움직이게 고정하는 기준점
 
-    // "카메라 초기화" 버튼을 눌렀을 때 되돌아갈 기본 팬/줌 값 - Play 모드에서 원하는 위치로 맞춘 뒤
-    // 그 값을 여기에 그대로 적어넣으면 됨 (content.anchoredPosition / localScale을 Inspector에서 확인 가능)
-    // 기본값: 줌 0.5, 팬 (-280, 700) = 0번 업그레이드 노드가 뷰포트 정중앙에 오는 위치
+    // "카메라 초기화" 버튼을 누르면 이 이름의 노드가 항상 뷰포트 정중앙에 오도록 매번 위치를 다시 계산함
+    // (트리를 재배치해도 이 노드의 현재 좌표를 그대로 따라가므로 defaultAnchoredPosition을 손으로 다시 맞출 필요 없음)
+    [SerializeField] private string centerNodeId = "0_맨손_데미지강화";
+    // centerNodeId 노드를 못 찾았을 때만 쓰는 폴백 팬 값
     [SerializeField] private Vector2 defaultAnchoredPosition = new Vector2(-280f, 700f);
     [SerializeField] private float defaultZoom = 0.5f;
 
@@ -164,14 +165,32 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         RefreshAll();
     }
 
-    // "카메라 초기화" 버튼에 연결 - 팬/줌을 defaultAnchoredPosition/defaultZoom으로 되돌림
+    // "카메라 초기화" 버튼에 연결 - centerNodeId 노드가 뷰포트 정중앙에 오도록 팬을 매번 새로 계산하고, 줌은 defaultZoom으로 되돌림
     public void ResetCamera()
     {
         if (content == null) return;
 
-        content.anchoredPosition = defaultAnchoredPosition;
         content.localScale = new Vector3(defaultZoom, defaultZoom, 1f);
         _zoomTarget = defaultZoom; // 목표값도 같이 맞춰야 함 - 안 그러면 다음 프레임에 Update()가 예전 목표로 다시 보간해버림
+        content.anchoredPosition = ComputeCenteredAnchoredPosition();
+    }
+
+    // centerNodeId 노드가 뷰포트 정중앙에 오는 content.anchoredPosition 계산.
+    // 주의: centerNode.Rect.anchoredPosition은 노드의 "바로 위 부모(Object 컨테이너) 기준" 좌표라 content 기준과 다름
+    // (Object 컨테이너 자체가 content 중앙에 앵커돼있어 오프셋이 낌) - 그래서 실제 트랜스폼으로 content 기준
+    // 언스케일 로컬 좌표를 직접 측정함(InverseTransformPoint는 content의 현재 팬/줌과 무관하게 정확한 값을 줌).
+    // 노드를 못 찾으면(이름이 바뀌었거나 트리에서 지워짐) defaultAnchoredPosition으로 폴백함.
+    private Vector2 ComputeCenteredAnchoredPosition()
+    {
+        UpgradeNodeUI centerNode = System.Array.Find(_upgradeNodes, n => n != null && n.Id == centerNodeId); // 대상 노드 검색
+        if (centerNode == null) return defaultAnchoredPosition;
+
+        RectTransform viewport = content.parent as RectTransform; // content를 담고 있는 뷰포트 (없으면 폴백)
+        if (viewport == null) return defaultAnchoredPosition;
+
+        Vector2 nodeLocalInContent = content.InverseTransformPoint(centerNode.Rect.position); // 노드의 content 기준 언스케일 로컬 좌표
+        Vector2 viewportHalfSize = new Vector2(viewport.rect.width * 0.5f, -viewport.rect.height * 0.5f); // 뷰포트 좌상단 기준 정중앙까지의 오프셋
+        return viewportHalfSize - nodeLocalInContent * defaultZoom;
     }
 
     // 열려있는 동안은 뒤쪽 월드 오브젝트(Click.cs)가 클릭되지 않도록 플래그를 켜고 끔
