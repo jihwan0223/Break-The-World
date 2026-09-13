@@ -39,7 +39,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
 
     // "카메라 초기화" 버튼을 누르면 이 이름의 노드가 항상 뷰포트 정중앙에 오도록 매번 위치를 다시 계산함
     // (트리를 재배치해도 이 노드의 현재 좌표를 그대로 따라가므로 defaultAnchoredPosition을 손으로 다시 맞출 필요 없음)
-    [SerializeField] private string centerNodeId = "0_맨손_데미지강화";
+    [SerializeField] private string centerNodeId = "0_BareHand_ClickDamageBoost";
     // centerNodeId 노드를 못 찾았을 때만 쓰는 폴백 팬 값
     [SerializeField] private Vector2 defaultAnchoredPosition = new Vector2(-280f, 700f);
     [SerializeField] private float defaultZoom = 0.5f;

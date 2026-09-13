@@ -262,7 +262,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "4_\uB9DD\uCE58_\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: 4_Hammer_ClickDamageBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -416,7 +416,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "43_\uBBF8\uC0AC\uC77C_\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: 70_Missile_ClickDamageBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -702,7 +702,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "91_\uAC00\uB85C\uB4F1_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: 66_StreetLamp_AutoClickUnlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -861,7 +861,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "69_\uC800\uCE35\uAC74\uBB3C_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "103_\uC800\uCE35\uAC74\uBB3C_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1001,7 +1001,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "7_\uCF64\uBCF4_\uD574\uAE08"
+      value: 7_Combo_Unlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1160,7 +1160,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "12_\uB354\uBE14\uD074\uB9AD_\uD655\uB960\uAC15\uD654"
+      value: 13_DoubleClick_ChanceBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1376,7 +1376,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "1_\uC811\uC2DC_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: 1_Plate_DropRateBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1591,7 +1591,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "68_\uAC00\uB85C\uB4F1_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: 77_StreetLamp_DropRateBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2421,7 +2421,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "45_\uC6B4\uC11D_\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: "90_\uC6B4\uC11D_\uB370\uBBF8\uC9C0\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2580,7 +2580,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "5_\uCE58\uBA85\uD0C0\uD655\uB960\uAC15\uD654"
+      value: 5_CritChanceBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2776,7 +2776,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "21_\uB7ED\uD0A4\uD074\uB9AD_\uD574\uAE08"
+      value: 24_LuckyClick_Unlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3053,7 +3053,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "99_\uC9C0\uAD6C_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "119_\uC9C0\uAD6C_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3212,7 +3212,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "22_\uCF64\uBCF4_\uBC30\uC728\uAC15\uD654"
+      value: 26_Combo_MultiplierBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3465,7 +3465,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "3_\uB354\uBE14\uD074\uB9AD_\uD574\uAE08"
+      value: 3_DoubleClick_Unlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3652,7 +3652,7 @@ MonoBehaviour:
   maxZoom: 1.5
   zoomStep: 0.1
   zoomSmoothSpeed: 8
-  centerNodeId: "0_\uB9E8\uC190_\uB370\uBBF8\uC9C0\uAC15\uD654"
+  centerNodeId: 0_BareHand_ClickDamageBoost
   defaultAnchoredPosition: {x: 1500, y: -2200}
   defaultZoom: 0.5
   pauseGameWhileOpen: 1
@@ -4064,7 +4064,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "42_\uB2E4\uC774\uB108\uB9C8\uC774\uD2B8_\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: "81_\uB2E4\uC774\uB108\uB9C8\uC774\uD2B8_\uB370\uBBF8\uC9C0\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4203,7 +4203,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "96_\uC800\uCE35\uAC74\uBB3C_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: "116_\uC800\uCE35\uAC74\uBB3C_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4874,7 +4874,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "70_\uC9C0\uAD6C_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "104_\uC9C0\uAD6C_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5137,7 +5137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "102_\uC6B0\uC8FC_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "122_\uC6B0\uC8FC_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5292,7 +5292,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "16_\uC811\uC2DC_\uB4DC\uB78D\uBC30\uC728\uAC15\uD654"
+      value: 17_Plate_DoubleDropBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5664,7 +5664,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "15_\uACC4\uC0B0\uAE30_\uD574\uAE08"
+      value: 16_Calculator_Unlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5819,7 +5819,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uD0DC\uC591_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: "157_\uD0DC\uC591_2\uBC30\uB4DC\uB78D\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5979,7 +5979,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: "154_\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_2\uBC30\uB4DC\uB78D\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6139,7 +6139,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uC790\uB3D9\uCC28_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: "149_\uC790\uB3D9\uCC28_2\uBC30\uB4DC\uB78D\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6309,7 +6309,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uAC00\uB85C\uB4F1_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: 69_StreetLamp_DoubleDropBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6459,7 +6459,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uACC4\uC0B0\uAE30_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: 48_Calculator_DoubleDropBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6624,7 +6624,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uC9C0\uAD6C_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: "155_\uC9C0\uAD6C_2\uBC30\uB4DC\uB78D\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6779,7 +6779,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uC800\uCE35 \uAC74\uBB3C_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: "153_\uC800\uCE35 \uAC74\uBB3C_2\uBC30\uB4DC\uB78D\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6934,7 +6934,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uC790\uC804\uAC70_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: 60_Bicycle_DoubleDropBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7084,7 +7084,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: "151_\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_2\uBC30\uB4DC\uB78D\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7709,7 +7709,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uB2EC_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: "156_\uB2EC_2\uBC30\uB4DC\uB78D\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7859,7 +7859,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uD654\uBD84_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: 33_FlowerPot_DoubleDropBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8019,7 +8019,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uAC00\uB85C\uC218_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: 78_RoadsideTree_DoubleDropBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8169,7 +8169,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uBCF4\uB3C4\uBE14\uB85D_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: "150_\uBCF4\uB3C4\uBE14\uB85D_2\uBC30\uB4DC\uB78D\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8328,7 +8328,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "101_\uC6B0\uC8FC_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "121_\uC6B0\uC8FC_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8483,7 +8483,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uC6B0\uC8FC_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: "158_\uC6B0\uC8FC_2\uBC30\uB4DC\uB78D\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8633,7 +8633,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uD3EC\uD06C\uB808\uC778_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: "152_\uD3EC\uD06C\uB808\uC778_2\uBC30\uB4DC\uB78D\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8788,7 +8788,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "\uCC45\uC0C1_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: 59_Desk_DoubleDropBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9133,7 +9133,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "17_\uC811\uC2DC_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: 18_Plate_AutoClickSpeedBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9284,7 +9284,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "95_\uCC45\uC0C1_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: 58_Desk_AutoClickCountBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9458,7 +9458,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "51_\uCC45\uC0C1_\uD574\uAE08"
+      value: 31_Desk_Unlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9694,7 +9694,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "44_\uD3ED\uD0C4_\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: "89_\uD3ED\uD0C4_\uB370\uBBF8\uC9C0\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9900,7 +9900,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "92_\uCC45\uC0C1_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: 56_Desk_AutoClickUnlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10186,7 +10186,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "40_\uC804\uB3D9\uB4DC\uB9B4_\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: 53_PowerDrill_ClickDamageBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10340,7 +10340,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "-----14_\uCF64\uBCF4_\uCFE8\uD0C0\uC784\uAC10\uC18C"
+      value: 15_Combo_CooldownReduce
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10499,7 +10499,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "46_\uBE45\uBC45_\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: "91_\uBE45\uBC45_\uB370\uBBF8\uC9C0\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10830,7 +10830,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "100_\uC6B0\uC8FC_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: "120_\uC6B0\uC8FC_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10985,7 +10985,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "14_\uC790\uB3D9\uCC44\uAD74_\uD68D\uB4DD\uB7C9\uAC15\uD654"
+      value: 50_AutoMine_YieldBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11144,7 +11144,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "41_\uC720\uC555\uBE0C\uB808\uC774\uCEE4_\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: 38_HydraulicBreaker_ClickDamageBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11947,7 +11947,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "20_\uC804\uC5ED_\uD074\uB9AD\uB370\uBBF8\uC9C0\uAC15\uD6542"
+      value: 22_Global_ClickDamageBoost2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12080,7 +12080,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "98_\uC9C0\uAD6C_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: "118_\uC9C0\uAD6C_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12239,7 +12239,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "97_\uC800\uCE35\uAC74\uBB3C_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "117_\uC800\uCE35\uAC74\uBB3C_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12434,7 +12434,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "30_\uCF64\uBCF4_\uC9C0\uC18D\uC2DC\uAC04\uAC15\uD6543"
+      value: "86_\uCF64\uBCF4_\uC9C0\uC18D\uC2DC\uAC04\uAC15\uD6543"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12593,7 +12593,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "24_\uB354\uBE14\uD074\uB9AD_\uD655\uB960\uAC15\uD6542"
+      value: 28_DoubleClick_ChanceBoost2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12747,7 +12747,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "33_\uC790\uB3D9\uCC44\uAD74_\uC8FC\uAE30\uB2E8\uCD952"
+      value: 51_AutoMine_IntervalReduce2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12897,7 +12897,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "36_\uC790\uB3D9\uCC44\uAD74_\uD68D\uB4DD\uB7C9\uAC15\uD6543"
+      value: "88_\uC790\uB3D9\uCC44\uAD74_\uD68D\uB4DD\uB7C9\uAC15\uD6543"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13204,7 +13204,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "53_\uC790\uC804\uAC70_\uD574\uAE08"
+      value: 46_Bicycle_Unlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13459,7 +13459,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "13_\uCE58\uBA85\uD0C0\uD655\uB960\uAC15\uD6542"
+      value: 14_CritChanceBoost2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13693,7 +13693,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "71_\uC6B0\uC8FC_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "105_\uC6B0\uC8FC_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13901,7 +13901,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "11_\uC811\uC2DC_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: 12_Plate_AutoClickUnlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -14060,7 +14060,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "32_\uCF64\uBCF4_\uBC30\uC728\uAC15\uD6543"
+      value: "87_\uCF64\uBCF4_\uBC30\uC728\uAC15\uD6543"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -14214,7 +14214,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "-----25_\uB7ED\uD0A4\uD074\uB9AD_\uD655\uB960\uAC15\uD6542"
+      value: 36_LuckyClick_ChanceBoost2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -14368,7 +14368,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "18_\uCE58\uBA85\uD0C0\uB370\uBBF8\uC9C0\uAC15\uD6543"
+      value: 68_CritDamageBoost3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -14522,7 +14522,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "28_\uCF64\uBCF4_\uCFE8\uD0C0\uC784\uAC10\uC18C3"
+      value: "85_\uCF64\uBCF4_\uCFE8\uD0C0\uC784\uAC10\uC18C3"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -14729,7 +14729,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "35_\uC790\uB3D9\uCC44\uAD74_\uD68D\uB4DD\uB7C9\uAC15\uD6542"
+      value: 61_AutoMine_YieldBoost2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -14847,7 +14847,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "10_\uD654\uBD84_\uD574\uAE08"
+      value: 11_FlowerPot_Unlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15016,7 +15016,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "16_\uCE58\uBA85\uD0C0\uD655\uB960\uAC15\uD6543"
+      value: 72_CritChanceBoost3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15192,7 +15192,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "0_\uB9E8\uC190_\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: 0_BareHand_ClickDamageBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15358,7 +15358,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "87_\uACE0\uCE35\uBE4C\uB529_2\uBC30\uB4DC\uB78D\uAC15\uD654"
+      value: "115_\uACE0\uCE35\uBE4C\uB529_2\uBC30\uB4DC\uB78D\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15518,7 +15518,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "18_\uCF64\uBCF4_\uC9C0\uC18D\uC2DC\uAC04\uAC15\uD654"
+      value: 19_Combo_DurationBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15697,7 +15697,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "8_\uC804\uC5ED_\uD074\uB9AD\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: 8_Global_ClickDamageBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15918,7 +15918,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "21_\uC804\uC5ED_\uD30C\uD3B8\uD68D\uB4DD\uAC15\uD6542"
+      value: 34_Global_PieceGainBoost2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16072,7 +16072,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "19_\uCE58\uBA85\uD0C0\uB370\uBBF8\uC9C0\uAC15\uD6542"
+      value: 20_CritDamageBoost2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16232,7 +16232,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "29_\uCF64\uBCF4_\uC9C0\uC18D\uC2DC\uAC04\uAC15\uD6542"
+      value: 52_Combo_DurationBoost2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16386,7 +16386,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "34_\uC790\uB3D9\uCC44\uAD74_\uC8FC\uAE30\uB2E8\uCD953"
+      value: 74_AutoMine_IntervalReduce3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16560,7 +16560,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "22_\uC804\uC5ED_\uD30C\uD3B8\uD68D\uB4DD\uAC15\uD6543"
+      value: "84_\uC804\uC5ED_\uD30C\uD3B8\uD68D\uB4DD\uAC15\uD6543"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16824,7 +16824,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "67_\uCC45\uC0C1_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: 39_Desk_DropRateBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16942,7 +16942,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "52_\uAC00\uB85C\uB4F1_\uD574\uAE08"
+      value: 54_StreetLamp_Unlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17117,7 +17117,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "27_\uCF64\uBCF4_\uCFE8\uD0C0\uC784\uAC10\uC18C2"
+      value: 32_Combo_CooldownReduce2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17276,7 +17276,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "31_\uCF64\uBCF4_\uBC30\uC728\uAC15\uD6542"
+      value: 44_Combo_MultiplierBoost2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17450,7 +17450,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "20_\uC804\uC5ED_\uD074\uB9AD\uB370\uBBF8\uC9C0\uAC15\uD6543"
+      value: 71_Global_ClickDamageBoost3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17660,7 +17660,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "94_\uAC00\uB85C\uB4F1_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: 67_StreetLamp_AutoClickSpeedBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17819,7 +17819,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "24_\uB354\uBE14\uD074\uB9AD_\uD655\uB960\uAC15\uD6543"
+      value: 75_DoubleClick_ChanceBoost3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -18080,7 +18080,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "26_\uB7ED\uD0A4\uD074\uB9AD_\uD655\uB960\uAC15\uD6543"
+      value: 73_LuckyClick_ChanceBoost3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -18226,7 +18226,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "-----90_\uC811\uC2DC_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: 30_Plate_AutoClickCountBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -18385,7 +18385,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "-----10_\uB7ED\uD0A4\uD074\uB9AD_\uD655\uB960\uAC15\uD654"
+      value: 25_LuckyClick_ChanceBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -18600,7 +18600,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "13_\uC790\uB3D9\uCC44\uAD74_\uC8FC\uAE30\uB2E8\uCD95"
+      value: 40_AutoMine_IntervalReduce
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -18957,7 +18957,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "144_\uD0DC\uC591_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "146_\uD0DC\uC591_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19107,7 +19107,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "132_\uD3EC\uD06C\uB808\uC778_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "134_\uD3EC\uD06C\uB808\uC778_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19246,7 +19246,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "118_\uAC00\uB85C\uC218_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: 79_RoadsideTree_AutoClickUnlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19360,7 +19360,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "65_\uC6B0\uC8FC_\uD574\uAE08"
+      value: "102_\uC6B0\uC8FC_\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19510,7 +19510,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "9_\uC720\uB9AC\uCEF5_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: 10_GlassCup_DropRateBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19640,7 +19640,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "133_\uACE0\uCE35 \uBE4C\uB529_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: "135_\uACE0\uCE35 \uBE4C\uB529_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19790,7 +19790,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "84_\uB2EC_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "113_\uB2EC_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19899,7 +19899,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "54_\uAC00\uB85C\uC218_\uD574\uAE08"
+      value: 76_RoadsideTree_Unlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20054,7 +20054,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "122_\uC790\uB3D9\uCC28_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "124_\uC790\uB3D9\uCC28_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20189,7 +20189,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "127_\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: "129_\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20344,7 +20344,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "78_\uC790\uB3D9\uCC28_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "107_\uC790\uB3D9\uCC28_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20479,7 +20479,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "130_\uD3EC\uD06C\uB808\uC778_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: "132_\uD3EC\uD06C\uB808\uC778_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20588,7 +20588,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "63_\uB2EC_\uD574\uAE08"
+      value: "100_\uB2EC_\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20739,7 +20739,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "137_\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "139_\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20889,7 +20889,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "105_\uC720\uB9AC\uCEF5_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: 43_GlassCup_AutoClickCountBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21115,7 +21115,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "108_\uD654\uBD84_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: 45_FlowerPot_AutoClickCountBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21265,7 +21265,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "113_\uACC4\uC0B0\uAE30_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: 47_Calculator_AutoClickSpeedBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21374,7 +21374,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "60_\uACE0\uCE35 \uBE4C\uB529_\uD574\uAE08"
+      value: "97_\uACE0\uCE35 \uBE4C\uB529_\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21524,7 +21524,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "----------147_\uC9C0\uAD6C_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "80_\uC9C0\uAD6C_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21674,7 +21674,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "123_\uC790\uB3D9\uCC28_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "125_\uC790\uB3D9\uCC28_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21824,7 +21824,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "107_\uD654\uBD84_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: 42_FlowerPot_AutoClickSpeedBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21979,7 +21979,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "114_\uACC4\uC0B0\uAE30_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: 49_Calculator_AutoClickCountBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -22155,7 +22155,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "128_\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "130_\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -22279,7 +22279,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "64_\uD0DC\uC591_\uD574\uAE08"
+      value: "101_\uD0DC\uC591_\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -22439,7 +22439,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "135_\uACE0\uCE35 \uBE4C\uB529_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "137_\uACE0\uCE35 \uBE4C\uB529_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -22594,7 +22594,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "125_\uBCF4\uB3C4\uBE14\uB85D_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "127_\uBCF4\uB3C4\uBE14\uB85D_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -22779,7 +22779,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "115_\uC790\uC804\uAC70_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: 62_Bicycle_AutoClickUnlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -22938,7 +22938,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "39_\uACE1\uAD2D\uC774_\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: 23_Pickaxe_ClickDamageBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -23052,7 +23052,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "55_\uC790\uB3D9\uCC28_\uD574\uAE08"
+      value: "92_\uC790\uB3D9\uCC28_\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -23260,7 +23260,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "93_\uCC45\uC0C1_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: 57_Desk_AutoClickSpeedBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -23415,7 +23415,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "117_\uC790\uC804\uAC70_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: 64_Bicycle_AutoClickCountBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -23668,7 +23668,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "112_\uACC4\uC0B0\uAE30_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: 41_Calculator_AutoClickUnlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -23777,7 +23777,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "61_\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_\uD574\uAE08"
+      value: "98_\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -23927,7 +23927,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "119_\uAC00\uB85C\uC218_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "82_\uAC00\uB85C\uC218_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24150,7 +24150,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "129_\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "131_\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24279,7 +24279,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "139_\uB2EC_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: "141_\uB2EC_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24408,7 +24408,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "142_\uD0DC\uC591_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: "144_\uD0DC\uC591_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24517,7 +24517,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "59_\uC800\uCE35 \uAC74\uBB3C_\uD574\uAE08"
+      value: "96_\uC800\uCE35 \uAC74\uBB3C_\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24687,7 +24687,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "131_\uD3EC\uD06C\uB808\uC778_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "133_\uD3EC\uD06C\uB808\uC778_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24816,7 +24816,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "121_\uC790\uB3D9\uCC28_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: "123_\uC790\uB3D9\uCC28_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24966,7 +24966,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "-----21_\uD654\uBD84_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: 21_FlowerPot_DropRateBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -25116,7 +25116,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "126_\uBCF4\uB3C4\uBE14\uB85D_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "128_\uBCF4\uB3C4\uBE14\uB85D_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -25250,7 +25250,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "106_\uD654\uBD84_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: 37_FlowerPot_AutoClickUnlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -25364,7 +25364,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "57_\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_\uD574\uAE08"
+      value: "94_\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -25514,7 +25514,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "116_\uC790\uC804\uAC70_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: 63_Bicycle_AutoClickSpeedBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -25664,7 +25664,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "104_\uC720\uB9AC\uCEF5_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: 35_GlassCup_AutoClickSpeedBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -25793,7 +25793,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "62_\uC9C0\uAD6C_\uD574\uAE08"
+      value: "99_\uC9C0\uAD6C_\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -25902,7 +25902,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "56_\uBCF4\uB3C4\uBE14\uB85D_\uD574\uAE08"
+      value: "93_\uBCF4\uB3C4\uBE14\uB85D_\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -26052,7 +26052,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "80_\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "109_\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -26181,7 +26181,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "103_\uC720\uB9AC\uCEF5_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: 29_GlassCup_AutoClickUnlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -26311,7 +26311,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "136_\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: "138_\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -26481,7 +26481,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "141_\uB2EC_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "143_\uB2EC_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -26641,7 +26641,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "81_\uD3EC\uD06C\uB808\uC778_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "110_\uD3EC\uD06C\uB808\uC778_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -26801,7 +26801,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "82_\uACE0\uCE35 \uBE4C\uB529_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "111_\uACE0\uCE35 \uBE4C\uB529_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -26931,7 +26931,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "124_\uBCF4\uB3C4\uBE14\uB85D_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
+      value: "126_\uBCF4\uB3C4\uBE14\uB85D_\uC790\uB3D9\uD074\uB9AD\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -27086,7 +27086,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "76_\uC790\uC804\uAC70_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: 65_Bicycle_DropRateBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -27297,7 +27297,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "146_\uC800\uCE35 \uAC74\uBB3C_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "148_\uC800\uCE35 \uAC74\uBB3C_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -27411,7 +27411,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "58_\uD3EC\uD06C\uB808\uC778_\uD574\uAE08"
+      value: "95_\uD3EC\uD06C\uB808\uC778_\uD574\uAE08"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -27561,7 +27561,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "77_\uAC00\uB85C\uC218_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "106_\uAC00\uB85C\uC218_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -27716,7 +27716,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "75_\uACC4\uC0B0\uAE30_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: 55_Calculator_DropRateBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -27866,7 +27866,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "134_\uACE0\uCE35 \uBE4C\uB529_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "136_\uACE0\uCE35 \uBE4C\uB529_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28016,7 +28016,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "143_\uD0DC\uC591_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "145_\uD0DC\uC591_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28171,7 +28171,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "140_\uB2EC_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
+      value: "142_\uB2EC_\uC790\uB3D9\uD074\uB9AD\uC18D\uB3C4"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28321,7 +28321,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "83_\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "112_\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28471,7 +28471,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "145_\uAC00\uB85C\uB4F1_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "147_\uAC00\uB85C\uB4F1_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28637,7 +28637,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "138_\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "140_\uCF58\uD06C\uB9AC\uD2B8 \uBC14\uB2E5_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28802,7 +28802,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "85_\uD0DC\uC591_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "114_\uD0DC\uC591_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28957,7 +28957,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "79_\uBCF4\uB3C4\uBE14\uB85D_\uB4DC\uB78D\uB7C9\uAC15\uD654"
+      value: "108_\uBCF4\uB3C4\uBE14\uB85D_\uB4DC\uB78D\uB7C9\uAC15\uD654"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -29141,7 +29141,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "-----06_\uC804\uC5ED_\uD30C\uD3B8\uD68D\uB4DD\uAC15\uD654"
+      value: 9_Global_PieceGainBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -29301,7 +29301,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "120_\uAC00\uB85C\uC218_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
+      value: "83_\uAC00\uB85C\uC218_\uC790\uB3D9\uD074\uB9AD\uD69F\uC218"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -29451,7 +29451,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "23_\uC720\uB9AC\uCEF5_\uB4DC\uB78D\uBC30\uC728\uAC15\uD654"
+      value: 27_GlassCup_DoubleDropBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -29610,7 +29610,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Name
-      value: "2_\uCE58\uBA85\uD0C0\uB370\uBBF8\uC9C0\uAC15\uD654"
+      value: 2_CritDamageBoost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -29724,7 +29724,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Name
-      value: "6_\uC720\uB9AC\uCEF5_\uD574\uAE08"
+      value: 6_GlassCup_Unlock
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
