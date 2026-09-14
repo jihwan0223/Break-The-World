@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // 업그레이드 트리에서 선행(부모) 노드 -> 이 노드를 잇는 선. 선행 노드를 2개 이상(fromNode + extraFromNodes) 넣을 수 있고,
-// 이 경우 전부(AND) 레벨업/해금돼야 toNode가 공개됨 - 화면에는 각 선행 노드에서 toNode로 선이 하나씩 따로 그려짐.
+// 이 경우 하나라도(OR) 레벨업/해금되면 toNode가 공개됨 - 화면에는 각 선행 노드에서 toNode로 선이 하나씩 따로 그려짐.
 // 각 선은 자식으로 1~3개의 축정렬 사각형(Image)을 만들어 직선 / ㄱ자 / ㄴ자 / 계단(Z) 모양으로 꺾어 그림.
 // from/to 노드의 RectTransform 위치를 매 프레임 읽어 따라감.
 // 선은 그 선행 노드와 toNode가 둘 다 화면에 보일 때만 나타남 (한쪽만 보이면 반쪽짜리 선이 되므로) - 선행 노드별로 따로 판단함.
@@ -14,7 +14,7 @@ using UnityEngine.UI;
 public class UpgradeTreeLink : MonoBehaviour
 {
     [SerializeField] private RectTransform fromNode; // 선행(부모) 노드 (1번째, 기존 씬 데이터 호환용 필드)
-    [SerializeField] private RectTransform[] extraFromNodes = System.Array.Empty<RectTransform>(); // 추가 선행 노드(2번째부터) - fromNode와 합쳐 전부(AND) 충족돼야 toNode가 열림
+    [SerializeField] private RectTransform[] extraFromNodes = System.Array.Empty<RectTransform>(); // 추가 선행 노드(2번째부터) - fromNode와 합쳐 하나라도(OR) 충족되면 toNode가 열림
     [SerializeField] private RectTransform toNode;   // 이 링크가 가리키는 자식 노드
     [SerializeField] private UpgradeManager.LinkRouting routing = UpgradeManager.LinkRouting.Straight; // 선 모양 (모든 선행 노드에 공통 적용)
     [SerializeField] private float thickness = 40f;  // 선 두께(px)
@@ -24,6 +24,7 @@ public class UpgradeTreeLink : MonoBehaviour
 
     private readonly Dictionary<RectTransform, List<Image>> _segmentGroups = new Dictionary<RectTransform, List<Image>>(); // 선행 노드별 세그먼트 풀
     private readonly Dictionary<RectTransform, Vector2> _lastFrom = new Dictionary<RectTransform, Vector2>(); // 선행 노드별 직전 위치
+    private readonly Dictionary<RectTransform, System.Func<bool>> _completionCheckCache = new Dictionary<RectTransform, System.Func<bool>>(); // 선행 노드별 IsLeveled 체크 캐시 (OR일 때 실제로 충족한 선만 그리기 위함)
     private Vector2 _lastTo; // 직전에 그린 toNode 위치
     private bool _dirty = true;
 
@@ -82,8 +83,13 @@ public class UpgradeTreeLink : MonoBehaviour
             List<Image> segs = GetOrCreateGroup(source);
             int sourceId = source.GetInstanceID();
 
-            // 선행 노드와 toNode가 둘 다 보일 때만 그 선을 그림 (한쪽만 보이면 허공에서 시작/끝나는 반쪽짜리 선이 됨)
-            bool visible = toVisible && source.gameObject.activeInHierarchy;
+            // 선행 노드와 toNode가 둘 다 보이고, 그 선행 노드 자체가 실제로 충족(레벨업/해금)됐을 때만 그 선을 그림.
+            // (한쪽만 보이면 허공에서 시작/끝나는 반쪽짜리 선이 됨. 선행이 여러 개(OR)면 toNode는 하나만 충족해도 열리는데,
+            //  이때 아직 안 채운 다른 선행 쪽 선까지 같이 나오면 이상해서 - 실제로 충족한 선행에서 나온 선만 보이게 함)
+            // 단, Play 모드가 아닐 때(에디터에서 트리 짜는 중)는 레벨업 여부와 무관하게 다 보여줌 - 안 그러면
+            // 에디터에선 UpgradeManager.Instance가 없어서 항상 false 취급돼 방금 이은 선도 안 보이는 문제가 있었음
+            bool gameplayGate = !Application.isPlaying || IsSourceCompleted(source);
+            bool visible = toVisible && source.gameObject.activeInHierarchy && gameplayGate;
             if (!visible)
             {
                 foreach (Image seg in segs)
@@ -97,10 +103,30 @@ public class UpgradeTreeLink : MonoBehaviour
             if (!aMoved && !toMoved) continue; // 이 선행 노드도, toNode도 안 움직였으면 다시 그릴 필요 없음
 
             _lastFrom[source] = a;
-            Rebuild(segs, sourceId, a, b);
+            Rebuild(segs, sourceId, source, a, b);
         }
 
         _dirty = false;
+    }
+
+    // source(선행 노드)가 실제로 충족(업그레이드면 레벨업, 해금/획득 노드면 IsLeveled)됐는지 - 결과를 캐싱해둠
+    private bool IsSourceCompleted(RectTransform source)
+    {
+        if (!_completionCheckCache.TryGetValue(source, out System.Func<bool> check))
+        {
+            UpgradeNodeUI upgradeNode = source.GetComponent<UpgradeNodeUI>();
+            if (upgradeNode != null)
+            {
+                check = upgradeNode.IsLeveled;
+            }
+            else
+            {
+                ObjectEconomyNodeUI economyNode = source.GetComponent<ObjectEconomyNodeUI>();
+                check = economyNode != null ? (System.Func<bool>)economyNode.IsLeveled : () => true; // 알 수 없는 타입이면 막지 않음
+            }
+            _completionCheckCache[source] = check;
+        }
+        return check();
     }
 
     // source(선행 노드)의 세그먼트 풀을 가져오거나 새로 만듦
@@ -111,36 +137,73 @@ public class UpgradeTreeLink : MonoBehaviour
         return segs;
     }
 
-    // a, b = 선행 노드/toNode의 anchoredPosition (링크와 같은 좌표계, Content 중심 기준). sourceId = 선행 노드 인스턴스ID(세그먼트 이름표용)
-    private void Rebuild(List<Image> segments, int sourceId, Vector2 a, Vector2 b)
+    // a, b = 선행 노드/toNode의 anchoredPosition (링크와 같은 좌표계, Content 중심 기준). sourceId = 선행 노드 인스턴스ID(세그먼트 이름표용).
+    // source = 선행 노드 RectTransform - 선을 노드 중심이 아니라 노드 사각형 "변"에서 시작하게 하려고 크기가 필요함
+    private void Rebuild(List<Image> segments, int sourceId, RectTransform source, Vector2 a, Vector2 b)
     {
+        Vector2 halfA = source.rect.size * 0.5f; // 선행 노드 사각형의 절반 크기
+        Vector2 halfB = toNode.rect.size * 0.5f; // toNode 사각형의 절반 크기
+
         switch (routing)
         {
             case UpgradeManager.LinkRouting.Straight:
+            {
+                Vector2 dir = (b - a).normalized; // a->b 방향
+                if (dir == Vector2.zero) break;
+                Vector2 clippedA = a + dir * RectEdgeDistance(dir, halfA); // a쪽 변에서 시작
+                Vector2 clippedB = b - dir * RectEdgeDistance(dir, halfB); // b쪽 변에서 끝
                 SetSegmentCount(segments, sourceId, 1);
-                LayoutDiagonal(segments[0], a, b);
+                LayoutDiagonal(segments[0], clippedA, clippedB);
                 break;
+            }
 
             case UpgradeManager.LinkRouting.ElbowVerticalFirst: // ㄱ자: 세로 먼저, 그 다음 가로
+            {
+                float vSign = Mathf.Sign(b.y - a.y); // a에서 세로로 나가는 방향(위/아래)
+                float hSign = Mathf.Sign(b.x - a.x); // b로 가로로 들어오는 방향(좌/우)
+                Vector2 clippedA = new Vector2(a.x, a.y + vSign * halfA.y); // a의 위/아래 변에서 시작
+                Vector2 corner = new Vector2(a.x, b.y);
+                Vector2 clippedB = new Vector2(b.x - hSign * halfB.x, b.y); // b의 좌/우 변에서 끝
                 SetSegmentCount(segments, sourceId, 2);
-                LayoutVertical(segments[0], a, new Vector2(a.x, b.y));
-                LayoutHorizontal(segments[1], new Vector2(a.x, b.y), b);
+                LayoutVertical(segments[0], clippedA, corner);
+                LayoutHorizontal(segments[1], corner, clippedB);
                 break;
+            }
 
             case UpgradeManager.LinkRouting.ElbowHorizontalFirst: // ㄴ자: 가로 먼저, 그 다음 세로
+            {
+                float hSign = Mathf.Sign(b.x - a.x); // a에서 가로로 나가는 방향(좌/우)
+                float vSign = Mathf.Sign(b.y - a.y); // b로 세로로 들어오는 방향(위/아래)
+                Vector2 clippedA = new Vector2(a.x + hSign * halfA.x, a.y); // a의 좌/우 변에서 시작
+                Vector2 corner = new Vector2(b.x, a.y);
+                Vector2 clippedB = new Vector2(b.x, b.y - vSign * halfB.y); // b의 위/아래 변에서 끝
                 SetSegmentCount(segments, sourceId, 2);
-                LayoutHorizontal(segments[0], a, new Vector2(b.x, a.y));
-                LayoutVertical(segments[1], new Vector2(b.x, a.y), b);
+                LayoutHorizontal(segments[0], clippedA, corner);
+                LayoutVertical(segments[1], corner, clippedB);
                 break;
+            }
 
-            case UpgradeManager.LinkRouting.Stepped: // 계단: 가로 - 세로 - 가로
+            case UpgradeManager.LinkRouting.Stepped: // 계단: 가로 - 세로 - 가로 (양 끝 다 가로로 드나듦)
+            {
+                float hSignA = Mathf.Sign(b.x - a.x);
+                float bx = Mathf.Lerp(a.x, b.x, bendRatio); // 꺾이는 x 위치 (원래 중심 좌표 기준으로 계산 - 클리핑과 무관하게 안정적으로)
+                Vector2 clippedA = new Vector2(a.x + hSignA * halfA.x, a.y);
+                Vector2 clippedB = new Vector2(b.x - hSignA * halfB.x, b.y);
                 SetSegmentCount(segments, sourceId, 3);
-                float bx = Mathf.Lerp(a.x, b.x, bendRatio); // 꺾이는 x 위치
-                LayoutHorizontal(segments[0], a, new Vector2(bx, a.y));
+                LayoutHorizontal(segments[0], clippedA, new Vector2(bx, a.y));
                 LayoutVertical(segments[1], new Vector2(bx, a.y), new Vector2(bx, b.y));
-                LayoutHorizontal(segments[2], new Vector2(bx, b.y), b);
+                LayoutHorizontal(segments[2], new Vector2(bx, b.y), clippedB);
                 break;
+            }
         }
+    }
+
+    // dir 방향으로 half 크기 사각형의 중심에서 변까지의 거리
+    private static float RectEdgeDistance(Vector2 dir, Vector2 half)
+    {
+        float tx = Mathf.Approximately(dir.x, 0f) ? float.PositiveInfinity : half.x / Mathf.Abs(dir.x);
+        float ty = Mathf.Approximately(dir.y, 0f) ? float.PositiveInfinity : half.y / Mathf.Abs(dir.y);
+        return Mathf.Min(tx, ty);
     }
 
     // 가로 세그먼트: 두 점의 y는 같다고 보고, x구간을 채우는 얇은 가로 막대

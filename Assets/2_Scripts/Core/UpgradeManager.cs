@@ -139,7 +139,7 @@ public class UpgradeManager : MonoBehaviour
         var links = FindObjectsByType<UpgradeTreeLink>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
         // 각 노드로 들어오는 링크(들)의 선행 노드(들)를 전부 모아둠 - 링크 하나가 선행을 여러 개(fromNode+extraFromNodes)
-        // 가질 수 있고, 같은 toNode를 가리키는 링크가 여러 개일 수도 있으므로 전부 합쳐서 모두(AND) 충족돼야 공개됨.
+        // 가질 수 있고, 같은 toNode를 가리키는 링크가 여러 개일 수도 있으므로 전부 합쳐서 하나라도(OR) 충족되면 공개됨.
         // 시작이 일반 업그레이드 노드면 그 노드 레벨로, 오브젝트 해금/획득 노드(ObjectEconomyNodeUI)면 IsLeveled()로 판단함
         var prereqsByToRect = new Dictionary<RectTransform, List<(string id, System.Func<bool> satisfied)>>();
         foreach (UpgradeTreeLink link in links)
@@ -182,7 +182,7 @@ public class UpgradeManager : MonoBehaviour
                 maxLevel = Mathf.Max(1, ui.MaxLevel),
                 prerequisiteId = prereqs != null ? string.Join(", ", prereqs.ConvertAll(p => p.id)) : null,
                 prerequisiteSatisfied = prereqs != null && prereqs.Count > 0
-                    ? () => prereqs.TrueForAll(p => p.satisfied())
+                    ? () => prereqs.Exists(p => p.satisfied()) // 선행 여러 개면 OR - 하나만 충족돼도 공개
                     : null,
                 valuePerLevel = ui.ValuePerLevel,
                 costs = ResolveCosts(ui.Costs, targetObjectIndex),

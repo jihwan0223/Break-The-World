@@ -39,8 +39,8 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     public bool IsLeveled() => ObjectManager.Instance != null &&
         (isGain ? ObjectManager.Instance.GetGainLevel(objectIndex) >= 1 : ObjectManager.Instance.IsUnlocked(objectIndex));
 
-    // 선행 노드(들)가 전부 충족됐는지 - 이 노드로 들어오는 UpgradeTreeLink(들)의 선행 노드가 전부(AND) 1레벨 이상/해금
-    // 완료면 true. 들어오는 링크가 없으면 옛날 anchor 필드로 폴백, 그것도 없으면 루트로 보고 항상 true.
+    // 선행 노드(들) 중 하나라도 충족됐는지 - 이 노드로 들어오는 UpgradeTreeLink(들)의 선행 노드 중 하나라도(OR) 1레벨
+    // 이상/해금 완료면 true. 들어오는 링크가 없으면 옛날 anchor 필드로 폴백, 그것도 없으면 루트로 보고 항상 true.
     private bool PrerequisiteSatisfied()
     {
         if (!_prereqResolved)
@@ -65,9 +65,9 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
                 bool leveled = prereq is UpgradeNodeUI upgradeNode ? upgradeNode.IsLeveled()
                              : prereq is ObjectEconomyNodeUI economyNode ? economyNode.IsLeveled()
                              : true;
-                if (!leveled) return false;
+                if (leveled) return true;
             }
-            return true;
+            return false;
         }
 
         // 링크 없음 - 옛날 방식 폴백
