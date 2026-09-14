@@ -165,6 +165,14 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         RefreshAll();
     }
 
+    // 테스트용 "전체 해금" 버튼에 연결 - 모든 업그레이드/오브젝트 노드를 조각 소모 없이 즉시 최대/해금 상태로 만듦
+    public void UnlockAllDebug()
+    {
+        UpgradeManager.Instance?.UnlockAllDebug();
+        ObjectManager.Instance?.UnlockAllDebug();
+        RefreshAll();
+    }
+
     // "카메라 초기화" 버튼에 연결 - centerNodeId 노드가 뷰포트 정중앙에 오도록 팬을 매번 새로 계산하고, 줌은 defaultZoom으로 되돌림
     public void ResetCamera()
     {

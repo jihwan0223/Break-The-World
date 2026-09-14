@@ -235,6 +235,17 @@ public class ObjectManager : MonoBehaviour
         OnGainLevelChanged?.Invoke(index, _gainLevel[index]);
     }
 
+    // 테스트용 - 모든 오브젝트를 즉시 해금 (조각 소모 없음)
+    public void UnlockAllDebug()
+    {
+        for (int i = 0; i < _unlocked.Length; i++)
+        {
+            if (_unlocked[i]) continue;
+            _unlocked[i] = true;
+            OnUnlockChanged?.Invoke(i);
+        }
+    }
+
     // 테스트용 - 0번(처음부터 해금)만 남기고 모든 오브젝트 해금/획득량 업그레이드를 초기 상태로 되돌림 (조각은 환불하지 않음)
     public void ResetAll()
     {
