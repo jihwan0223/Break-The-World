@@ -1,28 +1,14 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-// 업그레이드 화면 전체를 관리하는 총괄 매니저. 이 스크립트가 붙은 오브젝트(화면 전체를 덮는 패널)를
-// 통째로 SetActive(false)로 꺼둔 채 시작하고, "업그레이드" 버튼을 누르면 SidePanelUI가 이 오브젝트를 직접
-// SetActive(true)로 켬 - 그래서 열 때는 Instance(싱글톤)를 거치지 않음. Awake는 비활성 오브젝트에서는
-// 절대 안 돌기 때문에, "업그레이드" 버튼이 Instance를 통해 열려고 했으면 첫 실행 때 Instance가 아직
-// null이라 에러가 났을 것 - 그래서 여는 동작만큼은 SidePanelUI가 GameObject 참조로 직접 처리함.
-// 반대로 닫기(X 버튼)는 이 화면이 이미 열려있는(=Awake가 이미 돈) 상태에서만 눌릴 수 있으니 Instance를 써도 안전함.
-// - 노드/연결선은 전부 손으로 배치함 (UpgradeNodeUI 프리팹을 복사해서 이름/설명/효과/비용을 인스펙터에 적고,
-//   UpgradeTreeLink로 선행 노드와 이어주면 끝). 이 스크립트는 그렇게 배치된 걸 content 아래에서 자동으로
-//   찾아 매 구매마다 새로고침만 함.
-// - 팬(드래그)은 이 오브젝트에 같이 붙인 ScrollRect가 처리함 (Content만 연결하면 됨, Movement Type은
-//   Unrestricted로 설정해서 이동 거리 제한이 없게 하고, Scroll Sensitivity는 0으로 꺼서 휠 스크롤과 안 겹치게 함)
-// - 줌(마우스 휠)은 이 스크립트가 처리함 (이 오브젝트에 raycastTarget=true인 Image가 있어야 휠 입력을 받음)
 [RequireComponent(typeof(RectTransform))]
 public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public static UpgradeTreeUI Instance { get; private set; }
 
-    // 이 화면이 열리면 true, 닫히면 false로 전달 - PieceUI(우상단 조각 표시)/SidePanelUI(좌상단 버튼 줄)가 구독해서
-    // 이 화면이 열려있는 동안은 스스로 숨어서 화면 안의 닫기(X) 버튼과 겹치지 않게 함
     public static event System.Action<bool> OnTreeToggled;
 
-    [SerializeField] private RectTransform content; // 팬/줌이 실제로 적용되는 콘텐츠 (모든 노드/선의 부모, ScrollRect의 Content와 같은 걸 넣으면 됨)
+    [SerializeField] private RectTransform content;
 
     [Header("줌")]
     [SerializeField] private float minZoom = 0.07f; // 최소 축소 배율
@@ -30,7 +16,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
     [SerializeField] private float zoomStep = 0.1f; // 휠 한 틱당 목표 배율이 곱해지는 비율 (0.1 = 틱당 ±10%, 곱셈이라 어느 배율에서든 체감이 균일함)
     [SerializeField] private float zoomSmoothSpeed = 8f; // 목표 배율을 따라잡는 속도 (클수록 빠르게/뚝뚝 끊기게, 작을수록 부드럽게)
 
-    // 씬에 있는 노드들 - Awake 시 content 아래에서 자동으로 찾음 (손으로 배치한 노드 그대로 잡힘)
+    // 씬에 있는 노드들 - Awake 시 content 아래에서 자동으로 찾음
     private UpgradeNodeUI[] _upgradeNodes = System.Array.Empty<UpgradeNodeUI>();
     private ObjectEconomyNodeUI[] _economyNodes = System.Array.Empty<ObjectEconomyNodeUI>();
 
@@ -167,6 +153,9 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
 
     // 테스트용 "돈 초기화" 버튼에 연결 - 보유 중인 모든 조각을 0으로
     public void ResetCurrencyDebug() => CurrencyManager.Instance?.ResetAll();
+
+    // 테스트용 "돈 최대" 버튼에 연결 - 모든 오브젝트의 조각을 최대치로 채움
+    public void MaxCurrencyDebug() => CurrencyManager.Instance?.MaxAllDebug();
 
     // 테스트용 "전체 해금" 버튼에 연결 - 모든 업그레이드/오브젝트 노드를 조각 소모 없이 즉시 최대/해금 상태로 만듦
     public void UnlockAllDebug()

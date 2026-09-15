@@ -28,13 +28,10 @@ public class SidePanelUI : MonoBehaviour
     private VisualElement _currentlyOpenContent; // 지금 열려있는 팝업 내용 (닫을 때 오브젝트 전환 여부 판단용)
     private ObjectData _objectAtPanelOpen; // Object 팝업을 열었을 때 장착돼있던 오브젝트 (닫을 때와 비교해서 바뀌었는지 확인)
 
-    private VisualElement _buttonRow; // 좌상단 Upgrade/Weapon/Object 버튼 줄 - 셋 중 아무거나 하나라도 열려있으면 전부 숨김
+    private VisualElement _buttonRow; // 우상단 Upgrade/Weapon/Object 버튼 줄 - 셋 중 아무거나 하나라도 열려있으면 전부 숨김
     private bool _upgradeTreeOpen; // Canvas 업그레이드 화면이 지금 열려있는지 (UpgradeTreeUI.OnTreeToggled로 갱신됨)
 
-    // (업그레이드 화면이 열리고 닫히는 건 이제 Canvas 쪽 UpgradeTreeUI.OnTreeToggled가 담당함 - PieceUI도 그쪽을 구독함)
-
-    // Weapon/Object 팝업(_panel)이 열리면 true, 닫히면 false로 전달 - 화면 우상단을 가릴 수 있는 다른
-    // UIDocument(PieceUI 등)가 스스로 숨고 보여주는 데 사용
+    // Weapon/Object 팝업(_panel)이 열리면 true, 닫히면 false로 전달 - DebrisPool 등이 구독해서 팝업 열릴 때 바닥 조각을 치움
     public static event System.Action<bool> OnSelectorPanelToggled;
 
     void OnEnable()
@@ -97,20 +94,14 @@ public class SidePanelUI : MonoBehaviour
         // 실제 버튼/팝업 패널은 각자 picking 모드를 그대로 유지하므로 그 위 클릭은 정상 동작함
         root.pickingMode = PickingMode.Ignore;
 
-        // 화면(1920x1080 기준)보다 살짝 작은 크기로 거의 꽉 채우는 빈 팝업 패널
+        // 화면 전체를 꽉 채우는 팝업 패널 - 업그레이드 화면과 동일하게 전체화면으로 덮고 X 버튼으로 닫음
         _panel = new VisualElement();
         _panel.style.position = Position.Absolute;
-        _panel.style.left = 40;
-        // 우상단 조각 표시(PieceUI)와 겹치지 않도록 그 자리만큼 오른쪽을 비워둠 - 버튼은 이제 좌상단에 있어서
-        // 패널이 오른쪽 끝까지 안 가도 되고, 대신 조각 표시가 가려지지 않게 이 여백이 필요함
-        _panel.style.right = 280;
-        _panel.style.top = 40;
-        _panel.style.bottom = 40;
-        _panel.style.backgroundColor = new Color(0f, 0f, 0f, 0.85f);
-        _panel.style.borderTopLeftRadius = 8;
-        _panel.style.borderTopRightRadius = 8;
-        _panel.style.borderBottomLeftRadius = 8;
-        _panel.style.borderBottomRightRadius = 8;
+        _panel.style.left = 0;
+        _panel.style.right = 0;
+        _panel.style.top = 0;
+        _panel.style.bottom = 0;
+        _panel.style.backgroundColor = new Color(0.08f, 0.08f, 0.1f, 1f); // 업그레이드 화면처럼 불투명 단색(검정 대신 짙은 남색조)
         _panel.style.display = DisplayStyle.None;
 
         // 이 패널 위에 포인터가 있는 동안은 뒤쪽 월드 오브젝트가 클릭되지 않도록 플래그를 켜고 끔
@@ -126,15 +117,20 @@ public class SidePanelUI : MonoBehaviour
         _panelTitle.style.unityFontStyleAndWeight = FontStyle.Bold;
         _panel.Add(_panelTitle);
 
+        // 업그레이드 화면의 닫기 버튼처럼 배경 없이 흰 글자 X만
         var closeButton = new Button(ClosePanel) { text = "X" };
         closeButton.style.position = Position.Absolute;
         closeButton.style.top = 16;
         closeButton.style.right = 16;
-        closeButton.style.width = 36;
-        closeButton.style.height = 36;
-        closeButton.style.fontSize = 18;
+        closeButton.style.width = 44;
+        closeButton.style.height = 44;
+        closeButton.style.fontSize = 28;
         closeButton.style.unityFontStyleAndWeight = FontStyle.Bold;
-        closeButton.style.backgroundColor = new Color(0.3f, 0.1f, 0.1f, 0.9f);
+        closeButton.style.backgroundColor = Color.clear;
+        closeButton.style.borderTopWidth = 0;
+        closeButton.style.borderBottomWidth = 0;
+        closeButton.style.borderLeftWidth = 0;
+        closeButton.style.borderRightWidth = 0;
         closeButton.style.color = Color.white;
         _panel.Add(closeButton);
 
@@ -174,11 +170,11 @@ public class SidePanelUI : MonoBehaviour
 
         root.Add(_panel);
 
-        // Upgrade/Weapon/Object 버튼 3개가 화면 좌상단에 일렬로 나오는 가로줄
+        // Upgrade/Weapon/Object 버튼 3개가 화면 우상단에 일렬로 나오는 가로줄
         // (업그레이드 페이지 자체는 유저가 Canvas로 새로 만든 UpgradeTreeUI가 담당 - 여기선 그걸 여는 버튼만 있음)
         var buttonRow = new VisualElement();
         buttonRow.style.position = Position.Absolute;
-        buttonRow.style.left = 20;
+        buttonRow.style.right = 20;
         buttonRow.style.top = 20;
         buttonRow.style.flexDirection = FlexDirection.Row;
         buttonRow.style.alignItems = Align.Center;
@@ -407,7 +403,7 @@ public class SidePanelUI : MonoBehaviour
         _panel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility(); // 팝업이 열렸으니 버튼 줄 숨김
 
-        OnSelectorPanelToggled?.Invoke(true); // PieceUI 등 우상단 UI들에게 숨으라고 알림
+        OnSelectorPanelToggled?.Invoke(true); // DebrisPool 등에게 팝업 열림을 알림
 
         // 열 때마다 항상 최신 상태로 다시 그려서, 이름이 비어 보이는 경우가 없게 함
         _refreshWeaponSelector?.Invoke();
@@ -424,7 +420,7 @@ public class SidePanelUI : MonoBehaviour
         _panel.style.display = DisplayStyle.None;
         RefreshButtonRowVisibility(); // 팝업이 닫혔으니 버튼 줄 다시 보임
 
-        OnSelectorPanelToggled?.Invoke(false); // PieceUI 등 우상단 UI들에게 다시 보이라고 알림
+        OnSelectorPanelToggled?.Invoke(false); // DebrisPool 등에게 팝업 닫힘을 알림
 
         // Object 팝업이 열려있는 동안 선택이 바뀌었다면, 닫히는 지금 전환 애니메이션 재생
         if (_currentlyOpenContent == _objectContent && ObjectManager.Instance != null)

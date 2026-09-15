@@ -73,7 +73,7 @@ public class ObjectManager : MonoBehaviour
     // N번째 오브젝트는 (N-1)번째 오브젝트의 조각으로 해금해야 장착 가능. 0번(Plate)은 처음부터 해금된 상태로 시작
     private bool[] _unlocked;
     // 해금 비용 시작값 (1번 오브젝트 기준) - 오브젝트 해금은 새 오브젝트/화폐 하나가 통째로 열리는 중요한 업그레이드라
-    // 일반 트리 노드의 해금류 효과(AutoClickUnlock 등)와 같은 비중(4배)을 줘서 3->12로 올림
+    // 일반 트리 노드의 해금류 효과(AutoClickUnlock 등)와 같은 비중(4배)으로 잡음
     private const long UnlockCostBase = 12;
     private const float UnlockCostGrowth = 6f; // 오브젝트 하나 넘어갈 때마다 해금 비용이 늘어나는 배율 - 마지막 티어(19번)가 Q(10^15) 단위에 오도록 맞춘 값
 

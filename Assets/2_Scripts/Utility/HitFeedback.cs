@@ -46,10 +46,8 @@ public class HitFeedback : MonoBehaviour
 
     private IEnumerator PlayFeedback()
     {
-        // 항상 Awake 때 저장해둔 고정 기준(_restScale)을 기준으로 삼음.
-        // 예전엔 매번 호출 시점의 "현재" localScale을 기준으로 삼았는데, 연타(자동클릭/더블클릭 등)로 이전 펀치
-        // 연출이 커지는 도중에 끊기면 그 "커진 채로 멈춘 값"을 다음 펀치의 기준으로 또 잡아버려서, 클릭할수록
-        // 계속 조금씩 더 커지는(복리처럼 누적되는) 버그가 있었음. 매번 고정 기준으로 되돌린 뒤 시작하면 이 문제가 없음
+        // 매번 Awake 때 저장해둔 고정 기준(_restScale)으로 되돌린 뒤 시작 - 연타 중 이전 펀치가 커지는 도중에
+        // 끊겨도 그 값을 기준 삼지 않아서 클릭할수록 점점 커지는 현상을 방지함
         transform.localScale = _restScale;
         Vector3 originalScale = _restScale;
 

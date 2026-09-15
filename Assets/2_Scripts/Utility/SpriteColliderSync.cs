@@ -44,7 +44,7 @@ public class SpriteColliderSync : MonoBehaviour
 
         if (shapeCount == 0)
         {
-            // Sprite has no baked physics shape (Generate Physics Shape off) -> fall back to a rectangle.
+            // Physics Shape이 없는 스프라이트(Generate Physics Shape 꺼짐)는 사각형으로 대체
             Bounds bounds = _lastSprite.bounds;
             _pathBuffer.Clear();
             _pathBuffer.Add(new Vector2(bounds.min.x, bounds.min.y));

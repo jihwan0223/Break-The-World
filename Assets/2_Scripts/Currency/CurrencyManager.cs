@@ -95,4 +95,13 @@ public class CurrencyManager : MonoBehaviour
         foreach (int objectIndex in objectIndexes)
             OnPiecesChanged?.Invoke(objectIndex, 0);
     }
+
+    // 테스트용 - 모든 오브젝트의 조각을 최대치로 채움
+    public void MaxAllDebug()
+    {
+        if (ObjectManager.Instance == null) return;
+
+        for (int i = 0; i < ObjectManager.Instance.ObjectCount; i++)
+            SetPieces(i, DebugMaxPieceAmount);
+    }
 }

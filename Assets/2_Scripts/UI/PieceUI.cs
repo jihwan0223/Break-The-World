@@ -3,24 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// 화면 우상단에 오브젝트별 조각(화폐) 보유량을 표시. 통합 화폐가 없어서 "0개 이상 보유한 조각"만 동적으로 나열됨
+// 화면 좌상단에 오브젝트별 조각(화폐) 보유량을 표시. 통합 화폐가 없어서 "0개 이상 보유한 조각"만 동적으로 나열됨.
+// 업그레이드/무기/오브젝트 화면이 열려있는 동안에도 계속 보이도록, PanelSettings의 sortingOrder를 높게 잡아
+// 그 화면들(다른 UIDocument/Canvas)보다 항상 위에 그려지게 함
 [RequireComponent(typeof(UIDocument))]
 public class PieceUI : MonoBehaviour
 {
-    [SerializeField] private float rightOffset = 20f; // 화면 우상단 기준 오른쪽 여백
-    [SerializeField] private float topOffset = 20f; // 화면 우상단 기준 위쪽 여백
+    [SerializeField] private float leftOffset = 20f; // 화면 좌상단 기준 왼쪽 여백
+    [SerializeField] private float topOffset = 20f; // 화면 좌상단 기준 위쪽 여백
+    [SerializeField] private int sortingOrder = 100; // 업그레이드/무기/오브젝트 화면 위에 그려지도록 높게 잡은 값
 
-    private VisualElement _root; // 이 UIDocument의 최상위 요소 - 다른 팝업이 우상단을 가릴 때 숨기기 위해 저장해둠
     private VisualElement _piecesContainer; // 오브젝트별 조각 라벨들을 세로로 쌓는 컨테이너
     private readonly Dictionary<int, Label> _pieceLabels = new Dictionary<int, Label>(); // objectIndex -> 그 오브젝트의 조각 라벨 (처음 보유하는 순간 생성됨)
     private readonly Dictionary<int, long> _lastAmounts = new Dictionary<int, long>(); // objectIndex -> 직전에 표시했던 조각 개수 (늘었는지 판단용)
     private readonly Dictionary<int, Coroutine> _pulseCoroutines = new Dictionary<int, Coroutine>(); // objectIndex -> 지금 재생 중인 펄스 연출 (연속으로 늘어날 때 중첩 재생 방지용)
-
-    // Weapon/Object 팝업이 이제 우상단까지 안 가려서(패널 오른쪽에 여백을 둠) 더 이상 숨길 필요가 없어짐 -
-    // 팝업이 열려있는 동안에도 조각 개수가 계속 보여야(눌렀을 때도 보이게) 하기 때문.
-    // 업그레이드 화면(Canvas, UpgradeTreeUI)은 화면 전체를 덮고 우상단에 닫기(X) 버튼도 있어서, 그거 열려있는 동안은 계속 숨김
-    private bool _upgradeOverlayOpen;
-    private bool _selectorPanelOpen;
 
     void OnEnable()
     {
@@ -35,13 +31,11 @@ public class PieceUI : MonoBehaviour
             uiDocument.panelSettings = settings;
         }
 
-        _root = uiDocument.rootVisualElement;
-        GameFonts.Apply(_root);
-        BuildContainer(_root);
+        uiDocument.panelSettings.sortingOrder = sortingOrder;
 
-        // 업그레이드 화면(Canvas)이 열리면 우상단 X 버튼과 겹치니까 숨김 - Canvas 쪽 UpgradeTreeUI가 이벤트를 쏨
-        UpgradeTreeUI.OnTreeToggled += HandleUpgradeOverlayToggled;
-        SidePanelUI.OnSelectorPanelToggled += HandleSelectorPanelToggled;
+        VisualElement root = uiDocument.rootVisualElement;
+        GameFonts.Apply(root);
+        BuildContainer(root);
     }
 
     void Start()
@@ -69,33 +63,9 @@ public class PieceUI : MonoBehaviour
     {
         if (CurrencyManager.Instance != null)
             CurrencyManager.Instance.OnPiecesChanged -= UpdatePieceLabel;
-
-        UpgradeTreeUI.OnTreeToggled -= HandleUpgradeOverlayToggled;
-        SidePanelUI.OnSelectorPanelToggled -= HandleSelectorPanelToggled;
     }
 
-    private void HandleUpgradeOverlayToggled(bool open)
-    {
-        _upgradeOverlayOpen = open;
-        RefreshVisibility();
-    }
-
-    private void HandleSelectorPanelToggled(bool open)
-    {
-        _selectorPanelOpen = open;
-        RefreshVisibility();
-    }
-
-    // 이제 Weapon/Object 팝업이 열려있어도 계속 보임 (패널이 우상단을 안 가려서 겹칠 일이 없음) -
-    // 업그레이드 오버레이가 열렸을 때만 숨기는데, 지금은 그 오버레이 자체가 없어서(Canvas로 새로 만들 예정)
-    // 사실상 항상 보이는 상태가 됨
-    private void RefreshVisibility()
-    {
-        if (_root != null)
-            _root.style.display = _upgradeOverlayOpen ? DisplayStyle.None : DisplayStyle.Flex;
-    }
-
-    // UXML/USS 없이 코드로 직접 오브젝트별 조각 라벨 + 반투명 배경을 구성 (화면 우상단)
+    // UXML/USS 없이 코드로 직접 오브젝트별 조각 라벨 + 반투명 배경을 구성 (화면 좌상단)
     private void BuildContainer(VisualElement root)
     {
         root.Clear();
@@ -103,17 +73,17 @@ public class PieceUI : MonoBehaviour
         var background = new VisualElement();
         background.style.position = Position.Absolute;
         background.style.top = topOffset;
-        background.style.right = rightOffset;
-        background.style.paddingLeft = 18;
-        background.style.paddingRight = 18;
-        background.style.paddingTop = 10;
-        background.style.paddingBottom = 10;
+        background.style.left = leftOffset;
+        background.style.paddingLeft = 12;
+        background.style.paddingRight = 12;
+        background.style.paddingTop = 6;
+        background.style.paddingBottom = 6;
         background.style.backgroundColor = new Color(0f, 0f, 0f, 0.6f);
         background.style.borderTopLeftRadius = 4;
         background.style.borderTopRightRadius = 4;
         background.style.borderBottomLeftRadius = 4;
         background.style.borderBottomRightRadius = 4;
-        background.style.alignItems = Align.FlexEnd; // 라벨들을 오른쪽 정렬로 쌓음
+        background.style.alignItems = Align.FlexStart; // 라벨들을 왼쪽 정렬로 쌓음
 
         _piecesContainer = background; // 배경 자체가 곧 라벨 컨테이너 (별도 자식 없이 바로 라벨을 쌓음)
         root.Add(background);
@@ -137,7 +107,7 @@ public class PieceUI : MonoBehaviour
         if (!_pieceLabels.TryGetValue(objectIndex, out Label label))
         {
             label = new Label();
-            label.style.fontSize = 30; // 돈(조각) UI 키움 (기존 18)
+            label.style.fontSize = 20; // 보유 오브젝트 종류가 많아지면 세로로 길게 쌓여서 너무 크면 화면을 많이 차지함
             label.style.color = Color.white;
             label.style.unityFontStyleAndWeight = FontStyle.Bold;
             _piecesContainer.Add(label);
