@@ -25,7 +25,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
     [SerializeField] private RectTransform content; // 팬/줌이 실제로 적용되는 콘텐츠 (모든 노드/선의 부모, ScrollRect의 Content와 같은 걸 넣으면 됨)
 
     [Header("줌")]
-    [SerializeField] private float minZoom = 0.2f; // 최소 축소 배율
+    [SerializeField] private float minZoom = 0.07f; // 최소 축소 배율
     [SerializeField] private float maxZoom = 1.5f; // 최대 확대 배율
     [SerializeField] private float zoomStep = 0.1f; // 휠 한 틱당 목표 배율이 곱해지는 비율 (0.1 = 틱당 ±10%, 곱셈이라 어느 배율에서든 체감이 균일함)
     [SerializeField] private float zoomSmoothSpeed = 8f; // 목표 배율을 따라잡는 속도 (클수록 빠르게/뚝뚝 끊기게, 작을수록 부드럽게)
@@ -39,9 +39,9 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
 
     // "카메라 초기화" 버튼을 누르면 이 이름의 노드가 항상 뷰포트 정중앙에 오도록 매번 위치를 다시 계산함
     // (트리를 재배치해도 이 노드의 현재 좌표를 그대로 따라가므로 defaultAnchoredPosition을 손으로 다시 맞출 필요 없음)
-    [SerializeField] private string centerNodeId = "0_BareHand_ClickDamageBoost";
+    [SerializeField] private string centerNodeId = "0_접시_드랍량_강화";
     // centerNodeId 노드를 못 찾았을 때만 쓰는 폴백 팬 값
-    [SerializeField] private Vector2 defaultAnchoredPosition = new Vector2(-280f, 700f);
+    [SerializeField] private Vector2 defaultAnchoredPosition = new Vector2(1500f, -2200f);
     [SerializeField] private float defaultZoom = 0.5f;
 
     [SerializeField] private bool pauseGameWhileOpen = true; // 열려있는 동안 Time.timeScale을 0으로 멈출지
@@ -164,6 +164,9 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         ObjectManager.Instance?.ResetAll();
         RefreshAll();
     }
+
+    // 테스트용 "돈 초기화" 버튼에 연결 - 보유 중인 모든 조각을 0으로
+    public void ResetCurrencyDebug() => CurrencyManager.Instance?.ResetAll();
 
     // 테스트용 "전체 해금" 버튼에 연결 - 모든 업그레이드/오브젝트 노드를 조각 소모 없이 즉시 최대/해금 상태로 만듦
     public void UnlockAllDebug()

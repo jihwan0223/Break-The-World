@@ -207,8 +207,8 @@ public class SidePanelUI : MonoBehaviour
             OpenPanel("오브젝트", _objectContent);
         });
 
-        upgradeButton.style.marginRight = 8;
-        weaponButton.style.marginRight = 8;
+        upgradeButton.style.marginRight = 12;
+        weaponButton.style.marginRight = 12;
 
         buttonRow.Add(upgradeButton);
         buttonRow.Add(weaponButton);
@@ -381,13 +381,13 @@ public class SidePanelUI : MonoBehaviour
         button.style.color = Color.white;
     }
 
-    // 좌상단 가로줄에 나란히 놓이는 버튼 (고정 폭/높이)
+    // 좌상단 가로줄에 나란히 놓이는 버튼 (고정 폭/높이) - 3개 합쳐서 화면(1920 기준) 절반 가까이 오도록 키움
     private Button CreateButton(string text, System.Action onClick)
     {
         var button = new Button(onClick) { text = text };
-        button.style.width = 110;
-        button.style.height = 70;
-        button.style.fontSize = 20;
+        button.style.width = 300;
+        button.style.height = 110;
+        button.style.fontSize = 34;
         button.style.unityFontStyleAndWeight = FontStyle.Bold;
         button.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.85f);
         button.style.color = Color.white;

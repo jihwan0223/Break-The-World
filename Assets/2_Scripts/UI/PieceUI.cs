@@ -104,10 +104,10 @@ public class PieceUI : MonoBehaviour
         background.style.position = Position.Absolute;
         background.style.top = topOffset;
         background.style.right = rightOffset;
-        background.style.paddingLeft = 10;
-        background.style.paddingRight = 10;
-        background.style.paddingTop = 4;
-        background.style.paddingBottom = 4;
+        background.style.paddingLeft = 18;
+        background.style.paddingRight = 18;
+        background.style.paddingTop = 10;
+        background.style.paddingBottom = 10;
         background.style.backgroundColor = new Color(0f, 0f, 0f, 0.6f);
         background.style.borderTopLeftRadius = 4;
         background.style.borderTopRightRadius = 4;
@@ -119,13 +119,25 @@ public class PieceUI : MonoBehaviour
         root.Add(background);
     }
 
-    // 오브젝트 하나의 조각을 처음 보유하는 순간 라벨을 새로 만들고, 그 뒤로는 있는 라벨의 숫자만 갱신
+    // 오브젝트 하나의 조각을 처음 보유하는 순간 라벨을 새로 만들고, 그 뒤로는 있는 라벨의 숫자만 갱신.
+    // 0 이하로 돌아가면(초기화 등) 라벨 자체를 지움 - 다음에 다시 얻으면 "새로 생기는" 연출부터 재생됨
     private void UpdatePieceLabel(int objectIndex, long amount)
     {
+        if (amount <= 0)
+        {
+            if (_pieceLabels.TryGetValue(objectIndex, out Label oldLabel))
+            {
+                _piecesContainer.Remove(oldLabel);
+                _pieceLabels.Remove(objectIndex);
+            }
+            _lastAmounts[objectIndex] = 0;
+            return;
+        }
+
         if (!_pieceLabels.TryGetValue(objectIndex, out Label label))
         {
             label = new Label();
-            label.style.fontSize = 18;
+            label.style.fontSize = 30; // 돈(조각) UI 키움 (기존 18)
             label.style.color = Color.white;
             label.style.unityFontStyleAndWeight = FontStyle.Bold;
             _piecesContainer.Add(label);

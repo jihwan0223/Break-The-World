@@ -11,7 +11,7 @@ public class CurrencyManager : MonoBehaviour
 
     // 테스트용: 켜두면 모든 조각이 항상 최대치로 유지됨 (업그레이드 테스트할 때 조각 모으는 시간 아끼려고).
     // 실제 재화 밸런스를 테스트할 땐 꺼두면 됨
-    [SerializeField] private bool debugAlwaysMaxPieces = true;
+    [SerializeField] private bool debugAlwaysMaxPieces = false;
     private const long DebugMaxPieceAmount = 999_999_999_999_999L; // 테스트용 최대 조각 값 (Q 단위 비용도 감당할 만큼 넉넉하게)
 
     private readonly Dictionary<int, long> _pieces = new Dictionary<int, long>(); // objectIndex -> 보유 조각 개수
@@ -86,4 +86,13 @@ public class CurrencyManager : MonoBehaviour
 
     // 지금 등록된 모든 조각 보유량을 (objectIndex, amount) 쌍으로 반환 - 저장할 때 사용
     public IEnumerable<KeyValuePair<int, long>> GetAllPieces() => _pieces;
+
+    // 테스트용 - 보유 중인 모든 조각을 0으로 (UI도 다시 "미보유" 상태로 돌아가 안 보이게 됨)
+    public void ResetAll()
+    {
+        var objectIndexes = new List<int>(_pieces.Keys);
+        _pieces.Clear();
+        foreach (int objectIndex in objectIndexes)
+            OnPiecesChanged?.Invoke(objectIndex, 0);
+    }
 }

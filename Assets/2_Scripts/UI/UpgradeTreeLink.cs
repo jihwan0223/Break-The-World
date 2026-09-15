@@ -231,7 +231,7 @@ public class UpgradeTreeLink : MonoBehaviour
         Vector2 delta = q - p;
         float length = delta.magnitude;
         rt.anchoredPosition = (p + q) * 0.5f;
-        rt.sizeDelta = new Vector2(length, thickness);
+        rt.sizeDelta = new Vector2(length + thickness, thickness); // +thickness로 양 끝을 노드 안쪽으로 살짝 겹쳐서 틈 없이 이어지게 함 (ㄱ자/계단 세그먼트와 동일한 처리)
         rt.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg);
     }
 

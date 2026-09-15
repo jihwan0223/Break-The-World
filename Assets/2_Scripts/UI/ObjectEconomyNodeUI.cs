@@ -15,6 +15,8 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     [SerializeField] private bool isGain; // false면 해금(Unlock) 노드, true면 획득량 증가(Gain) 노드
     [SerializeField] private TextMeshProUGUI label; // 이름/레벨(또는 완료)/비용을 표시할 텍스트
     [SerializeField] private Image doneOverlay; // (미사용) 예전엔 해금 완료/최대 레벨이면 켜두던 초록 오버레이 - 지금은 항상 꺼둠
+    [Tooltip("해금 완료(또는 획득량 1레벨 이상)되면 바뀔 스프라이트 (비워두면 기본 이미지 그대로 유지)")]
+    [SerializeField] private Sprite upgradedSprite;
 
     // 선행(부모) 노드는 이 노드로 들어오는 UpgradeTreeLink로 정함 (선 하나 = 선행 하나). 일반 업그레이드 노드에서 오든
     // 다른 해금/획득 노드에서 오든 상관없음. 아래 anchor 필드는 링크가 없을 때만 쓰는 옛날 방식 폴백.
@@ -22,6 +24,8 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     [SerializeField] private ObjectEconomyNodeUI anchorEconomyNode; // (폴백) 들어오는 링크가 없을 때 선행으로 볼 해금/획득 노드
 
     private Button _button;
+    private Image _icon;
+    private Sprite _baseSprite; // 원래(미해금/0레벨) 스프라이트 - Awake 시점에 저장해둠
     private RectTransform _rect;
     private Coroutine _shakeRoutine; // 지금 재생 중인 흔들림 (중첩 방지)
     private bool _wasRevealed; // 직전 Refresh 때 이 노드가 공개 상태였는지 - hidden→revealed로 바뀌는 "등장 순간"을 한 번만 잡으려고 추적
@@ -81,6 +85,8 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         _rect = (RectTransform)transform;
         _button = GetComponent<Button>();
         _button.onClick.AddListener(HandleClicked);
+        _icon = GetComponent<Image>();
+        if (_icon != null) _baseSprite = _icon.sprite;
 
         // 미사용 오버레이 - 클릭을 가로채지 않도록만 처리
         if (doneOverlay != null)
@@ -88,6 +94,13 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             doneOverlay.raycastTarget = false;
             doneOverlay.gameObject.SetActive(false);
         }
+    }
+
+    // 해금 완료(또는 획득량 1레벨 이상)면 upgradedSprite로, 아니면 원래 스프라이트로
+    private void UpdateIcon()
+    {
+        if (_icon == null || upgradedSprite == null) return;
+        _icon.sprite = IsLeveled() ? upgradedSprite : _baseSprite;
     }
 
     private void HandleClicked()
@@ -126,6 +139,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         gameObject.SetActive(isRevealed);
         if (!isRevealed) return;
 
+        UpdateIcon();
         if (justRevealed) PlayShake();
 
         string objectName = ObjectManager.Instance.GetObjectAt(objectIndex).objectName;
@@ -165,8 +179,44 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
 
     // ---- 호버 툴팁 (일반 업그레이드 노드와 동일하게 동작) ----
 
-    public void OnPointerEnter(PointerEventData eventData) => UpgradeTooltip.Instance?.Show(_tooltipText, Rect);
+    public void OnPointerEnter(PointerEventData eventData) => UpgradeTooltip.Instance?.Show(BuildTooltipContent(), Rect);
     public void OnPointerExit(PointerEventData eventData) => UpgradeTooltip.Instance?.Hide();
+
+    // 툴팁에 보여줄 내용 - 제목/설명/레벨/가격 4줄 (노드 위에 직접 쓰는 짧은 label 문구와는 별개)
+    private UpgradeTooltip.Content BuildTooltipContent()
+    {
+        if (ObjectManager.Instance == null) return new UpgradeTooltip.Content { title = "" };
+
+        string objectName = ObjectManager.Instance.GetObjectAt(objectIndex).objectName;
+        string prevName = objectIndex > 0 ? ObjectManager.Instance.GetObjectAt(objectIndex - 1).objectName : objectName;
+
+        if (!isGain)
+        {
+            bool unlocked = ObjectManager.Instance.IsUnlocked(objectIndex);
+            if (unlocked)
+                return new UpgradeTooltip.Content { title = $"{objectName} 해금", description = "이미 해금했습니다.", level = "완료" };
+
+            long cost = ObjectManager.Instance.GetUnlockCost(objectIndex);
+            return new UpgradeTooltip.Content
+            {
+                title = $"{objectName} 해금",
+                description = $"{objectName}을(를) 해금합니다.",
+                level = "0 / 1",
+                price = $"{NumberFormatUtil.Format(cost)} {prevName}",
+            };
+        }
+
+        int level = ObjectManager.Instance.GetGainLevel(objectIndex);
+        bool maxed = level >= 5;
+        string nextGain = maxed ? null : $"+{Mathf.Max(1, objectIndex)}개"; // 레벨당 이 오브젝트 처치 시 더 주는 파편 개수(고정값, ObjectManager.GetGainBonus와 동일 공식)
+        return new UpgradeTooltip.Content
+        {
+            title = $"{objectName} 획득량 증가",
+            description = "처치 시 추가로 얻는 파편이 늘어납니다.",
+            level = nextGain != null ? $"{level} / 5  (다음 {nextGain})" : $"{level} / 5",
+            price = maxed ? "최대" : $"{NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))} {prevName}",
+        };
+    }
 
     // 구매 성공 / 노드 등장 공용 흔들림 - 색 반짝임 없이 좌우로 살짝 기울었다 돌아옴 (일반 업그레이드 노드와 동일)
     private void PlayShake()
