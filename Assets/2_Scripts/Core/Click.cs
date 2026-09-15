@@ -49,7 +49,8 @@ public class Click : MonoBehaviour
         if (objectIndex < 0) return;
         int weaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : -1;
 
-        // 그 오브젝트의 "획득량 증가"(ObjectManager) 보너스 + 콤보 배율
+        // 오브젝트 티어에 따라 기하급수적으로 커지는 기본 보상 + "획득량 증가"(ObjectManager) 보너스 + 콤보 배율
+        long baseReward = ObjectManager.Instance.GetBaseReward(objectIndex) * pieceReward;
         long gainBonus = ObjectManager.Instance.GetGainBonus(objectIndex);
         float comboMultiplier = ComboManager.Instance != null ? ComboManager.Instance.ShardMultiplier : 1f;
 
@@ -62,7 +63,9 @@ public class Click : MonoBehaviour
             weaponKillBonus = UpgradeManager.Instance.WeaponKillBonusPieces(weaponIndex);
         }
 
-        long finalPieces = Mathf.Max(1, Mathf.RoundToInt((pieceReward + gainBonus + weaponKillBonus) * comboMultiplier * upgradeMultiplier));
+        // 후반 티어는 값이 int 범위를 넘어설 수 있어서 double로 곱한 뒤 long으로 반올림함 (Mathf.RoundToInt는 int라 오버플로됨)
+        double rawTotal = (baseReward + gainBonus + weaponKillBonus) * (double)comboMultiplier * upgradeMultiplier;
+        long finalPieces = System.Math.Max(1L, (long)System.Math.Round(rawTotal));
 
         // 오브젝트별 "확률적 2배 드랍" 업그레이드
         if (UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.ObjectDoubleDropChance(objectIndex))

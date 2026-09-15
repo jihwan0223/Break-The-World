@@ -156,6 +156,16 @@ public class ObjectManager : MonoBehaviour
 
     public bool IsUnlocked(int index) => index >= 0 && index < _unlocked.Length && _unlocked[index];
 
+    // ---- 클릭 시 기본 파편 보상 ----
+    // 오브젝트를 부술 때마다 받는 기본 파편 수. 업그레이드/해금 비용이 티어마다 6배씩 기하급수적으로 커지는데
+    // 기본 보상이 고정값(예: 1개)이면 콤보/업그레이드 배율을 아무리 곱해도(배율은 곱셈일 뿐 밑변이 1이면 그대로
+    // 작은 수) 후반 티어 가격을 절대 못 따라잡음. 그래서 기본 보상도 오브젝트 티어마다 기하급수적으로 커지게 함.
+    private const long BaseRewardStart = 1; // 0번 오브젝트 기본 보상
+    private const float BaseRewardGrowth = 4.5f; // 오브젝트 하나 넘어갈 때마다 곱해지는 배율 - 콤보/업그레이드 배율까지 곱해졌을 때 후반 가격대와 맞도록 잡은 값
+
+    public long GetBaseReward(int index) =>
+        Math.Max(1L, (long)(BaseRewardStart * Mathf.Pow(BaseRewardGrowth, Mathf.Max(0, index))));
+
     // index번째 오브젝트를 해금하는 데 필요한 (index-1)번째 오브젝트의 조각 개수 (0번은 비용 없음 - 처음부터 해금)
     public long GetUnlockCost(int index)
     {

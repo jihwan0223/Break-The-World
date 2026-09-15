@@ -403,6 +403,8 @@ public class SidePanelUI : MonoBehaviour
         _panel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility(); // 팝업이 열렸으니 버튼 줄 숨김
 
+        Time.timeScale = 0f; // 열려있는 동안 자동클릭/자동채굴 등이 계속 진행되는 걸 막음 (업그레이드 화면과 동일)
+
         OnSelectorPanelToggled?.Invoke(true); // DebrisPool 등에게 팝업 열림을 알림
 
         // 열 때마다 항상 최신 상태로 다시 그려서, 이름이 비어 보이는 경우가 없게 함
@@ -419,6 +421,8 @@ public class SidePanelUI : MonoBehaviour
     {
         _panel.style.display = DisplayStyle.None;
         RefreshButtonRowVisibility(); // 팝업이 닫혔으니 버튼 줄 다시 보임
+
+        Time.timeScale = 1f; // 멈춰뒀던 게임 시간을 다시 정상 속도로
 
         OnSelectorPanelToggled?.Invoke(false); // DebrisPool 등에게 팝업 닫힘을 알림
 
