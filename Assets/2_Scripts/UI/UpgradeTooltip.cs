@@ -76,27 +76,18 @@ public class UpgradeTooltip : MonoBehaviour
         CreateBorderEdge("BorderRight", new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), new Vector2(borderThickness, 0f));
         // ↑ 각 호출의 마지막 Vector2는 sizeDelta: 두께 축만 값을 주고 나머지 축은 0(=부모 폭/높이에 꽉 붙는 스트레치)
 
-        // Content: 세로로 제목/설명/구분선/레벨/가격을 쌓는 컨테이너. 높이는 자식들 크기에 맞춰 자동으로 늘어남
-        var contentGo = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+        // Content: 제목/설명/구분선/레벨/가격을 세로로 쌓는 컨테이너. VerticalLayoutGroup+ContentSizeFitter 조합은
+        // TMP가 폭 확정 전에 줄바꿈 높이를 미리 계산해버리는 타이밍 문제 때문에 텍스트가 박스 밖으로 삐져나오는
+        // 버그가 계속 나서, 아예 안 쓰고 ApplyContent()에서 각 줄의 위치/높이를 직접 계산해서 박음(LayoutRow 참고).
+        // RectMask2D는 그래도 혹시 모를 폭 초과에 대비한 최종 안전장치로 유지.
+        var contentGo = new GameObject("Content", typeof(RectTransform), typeof(RectMask2D));
         _content = (RectTransform)contentGo.transform;
-        _content.SetParent(_rect, false);
         _content.anchorMin = new Vector2(0f, 1f);
         _content.anchorMax = new Vector2(1f, 1f);
         _content.pivot = new Vector2(0.5f, 1f);
+        _content.SetParent(_rect, false);
         _content.anchoredPosition = Vector2.zero;
-
-        var layout = contentGo.GetComponent<VerticalLayoutGroup>();
-        layout.padding = new RectOffset((int)padding.x, (int)padding.x, (int)padding.y, (int)padding.y);
-        layout.spacing = fontSize * 0.2f;
-        layout.childAlignment = TextAnchor.UpperLeft;
-        layout.childControlWidth = true;
-        layout.childForceExpandWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandHeight = false;
-
-        var fitter = contentGo.GetComponent<ContentSizeFitter>();
-        fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained; // 폭은 root(maxWidth)에 고정
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;   // 높이만 내용대로
+        _content.sizeDelta = Vector2.zero; // 높이는 ApplyContent가 매번 직접 재계산해서 넣어줌
 
         _titleText = CreateText("Title", fontSize * 1.05f, FontStyles.Bold, Color.white);
         _dividerAfterTitle = CreateDivider("DividerAfterTitle");
@@ -107,19 +98,20 @@ public class UpgradeTooltip : MonoBehaviour
         _priceText = CreateText("Price", fontSize * 0.82f, FontStyles.Normal, Color.white);
     }
 
-    // Content 아래에 가로 한 줄짜리 구분선 생성 (제목/설명/레벨/가격 사이에 씀)
+    // Content 아래에 가로 한 줄짜리 구분선 생성 (제목/설명/레벨/가격 사이에 씀). 위치/높이는 ApplyContent가 직접 배치.
     private RectTransform CreateDivider(string name)
     {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(LayoutElement));
+        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
         var rt = (RectTransform)go.transform;
+        rt.anchorMin = new Vector2(0f, 1f);
+        rt.anchorMax = new Vector2(1f, 1f);
+        rt.pivot = new Vector2(0.5f, 1f);
         rt.SetParent(_content, false);
+        rt.offsetMin = new Vector2(padding.x, rt.offsetMin.y);
+        rt.offsetMax = new Vector2(-padding.x, rt.offsetMax.y);
         var img = go.GetComponent<Image>();
         img.color = dividerColor;
         img.raycastTarget = false;
-        var layout = go.GetComponent<LayoutElement>();
-        layout.minHeight = 1f;
-        layout.preferredHeight = 1f;
-        layout.flexibleHeight = 0f;
         return rt;
     }
 
@@ -139,11 +131,20 @@ public class UpgradeTooltip : MonoBehaviour
         img.raycastTarget = false;
     }
 
-    // Content 아래에 TMP 텍스트 한 줄 생성 (제목/설명/레벨/가격 공용)
+    // Content 아래에 TMP 텍스트 한 줄 생성 (제목/설명/레벨/가격 공용). 가로는 Content 폭에 패딩만큼 인셋된
+    // 스트레치 앵커로 고정해서, 레이아웃 시스템의 리빌드 타이밍과 무관하게 항상 정확한 폭으로 줄바꿈됨.
+    // 세로 위치/높이는 매번 ApplyContent()의 LayoutRow가 실제 줄바꿈 결과(ForceMeshUpdate)를 보고 직접 넣어줌.
     private TextMeshProUGUI CreateText(string name, float size, FontStyles style, Color color)
     {
         var go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
-        go.transform.SetParent(_content, false);
+        var rt = (RectTransform)go.transform;
+        rt.anchorMin = new Vector2(0f, 1f);
+        rt.anchorMax = new Vector2(1f, 1f);
+        rt.pivot = new Vector2(0f, 1f);
+        rt.SetParent(_content, false);
+        rt.offsetMin = new Vector2(padding.x, rt.offsetMin.y);
+        rt.offsetMax = new Vector2(-padding.x, rt.offsetMax.y);
+
         var tmp = go.GetComponent<TextMeshProUGUI>();
         tmp.fontSize = size;
         tmp.enableAutoSizing = false;
@@ -183,7 +184,9 @@ public class UpgradeTooltip : MonoBehaviour
         ApplyContent(content);
     }
 
-    // 제목/설명/레벨/가격 텍스트를 채우고(빈 줄은 숨김) 레이아웃을 다시 계산해 박스 높이를 맞춤
+    // 제목/설명/레벨/가격 텍스트를 채우고(빈 줄은 숨김) 각 줄을 위에서부터 차례로 직접 쌓아 박스 높이를 맞춤.
+    // Unity 레이아웃 시스템(VerticalLayoutGroup/ContentSizeFitter)에 안 맡기고 여기서 직접 계산하는 이유는
+    // LayoutRow 주석 참고 - 그쪽 조합은 리빌드 타이밍 문제로 텍스트가 박스 밖으로 삐져나오는 버그가 반복됐음.
     private void ApplyContent(Content content)
     {
         _titleText.text = content.title;
@@ -200,12 +203,46 @@ public class UpgradeTooltip : MonoBehaviour
         _dividerAfterDescription.gameObject.SetActive(hasDescription && (hasLevel || hasPrice));
         _dividerAfterLevel.gameObject.SetActive(hasLevel && hasPrice);
 
-        // TMP는 text를 바꿔도 실제 메시(줄바꿈 계산)를 이 프레임에 바로 만들지 않고 미뤄서, 그 상태로 높이를 재면
-        // 실제보다 낮게 잡혀 글자가 박스 밑으로 삐져나옴. ForceUpdateCanvases로 대기 중인 갱신을 전부 강제로 끝낸 뒤
-        // 리빌드해야 폭 확정 후의 진짜 줄바꿈 높이를 읽을 수 있음.
-        Canvas.ForceUpdateCanvases();
-        LayoutRebuilder.ForceRebuildLayoutImmediate(_content);
-        _rect.sizeDelta = new Vector2(maxWidth, _content.rect.height);
+        float spacing = fontSize * 0.2f; // 줄 사이 간격 (기존 VerticalLayoutGroup.spacing과 동일 값)
+        float cursorY = padding.y; // 위쪽 패딩만큼 아래로 시작해서 한 줄씩 내려가며 쌓음
+
+        cursorY = LayoutRow(_titleText, cursorY, spacing);
+        cursorY = LayoutDivider(_dividerAfterTitle, cursorY, spacing);
+        if (hasDescription) cursorY = LayoutRow(_descriptionText, cursorY, spacing);
+        cursorY = LayoutDivider(_dividerAfterDescription, cursorY, spacing);
+        if (hasLevel) cursorY = LayoutRow(_levelText, cursorY, spacing);
+        cursorY = LayoutDivider(_dividerAfterLevel, cursorY, spacing);
+        if (hasPrice) cursorY = LayoutRow(_priceText, cursorY, spacing);
+
+        float totalHeight = cursorY + padding.y; // 마지막 줄 뒤 아래쪽 패딩 추가
+        _rect.sizeDelta = new Vector2(maxWidth, totalHeight);
+        // Content 자신의 높이도 같이 갱신해야 함 - RectMask2D가 이 rect 기준으로 자르기 때문에, 안 늘려주면
+        // 매번 이전 높이(맨 처음엔 0)로 잘려서 내용이 안 보이거나 잘린 채로 남음
+        _content.sizeDelta = new Vector2(_content.sizeDelta.x, totalHeight);
+    }
+
+    // 보이는 TMP 한 줄을 cursorY(박스 상단에서부터의 거리) 위치에 배치하고, 실제 줄바꿈 높이만큼 커서를 내림.
+    // ForceMeshUpdate()로 지금 폭(CreateText에서 이미 패딩만큼 인셋해둔 폭) 기준 줄바꿈을 이 자리에서 강제로 계산해서
+    // preferredHeight가 레이아웃 리빌드 타이밍에 좌우되지 않고 항상 지금 텍스트의 진짜 줄 수를 반영하게 함.
+    private float LayoutRow(TextMeshProUGUI tmp, float cursorY, float spacing)
+    {
+        tmp.ForceMeshUpdate();
+        float height = tmp.preferredHeight;
+        RectTransform rt = tmp.rectTransform;
+        rt.offsetMax = new Vector2(rt.offsetMax.x, -cursorY);
+        rt.offsetMin = new Vector2(rt.offsetMin.x, -(cursorY + height));
+        return cursorY + height + spacing;
+    }
+
+    // 구분선 한 줄(고정 두께 1px)을 cursorY에 배치. 안 보이면 커서 그대로 반환(자리 안 차지함)
+    private float LayoutDivider(RectTransform divider, float cursorY, float spacing)
+    {
+        if (!divider.gameObject.activeSelf) return cursorY;
+
+        const float thickness = 1f;
+        divider.offsetMax = new Vector2(divider.offsetMax.x, -cursorY);
+        divider.offsetMin = new Vector2(divider.offsetMin.x, -(cursorY + thickness));
+        return cursorY + thickness + spacing;
     }
 
     private static void SetRow(GameObject row, TextMeshProUGUI tmp, string text)
