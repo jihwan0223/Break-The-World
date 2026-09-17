@@ -377,10 +377,18 @@ public class SidePanelUI : MonoBehaviour
         button.style.color = Color.white;
     }
 
+    private const float NavButtonPunchAmount = 0.15f; // 업글/무기/오브젝트 버튼 클릭시 커지는 비율
+    private const float NavButtonPunchDuration = 0.12f; // 펀치 애니메이션 길이(초)
+
     // 좌상단 가로줄에 나란히 놓이는 버튼 (고정 폭/높이) - 3개 합쳐서 화면(1920 기준) 절반 가까이 오도록 키움
     private Button CreateButton(string text, System.Action onClick)
     {
-        var button = new Button(onClick) { text = text };
+        // onClick이 패널을 열거나 버튼 줄 자체를 숨겨버리므로, 펀치가 다 보인 뒤에 실제 동작을 실행해야 함
+        // (먼저 실행하면 버튼이 그 즉시 사라져서 펀치가 눈에 안 보임)
+        // 카메라 리셋 버튼처럼 밝은 배경+진회색 글씨로 바꿔봤는데, 이 패널에서는 텍스트 color 자체가
+        // 무슨 값을 넣어도 흰색으로 고정되는 문제가 있어서(재컴파일 후에도 재현) 일단 원래 스타일로 되돌림
+        var button = new Button { text = text };
+        button.clicked += () => StartCoroutine(PunchThenInvoke(button, NavButtonPunchDuration, NavButtonPunchAmount, onClick));
         button.style.width = 300;
         button.style.height = 110;
         button.style.fontSize = 34;
@@ -392,6 +400,22 @@ public class SidePanelUI : MonoBehaviour
         button.style.borderBottomLeftRadius = 6;
         button.style.borderBottomRightRadius = 6;
         return button;
+    }
+
+    // VisualElement를 1배 -> 1+punch배 -> 1배로 튕긴 뒤, 그제서야 실제 클릭 동작(onClick)을 실행
+    private IEnumerator PunchThenInvoke(VisualElement element, float duration, float punch, System.Action onClick)
+    {
+        float t = 0f; // 경과 시간
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime; // 패널 열림 등으로 timeScale이 0이어도 정상 재생되도록 unscaled 사용
+            float p = Mathf.Clamp01(t / duration); // 0~1 진행률
+            float s = 1f + punch * Mathf.Sin(p * Mathf.PI); // 커졌다 돌아오는 곡선
+            element.style.scale = new Scale(new Vector3(s, s, 1f));
+            yield return null;
+        }
+        element.style.scale = new Scale(Vector3.one);
+        onClick?.Invoke();
     }
 
     private void OpenPanel(string title, VisualElement contentToShow)

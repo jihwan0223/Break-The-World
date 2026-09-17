@@ -3750,6 +3750,7 @@ GameObject:
   - component: {fileID: 568773934}
   - component: {fileID: 568773933}
   - component: {fileID: 568773932}
+  - component: {fileID: 568773935}
   m_Layer: 5
   m_Name: '**MaxCashButton**'
   m_TagString: Untagged
@@ -3871,6 +3872,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 568773930}
   m_CullTransparentMesh: 1
+--- !u!114 &568773935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 568773930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc3320a7c77c1ef4ab1b77d9cebd57ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonClickFeedback
+  punchAmount: 0.15
+  duration: 0.15
 --- !u!1 &572558696
 GameObject:
   m_ObjectHideFlags: 0
@@ -4560,6 +4575,7 @@ GameObject:
   - component: {fileID: 683516805}
   - component: {fileID: 683516804}
   - component: {fileID: 683516803}
+  - component: {fileID: 683516806}
   m_Layer: 5
   m_Name: CameraResetButton
   m_TagString: Untagged
@@ -4681,6 +4697,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 683516801}
   m_CullTransparentMesh: 1
+--- !u!114 &683516806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683516801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc3320a7c77c1ef4ab1b77d9cebd57ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonClickFeedback
+  punchAmount: 0.15
+  duration: 0.15
 --- !u!1 &719702059
 GameObject:
   m_ObjectHideFlags: 0
@@ -4693,6 +4723,7 @@ GameObject:
   - component: {fileID: 719702063}
   - component: {fileID: 719702062}
   - component: {fileID: 719702061}
+  - component: {fileID: 719702064}
   m_Layer: 5
   m_Name: '**ResetButton**'
   m_TagString: Untagged
@@ -4814,6 +4845,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 719702059}
   m_CullTransparentMesh: 1
+--- !u!114 &719702064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 719702059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc3320a7c77c1ef4ab1b77d9cebd57ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonClickFeedback
+  punchAmount: 0.15
+  duration: 0.15
 --- !u!1001 &740486082
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14657,6 +14702,7 @@ GameObject:
   - component: {fileID: 949322153}
   - component: {fileID: 939592821}
   - component: {fileID: 995955286}
+  - component: {fileID: 995955287}
   m_Layer: 5
   m_Name: '**UnlockAllButton**'
   m_TagString: Untagged
@@ -18522,6 +18568,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &995955287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900986464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc3320a7c77c1ef4ab1b77d9cebd57ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonClickFeedback
+  punchAmount: 0.15
+  duration: 0.15
 --- !u!1 &1018461015
 GameObject:
   m_ObjectHideFlags: 0
@@ -18534,6 +18594,7 @@ GameObject:
   - component: {fileID: 1076854807}
   - component: {fileID: 1044659973}
   - component: {fileID: 1040878749}
+  - component: {fileID: 1093546159}
   m_Layer: 5
   m_Name: '**CashResetButton**'
   m_TagString: Untagged
@@ -19178,6 +19239,20 @@ RectTransform:
   m_AnchoredPosition: {x: 710, y: 50}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1093546159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018461015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc3320a7c77c1ef4ab1b77d9cebd57ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonClickFeedback
+  punchAmount: 0.15
+  duration: 0.15
 --- !u!1001 &1095151920
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20307,9 +20382,9 @@ MonoBehaviour:
   m_text: CameraReset
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: df1418bee46655547a4ed1f2937b9105, type: 2}
-  m_sharedMaterial: {fileID: -4886497620305204777, guid: df1418bee46655547a4ed1f2937b9105, type: 2}
+  m_sharedMaterial: {fileID: 1908202059}
   m_fontSharedMaterials: []
-  m_fontMaterial: {fileID: 0}
+  m_fontMaterial: {fileID: 1908202059}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
@@ -27957,6 +28032,73 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+--- !u!21 &1908202059
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MonaS12 - Regular Material (Instance)
+  m_Shader: {fileID: 4800000, guid: fe393ace9b354375a9cb14cdbbc28be4, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: -1606759924803876777, guid: df1418bee46655547a4ed1f2937b9105, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _ColorMask: 15
+    - _CullMode: 0
+    - _FaceDilate: 0
+    - _GradientScale: 10
+    - _MaskSoftnessX: 0
+    - _MaskSoftnessY: 0
+    - _OutlineSoftness: 0
+    - _OutlineWidth: 0
+    - _PerspectiveFilter: 0.875
+    - _ScaleRatioA: 0.9
+    - _ScaleRatioB: 1
+    - _ScaleRatioC: 0.73125
+    - _ScaleX: 1
+    - _ScaleY: 1
+    - _ShaderFlags: 0
+    - _Sharpness: 0
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _TextureHeight: 1024
+    - _TextureWidth: 1024
+    - _UnderlayDilate: 0
+    - _UnderlayOffsetX: 0
+    - _UnderlayOffsetY: 0
+    - _UnderlaySoftness: 0
+    - _VertexOffsetX: 0
+    - _VertexOffsetY: 0
+    - _WeightBold: 0.75
+    - _WeightNormal: 0
+    m_Colors:
+    - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
+    - _FaceColor: {r: 1, g: 1, b: 1, a: 1}
+    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
+    - _UnderlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1001 &1912714696
 PrefabInstance:
   m_ObjectHideFlags: 0
