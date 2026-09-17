@@ -213,6 +213,18 @@ public class ObjectManager : MonoBehaviour
         return (long)(GainCostBase * objectFactor * levelFactor);
     }
 
+    // index번째 오브젝트의 획득량 증가 업그레이드를 0레벨부터 최대 레벨까지 다 올리는 데 드는 총 비용 (디버그용)
+    public long GetTotalGainCost(int index)
+    {
+        if (index <= 0) return 0;
+
+        long total = 0;
+        float objectFactor = Mathf.Pow(GainCostGrowthPerObject, index - 1);
+        for (int level = 0; level < MaxGainLevel; level++)
+            total += (long)(GainCostBase * objectFactor * Mathf.Pow(GainCostGrowthPerLevel, level));
+        return total;
+    }
+
     // index번째 오브젝트가 파괴될 때마다 추가로 더 얻는 조각 개수 (획득량 증가 업그레이드 보너스)
     public long GetGainBonus(int index)
     {

@@ -147,7 +147,7 @@ public class UpgradeTooltip : MonoBehaviour
         tmp.enableAutoSizing = false;
         tmp.color = color;
         tmp.fontStyle = style;
-        tmp.alignment = TextAlignmentOptions.TopLeft;
+        tmp.alignment = TextAlignmentOptions.Top;
         tmp.textWrappingMode = TextWrappingModes.Normal;
         tmp.raycastTarget = false;
         if (GameFonts.Tmp != null) tmp.font = GameFonts.Tmp;

@@ -1,0 +1,322 @@
+<meta charset="UTF-8">
+<title>Break The World Roadmap</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap">
+<style>
+:root{
+  --bg:#f5f2ec;
+  --surface:#ffffff;
+  --surface-2:#efe9de;
+  --border:#ddd4c2;
+  --text:#211c15;
+  --text-muted:#756b5a;
+  --accent:#d9541f;
+  --accent-soft:#f6e1d2;
+  --good:#2f8f5b;
+  --good-bg:#e4f3ea;
+  --rail:#d9cfba;
+  --shadow:0 1px 2px rgba(33,28,21,.06), 0 8px 24px -12px rgba(33,28,21,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161310;
+    --surface:#1f1b15;
+    --surface-2:#292319;
+    --border:#3c3323;
+    --text:#f4efe4;
+    --text-muted:#a89a80;
+    --accent:#ff8a4c;
+    --accent-soft:#3a2618;
+    --good:#5fcf8f;
+    --good-bg:rgba(95,207,143,.14);
+    --rail:#3c3323;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161310;
+  --surface:#1f1b15;
+  --surface-2:#292319;
+  --border:#3c3323;
+  --text:#f4efe4;
+  --text-muted:#a89a80;
+  --accent:#ff8a4c;
+  --accent-soft:#3a2618;
+  --good:#5fcf8f;
+  --good-bg:rgba(95,207,143,.14);
+  --rail:#3c3323;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif;
+  padding-inline:20px;
+  padding-block:36px 64px;
+}
+.wrap{ max-width:760px; margin:0 auto; }
+.display{ font-family:"Black Han Sans","Noto Sans KR",sans-serif; }
+header.hero{
+  display:flex; flex-direction:column; gap:14px;
+  padding-bottom:28px; margin-bottom:36px;
+  border-bottom:1px solid var(--border);
+}
+.eyebrow{
+  font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent); font-weight:700;
+}
+h1{
+  font-size:clamp(1.9rem, 5vw, 2.6rem);
+  line-height:1.15; margin:0; text-wrap:balance;
+  letter-spacing:.01em;
+}
+h1 em{ color:var(--accent); font-style:normal; }
+.hero-meta{
+  display:flex; flex-wrap:wrap; gap:10px 28px;
+  align-items:baseline;
+}
+.meta-item .label{ font-size:.72rem; color:var(--text-muted); }
+.meta-item .value{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;
+  font-size:1.5rem; font-variant-numeric:tabular-nums;
+}
+.meta-item .value.accent{ color:var(--accent); }
+.progress-block{ margin-top:4px; }
+.progress-row{
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:.8rem; color:var(--text-muted); margin-bottom:6px;
+}
+.progress-row strong{ color:var(--text); font-variant-numeric:tabular-nums; }
+.progress-track{
+  height:8px; border-radius:5px; background:var(--surface-2);
+  overflow:hidden; border:1px solid var(--border);
+}
+.progress-fill{
+  height:100%; width:0%; background:var(--accent);
+  border-radius:5px; transition:width .3s ease;
+}
+.timeline{ position:relative; }
+.timeline::before{
+  content:""; position:absolute; left:23px; top:6px; bottom:6px;
+  width:2px; background:var(--rail);
+}
+.week{
+  position:relative; display:grid;
+  grid-template-columns:48px 1fr;
+  gap:0 18px;
+  margin-bottom:22px;
+}
+.week:last-child{ margin-bottom:0; }
+.node{
+  position:relative; z-index:1;
+  width:48px; height:48px; border-radius:50%;
+  background:var(--surface); border:2px solid var(--rail);
+  display:flex; align-items:center; justify-content:center;
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;
+  font-size:1.15rem; color:var(--text-muted);
+}
+.week[data-status="current"] .node{
+  border-color:var(--accent); color:var(--accent); background:var(--accent-soft);
+  box-shadow:0 0 0 4px var(--accent-soft);
+}
+.week[data-status="done"] .node{
+  border-color:var(--good); color:var(--good); background:var(--good-bg);
+}
+.card{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:18px 20px 16px;
+  box-shadow:var(--shadow);
+}
+.card-head{
+  display:flex; flex-wrap:wrap; align-items:baseline;
+  gap:8px 12px; margin-bottom:12px;
+}
+.card-title{ font-size:1.05rem; font-weight:700; }
+.card-range{
+  font-size:.76rem; color:var(--text-muted);
+  font-variant-numeric:tabular-nums;
+  margin-left:auto;
+}
+.pill{
+  font-size:.68rem; font-weight:700; letter-spacing:.04em;
+  padding:2px 9px; border-radius:99px;
+  background:var(--surface-2); color:var(--text-muted);
+}
+.week[data-status="current"] .pill{ background:var(--accent); color:#fff; }
+.week[data-status="done"] .pill{ background:var(--good-bg); color:var(--good); }
+ul.items{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px; }
+.items li{ display:flex; align-items:flex-start; gap:10px; }
+.items input[type="checkbox"]{
+  appearance:none; -webkit-appearance:none;
+  width:18px; height:18px; margin-top:2px; flex:none;
+  border:1.5px solid var(--border); border-radius:5px;
+  background:var(--surface); cursor:pointer; position:relative;
+}
+.items input[type="checkbox"]:checked{ background:var(--good); border-color:var(--good); }
+.items input[type="checkbox"]:checked::after{
+  content:""; position:absolute; left:5px; top:1px;
+  width:5px; height:9px; border:solid #fff;
+  border-width:0 2px 2px 0; transform:rotate(40deg);
+}
+.items input[type="checkbox"]:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+.items label{ font-size:.9rem; line-height:1.45; cursor:pointer; }
+.items input[type="checkbox"]:checked + label{
+  color:var(--text-muted); text-decoration:line-through; text-decoration-color:var(--border);
+}
+footer{
+  margin-top:40px; padding-top:18px; border-top:1px solid var(--border);
+  font-size:.76rem; color:var(--text-muted); text-align:center;
+}
+@media (max-width:480px){
+  .week{ grid-template-columns:36px 1fr; }
+  .node{ width:36px; height:36px; font-size:.95rem; }
+  .timeline::before{ left:17px; }
+  .card-range{ margin-left:0; width:100%; order:3; }
+}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">BREAK THE WORLD</div>
+    <h1 class="display">11월 23일까지<br>체크리스트</h1>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <div class="label">목표일</div>
+        <div class="value">2026.11.23</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">남은 기간</div>
+        <div class="value accent" id="ddayValue"></div>
+      </div>
+      <div class="meta-item">
+        <div class="label">주 단위 체크포인트</div>
+        <div class="value">10주</div>
+      </div>
+    </div>
+    <div class="progress-block">
+      <div class="progress-row">
+        <span>전체 진행률</span>
+        <strong id="progressLabel"></strong>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </header>
+  <div class="timeline" id="timeline"></div>
+  <footer>살려주세요</footer>
+</div>
+
+<script>
+var WEEKS = [
+  { start:"2026-09-17", end:"2026-09-23", range:"09.17 – 09.23", title:"오브젝트 그림 (1)",
+    items:["그릴 오브젝트 목록 정리하고 순서 정하기","그림 스타일·색 정하기","오브젝트 스케치 시작"] },
+  { start:"2026-09-24", end:"2026-09-30", range:"09.24 – 09.30", title:"오브젝트 그림 (2)",
+    items:["오브젝트 전부 색칠해서 완성","부서지는 단계별 그림도 만들기","게임에 넣어서 확인"] },
+  { start:"2026-10-01", end:"2026-10-07", range:"10.01 – 10.07", title:"업그레이드 아이콘 (1)",
+    items:["그릴 아이콘 목록 정리","아이콘 스케치 시작"] },
+  { start:"2026-10-08", end:"2026-10-14", range:"10.08 – 10.14", title:"업그레이드 아이콘 (2)",
+    items:["아이콘 전부 색칠해서 완성","트리 노드에 다 넣어서 확인"] },
+  { start:"2026-10-15", end:"2026-10-21", range:"10.15 – 10.21", title:"이펙트 만들기",
+    items:["맞고 부서질 때 이펙트","해금·구매할 때 이펙트","콤보·환생 같은 특별한 이펙트"] },
+  { start:"2026-10-22", end:"2026-10-28", range:"10.22 – 10.28", title:"사운드 넣기",
+    items:["클릭·파괴 소리 전부 연결","해금·구매·콤보 소리","배경음악 넣기"] },
+  { start:"2026-10-29", end:"2026-11-04", range:"10.29 – 11.04", title:"밸런스 맞추기",
+    items:["보상·가격 오르는 정도 다시 확인","콤보·무기·오브젝트 밸런스 조정","직접 플레이하면서 조정"] },
+  { start:"2026-11-05", end:"2026-11-11", range:"11.05 – 11.11", title:"엔딩 만들기",
+    items:["언제 엔딩 나는지 정하기","엔딩 화면·연출 만들기","엔딩 끝나고 이어질 흐름 연결"] },
+  { start:"2026-11-12", end:"2026-11-18", range:"11.12 – 11.18", title:"환생 시스템 만들기",
+    items:["환생 조건·보상 정하기","환생하면 뭐가 리셋되고 뭐가 남는지 구현","환생 화면 만들기"] },
+  { start:"2026-11-19", end:"2026-11-23", range:"11.19 – 11.23", title:"마지막 점검하고 내보내기",
+    items:["처음부터 끝까지 플레이하며 확인","버그 고치기","최종 빌드 만들어서 배포"] }
+];
+
+var STORAGE_KEY = "btw-roadmap-checked";
+
+function loadChecked(){
+  try{
+    var raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){
+    return {};
+  }
+}
+
+function saveChecked(checked){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(checked));
+  }catch(e){}
+}
+
+function dayStart(d){
+  var x = new Date(d);
+  x.setHours(0,0,0,0);
+  return x;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+
+var checked = loadChecked();
+var timelineEl = document.getElementById("timeline");
+var ddayEl = document.getElementById("ddayValue");
+var progressLabelEl = document.getElementById("progressLabel");
+var progressFillEl = document.getElementById("progressFill");
+
+function render(){
+  var today = dayStart(new Date());
+  var target = dayStart(new Date("2026-11-23T00:00:00"));
+  var dday = Math.round((target - today) / 86400000);
+  ddayEl.textContent = dday > 0 ? ("D-" + dday) : (dday === 0 ? "D-DAY" : "완료");
+
+  var total = 0;
+  var done = 0;
+  var html = "";
+
+  for(var wi = 0; wi < WEEKS.length; wi++){
+    var w = WEEKS[wi];
+    var s = dayStart(new Date(w.start + "T00:00:00"));
+    var e = dayStart(new Date(w.end + "T00:00:00"));
+    var status = today < s ? "upcoming" : (today > e ? "done" : "current");
+    var pillText = status === "current" ? "진행 중" : (status === "done" ? "지난 주" : "예정");
+
+    var itemsHtml = "";
+    for(var ii = 0; ii < w.items.length; ii++){
+      total++;
+      var id = "w" + wi + "i" + ii;
+      var isChecked = !!checked[id];
+      if(isChecked) done++;
+      itemsHtml += '<li><input type="checkbox" id="' + id + '"' + (isChecked ? " checked" : "") + '>' +
+        '<label for="' + id + '">' + escapeHtml(w.items[ii]) + '</label></li>';
+    }
+
+    html += '<div class="week" data-status="' + status + '">' +
+      '<div class="node">' + String(wi + 1).padStart(2, "0") + '</div>' +
+      '<div class="card">' +
+        '<div class="card-head">' +
+          '<span class="pill">' + (wi + 1) + '주차 · ' + pillText + '</span>' +
+          '<span class="card-title">' + escapeHtml(w.title) + '</span>' +
+          '<span class="card-range">' + w.range + '</span>' +
+        '</div>' +
+        '<ul class="items">' + itemsHtml + '</ul>' +
+      '</div>' +
+    '</div>';
+  }
+
+  timelineEl.innerHTML = html;
+  progressLabelEl.textContent = done + " / " + total;
+  progressFillEl.style.width = (total ? (done / total * 100) : 0) + "%";
+}
+
+render();
+
+timelineEl.addEventListener("change", function(e){
+  var cb = e.target;
+  if(cb.tagName !== "INPUT" || cb.type !== "checkbox") return;
+  checked[cb.id] = cb.checked;
+  saveChecked(checked);
+  render();
+});
+</script>

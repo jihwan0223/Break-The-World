@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 32d8eb6661c7e8d418105e8d904795fe
+guid: f0341057a0e26dc47b2638468d674b2e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1887868004930972562
-    second: Object2_UnLock_X_0
+      213: 1779989008120849956
+    second: Click_Damage_O_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -53,7 +53,7 @@ TextureImporter:
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 1
+  spriteGenerateFallbackPhysicsShape: 0
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Object2_UnLock_X_0
+      name: Click_Damage_O_0
       rect:
         serializedVersion: 2
         x: 0
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e6493474d02fcc5e0800000000000000
-      internalID: -1887868004930972562
+      spriteID: 426a425729ac3b810800000000000000
+      internalID: 1779989008120849956
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Object2_UnLock_X_0: -1887868004930972562
+      Click_Damage_O_0: 1779989008120849956
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

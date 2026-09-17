@@ -301,11 +301,11 @@ public class UpgradeManager : MonoBehaviour
         OnUpgradeChanged?.Invoke(nodeId, level);
     }
 
-    // 테스트용 - 모든 업그레이드 노드를 즉시 최대 레벨로 (조각 소모 없음)
+    // 테스트용 - 모든 업그레이드 노드를 1레벨만 해금 (조각 소모 없음)
     public void UnlockAllDebug()
     {
         foreach (UpgradeNode node in _nodes)
-            SetLevelInternal(node.id, node.maxLevel);
+            SetLevelInternal(node.id, 1);
     }
 
     // 테스트용 - 모든 업그레이드 레벨을 0으로 (조각 환불은 없음)

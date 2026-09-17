@@ -96,12 +96,45 @@ public class CurrencyManager : MonoBehaviour
             OnPiecesChanged?.Invoke(objectIndex, 0);
     }
 
-    // 테스트용 - 모든 오브젝트의 조각을 최대치로 채움
+    // 테스트용 - 모든 업그레이드 노드/오브젝트 해금/획득량 업그레이드를 전부 살 수 있을 만큼만 각 조각을 채워줌
+    // (조각 종류별로 필요한 만큼만 - 이미 그보다 많이 갖고 있으면 안 건드림)
     public void MaxAllDebug()
     {
         if (ObjectManager.Instance == null) return;
 
+        var required = new Dictionary<int, long>(); // objectIndex(=조각 종류) -> 필요한 총량
+
+        void Add(int objectIndex, long amount)
+        {
+            required.TryGetValue(objectIndex, out long existing);
+            required[objectIndex] = existing + amount;
+        }
+
+        if (UpgradeManager.Instance != null)
+        {
+            foreach (UpgradeManager.UpgradeNode node in UpgradeManager.Instance.Nodes)
+            {
+                for (int level = 0; level < node.maxLevel; level++)
+                {
+                    PieceCost[] costs = node.CostForLevel(level);
+                    if (costs == null) continue;
+                    foreach (PieceCost cost in costs)
+                        Add(cost.objectIndex, cost.amount);
+                }
+            }
+        }
+
+        for (int i = 1; i < ObjectManager.Instance.ObjectCount; i++)
+        {
+            Add(i - 1, ObjectManager.Instance.GetUnlockCost(i));
+            Add(i - 1, ObjectManager.Instance.GetTotalGainCost(i));
+        }
+
         for (int i = 0; i < ObjectManager.Instance.ObjectCount; i++)
-            SetPieces(i, DebugMaxPieceAmount);
+        {
+            required.TryGetValue(i, out long need);
+            if (need > GetPieces(i))
+                SetPieces(i, need);
+        }
     }
 }
