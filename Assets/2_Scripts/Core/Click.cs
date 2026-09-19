@@ -210,10 +210,8 @@ public class Click : MonoBehaviour
         Vector2 screenPos = Mouse.current.position.ReadValue();
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
 
-        // 클릭한 월드 좌표에 콜라이더가 있는지 확인하고,
-        // 그 콜라이더가 다른 오브젝트가 아니라 "나 자신"인지 비교 (여러 콜라이더가 겹쳐도 안전)
-        Collider2D hit = Physics2D.OverlapPoint(worldPos);
-        if (hit != null && hit.gameObject == gameObject)
+        // 클릭한 월드 좌표에서 맨 위에 그려진 오브젝트가 "나 자신"일 때만 반응
+        if (TopmostAt(worldPos) == gameObject)
         {
             Debug.Log("Click");
             PerformClickHit();
@@ -229,5 +227,29 @@ public class Click : MonoBehaviour
     {
         yield return new WaitForSeconds(doubleClickDelaySeconds);
         PerformClickHit();
+    }
+
+    // 한 점에 겹친 콜라이더 중 화면상 가장 앞에 그려지는 오브젝트를 고름.
+    // 책상처럼 화면 전체를 덮는 오브젝트가 그 위에 놓인 소품 클릭을 가로채지 않게 하려고 필요함
+    private static GameObject TopmostAt(Vector2 worldPos)
+    {
+        Collider2D[] hits = Physics2D.OverlapPointAll(worldPos);
+
+        GameObject best = null; // 지금까지 찾은 것 중 가장 앞에 있는 오브젝트
+        int bestOrder = int.MinValue; // 그 오브젝트의 정렬 순서
+
+        foreach (Collider2D hit in hits)
+        {
+            SpriteRenderer renderer = hit.GetComponent<SpriteRenderer>();
+            int order = renderer != null ? renderer.sortingOrder : 0;
+
+            if (best == null || order > bestOrder)
+            {
+                best = hit.gameObject;
+                bestOrder = order;
+            }
+        }
+
+        return best;
     }
 }

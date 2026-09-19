@@ -8,6 +8,9 @@ public class UnlockGate : MonoBehaviour
 {
     [SerializeField] private int objectIndex; // ObjectManager objects 리스트 인덱스 (0 = 첫 오브젝트, 항상 해금)
 
+    // 켜두면 해금 전에도 그림은 그대로 보이고 클릭만 막음 - 책상처럼 오브젝트 자체가 배경인 경우에 씀
+    [SerializeField] private bool keepVisibleWhenLocked;
+
     // 자동으로 못 찾는 걸 추가로 끄고 싶을 때만 채움 (보통 비워둠)
     [SerializeField] private Behaviour[] extraBehaviours;
     [SerializeField] private Renderer[] extraRenderers;
@@ -43,8 +46,11 @@ public class UnlockGate : MonoBehaviour
         _applied = true;
         _shown = show;
 
-        foreach (Renderer r in _renderers) if (r != null) r.enabled = show;
-        if (extraRenderers != null) foreach (Renderer r in extraRenderers) if (r != null) r.enabled = show;
+        if (!keepVisibleWhenLocked)
+        {
+            foreach (Renderer r in _renderers) if (r != null) r.enabled = show;
+            if (extraRenderers != null) foreach (Renderer r in extraRenderers) if (r != null) r.enabled = show;
+        }
         foreach (Collider2D c in _colliders) if (c != null) c.enabled = show;
         foreach (Behaviour b in _behaviours) if (b != null) b.enabled = show;
     }

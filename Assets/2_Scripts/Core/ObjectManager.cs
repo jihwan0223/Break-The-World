@@ -29,17 +29,16 @@ public class ObjectManager : MonoBehaviour
 
     [SerializeField] private bool debugUnlockAll = false; // 테스트용 - 켜면 모든 오브젝트가 처음부터 해금됨 (업그레이드 무관)
 
-    // 파괴 대상 오브젝트 20종 - 책상 위 소품에서 시작해 지형(책상/길바닥/공사장 지반)을 부수며 우주 스케일까지. ★=마일스톤(체력 x2)
-    // 티어 구성은 ObjectHealthCalculator.tierSizes = {3,3,3,2,3,2,1,1,1,1} 와 순서/개수가 정확히 일치해야 함
+    // 파괴 대상 오브젝트 19종 - 책상 위 소품에서 시작해 지형(책상/길바닥/공사장 지반)을 부수며 우주 스케일까지. ★=마일스톤(체력 x2)
+    // 티어 구성은 ObjectHealthCalculator.tierSizes = {3,2,3,2,3,2,1,1,1,1} 와 순서/개수가 정확히 일치해야 함
     private static readonly List<ObjectData> objects = new List<ObjectData>
     {
         // --- 존1: 책상 위 (맨손 t1 / 망치 t2) ---
         new ObjectData(1, 1, "접시", new Color(0.95f, 0.95f, 0.92f)),
         new ObjectData(1, 2, "유리컵", new Color(0.93f, 0.95f, 0.96f)),
         new ObjectData(1, 3, "화분", new Color(0.80f, 0.42f, 0.25f)),
-        new ObjectData(2, 1, "머그컵", new Color(0.85f, 0.80f, 0.75f)),
-        new ObjectData(2, 2, "계산기", new Color(0.30f, 0.32f, 0.35f)),
-        new ObjectData(2, 3, "책상", new Color(0.55f, 0.38f, 0.22f)) { hpMultiplier = 2f }, // ★ -> 존2
+        new ObjectData(2, 1, "계산기", new Color(0.30f, 0.32f, 0.35f)),
+        new ObjectData(2, 2, "책상", new Color(0.55f, 0.38f, 0.22f)) { hpMultiplier = 2f }, // ★ -> 존2
         // --- 존2: 길거리 (곡괭이 t3 / 전동드릴 t4) ---
         new ObjectData(3, 1, "가로등", new Color(0.30f, 0.35f, 0.32f)),
         new ObjectData(3, 2, "자전거", new Color(0.45f, 0.50f, 0.58f)),

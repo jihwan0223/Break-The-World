@@ -15,18 +15,10 @@ import re
 
 # (메타 파일 경로, internalID, 새 가로, 새 세로)
 TARGETS = [
-    ("Assets/3_Image/ObjectImage/Object1.png.meta", 1275030799, 1394, 1323),
-    ("Assets/3_Image/ObjectImage/Object1-1.png.meta", -5934715673664778258, 1394, 1323),
-    ("Assets/3_Image/ObjectImage/Object1-2.png.meta", -9220788892964207167, 1394, 1323),
-    ("Assets/3_Image/ObjectImage/Object1-3.png.meta", 1379209726663985032, 1394, 1323),
-    ("Assets/3_Image/ObjectImage/Object2.png.meta", -2340292433013277512, 703, 1025),
-    ("Assets/3_Image/ObjectImage/Object2-1.png.meta", 6578731144817686623, 703, 1025),
-    ("Assets/3_Image/ObjectImage/Object2-2.png.meta", -1385604352584601288, 703, 1025),
-    ("Assets/3_Image/ObjectImage/Object2-3.png.meta", -8288779678485480098, 703, 1025),
-    ("Assets/3_Image/ObjectImage/Object3.png.meta", 5378765685844372841, 961, 1027),
-    ("Assets/3_Image/ObjectImage/object3-1.png.meta", -7309518164613636011, 961, 1027),
-    ("Assets/3_Image/ObjectImage/object3-2.png.meta", -1730377823473803685, 961, 1027),
-    ("Assets/3_Image/ObjectImage/object3-3.png.meta", -4773684954617920154, 961, 1027),
+    ("Assets/3_Image/ObjectImage/Object4.png.meta", -8421109567481150060, 1227, 1351),
+    ("Assets/3_Image/ObjectImage/Object4-1.png.meta", -4261903229174933793, 1227, 1351),
+    ("Assets/3_Image/ObjectImage/Object4-2.png.meta", 6183234963166844781, 1227, 1351),
+    ("Assets/3_Image/ObjectImage/Object4-3.png.meta", 7344324394810574598, 1227, 1351),
 ]
 
 
