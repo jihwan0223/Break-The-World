@@ -1693,6 +1693,7 @@ MonoBehaviour:
   respawnDelay: 0
   dieFadeDuration: 0.25
   respawnFadeDuration: 0.25
+  stayVisibleWhenDead: 0
 --- !u!114 &212293557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4406,6 +4407,7 @@ MonoBehaviour:
   respawnDelay: 0
   dieFadeDuration: 0.25
   respawnFadeDuration: 0.25
+  stayVisibleWhenDead: 0
 --- !u!114 &586884060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16874,6 +16876,7 @@ MonoBehaviour:
   respawnDelay: 0
   dieFadeDuration: 0.25
   respawnFadeDuration: 0.25
+  stayVisibleWhenDead: 0
 --- !u!114 &935102239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23529,6 +23532,7 @@ GameObject:
   - component: {fileID: 1601500298}
   - component: {fileID: 1601500297}
   - component: {fileID: 1601500296}
+  - component: {fileID: 1601500302}
   m_Layer: 0
   m_Name: BGImage
   m_TagString: Untagged
@@ -23669,11 +23673,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   weaponTier: 2
   objectIndexInTier: 2
-  hpMultiplier: 2
+  hpMultiplier: 7
   fixedObjectIndex: 4
-  respawnDelay: 0
+  respawnDelay: 0.5
   dieFadeDuration: 0.25
   respawnFadeDuration: 0.25
+  stayVisibleWhenDead: 1
 --- !u!61 &1601500300
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -23817,6 +23822,21 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1601500302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1601500293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89900db4fd9b80440a49876c75e59708, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ZoneBreaker
+  zoneRoot: {fileID: 1630271656}
+  unlockZone: 1
+  unlockEffect: {fileID: 1797684722}
 --- !u!1 &1610872449
 GameObject:
   m_ObjectHideFlags: 0
@@ -26704,6 +26724,7 @@ GameObject:
   - component: {fileID: 1797684719}
   - component: {fileID: 1797684721}
   - component: {fileID: 1797684720}
+  - component: {fileID: 1797684722}
   m_Layer: 0
   m_Name: ZoneArrowsUI
   m_TagString: Untagged
@@ -26739,7 +26760,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZoneArrowsUI
   sideOffset: 24
-  arrowSize: 64
+  bottomOffset: 40
+  pixelScale: 8
+  popDuration: 0.35
 --- !u!114 &1797684721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26763,6 +26786,26 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
+--- !u!114 &1797684722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1797684718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 505338c4959ecec49aa6806d32cff46e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ZoneUnlockEffect
+  unlockDelay: 0.2
+  flashDuration: 0.6
+  shakeDuration: 0.5
+  shakeAmount: 0.3
+  bannerDelay: 0.15
+  bannerFadeIn: 0.3
+  bannerHold: 2
+  bannerFadeOut: 0.5
 --- !u!1001 &1808973938
 PrefabInstance:
   m_ObjectHideFlags: 0

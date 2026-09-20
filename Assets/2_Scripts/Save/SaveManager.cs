@@ -50,6 +50,9 @@ public class SaveManager : MonoBehaviour
 
         if (UpgradeManager.Instance != null)
             UpgradeManager.Instance.OnUpgradeChanged += (_, __) => MarkDirty();
+
+        if (ZoneManager.Instance != null)
+            ZoneManager.Instance.OnZoneChanged += MarkDirty;
     }
 
     void OnApplicationQuit()
@@ -117,6 +120,8 @@ public class SaveManager : MonoBehaviour
             gainLevels = gainLevels,
             weaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : 0,
             objectIndex = ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : 0,
+            unlockedMaxZone = ZoneManager.Instance != null ? ZoneManager.Instance.UnlockedMaxZone : 0,
+            currentZone = ZoneManager.Instance != null ? ZoneManager.Instance.CurrentZone : 0,
             upgrades = upgrades.ToArray(),
         };
 
@@ -152,6 +157,8 @@ public class SaveManager : MonoBehaviour
             for (int i = 0; i < data.gainLevels.Length; i++)
                 ObjectManager.Instance.SetGainLevel(i, data.gainLevels[i]);
         }
+
+        ZoneManager.Instance?.SetState(data.unlockedMaxZone, data.currentZone);
 
         WeaponManager.Instance?.Equip(data.weaponIndex);
         ObjectManager.Instance?.Equip(data.objectIndex);

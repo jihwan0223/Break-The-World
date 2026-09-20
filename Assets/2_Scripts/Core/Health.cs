@@ -12,6 +12,7 @@ public class Health : MonoBehaviour
     [SerializeField] private float respawnDelay = 1f; // 죽고 나서 재생성까지 대기하는 시간(초)
     [SerializeField] private float dieFadeDuration = 0.25f; // 죽을 때 흐려지며 사라지는 연출 시간(초)
     [SerializeField] private float respawnFadeDuration = 0.25f; // 재생성될 때 서서히 나타나는 연출 시간(초)
+    [SerializeField] private bool stayVisibleWhenDead; // 켜두면 죽어도 흐려지거나 숨지 않고 부서진 그림 그대로 두었다가 리셋 - 배경 자체인 책상처럼 사라지면 뒤가 텅 비는 오브젝트용
 
     private int maxHP; // weaponTier/objectIndexInTier(×hpMultiplier)로부터 자동 계산된 최대 체력
 
@@ -145,9 +146,12 @@ public class Health : MonoBehaviour
 
     private IEnumerator DieAndRespawnRoutine()
     {
-        yield return Fade(_originalColor.a, 0f, dieFadeDuration);
+        if (!stayVisibleWhenDead)
+        {
+            yield return Fade(_originalColor.a, 0f, dieFadeDuration);
 
-        if (_spriteRenderer != null) _spriteRenderer.enabled = false;
+            if (_spriteRenderer != null) _spriteRenderer.enabled = false;
+        }
 
         RespawnRemaining = respawnDelay;
 
@@ -169,7 +173,8 @@ public class Health : MonoBehaviour
         // 깨진 이미지가 아니라 원래(온전한) 이미지가 서서히 나타난다
         OnDamaged?.Invoke(CurrentHP, maxHP);
 
-        yield return Fade(0f, _originalColor.a, respawnFadeDuration);
+        if (!stayVisibleWhenDead)
+            yield return Fade(0f, _originalColor.a, respawnFadeDuration);
 
         OnRespawned?.Invoke();
     }

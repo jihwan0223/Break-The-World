@@ -26,5 +26,7 @@ public class SaveData
     public int[] gainLevels; // 오브젝트별 "획득량 증가" 업그레이드 레벨 (ObjectManager 리스트 순서)
     public int weaponIndex; // 장착 중인 무기의 WeaponManager 리스트 인덱스
     public int objectIndex; // 선택된 오브젝트의 ObjectManager 리스트 인덱스
+    public int unlockedMaxZone; // 해금된 마지막 존 번호 (0 = 첫 존만 열림, 옛 세이브에는 없어서 0으로 읽힘)
+    public int currentZone; // 보고 있던 존 번호
     public SavedUpgrade[] upgrades; // 업그레이드 노드별 레벨 (id 기반, 레벨 0인 건 저장 안 함). 옛 세이브의 upgradeLevels(int[])는 무시됨
 }
