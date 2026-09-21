@@ -17,7 +17,7 @@ public class Health : MonoBehaviour
     private int maxHP; // weaponTier/objectIndexInTier(×hpMultiplier)로부터 자동 계산된 최대 체력
 
     // 계산된 기본 체력에 배수를 곱해 반올림
-    private static int ComputeMaxHP(int tier, int indexInTier, float multiplier) =>
+    public static int ComputeMaxHP(int tier, int indexInTier, float multiplier) =>
         Mathf.Max(1, Mathf.RoundToInt(ObjectHealthCalculator.Calculate(tier, indexInTier) * multiplier));
 
     public int MaxHP => maxHP;

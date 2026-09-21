@@ -155,6 +155,32 @@ public class ObjectManager : MonoBehaviour
 
     public bool IsUnlocked(int index) => index >= 0 && index < _unlocked.Length && _unlocked[index];
 
+    // ---- 도감(오브젝트 팝업) 표시용 조회 ----
+    private static readonly string[] zoneNames = { "책상 위", "길거리", "공사장", "우주" }; // 위 objects 목록의 존 구분과 같음 (무기 티어 2개당 존 1개, 우주만 티어 4개)
+
+    // index번째 오브젝트가 속한 존 이름
+    public static string ZoneNameOf(int index) =>
+        zoneNames[Mathf.Clamp((objects[index].tier - 1) / 2, 0, zoneNames.Length - 1)];
+
+    // index번째 오브젝트의 최대 체력 - Health가 실제로 쓰는 공식과 같음
+    public static int MaxHPOf(int index) =>
+        Health.ComputeMaxHP(objects[index].tier, objects[index].indexInTier, objects[index].hpMultiplier);
+
+    // 지금 업그레이드 기준으로 index번째 오브젝트를 한 번 부술 때 받는 파편 수.
+    // Click.HandleDied 계산에서 콤보 배율과 2배 드랍 확률(둘 다 상황마다 달라짐)만 뺀 값
+    public long ExpectedPieces(int index)
+    {
+        float upgradeMultiplier = 1f; // 파편 획득 배율 업그레이드
+        long weaponKillBonus = 0; // 장착 무기의 처치 보너스 파편
+        if (UpgradeManager.Instance != null)
+        {
+            upgradeMultiplier = UpgradeManager.Instance.PieceGainMultiplier(index);
+            weaponKillBonus = UpgradeManager.Instance.WeaponKillBonusPieces(WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : -1);
+        }
+
+        return Math.Max(1L, (long)Math.Round((GetBaseReward(index) + GetGainBonus(index) + weaponKillBonus) * (double)upgradeMultiplier));
+    }
+
     // ---- 클릭 시 기본 파편 보상 ----
     // 오브젝트를 부술 때마다 받는 기본 파편 수. 업그레이드/해금 비용이 티어마다 6배씩 기하급수적으로 커지는데
     // 기본 보상이 고정값(예: 1개)이면 콤보/업그레이드 배율을 아무리 곱해도(배율은 곱셈일 뿐 밑변이 1이면 그대로
@@ -231,6 +257,22 @@ public class ObjectManager : MonoBehaviour
         if (level <= 0) return 0;
 
         return level * Mathf.Max(1, index); // 오브젝트가 늦게 나올수록(index가 클수록) 레벨당 보너스도 커짐
+    }
+
+    // 이 오브젝트의 "파편 레벨" 진행도(0~1) - 드랍량 강화 노드 레벨 + 획득량 증가 레벨을 합쳐 만렙 합으로 나눈 값.
+    // 바닥에 떨어지는 파편 개수(연출)에만 씀 - 실제 조각 획득량과는 무관
+    public float PieceLevelRatio(int index)
+    {
+        int level = GetGainLevel(index);
+        int maxLevel = index > 0 ? MaxGainLevel : 0; // 0번 오브젝트는 획득량 증가 대상이 아님
+        if (UpgradeManager.Instance != null)
+        {
+            var (nodeLevel, nodeMaxLevel) = UpgradeManager.Instance.PieceGainLevels(index);
+            level += nodeLevel;
+            maxLevel += nodeMaxLevel;
+        }
+
+        return maxLevel > 0 ? Mathf.Clamp01(level / (float)maxLevel) : 0f;
     }
 
     public bool TryUpgradeGain(int index)

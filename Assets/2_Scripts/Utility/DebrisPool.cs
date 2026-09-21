@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// 오브젝트를 부술 때마다, 그때 획득한 조각 수만큼 조각이 부서진 지점에서 떨어져 바닥(spawnArea) 안 랜덤한 위치로 쌓이는 시스템.
+// 오브젝트를 부술 때마다, 그 오브젝트의 파편 레벨에 비례한 개수만큼 조각이 부서진 지점에서 떨어져 바닥(spawnArea) 안 랜덤한 위치로 쌓이는 시스템.
 // 최대 개수에 도달한 상태에서 새 조각이 착지하면, 가장 먼저 쌓였던 조각이 자연스럽게 페이드아웃되며 사라짐.
 // 업그레이드/무기/오브젝트 탭이 열리면 바닥에 쌓인 조각을 전부 즉시 치움. 선택된 오브젝트가 바뀔 때도 전부 리셋됨.
 public class DebrisPool : MonoBehaviour
@@ -12,7 +12,8 @@ public class DebrisPool : MonoBehaviour
 
     [SerializeField] private Collider2D spawnArea; // 조각이 떨어질 바닥 범위 콜라이더 (이 안 랜덤한 위치로 떨어짐)
     [SerializeField] private int maxPieces = 2000; // 바닥에 동시에 쌓일 수 있는 최대 조각 개수
-    [SerializeField] private int maxPiecesPerBreak = 300; // 한 번 부술 때 떨어뜨릴 조각 수 상한 (더 많이 획득해도 연출만 이 수로 제한, 조각 지급은 정상)
+    [SerializeField] private int maxPiecesPerBreak = 300; // 한 번 부술 때 떨어뜨릴 파편 수의 절대 상한 (풀을 미리 채워두는 개수이기도 함)
+    [SerializeField] private int piecesAtMaxLevel = 30; // 파편 레벨이 만렙일 때 한 번 부술 때 떨어지는 파편 수. 레벨이 낮으면 비율만큼 줄어들고 0레벨은 1개 - 조각 획득량과는 무관
     [SerializeField] private float pieceSize = 1f; // 조각 하나의 크기 (월드 유닛)
     [SerializeField] private Sprite[] pieceSprites; // 조각으로 쓸 스프라이트들 (Object-Break.png의 서브 스프라이트들). 색은 부순 오브젝트의 pileColor로 입힘
     [SerializeField] private float initialSpread = 1f; // 처음엔 오브젝트 바로 아래 이 반경(월드 유닛) 안으로만 떨어지고, 쌓일수록 spawnArea 폭까지 점점 넓어짐
@@ -75,10 +76,12 @@ public class DebrisPool : MonoBehaviour
             ZoneManager.Instance.OnZoneChanged -= HandleZoneChanged;
     }
 
-    // 오브젝트를 부술 때 호출 - objectIndex 오브젝트의 색으로, 획득한 조각 수(count)만큼 조각이 fromPosition에서 떨어짐
-    public void AddPiece(Vector3 fromPosition, int objectIndex, int count)
+    // 오브젝트를 부술 때 호출 - objectIndex 오브젝트의 색으로, 그 오브젝트의 파편 레벨에 비례한 개수(0레벨 1개 ~ 만렙 piecesAtMaxLevel개)만큼 조각이 fromPosition에서 떨어짐.
+    // 조각 지급은 Click에서 이미 끝난 상태라 여기서는 화면 연출만 함
+    public void AddPiece(Vector3 fromPosition, int objectIndex)
     {
-        int amount = Mathf.Clamp(count, 1, maxPiecesPerBreak); // 연출용 상한 (조각 지급 자체는 Click에서 이미 끝난 상태)
+        float levelRatio = ObjectManager.Instance != null ? ObjectManager.Instance.PieceLevelRatio(objectIndex) : 0f; // 파편 레벨 진행도 0~1 (인스펙터 값을 바꿔도 바로 반영되게 매번 계산)
+        int amount = Mathf.Clamp(1 + Mathf.RoundToInt((piecesAtMaxLevel - 1) * levelRatio), 1, maxPiecesPerBreak);
         Color color = PileColorFor(objectIndex);
 
         for (int i = 0; i < amount; i++)

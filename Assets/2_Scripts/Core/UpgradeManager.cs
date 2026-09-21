@@ -443,6 +443,21 @@ public class UpgradeManager : MonoBehaviour
     public float ObjectDoubleDropChance(int objectIndex) =>
         Mathf.Clamp01(SumEffect(UpgradeEffect.ObjectDoubleDrop, objectIndex) / 100f);
 
+    // 이 오브젝트 대상 "오브젝트 파편 획득 증가"(드랍량 강화) 노드들의 현재 레벨 합과 만렙 합 - 바닥에 떨어지는 파편 개수(연출) 계산용
+    public (int level, int maxLevel) PieceGainLevels(int objectIndex)
+    {
+        int level = 0; // 현재 레벨 합
+        int maxLevel = 0; // 만렙 합
+        foreach (UpgradeNode node in _nodes)
+        {
+            if (node.effect != UpgradeEffect.PieceGainObject || node.targetObjectIndex != objectIndex) continue;
+
+            level += GetLevel(node.id);
+            maxLevel += node.maxLevel;
+        }
+        return (level, maxLevel);
+    }
+
     // 이 무기를 장착하고 오브젝트를 처치했을 때 추가로 주는 파편 (전역 노드는 targetWeaponIndex -1이라 항상 포함)
     public long WeaponKillBonusPieces(int equippedWeaponIndex)
     {

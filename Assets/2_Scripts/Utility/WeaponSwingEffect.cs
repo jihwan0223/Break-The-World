@@ -29,13 +29,13 @@ public class WeaponSwingEffect : MonoBehaviour
         Instance = this;
     }
 
-    // hitCollider의 외곽선 위 랜덤한 지점에 icon을 잠깐 띄움. 같은 프레임에 여러 번 불러도 각각 독립적으로 보임
-    public void PlaySwing(Collider2D hitCollider, Sprite icon)
+    // hitCollider의 외곽선 위 랜덤한 지점(onSurface면 콜라이더 안쪽 면 아무 데나)에 icon을 잠깐 띄움. 같은 프레임에 여러 번 불러도 각각 독립적으로 보임
+    public void PlaySwing(Collider2D hitCollider, Sprite icon, bool onSurface = false)
     {
         if (icon == null || hitCollider == null)
             return;
 
-        Vector3 point = GetRandomPointOnColliderEdge(hitCollider);
+        Vector3 point = onSurface ? GetRandomPointInsideCollider(hitCollider) : GetRandomPointOnColliderEdge(hitCollider);
 
         // 이미지의 "위쪽"(로컬 +Y)이 그 지점에서 콜라이더 중심을 향하도록 회전 계산
         Vector2 towardCollider = (Vector2)(hitCollider.bounds.center - point);
@@ -117,6 +117,27 @@ public class WeaponSwingEffect : MonoBehaviour
         }
 
         return collider.bounds.center;
+    }
+
+    // 콜라이더 안쪽(면) 랜덤한 점. 책상처럼 큰 오브젝트가 항상 중앙에만 맞는 걸로 보이지 않게 함.
+    // 바운딩 박스에서 뽑되 실제 콜라이더 안에 들어오는 점만 쓰고, 직전 연출 위치와 너무 가까우면 다시 뽑음
+    private Vector3 GetRandomPointInsideCollider(Collider2D collider)
+    {
+        Bounds bounds = collider.bounds;
+        float minDistance = bounds.size.magnitude * 0.2f; // 직전 위치와 이 거리 이상 떨어지게
+        Vector2 fallback = bounds.center; // 안쪽 점을 하나도 못 찾았을 때 쓸 값
+
+        for (int attempt = 0; attempt < 20; attempt++)
+        {
+            var point = new Vector2(Random.Range(bounds.min.x, bounds.max.x), Random.Range(bounds.min.y, bounds.max.y));
+            if (!collider.OverlapPoint(point)) continue;
+
+            fallback = point;
+            if (_lastPoint == null || Vector3.Distance(point, _lastPoint.Value) >= minDistance)
+                return point;
+        }
+
+        return fallback;
     }
 
     // 폴리곤 콜라이더의 여러 경로(Path) 중 둘레가 가장 긴 것을 바깥 테두리로 간주해서 반환

@@ -18,7 +18,7 @@ import re
 
 # (메타 파일 경로, 새 가로, 새 세로, PPU)
 TARGETS = [
-    ("Assets/3_Image/BGImage/BackgroundImage1.png.meta", 1920, 1080, 100),
+    ("Assets/3_Image/WeaponImage/Mine_pix.png.meta", 542, 542, 70),
 ]
 
 NAME_ENTRY = r"  - first:\n      213: -?\d+\n    second: \S+\n"  # internalIDToNameTable 항목 하나

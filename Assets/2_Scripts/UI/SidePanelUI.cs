@@ -133,7 +133,8 @@ public class SidePanelUI : MonoBehaviour
                 ObjectManager.Instance?.Equip(index);
             },
             out _refreshObjectSelector,
-            index => ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(index));
+            index => ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(index),
+            GetObjectInfoRows);
         _panel.Add(_objectContent);
 
         root.Add(_panel);
@@ -166,10 +167,10 @@ public class SidePanelUI : MonoBehaviour
             OpenPanel("무기", _weaponContent);
         });
 
-        var objectButton = CreateButton("오브젝트", () =>
+        var objectButton = CreateButton("도감", () =>
         {
-            Debug.Log("오브젝트 버튼 눌림");
-            OpenPanel("오브젝트", _objectContent);
+            Debug.Log("도감 버튼 눌림");
+            OpenPanel("도감", _objectContent);
         });
 
         var debugButton = CreateButton("디버그", () =>
@@ -201,6 +202,27 @@ public class SidePanelUI : MonoBehaviour
         panel.style.top = 0;
         panel.style.bottom = 0;
         panel.style.backgroundColor = new Color(0.08f, 0.08f, 0.1f, 1f); // 업그레이드 화면처럼 불투명 단색(검정 대신 짙은 남색조)
+
+        // 밋밋한 단색 대신 위쪽이 살짝 밝은 남색 그라데이션을 깔고, 그 위에 은은한 십자 점 무늬를 반복해서 깔아 꾸밈 (이미지 파일 없이 코드로 그림)
+        panel.style.backgroundImage = new StyleBackground(MakeTexture(1, 64, (x, y) =>
+            Color.Lerp(new Color(0.03f, 0.04f, 0.08f), new Color(0.13f, 0.16f, 0.26f), y / 63f).linear, FilterMode.Bilinear, TextureWrapMode.Clamp)); // .linear: 텍스처 색은 감마 보정 없이 그려져서 그냥 쓰면 훨씬 밝게 보임
+
+        var pattern = new VisualElement(); // 무늬 층 - 클릭은 통과시킴
+        pattern.pickingMode = PickingMode.Ignore;
+        pattern.style.position = Position.Absolute;
+        pattern.style.left = 0;
+        pattern.style.right = 0;
+        pattern.style.top = 0;
+        pattern.style.bottom = 0;
+        Color dot = new Color(0.7f, 0.8f, 1f, 0.025f); // 무늬 색 - 어두운 배경 위에 섞이면 알파가 조금만 커도 꽤 밝아 보여서 아주 낮게 잡음
+        Color corner = new Color(0.7f, 0.8f, 1f, 0.012f); // 모서리 점은 십자보다 더 옅게
+        pattern.style.backgroundImage = new StyleBackground(MakeTexture(16, 16, (x, y) =>
+            (x == 8 && y >= 6 && y <= 10) || (y == 8 && x >= 6 && x <= 10) ? dot // 칸 가운데 십자
+            : (x <= 1 && y <= 1) ? corner // 칸 모서리 점
+            : Color.clear, FilterMode.Point, TextureWrapMode.Repeat));
+        pattern.style.backgroundRepeat = new BackgroundRepeat(Repeat.Repeat, Repeat.Repeat);
+        pattern.style.backgroundSize = new BackgroundSize(96, 96); // 16px 무늬를 6배로 키워 픽셀 느낌 유지
+        panel.Add(pattern);
         panel.style.display = DisplayStyle.None;
 
         // 이 패널 위에 포인터가 있는 동안은 뒤쪽 월드 오브젝트가 클릭되지 않도록 플래그를 켜고 끔
@@ -234,6 +256,17 @@ public class SidePanelUI : MonoBehaviour
         panel.Add(closeButton);
 
         return panel;
+    }
+
+    // 픽셀마다 색을 계산해 작은 텍스처를 만듦 - 팝업 배경 장식용. 어두운 색에서 8비트 단계가 띠로 보이지 않도록 Half 포맷 사용
+    private static Texture2D MakeTexture(int width, int height, System.Func<int, int, Color> pixel, FilterMode filter, TextureWrapMode wrap)
+    {
+        var texture = new Texture2D(width, height, TextureFormat.RGBAHalf, false) { filterMode = filter, wrapMode = wrap };
+        for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
+                texture.SetPixel(x, y, pixel(x, y));
+        texture.Apply();
+        return texture;
     }
 
     // 디버그 팝업 - 다른 팝업과 같은 전체 화면 모양. 테스트용 버튼을 세로로 모아둠 (원래 업그레이드 화면 아래쪽에 있던 것들)
@@ -332,7 +365,8 @@ public class SidePanelUI : MonoBehaviour
         System.Func<int> getEquippedIndex,
         System.Action<int> onSelect,
         out System.Action refresh,
-        System.Func<int, bool> isLocked = null) // Object 패널에서만 씀 - null이면(Weapon) 잠김 개념 자체가 없음
+        System.Func<int, bool> isLocked = null, // Object 패널에서만 씀 - null이면(Weapon) 잠김 개념 자체가 없음
+        System.Func<int, (string label, string value, Color color)[]> getInfoRows = null) // Object 패널에서만 씀 - 도감 정보 카드의 (항목, 값, 값 색) 줄들. null이면 카드 없음
     {
         var content = new VisualElement();
         content.style.position = Position.Absolute;
@@ -341,6 +375,8 @@ public class SidePanelUI : MonoBehaviour
         content.style.top = 60;
         content.style.bottom = 16;
         content.style.display = DisplayStyle.None;
+
+        System.Action redraw = null; // 이름/이미지/버튼/정보 카드를 현재 browse.index 기준으로 다시 그리는 함수 (아래 끝에서 채움)
 
         // 위쪽 줄: < 이름 >
         var arrowRow = new VisualElement();
@@ -392,25 +428,66 @@ public class SidePanelUI : MonoBehaviour
         previewImage.style.height = previewImageSize;
         previewImage.scaleMode = ScaleMode.ScaleToFit;
 
+        // 미리보기 액자 - 반투명 어두운 판에 테두리를 둘러 도감 진열칸처럼 보이게 함
+        previewImage.style.backgroundColor = new Color(0.55f, 0.6f, 0.8f, 0.1f); // 어두운 배경 위에서도 새까만 그림자 모양이 보이도록 살짝 밝은 판
+        previewImage.style.borderTopWidth = 3;
+        previewImage.style.borderBottomWidth = 3;
+        previewImage.style.borderLeftWidth = 3;
+        previewImage.style.borderRightWidth = 3;
+        previewImage.style.borderTopColor = InfoBorderColor;
+        previewImage.style.borderBottomColor = InfoBorderColor;
+        previewImage.style.borderLeftColor = InfoBorderColor;
+        previewImage.style.borderRightColor = InfoBorderColor;
+        previewImage.style.borderTopLeftRadius = 14;
+        previewImage.style.borderTopRightRadius = 14;
+        previewImage.style.borderBottomLeftRadius = 14;
+        previewImage.style.borderBottomRightRadius = 14;
+
+        // 도감 정보 카드 - 항목 이름은 왼쪽, 값은 오른쪽에 한 줄씩. 선택 버튼(right 350, 폭 140) 위쪽에 가운데가 맞도록 둠
+        var infoCard = new VisualElement();
+        infoCard.style.position = Position.Absolute;
+        infoCard.style.top = 110;
+        infoCard.style.right = 200;
+        infoCard.style.width = 440;
+        infoCard.style.paddingTop = 24;
+        infoCard.style.paddingBottom = 10;
+        infoCard.style.paddingLeft = 24;
+        infoCard.style.paddingRight = 24;
+        infoCard.style.backgroundColor = new Color(0.03f, 0.04f, 0.08f, 0.8f);
+        infoCard.style.borderTopWidth = 3;
+        infoCard.style.borderBottomWidth = 3;
+        infoCard.style.borderLeftWidth = 3;
+        infoCard.style.borderRightWidth = 3;
+        infoCard.style.borderTopColor = InfoBorderColor;
+        infoCard.style.borderBottomColor = InfoBorderColor;
+        infoCard.style.borderLeftColor = InfoBorderColor;
+        infoCard.style.borderRightColor = InfoBorderColor;
+        infoCard.style.borderTopLeftRadius = 8;
+        infoCard.style.borderTopRightRadius = 8;
+        infoCard.style.borderBottomLeftRadius = 8;
+        infoCard.style.borderBottomRightRadius = 8;
+        infoCard.style.display = DisplayStyle.None;
+
         selectButton.clicked += () =>
         {
             if (isLocked != null && isLocked(browse.index))
                 return; // 잠긴 오브젝트는 여기서 선택 안 됨 - 업그레이드 트리에서 먼저 해금해야 함
 
             onSelect(browse.index);
-            RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, getName, getIcon, getEquippedIndex, browse.index, isLocked);
+            redraw();
         };
 
         content.Add(selectButton);
         content.Add(equippedLabel);
         content.Add(previewImage);
+        content.Add(infoCard);
 
         var prevButton = new Button(() =>
         {
             int count = getCount();
             if (count <= 0) return;
             browse.index = Mathf.Max(0, browse.index - 1);
-            RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, getName, getIcon, getEquippedIndex, browse.index, isLocked);
+            redraw();
         })
         { text = "<" };
         SetArrowButtonStyle(prevButton);
@@ -427,7 +504,7 @@ public class SidePanelUI : MonoBehaviour
             int count = getCount();
             if (count <= 0) return;
             browse.index = Mathf.Min(count - 1, browse.index + 1);
-            RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, getName, getIcon, getEquippedIndex, browse.index, isLocked);
+            redraw();
         })
         { text = ">" };
         SetArrowButtonStyle(nextButton);
@@ -439,9 +516,57 @@ public class SidePanelUI : MonoBehaviour
         content.Add(arrowRow);
 
         // 외부(Start, OpenPanel)에서 필요할 때마다 최신 상태로 다시 그릴 수 있도록 넘겨줌
-        refresh = () => RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, getName, getIcon, getEquippedIndex, browse.index, isLocked);
+        redraw = () => RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, infoCard, getName, getIcon, getEquippedIndex, getInfoRows, browse.index, isLocked);
+        refresh = redraw;
 
         return content;
+    }
+
+    private static readonly Color InfoBorderColor = new Color(0.32f, 0.38f, 0.55f); // 도감 카드/미리보기 액자 테두리색
+
+    // 도감 카드의 한 줄 - 항목 이름은 왼쪽, 값은 오른쪽 끝
+    private VisualElement CreateInfoRow(string label, string value, Color valueColor)
+    {
+        var row = new VisualElement();
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.justifyContent = Justify.SpaceBetween;
+        row.style.marginBottom = 14;
+
+        var labelText = new Label(label);
+        labelText.style.fontSize = 22;
+        labelText.style.color = new Color(0.65f, 0.7f, 0.8f);
+        row.Add(labelText);
+
+        var valueText = new Label(value);
+        valueText.style.fontSize = 24;
+        valueText.style.unityFontStyleAndWeight = FontStyle.Bold;
+        valueText.style.color = valueColor;
+        row.Add(valueText);
+
+        return row;
+    }
+
+    // 도감 카드에 들어갈 (항목, 값, 값 색) 목록. 잠긴 오브젝트는 지역/체력/파편 획득량을 ???로 가림
+    private (string label, string value, Color color)[] GetObjectInfoRows(int index)
+    {
+        var manager = ObjectManager.Instance; // 오브젝트 데이터/해금 여부 조회용
+        if (manager == null) return null;
+
+        Color hidden = new Color(0.5f, 0.52f, 0.6f); // ???로 가린 값의 색
+        Color good = new Color(0.5f, 0.9f, 0.5f); // 해금 완료
+        Color bad = new Color(0.95f, 0.45f, 0.4f); // 잠김
+
+        bool locked = !manager.IsUnlocked(index);
+
+        var rows = new List<(string label, string value, Color color)>
+        {
+            ("지역", locked ? "???" : ObjectManager.ZoneNameOf(index), locked ? hidden : Color.white),
+            ("체력", locked ? "???" : NumberFormatUtil.Format(ObjectManager.MaxHPOf(index)), locked ? hidden : Color.white),
+            ("획득 파편", locked ? "???" : $"{NumberFormatUtil.Format(manager.ExpectedPieces(index))}개", locked ? hidden : Color.white),
+            ("상태", locked ? "잠김" : "해금 완료", locked ? bad : good),
+        };
+
+        return rows.ToArray();
     }
 
     // 이름 라벨, 미리보기 이미지, Select 버튼/Equipped 표시 중 무엇을 보여줄지 갱신
@@ -450,20 +575,31 @@ public class SidePanelUI : MonoBehaviour
         Button selectButton,
         Label equippedLabel,
         Image previewImage,
+        VisualElement infoCard,
         System.Func<int, string> getName,
         System.Func<int, Sprite> getIcon,
         System.Func<int> getEquippedIndex,
+        System.Func<int, (string label, string value, Color color)[]> getInfoRows,
         int index,
         System.Func<int, bool> isLocked = null)
     {
-        nameLabel.text = getName(index);
+        bool locked = isLocked != null && isLocked(index); // 잠긴 오브젝트인지
+        nameLabel.text = locked ? "???" : getName(index); // 잠긴 오브젝트는 이름도 가림
         previewImage.sprite = getIcon(index);
+        previewImage.tintColor = locked ? Color.black : Color.white; // 잠겼으면 완전히 새까만 그림자로 (tint는 그림 색에 곱해지므로 검정이면 안쪽 무늬가 전부 사라지고 모양만 남음)
 
-        // 잠긴 오브젝트는 Select 대신 Locked만 보여주고, Equipped 표시는 아예 숨김
-        if (isLocked != null && isLocked(index))
+        // 도감 정보 카드를 현재 오브젝트 기준으로 새로 채움
+        var rows = getInfoRows?.Invoke(index);
+        infoCard.Clear();
+        infoCard.style.display = rows == null ? DisplayStyle.None : DisplayStyle.Flex;
+        if (rows != null)
+            foreach (var row in rows)
+                infoCard.Add(CreateInfoRow(row.label, row.value, row.color));
+
+        // 도감 모드(오브젝트 팝업): 선택 버튼/장착됨 표시 없이 카드의 "상태" 줄(잠김/해금 완료)만 씀
+        if (getInfoRows != null)
         {
-            selectButton.text = "잠김";
-            selectButton.style.display = DisplayStyle.Flex;
+            selectButton.style.display = DisplayStyle.None;
             equippedLabel.style.display = DisplayStyle.None;
             return;
         }

@@ -13,6 +13,7 @@ public class Click : MonoBehaviour
 
     [SerializeField] private int pieceReward = 1; // 이 오브젝트를 파괴했을 때 기본으로 지급되는 조각 개수 (그 오브젝트 종류의 조각)
     [SerializeField] private float doubleClickDelaySeconds = 0.08f; // 더블클릭의 두 번째 타격이 첫 타격보다 이만큼 늦게 나옴
+    [SerializeField] private bool swingOnSurface; // 켜두면 무기 타격 연출이 테두리가 아니라 오브젝트 면(안쪽) 아무 데나 나타남 - 책상처럼 화면을 크게 덮는 오브젝트용
     [SerializeField] private int fixedObjectIndex = -1; // -1이면 지금 장착 중인 오브젝트(가운데서 화살표로 스왑되는 것). 0 이상이면 그 인덱스 오브젝트 전용(해금돼서 옆에 놓인 것)
 
     // 이 Click이 다루는 오브젝트 인덱스 - 고정이면 그 값, 아니면 지금 장착 중인 것
@@ -73,8 +74,8 @@ public class Click : MonoBehaviour
 
         CurrencyManager.Instance.AddPieces(objectIndex, finalPieces);
 
-        // 획득한 조각 수만큼 파편을 떨어뜨림 (연출). 너무 많으면 DebrisPool이 알아서 상한을 걸음
-        DebrisPool.Instance?.AddPiece(transform.position, objectIndex, (int)System.Math.Min(finalPieces, 100000L));
+        // 바닥에 파편을 떨어뜨림 (연출). 개수는 획득한 조각 수와 무관하게 이 오브젝트의 파편 레벨로 DebrisPool이 정함
+        DebrisPool.Instance?.AddPiece(transform.position, objectIndex);
     }
 
     // 현재 선택된 오브젝트(ObjectManager)의 clickSounds 중 하나를 랜덤 재생하되,
@@ -139,7 +140,7 @@ public class Click : MonoBehaviour
 
         // 콜라이더 테두리 위 랜덤한 지점에 현재 무기 이미지로 타격 연출 재생
         if (WeaponManager.Instance != null && _collider != null)
-            WeaponSwingEffect.Instance?.PlaySwing(_collider, WeaponManager.Instance.CurrentWeapon.icon);
+            WeaponSwingEffect.Instance?.PlaySwing(_collider, WeaponManager.Instance.CurrentWeapon.icon, swingOnSurface);
     }
 
     // 자동클릭 업그레이드가 켜져있으면 일정 주기마다 자동으로 PerformClickHit을 호출.
