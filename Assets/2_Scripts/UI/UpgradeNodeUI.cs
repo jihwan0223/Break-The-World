@@ -77,6 +77,9 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         _icon.sprite = level >= 1 ? upgradedSprite : _baseSprite;
     }
 
+    // 이 노드가 아직 해금 안 된 오브젝트 대상이라 툴팁을 "???"로 가려야 하는지 - 그 오브젝트를 해금하면 원래 설명으로 돌아옴
+    private bool IsMasked() => UpgradeManager.Instance != null && UpgradeManager.Instance.IsTargetObjectLocked(Id);
+
     private void HandleClicked()
     {
         // 성공하면 대각선 흔들림만. 실패(최대레벨/조각부족/미공개)면 아무 반응 없음 (툴팁은 호버로 이미 떠있음)
@@ -93,13 +96,13 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     private UpgradeTooltip.Content BuildTooltipContent()
     {
         int level = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetLevel(Id) : 0;
-        string nextEffect = NextLevelEffectText(level); // 다음 레벨에서 늘어나는 수치 문구 ("+3", "+15%" 등) - 해금류/최대레벨이면 null
+        string nextEffect = IsMasked() ? null : NextLevelEffectText(level); // 다음 레벨에서 늘어나는 수치 문구 ("+3", "+15%" 등) - 해금류/최대레벨이면 null, 가려진 노드는 효과 종류가 드러나지 않게 null
         return new UpgradeTooltip.Content
         {
-            title = displayName,
-            description = description,
+            title = IsMasked() ? "???" : displayName,
+            description = IsMasked() ? "아직 해금할 수 없습니다" : description,
             level = nextEffect != null ? $"{level} / {maxLevel}  (다음 {nextEffect})" : $"{level} / {maxLevel}",
-            price = NextCostText(level),
+            price = IsMasked() ? "" : NextCostText(level), // 가려진 노드는 가격도 숨김
         };
     }
 

@@ -18,6 +18,9 @@ public class ZoneArrowsUI : MonoBehaviour
 
     private VisualElement _prevArrow; // 이전(좁은 스케일) 존으로
     private VisualElement _nextArrow; // 다음(넓은 스케일) 존으로
+    private VisualElement _root; // 화살표 두 개를 담는 루트 - 전체 화면 창이 열려있는 동안 통째로 숨김
+    private bool _treeOpen; // 업그레이드 화면이 열려있는지
+    private bool _popupOpen; // 도감/무기/디버그 팝업이 열려있는지
 
     void OnEnable()
     {
@@ -35,6 +38,10 @@ public class ZoneArrowsUI : MonoBehaviour
         if (ZoneManager.Instance != null)
             ZoneManager.Instance.OnZoneChanged += Refresh;
 
+        // 전체 화면 창(업그레이드 화면, 도감/무기/디버그 팝업)이 열려있는 동안은 화살표가 그 위에 뜨지 않게 숨김
+        UpgradeTreeUI.OnTreeToggled += HandleTreeToggled;
+        SidePanelUI.OnSelectorPanelToggled += HandlePopupToggled;
+
         Refresh();
     }
 
@@ -42,10 +49,34 @@ public class ZoneArrowsUI : MonoBehaviour
     {
         if (ZoneManager.Instance != null)
             ZoneManager.Instance.OnZoneChanged -= Refresh;
+
+        UpgradeTreeUI.OnTreeToggled -= HandleTreeToggled;
+        SidePanelUI.OnSelectorPanelToggled -= HandlePopupToggled;
+    }
+
+    private void HandleTreeToggled(bool open)
+    {
+        _treeOpen = open;
+        UpdateRootVisibility();
+    }
+
+    private void HandlePopupToggled(bool open)
+    {
+        _popupOpen = open;
+        UpdateRootVisibility();
+    }
+
+    // 전체 화면 창이 하나라도 열려있으면 루트째 숨김 (다시 보일 때 튀어나오는 연출이 반복되지 않게 화살표 개별 표시는 건드리지 않음)
+    private void UpdateRootVisibility()
+    {
+        if (_root == null) return;
+
+        _root.style.display = _treeOpen || _popupOpen ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
     private void Build(VisualElement root)
     {
+        _root = root;
         root.Clear();
         GameFonts.Apply(root);
         root.pickingMode = PickingMode.Ignore; // 화살표 밖 영역은 뒤쪽 오브젝트 클릭이 통과해야 함

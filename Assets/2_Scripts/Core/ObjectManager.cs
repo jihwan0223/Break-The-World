@@ -155,6 +155,9 @@ public class ObjectManager : MonoBehaviour
 
     public bool IsUnlocked(int index) => index >= 0 && index < _unlocked.Length && _unlocked[index];
 
+    // index번째 오브젝트를 해금할 순서가 됐는지 - 바로 앞 오브젝트가 해금돼 있어야 함 (트리가 세 갈래로 나뉘어 있어서 순서는 여기서 지킴)
+    public bool IsUnlockOrderMet(int index) => index <= 0 || IsUnlocked(index - 1);
+
     // ---- 도감(오브젝트 팝업) 표시용 조회 ----
     private static readonly string[] zoneNames = { "책상 위", "길거리", "공사장", "우주" }; // 위 objects 목록의 존 구분과 같음 (무기 티어 2개당 존 1개, 우주만 티어 4개)
 
@@ -199,11 +202,12 @@ public class ObjectManager : MonoBehaviour
     }
 
     // (index-1)번째 오브젝트의 조각으로 index번째 오브젝트를 해금 시도.
-    // 전 단계 해금 여부는 더 이상 안 따짐(트리 UI 링크가 선행조건을 대신함) - 조각만 있으면 순서 상관없이 해금 가능
+    // 바로 앞 오브젝트가 해금돼 있어야 하고, 그 조각이 충분해야 함 (트리 링크만으로는 갈래가 나뉘어 순서가 안 지켜져서 여기서 막음)
     public bool TryUnlock(int index)
     {
         if (index <= 0 || index >= objects.Count) return false;
         if (_unlocked[index]) return true; // 이미 해금됨
+        if (!IsUnlockOrderMet(index)) return false; // 앞 오브젝트를 먼저 해금해야 함
 
         var cost = new List<PieceCost> { new PieceCost(index - 1, GetUnlockCost(index)) };
         if (CurrencyManager.Instance == null || !CurrencyManager.Instance.TrySpendPieces(cost))

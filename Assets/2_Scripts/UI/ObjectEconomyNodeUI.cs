@@ -152,6 +152,10 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             {
                 _tooltipText = $"해금\n{objectName}\n완료";
             }
+            else if (!ObjectManager.Instance.IsUnlockOrderMet(objectIndex))
+            {
+                _tooltipText = "해금\n???"; // 앞 오브젝트를 아직 해금 못했으면 이름과 가격을 가림
+            }
             else
             {
                 long cost = ObjectManager.Instance.GetUnlockCost(objectIndex);
@@ -195,6 +199,9 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             bool unlocked = ObjectManager.Instance.IsUnlocked(objectIndex);
             if (unlocked)
                 return new UpgradeTooltip.Content { title = $"{objectName} 해금", description = "이미 해금했습니다.", level = "완료" };
+
+            if (!ObjectManager.Instance.IsUnlockOrderMet(objectIndex))
+                return new UpgradeTooltip.Content { title = "???", description = "아직 해금할 수 없습니다", level = "0 / 1" }; // 가격은 표시 안 함
 
             long cost = ObjectManager.Instance.GetUnlockCost(objectIndex);
             return new UpgradeTooltip.Content

@@ -255,6 +255,14 @@ public class UpgradeManager : MonoBehaviour
     }
 
     // 조각을 소모해서 한 레벨 올림. 실패(미공개/최대레벨/조각부족) 시 false
+    // 이 노드가 특정 오브젝트 대상인데 그 오브젝트를 아직 해금하지 못했는지 - UI는 "???"로 가리고, 구매도 막음
+    public bool IsTargetObjectLocked(string nodeId)
+    {
+        UpgradeNode node = GetNode(nodeId);
+        return node != null && node.targetObjectIndex >= 0 && ObjectManager.Instance != null
+               && !ObjectManager.Instance.IsUnlocked(node.targetObjectIndex);
+    }
+
     public bool TryUpgrade(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId);
@@ -263,6 +271,12 @@ public class UpgradeManager : MonoBehaviour
         if (!IsRevealed(nodeId))
         {
             Debug.Log($"{nodeId} 업그레이드는 아직 잠겨있음 (선행 조건 미충족)");
+            return false;
+        }
+
+        if (IsTargetObjectLocked(nodeId))
+        {
+            Debug.Log($"{nodeId} 업그레이드는 대상 오브젝트가 아직 해금되지 않아 구매 불가");
             return false;
         }
 
