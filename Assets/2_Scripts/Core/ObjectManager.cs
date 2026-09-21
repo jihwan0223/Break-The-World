@@ -37,10 +37,10 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(1, 1, "접시", new Color(0.95f, 0.95f, 0.92f)),
         new ObjectData(1, 2, "유리컵", new Color(0.93f, 0.95f, 0.96f)),
         new ObjectData(1, 3, "화분", new Color(0.80f, 0.42f, 0.25f)),
-        new ObjectData(2, 1, "계산기", new Color(0.30f, 0.32f, 0.35f)),
+        new ObjectData(2, 1, "계산기", new Color(0.01f, 0.18f, 0.23f)),
         new ObjectData(2, 2, "책상", new Color(0.55f, 0.38f, 0.22f)) { hpMultiplier = 7f }, // ★ -> 존2
         // --- 존2: 길거리 (곡괭이 t3 / 전동드릴 t4) ---
-        new ObjectData(3, 1, "가로등", new Color(0.30f, 0.35f, 0.32f)),
+        new ObjectData(3, 1, "가로등", new Color(0.2f, 0.2f, 0.26f)),
         new ObjectData(3, 2, "자전거", new Color(0.45f, 0.50f, 0.58f)),
         new ObjectData(3, 3, "가로수", new Color(0.35f, 0.50f, 0.28f)),
         new ObjectData(4, 1, "자동차", new Color(0.55f, 0.58f, 0.62f)),
