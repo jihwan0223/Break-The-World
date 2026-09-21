@@ -10,7 +10,6 @@ public class ZoneBreaker : MonoBehaviour
     [SerializeField] private ZoneUnlockEffect unlockEffect; // 첫 파괴 연출 (비워두면 연출 없이 바로 해금)
 
     private Health _health; // 이 오브젝트(책상)의 체력
-    private bool _unlockStarted; // 이번 실행 중 해금 연출을 이미 시작했는지 (연출 도중 또 부서져도 한 번만)
 
     void Start()
     {
@@ -28,10 +27,8 @@ public class ZoneBreaker : MonoBehaviour
     {
         HarvestZone();
 
-        if (ZoneManager.Instance == null || _unlockStarted || ZoneManager.Instance.UnlockedMaxZone >= unlockZone)
+        if (ZoneManager.Instance == null || ZoneManager.Instance.UnlockedMaxZone >= unlockZone)
             return;
-
-        _unlockStarted = true;
 
         if (unlockEffect != null) unlockEffect.Play(unlockZone);
         else ZoneManager.Instance.UnlockZone(unlockZone);

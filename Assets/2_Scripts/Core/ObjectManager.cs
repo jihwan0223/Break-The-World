@@ -188,7 +188,7 @@ public class ObjectManager : MonoBehaviour
         return true;
     }
 
-    // 저장 파일 로드 시 구매 로직 없이 해금 상태를 그대로 대입
+    // 구매 로직 없이 해금 상태를 그대로 대입 - 저장 파일 로드, 존 해금 보상(ZoneManager)에서 씀
     public void SetUnlocked(int index, bool unlocked)
     {
         if (index < 0 || index >= _unlocked.Length) return;

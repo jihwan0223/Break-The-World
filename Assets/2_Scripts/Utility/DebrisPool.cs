@@ -23,6 +23,7 @@ public class DebrisPool : MonoBehaviour
     private readonly Stack<SpriteRenderer> _pool = new Stack<SpriteRenderer>(); // 재사용 가능한(비활성) 조각 오브젝트들
     private Color _currentColor = Color.white; // ObjectManager를 못 찾을 때 폴백으로 쓸 색
     private Sprite _fallbackSprite; // pieceSprites가 비어있을 때 대신 쓸 흰색 정사각형 스프라이트
+    private int _lastZone; // 직전에 보고 있던 존 번호 (존이 실제로 바뀔 때만 조각을 치우려고 기억해둠)
 
     void Awake()
     {
@@ -50,6 +51,13 @@ public class DebrisPool : MonoBehaviour
         UpgradeTreeUI.OnTreeToggled += HandleTabToggled;
         SidePanelUI.OnSelectorPanelToggled += HandleTabToggled;
 
+        // 존을 넘기면 앞 존에서 쌓인 조각을 치움
+        if (ZoneManager.Instance != null)
+        {
+            _lastZone = ZoneManager.Instance.CurrentZone;
+            ZoneManager.Instance.OnZoneChanged += HandleZoneChanged;
+        }
+
         // 첫 몇 번 부술 때 조각 GameObject를 한꺼번에 만드느라 프레임이 튀는 걸 막으려고 풀을 미리 채워둠
         for (int i = 0; i < maxPiecesPerBreak; i++)
             _pool.Push(CreatePiece());
@@ -62,6 +70,9 @@ public class DebrisPool : MonoBehaviour
 
         UpgradeTreeUI.OnTreeToggled -= HandleTabToggled;
         SidePanelUI.OnSelectorPanelToggled -= HandleTabToggled;
+
+        if (ZoneManager.Instance != null)
+            ZoneManager.Instance.OnZoneChanged -= HandleZoneChanged;
     }
 
     // 오브젝트를 부술 때 호출 - objectIndex 오브젝트의 색으로, 획득한 조각 수(count)만큼 조각이 fromPosition에서 떨어짐
@@ -199,6 +210,16 @@ public class DebrisPool : MonoBehaviour
     private void HandleTabToggled(bool open)
     {
         if (open) ReturnAllPieces();
+    }
+
+    // 존이 해금될 때도 이 이벤트가 오는데(화살표 등장), 그땐 보는 존이 그대로라서 방금 떨어진 조각을 치우면 안 됨
+    private void HandleZoneChanged()
+    {
+        int zone = ZoneManager.Instance.CurrentZone; // 지금 보고 있는 존
+        if (zone == _lastZone) return;
+
+        _lastZone = zone;
+        ReturnAllPieces();
     }
 
     private void HandleObjectChanged(ObjectData newObject)

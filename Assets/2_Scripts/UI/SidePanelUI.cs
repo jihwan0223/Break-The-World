@@ -31,6 +31,9 @@ public class SidePanelUI : MonoBehaviour
     private VisualElement _buttonRow; // 우상단 Upgrade/Weapon/Object 버튼 줄 - 셋 중 아무거나 하나라도 열려있으면 전부 숨김
     private bool _upgradeTreeOpen; // Canvas 업그레이드 화면이 지금 열려있는지 (UpgradeTreeUI.OnTreeToggled로 갱신됨)
 
+    private VisualElement _debugPanel; // 디버그 팝업 (테스트용 버튼 모음)
+    private Label _debugStatus; // 디버그 버튼을 누른 결과를 보여주는 줄
+
     // Weapon/Object 팝업(_panel)이 열리면 true, 닫히면 false로 전달 - DebrisPool 등이 구독해서 팝업 열릴 때 바닥 조각을 치움
     public static event System.Action<bool> OnSelectorPanelToggled;
 
@@ -68,7 +71,9 @@ public class SidePanelUI : MonoBehaviour
     {
         if (_buttonRow == null) return;
 
-        bool hide = (_panel != null && _panel.style.display == DisplayStyle.Flex) || _upgradeTreeOpen;
+        bool hide = (_panel != null && _panel.style.display == DisplayStyle.Flex)
+                    || (_debugPanel != null && _debugPanel.style.display == DisplayStyle.Flex)
+                    || _upgradeTreeOpen;
         _buttonRow.style.display = hide ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
@@ -95,44 +100,7 @@ public class SidePanelUI : MonoBehaviour
         root.pickingMode = PickingMode.Ignore;
 
         // 화면 전체를 꽉 채우는 팝업 패널 - 업그레이드 화면과 동일하게 전체화면으로 덮고 X 버튼으로 닫음
-        _panel = new VisualElement();
-        _panel.style.position = Position.Absolute;
-        _panel.style.left = 0;
-        _panel.style.right = 0;
-        _panel.style.top = 0;
-        _panel.style.bottom = 0;
-        _panel.style.backgroundColor = new Color(0.08f, 0.08f, 0.1f, 1f); // 업그레이드 화면처럼 불투명 단색(검정 대신 짙은 남색조)
-        _panel.style.display = DisplayStyle.None;
-
-        // 이 패널 위에 포인터가 있는 동안은 뒤쪽 월드 오브젝트가 클릭되지 않도록 플래그를 켜고 끔
-        _panel.RegisterCallback<PointerEnterEvent>(_ => UIPointerGuard.IsPointerOverUI = true);
-        _panel.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
-
-        _panelTitle = new Label();
-        _panelTitle.style.position = Position.Absolute;
-        _panelTitle.style.top = 16;
-        _panelTitle.style.left = 16;
-        _panelTitle.style.fontSize = 22;
-        _panelTitle.style.color = Color.white;
-        _panelTitle.style.unityFontStyleAndWeight = FontStyle.Bold;
-        _panel.Add(_panelTitle);
-
-        // 업그레이드 화면의 닫기 버튼처럼 배경 없이 흰 글자 X만
-        var closeButton = new Button(ClosePanel) { text = "X" };
-        closeButton.style.position = Position.Absolute;
-        closeButton.style.top = 16;
-        closeButton.style.right = 16;
-        closeButton.style.width = 44;
-        closeButton.style.height = 44;
-        closeButton.style.fontSize = 28;
-        closeButton.style.unityFontStyleAndWeight = FontStyle.Bold;
-        closeButton.style.backgroundColor = Color.clear;
-        closeButton.style.borderTopWidth = 0;
-        closeButton.style.borderBottomWidth = 0;
-        closeButton.style.borderLeftWidth = 0;
-        closeButton.style.borderRightWidth = 0;
-        closeButton.style.color = Color.white;
-        _panel.Add(closeButton);
+        _panel = CreatePopupFrame(ClosePanel, out _panelTitle);
 
         _weaponContent = BuildSelectorSection(
             _weaponBrowse,
@@ -169,6 +137,7 @@ public class SidePanelUI : MonoBehaviour
         _panel.Add(_objectContent);
 
         root.Add(_panel);
+        BuildDebugPanel(root);
 
         // Upgrade/Weapon/Object 버튼 3개가 화면 우상단에 일렬로 나오는 가로줄
         // (업그레이드 페이지 자체는 유저가 Canvas로 새로 만든 UpgradeTreeUI가 담당 - 여기선 그걸 여는 버튼만 있음)
@@ -203,15 +172,154 @@ public class SidePanelUI : MonoBehaviour
             OpenPanel("오브젝트", _objectContent);
         });
 
+        var debugButton = CreateButton("디버그", () =>
+        {
+            Debug.Log("디버그 버튼 눌림");
+            OpenDebugPanel();
+        });
+
+        debugButton.style.marginRight = 12; // 맨 왼쪽에 둠 - 줄이 오른쪽 기준 정렬이라 기존 3개 위치가 안 바뀜
         upgradeButton.style.marginRight = 12;
         weaponButton.style.marginRight = 12;
 
+        buttonRow.Add(debugButton);
         buttonRow.Add(upgradeButton);
         buttonRow.Add(weaponButton);
         buttonRow.Add(objectButton);
         root.Add(buttonRow);
 
         _buttonRow = buttonRow; // OpenPanel/ClosePanel/업그레이드 화면 토글에서 보이기/숨기기 위해 저장해둠
+    }
+
+    // 화면 전체를 꽉 채우는 팝업 틀 - 업그레이드 화면과 동일하게 전체화면으로 덮고 좌상단 제목, 우상단 X 버튼(onClose)이 있음
+    private VisualElement CreatePopupFrame(System.Action onClose, out Label titleLabel)
+    {
+        var panel = new VisualElement();
+        panel.style.position = Position.Absolute;
+        panel.style.left = 0;
+        panel.style.right = 0;
+        panel.style.top = 0;
+        panel.style.bottom = 0;
+        panel.style.backgroundColor = new Color(0.08f, 0.08f, 0.1f, 1f); // 업그레이드 화면처럼 불투명 단색(검정 대신 짙은 남색조)
+        panel.style.display = DisplayStyle.None;
+
+        // 이 패널 위에 포인터가 있는 동안은 뒤쪽 월드 오브젝트가 클릭되지 않도록 플래그를 켜고 끔
+        panel.RegisterCallback<PointerEnterEvent>(_ => UIPointerGuard.IsPointerOverUI = true);
+        panel.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
+
+        titleLabel = new Label();
+        titleLabel.style.position = Position.Absolute;
+        titleLabel.style.top = 16;
+        titleLabel.style.left = 16;
+        titleLabel.style.fontSize = 22;
+        titleLabel.style.color = Color.white;
+        titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+        panel.Add(titleLabel);
+
+        // 업그레이드 화면의 닫기 버튼처럼 배경 없이 흰 글자 X만
+        var closeButton = new Button(onClose) { text = "X" };
+        closeButton.style.position = Position.Absolute;
+        closeButton.style.top = 16;
+        closeButton.style.right = 16;
+        closeButton.style.width = 44;
+        closeButton.style.height = 44;
+        closeButton.style.fontSize = 28;
+        closeButton.style.unityFontStyleAndWeight = FontStyle.Bold;
+        closeButton.style.backgroundColor = Color.clear;
+        closeButton.style.borderTopWidth = 0;
+        closeButton.style.borderBottomWidth = 0;
+        closeButton.style.borderLeftWidth = 0;
+        closeButton.style.borderRightWidth = 0;
+        closeButton.style.color = Color.white;
+        panel.Add(closeButton);
+
+        return panel;
+    }
+
+    // 디버그 팝업 - 다른 팝업과 같은 전체 화면 모양. 테스트용 버튼을 세로로 모아둠 (원래 업그레이드 화면 아래쪽에 있던 것들)
+    private void BuildDebugPanel(VisualElement root)
+    {
+        _debugPanel = CreatePopupFrame(CloseDebugPanel, out Label title);
+        title.text = "디버그";
+
+        var list = new VisualElement(); // 버튼 세로 목록
+        list.style.position = Position.Absolute;
+        list.style.left = 0;
+        list.style.right = 0;
+        list.style.top = 90;
+        list.style.alignItems = Align.Center;
+
+        // 각 동작은 눌린 결과를 한 줄 문구로 돌려줌 - 화면이 팝업에 가려져서 눌렀는지 알 수 없기 때문
+        AddDebugButton(list, "돈 최대", () =>
+        {
+            CurrencyManager.Instance?.MaxAllDebug();
+            return "모든 조각을 최대치로 채웠습니다";
+        });
+        AddDebugButton(list, "돈 초기화", () =>
+        {
+            CurrencyManager.Instance?.ResetAll();
+            return "모든 조각을 0으로 되돌렸습니다";
+        });
+        AddDebugButton(list, "전체 해금", () =>
+        {
+            UpgradeManager.Instance?.UnlockAllDebug();
+            ObjectManager.Instance?.UnlockAllDebug();
+            UpgradeTreeUI.Instance?.RefreshAll();
+            return "모든 업그레이드와 오브젝트를 해금했습니다";
+        });
+        AddDebugButton(list, "업그레이드 초기화", () =>
+        {
+            UpgradeManager.Instance?.ResetAll();
+            ObjectManager.Instance?.ResetAll();
+            UpgradeTreeUI.Instance?.RefreshAll();
+            return "업그레이드와 오브젝트 해금을 처음 상태로 되돌렸습니다";
+        });
+        AddDebugButton(list, "존 해금 초기화", () =>
+        {
+            ZoneManager.Instance?.ResetAll();
+            return "존1만 열린 상태로 되돌렸습니다. 책상을 부수면 해금 연출이 나옵니다";
+        });
+        _debugPanel.Add(list);
+
+        _debugStatus = new Label();
+        _debugStatus.style.position = Position.Absolute;
+        _debugStatus.style.left = 0;
+        _debugStatus.style.right = 0;
+        _debugStatus.style.bottom = 40;
+        _debugStatus.style.fontSize = 26;
+        _debugStatus.style.color = Color.white;
+        _debugStatus.style.unityTextAlign = TextAnchor.MiddleCenter;
+        _debugPanel.Add(_debugStatus);
+
+        root.Add(_debugPanel);
+    }
+
+    // 디버그 목록에 버튼 하나 추가 - 누르면 action을 실행하고 돌려받은 문구를 아래 줄에 표시
+    private void AddDebugButton(VisualElement list, string text, System.Func<string> action)
+    {
+        Button button = CreateButton(text, () => _debugStatus.text = action());
+        button.style.width = 460; // "업그레이드 초기화"처럼 긴 글자도 들어가도록 기본 폭보다 넓게
+        button.style.marginBottom = 14;
+        list.Add(button);
+    }
+
+    private void OpenDebugPanel()
+    {
+        _debugStatus.text = "";
+        _debugPanel.style.display = DisplayStyle.Flex;
+        RefreshButtonRowVisibility(); // 팝업이 열렸으니 버튼 줄 숨김
+
+        Time.timeScale = 0f; // 다른 팝업과 동일 - 열려있는 동안 게임 시간 정지
+        OnSelectorPanelToggled?.Invoke(true); // DebrisPool 등에게 팝업 열림을 알림
+    }
+
+    private void CloseDebugPanel()
+    {
+        _debugPanel.style.display = DisplayStyle.None;
+        RefreshButtonRowVisibility(); // 팝업이 닫혔으니 버튼 줄 다시 보임
+
+        Time.timeScale = 1f;
+        OnSelectorPanelToggled?.Invoke(false);
     }
 
     // 팝업 안에 들어갈 전체 영역: 화살표 사이에 이름, 그 아래 왼쪽엔 이미지 자리 / 오른쪽엔 설명 + Select 버튼.

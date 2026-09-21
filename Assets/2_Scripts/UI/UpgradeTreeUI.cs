@@ -143,28 +143,6 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         content.localScale = new Vector3(newScale, newScale, 1f);
     }
 
-    // 업그레이드 트리 전체 초기화 버튼에 연결 (레벨 0, 공개 상태도 리셋 - 조각은 환불 안 됨)
-    public void ResetTree()
-    {
-        UpgradeManager.Instance?.ResetAll();
-        ObjectManager.Instance?.ResetAll();
-        RefreshAll();
-    }
-
-    // 테스트용 "돈 초기화" 버튼에 연결 - 보유 중인 모든 조각을 0으로
-    public void ResetCurrencyDebug() => CurrencyManager.Instance?.ResetAll();
-
-    // 테스트용 "돈 최대" 버튼에 연결 - 모든 오브젝트의 조각을 최대치로 채움
-    public void MaxCurrencyDebug() => CurrencyManager.Instance?.MaxAllDebug();
-
-    // 테스트용 "전체 해금" 버튼에 연결 - 모든 업그레이드/오브젝트 노드를 조각 소모 없이 즉시 최대/해금 상태로 만듦
-    public void UnlockAllDebug()
-    {
-        UpgradeManager.Instance?.UnlockAllDebug();
-        ObjectManager.Instance?.UnlockAllDebug();
-        RefreshAll();
-    }
-
     // "카메라 초기화" 버튼에 연결 - centerNodeId 노드가 뷰포트 정중앙에 오도록 팬을 매번 새로 계산하고, 줌은 defaultZoom으로 되돌림
     public void ResetCamera()
     {
