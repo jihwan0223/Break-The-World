@@ -40,10 +40,10 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(2, 1, "계산기", new Color(0.01f, 0.18f, 0.23f)),
         new ObjectData(2, 2, "책상", new Color(0.55f, 0.38f, 0.22f)) { hpMultiplier = 7f }, // ★ -> 존2
         // --- 존2: 길거리 (곡괭이 t3 / 전동드릴 t4) ---
-        new ObjectData(3, 1, "가로등", new Color(0.2f, 0.2f, 0.26f)),
-        new ObjectData(3, 2, "자전거", new Color(0.45f, 0.50f, 0.58f)),
-        new ObjectData(3, 3, "가로수", new Color(0.35f, 0.50f, 0.28f)),
-        new ObjectData(4, 1, "자동차", new Color(0.55f, 0.58f, 0.62f)),
+        new ObjectData(3, 1, "가로등", new Color(0.23f, 0.24f, 0.35f)),
+        new ObjectData(3, 2, "자전거", new Color(0.23f, 0.24f, 0.30f)),
+        new ObjectData(3, 3, "가로수", new Color(0.24f, 0.59f, 0.32f)),
+        new ObjectData(4, 1, "자동차", new Color(0.70f, 0.69f, 0.71f)),
         new ObjectData(4, 2, "보도블록", new Color(0.62f, 0.60f, 0.58f)) { hpMultiplier = 2f }, // ★ -> 존3
         // --- 존3: 공사장 / 건물 (유압 브레이커 t5 / 다이너마이트 t6) ---
         new ObjectData(5, 1, "컨테이너 박스", new Color(0.55f, 0.45f, 0.35f)),
