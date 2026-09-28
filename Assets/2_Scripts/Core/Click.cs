@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,11 +17,22 @@ public class Click : MonoBehaviour
     [SerializeField] private bool swingOnSurface; // 켜두면 무기 타격 연출이 테두리가 아니라 오브젝트 면(안쪽) 아무 데나 나타남 - 책상처럼 화면을 크게 덮는 오브젝트용
     [SerializeField] private int fixedObjectIndex = -1; // -1이면 지금 장착 중인 오브젝트(가운데서 화살표로 스왑되는 것). 0 이상이면 그 인덱스 오브젝트 전용(해금돼서 옆에 놓인 것)
 
+    // 이 오브젝트가 지금 안 보이는 존에 있는지 - 그런 존의 오브젝트도 자동클릭은 계속 돌지만 소리/연출/그림은 내지 않음
+    private bool IsZoneHidden => ZoneManager.Instance != null && ZoneManager.Instance.IsHidden(transform);
+
     // 이 Click이 다루는 오브젝트 인덱스 - 고정이면 그 값, 아니면 지금 장착 중인 것
     private int ObjIndex => fixedObjectIndex >= 0 ? fixedObjectIndex
         : (ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : -1);
 
+    [SerializeField] private Sprite autoClickProjectile; // 채워두면 자동클릭이 즉시 때리는 대신 이 그림이 날아와서 맞는 순간에 타격이 들어감 (유리컵의 야구공처럼)
+    [SerializeField] private float projectileScale = 2.5f; // 투사체 그림 크기 배율 (스프라이트 원래 크기 기준)
+    [SerializeField] private float projectileFlightSeconds = 2f; // 타격 몇 초 전부터 날아오기 시작할지(초) - 자동클릭 주기보다 길면 주기만큼만 날아옴
+    [SerializeField] private float projectileSpinDegreesPerSecond = 720f; // 날아오는 동안 도는 속도
+    [SerializeField] private float projectileStaggerSeconds = 0.1f; // 한 번에 여러 번 때릴 때 투사체 사이의 간격(초)
+
+    private readonly List<GameObject> _flyingProjectiles = new List<GameObject>(); // 지금 날아가는 중인 투사체들 - 오브젝트가 꺼질 때 남지 않게 지우려고 기억
     private int _lastClickSoundIndex = -1; // 방금 재생한 사운드 인덱스 (바로 다음 클릭에서 같은 소리가 안 나오게 기억)
+    private bool _projectilesLaunched; // 이번 자동클릭 주기에 투사체를 이미 날렸는지
     private float _autoClickTimer; // 자동클릭 업그레이드의 다음 발동까지 누적된 시간(초)
     private float _autoMineTimer; // 자동채굴 업그레이드의 다음 발동까지 누적된 시간(초)
 
@@ -30,6 +42,15 @@ public class Click : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _collider = GetComponent<Collider2D>();
         _health.OnDied += HandleDied;
+    }
+
+    void OnDisable()
+    {
+        // 존이 바뀌거나 잠겨서 코루틴이 멈추면 날아가던 투사체가 화면에 남으므로 같이 지움
+        foreach (GameObject projectile in _flyingProjectiles)
+            if (projectile != null) Destroy(projectile);
+        _flyingProjectiles.Clear();
+        _projectilesLaunched = false; // 코루틴이 멈췄으니 다음에 켜지면 다시 날리게 함
     }
 
     void OnDestroy()
@@ -75,7 +96,8 @@ public class Click : MonoBehaviour
         CurrencyManager.Instance.AddPieces(objectIndex, finalPieces);
 
         // 바닥에 파편을 떨어뜨림 (연출). 개수는 획득한 조각 수와 무관하게 이 오브젝트의 파편 레벨로 DebrisPool이 정함
-        DebrisPool.Instance?.AddPiece(transform.position, objectIndex);
+        if (!IsZoneHidden)
+            DebrisPool.Instance?.AddPiece(transform.position, objectIndex);
     }
 
     // 현재 선택된 오브젝트(ObjectManager)의 clickSounds 중 하나를 랜덤 재생하되,
@@ -104,7 +126,7 @@ public class Click : MonoBehaviour
 
     // 클릭 한 번(플레이어 클릭/자동클릭/더블클릭 추가 타격 공용)의 데미지 계산 + 적용 + 연출.
     // 이미 죽어서 리스폰을 기다리는 중이면 아무것도 하지 않음 (더블클릭/자동클릭이 중복으로 때리는 걸 방지)
-    private void PerformClickHit()
+    private void PerformClickHit(bool playWeaponSwing = true, Vector2? swingPoint = null)
     {
         // 바로 부활형 오브젝트가 페이드아웃/부활 대기 중이면, 이 클릭이 씹히지 않게 즉시 되살림
         if (_health.IsDead)
@@ -133,14 +155,14 @@ public class Click : MonoBehaviour
 
         // 이번 타격으로 죽는 게 아닐 때만 클릭 사운드 재생 (죽을 땐 파괴 사운드만 나오게)
         bool willDie = damage >= _health.CurrentHP;
-        if (!willDie)
+        if (!willDie && !IsZoneHidden)
             PlayRandomClickSound();
 
         _health.TakeDamage(damage);
 
         // 콜라이더 테두리 위 랜덤한 지점에 현재 무기 이미지로 타격 연출 재생
-        if (WeaponManager.Instance != null && _collider != null)
-            WeaponSwingEffect.Instance?.PlaySwing(_collider, WeaponManager.Instance.CurrentWeapon.icon, swingOnSurface);
+        if (playWeaponSwing && !IsZoneHidden && WeaponManager.Instance != null && _collider != null)
+            WeaponSwingEffect.Instance?.PlaySwing(_collider, WeaponManager.Instance.CurrentWeapon.icon, swingOnSurface, swingPoint);
     }
 
     // 자동클릭 업그레이드가 켜져있으면 일정 주기마다 자동으로 PerformClickHit을 호출.
@@ -153,15 +175,77 @@ public class Click : MonoBehaviour
 
         _autoClickTimer += Time.deltaTime;
         float interval = UpgradeManager.Instance.AutoClickIntervalSecondsFor(objectIndex);
+        int clicks = UpgradeManager.Instance.AutoClickClicksPerTriggerFor(objectIndex);
+
+        // 투사체는 타격 시각보다 flight초 먼저 날려서, 남은 시간 동안 날아와 타격 순간에 딱 맞게 도착시킴
+        if (autoClickProjectile != null && !_projectilesLaunched && !IsZoneHidden && _autoClickTimer >= interval - Mathf.Min(projectileFlightSeconds, interval))
+        {
+            _projectilesLaunched = true;
+            float remaining = Mathf.Max(interval - _autoClickTimer, 0.05f); // 타격까지 남은 시간 = 이번 비행 시간
+            for (int i = 0; i < clicks; i++)
+                StartCoroutine(FlyProjectileThenHit(i * projectileStaggerSeconds, remaining));
+        }
 
         if (_autoClickTimer < interval)
             return;
 
         _autoClickTimer -= interval; // 0으로 딱 자르지 않고 남은 오차만 빼서 주기가 조금씩 밀리는 걸 방지
 
-        int clicks = UpgradeManager.Instance.AutoClickClicksPerTriggerFor(objectIndex);
+        bool projectilesFlying = _projectilesLaunched; // 이번 주기에 투사체를 날렸으면 타격은 투사체가 도착하면서 넣음 (안 보이는 존이면 날리지 않고 여기서 바로 타격)
+        _projectilesLaunched = false;
+        if (projectilesFlying)
+            return;
+
         for (int i = 0; i < clicks; i++)
             PerformClickHit();
+    }
+
+    // 화면 옆 밖에서 투사체가 날아와 오브젝트에 맞는 순간 타격을 넣음. 무기 타격 이미지는 대신 투사체라 안 나옴
+    private IEnumerator FlyProjectileThenHit(float startDelaySeconds, float flightSeconds)
+    {
+        if (startDelaySeconds > 0f)
+            yield return new WaitForSeconds(startDelaySeconds);
+
+        Camera cam = Camera.main; // 화면 밖 시작점을 구하려고 필요
+        if (cam == null || _collider == null)
+        {
+            PerformClickHit();
+            yield break;
+        }
+
+        Bounds bounds = _collider.bounds; // 맞출 오브젝트의 범위 - 이 안의 한 점을 노림
+        float side = Random.value < 0.5f ? -1f : 1f; // 왼쪽/오른쪽 중 어느 쪽에서 날아올지
+        float halfWidth = cam.orthographicSize * cam.aspect; // 화면 가로 절반(월드 유닛)
+        Vector3 start = new Vector3(cam.transform.position.x + side * (halfWidth + 1f),
+            bounds.center.y + bounds.extents.y * Random.Range(0.2f, 0.9f), transform.position.z); // 화면 밖 오른쪽/왼쪽, 오브젝트 위쪽 높이
+        Vector3 end = new Vector3(bounds.center.x + bounds.extents.x * Random.Range(-0.4f, 0.4f),
+            bounds.center.y + bounds.extents.y * Random.Range(-0.4f, 0.4f), transform.position.z); // 오브젝트 안쪽 한 점
+
+        var projectile = new GameObject("AutoClickProjectile"); // 날아가는 그림 하나
+        var projectileRenderer = projectile.AddComponent<SpriteRenderer>(); // 투사체 그림을 그리는 렌더러
+        projectileRenderer.sprite = autoClickProjectile;
+        SpriteRenderer ownRenderer = GetComponent<SpriteRenderer>(); // 오브젝트 자신의 렌더러 - 그 위에 그리려고 정렬 순서를 참고
+        projectileRenderer.sortingOrder = (ownRenderer != null ? ownRenderer.sortingOrder : 0) + 5;
+        projectile.transform.localScale = Vector3.one * projectileScale;
+        projectile.transform.position = start;
+        _flyingProjectiles.Add(projectile);
+
+        float elapsed = 0f; // 날아간 시간
+        while (elapsed < flightSeconds)
+        {
+            elapsed += Time.deltaTime;
+            float progress = Mathf.Clamp01(elapsed / flightSeconds); // 0~1 진행도
+            Vector3 position = Vector3.Lerp(start, end, progress);
+            position.y += Mathf.Sin(progress * Mathf.PI) * 1.2f; // 살짝 포물선으로 뜨는 높이
+            projectile.transform.position = position;
+            projectileRenderer.enabled = !IsZoneHidden; // 날아가는 도중 다른 존으로 넘어가면 그림만 숨김 (타격은 그대로)
+            projectile.transform.Rotate(0f, 0f, projectileSpinDegreesPerSecond * Time.deltaTime * -side);
+            yield return null;
+        }
+
+        _flyingProjectiles.Remove(projectile);
+        Destroy(projectile);
+        PerformClickHit(false);
     }
 
     // 자동채굴 업그레이드가 켜져있으면 일정 주기마다, 지금 캐는 오브젝트보다 몇 단계 전 오브젝트를 자동으로 캐서 조각을 지급함
@@ -215,7 +299,7 @@ public class Click : MonoBehaviour
         if (TopmostAt(worldPos) == gameObject)
         {
             Debug.Log("Click");
-            PerformClickHit();
+            PerformClickHit(true, worldPos); // 직접 클릭은 타격 연출이 커서 위치에서 나옴
 
             // 더블클릭 업그레이드 - 확률 판정 성공 시 살짝 늦게 두 번째 타격을 처리
             // (첫 타격에 죽었으면 지연된 PerformClickHit이 알아서 무시함 - IsDead 체크가 있음)
@@ -241,6 +325,9 @@ public class Click : MonoBehaviour
 
         foreach (Collider2D hit in hits)
         {
+            if (ZoneManager.Instance != null && ZoneManager.Instance.IsHidden(hit.transform))
+                continue; // 안 보이는 존의 오브젝트는 클릭을 받지 않음
+
             SpriteRenderer renderer = hit.GetComponent<SpriteRenderer>();
             int order = renderer != null ? renderer.sortingOrder : 0;
 

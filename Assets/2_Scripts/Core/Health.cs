@@ -82,6 +82,27 @@ public class Health : MonoBehaviour
         OnDamaged?.Invoke(CurrentHP, maxHP);
     }
 
+    // 존을 다시 볼 때 호출 - 부서지다 만/죽어 있던 상태를 지우고 체력을 꽉 채운 온전한 모습으로 되돌림.
+    // 아직 해금 전이라 UnlockGate가 꺼둔 오브젝트는 그림/콜라이더를 켜면 안 되므로 건드리지 않음
+    public void ResetToFull()
+    {
+        if (!enabled) return;
+
+        StopAllCoroutines();
+        RespawnRemaining = 0f;
+        CurrentHP = maxHP;
+        IsDead = false;
+
+        if (_spriteRenderer != null)
+        {
+            _spriteRenderer.enabled = true;
+            _spriteRenderer.color = _originalColor;
+        }
+        if (_collider != null) _collider.enabled = true;
+
+        OnDamaged?.Invoke(CurrentHP, maxHP); // 스프라이트를 온전한 단계로 되돌림
+    }
+
     public void TakeDamage(int amount)
     {
         // 죽어서 재생성을 기다리는 동안은 데미지를 받지 않음
@@ -110,7 +131,7 @@ public class Health : MonoBehaviour
                 ? ObjectManager.Instance.GetObjectAt(fixedObjectIndex).breakSound
                 : ObjectManager.Instance.CurrentObject.breakSound;
         }
-        if (breakSound != null)
+        if (breakSound != null && !(ZoneManager.Instance != null && ZoneManager.Instance.IsHidden(transform))) // 안 보이는 존이면 소리 안 냄
             _audioSource.PlayOneShot(breakSound);
 
         // 파편은 Click.HandleDied가 "획득한 조각 수만큼" 떨어뜨림 (여기서 안 함)

@@ -52,6 +52,7 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private float baseCritMultiplier = 1.5f;    // 크리티컬 기본 배율
     [SerializeField] private float baseAutoClickInterval = 5f;   // 자동 클릭 기본 주기(초)
     [SerializeField] private float minAutoClickInterval = 1.5f;  // 자동 클릭 주기 하한
+    [SerializeField] private float autoClickIntervalGrowthPerObject = 1.05f; // 오브젝트 번호가 1 늘 때마다 자동 클릭 주기에 곱해지는 배율 (1이면 모두 같은 주기, 클수록 뒤쪽 오브젝트가 늦게 깨짐)
     [SerializeField] private int baseAutoClickCount = 1;         // 자동 클릭 1회당 기본 클릭 수
     [SerializeField] private float baseComboCooldown = 30f;      // 콤보 기본 쿨타임(초)
     [SerializeField] private float minComboCooldown = 10f;       // 콤보 쿨타임 하한
@@ -410,8 +411,10 @@ public class UpgradeManager : MonoBehaviour
     // 자동클릭은 오브젝트별로 따로 켜짐 - 지금 장착 중인 오브젝트를 대상으로 하는 노드가 있어야 작동함
     public bool AutoClickIsUnlockedFor(int objectIndex) => AnyUnlocked(UpgradeEffect.AutoClickUnlock, objectIndex);
 
+    // 업그레이드로 줄인 공통 주기에 오브젝트 번호별 배율을 곱함 - 뒤쪽 오브젝트일수록 주기가 길고, 하한도 같은 배율로 같이 늘어남
     public float AutoClickIntervalSecondsFor(int objectIndex) =>
-        Mathf.Max(minAutoClickInterval, baseAutoClickInterval - SumEffect(UpgradeEffect.AutoClickSpeed, objectIndex));
+        Mathf.Max(minAutoClickInterval, baseAutoClickInterval - SumEffect(UpgradeEffect.AutoClickSpeed, objectIndex))
+        * Mathf.Pow(autoClickIntervalGrowthPerObject, Mathf.Max(0, objectIndex));
 
     public int AutoClickClicksPerTriggerFor(int objectIndex) =>
         baseAutoClickCount + Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoClickCount, objectIndex));

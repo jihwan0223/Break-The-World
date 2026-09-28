@@ -30,12 +30,17 @@ public class WeaponSwingEffect : MonoBehaviour
     }
 
     // hitCollider의 외곽선 위 랜덤한 지점(onSurface면 콜라이더 안쪽 면 아무 데나)에 icon을 잠깐 띄움. 같은 프레임에 여러 번 불러도 각각 독립적으로 보임
-    public void PlaySwing(Collider2D hitCollider, Sprite icon, bool onSurface = false)
+    // cursorPoint가 있으면(플레이어가 직접 클릭한 위치) 그 자리에, 없으면(자동클릭 등) 위처럼 랜덤한 지점에 띄움
+    public void PlaySwing(Collider2D hitCollider, Sprite icon, bool onSurface = false, Vector2? cursorPoint = null)
     {
         if (icon == null || hitCollider == null)
             return;
 
-        Vector3 point = onSurface ? GetRandomPointInsideCollider(hitCollider) : GetRandomPointOnColliderEdge(hitCollider);
+        Vector3 point;
+        if (cursorPoint.HasValue)
+            point = new Vector3(cursorPoint.Value.x, cursorPoint.Value.y, hitCollider.bounds.center.z);
+        else
+            point = onSurface ? GetRandomPointInsideCollider(hitCollider) : GetRandomPointOnColliderEdge(hitCollider);
 
         // 이미지의 "위쪽"(로컬 +Y)이 그 지점에서 콜라이더 중심을 향하도록 회전 계산
         Vector2 towardCollider = (Vector2)(hitCollider.bounds.center - point);
