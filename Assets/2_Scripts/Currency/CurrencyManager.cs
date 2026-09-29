@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// 모든 오브젝트가 공통으로 쌓는 단일 통합 화폐("조각")를 관리하는 지갑.
-// 예전엔 오브젝트별로 조각이 따로 쌓였지만, 이제는 뭘 부수든 같은 조각으로 합쳐짐
+// 모든 오브젝트가 공통으로 쌓는 단일 통합 화폐("조각")와 희귀 화폐("결정")를 관리하는 지갑.
 public class CurrencyManager : MonoBehaviour
 {
     // 씬 어디서든 CurrencyManager.Instance로 접근하기 위한 싱글톤

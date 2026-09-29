@@ -15,7 +15,7 @@ public class DebrisPool : MonoBehaviour
     [SerializeField] private int maxPiecesPerBreak = 50; // 한 번 부술 때 떨어뜨릴 파편 수의 상한 (렉 방지 - 넘치는 조각은 파편 하나에 합쳐 담음)
     [SerializeField] private float pieceSize = 1f; // 조각 하나의 크기 (월드 유닛)
     [SerializeField] private float pickupColliderScale = 1.4f; // 줍기 판정 콜라이더를 파편 그림보다 이 배율만큼 크게 (잘 주워지게)
-    [SerializeField] private Sprite[] pieceSprites; // 조각으로 쓸 스프라이트들 (Object-Break.png의 서브 스프라이트들). 색은 부순 오브젝트의 pileColor로 입힘
+    [SerializeField] private Sprite[] pieceSprites; // 조각으로 쓸 스프라이트들 (BreakPieces 폴더의 파편 이미지들). 색은 부순 오브젝트의 pileColor로 입힘
     [SerializeField] private float initialSpread = 1f; // 처음엔 오브젝트 바로 아래 이 반경(월드 유닛) 안으로만 떨어지고, 쌓일수록 spawnArea 폭까지 점점 넓어짐
     [SerializeField] private float fallDuration = 0.4f; // 부서진 지점에서 바닥까지 떨어지는 데 걸리는 시간(초)
     [SerializeField] private Color crystalColor = new Color(0.45f, 0.9f, 1f); // 결정 색 (전용 이미지가 생기기 전까지 파편 그림에 이 색을 입혀 구분)

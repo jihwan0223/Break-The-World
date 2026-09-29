@@ -69,7 +69,7 @@ public class ObjectManager : MonoBehaviour
     public event Action<ObjectData> OnObjectChanged;
 
     // ---- 오브젝트 해금 시스템 ----
-    // N번째 오브젝트는 (N-1)번째 오브젝트의 조각으로 해금해야 장착 가능. 0번(Plate)은 처음부터 해금된 상태로 시작
+    // 오브젝트는 앞 오브젝트부터 순서대로 조각으로 해금해야 장착 가능. 0번(Plate)은 처음부터 해금된 상태로 시작
     private bool[] _unlocked;
     // 해금 비용 = 직전 오브젝트를 몇 번 부숴야 하는지로 맞춤. 보상이 4.5배씩 늘 때 비용은 4.88배씩 늘어서
     // 필요한 부수기 횟수가 유리컵 15번 -> 우주 약 60번으로 조금씩 늘어남 (무기 해금 비용도 이 곡선을 따라감)
@@ -80,7 +80,7 @@ public class ObjectManager : MonoBehaviour
     public event Action<int> OnUnlockChanged;
 
     // ---- 오브젝트별 "획득량 증가" 업그레이드 ----
-    // N번째 오브젝트의 획득량 증가 업그레이드는 (N-1)번째 오브젝트의 조각으로 구매. 0번은 대상 아님(항상 0레벨)
+    // 오브젝트의 획득량 증가 업그레이드는 조각으로 구매. 0번은 대상 아님(항상 0레벨)
     private int[] _gainLevel;
     private const int MaxGainLevel = 5;
     private const long GainCostBase = 8; // 비용 시작값 - 그 오브젝트 해금 비용의 약 절반
@@ -213,15 +213,15 @@ public class ObjectManager : MonoBehaviour
     public long GetBaseReward(int index) =>
         Math.Max(1L, (long)(BaseRewardStart * Mathf.Pow(BaseRewardGrowth, Mathf.Max(0, index))));
 
-    // index번째 오브젝트를 해금하는 데 필요한 (index-1)번째 오브젝트의 조각 개수 (0번은 비용 없음 - 처음부터 해금)
+    // index번째 오브젝트를 해금하는 데 필요한 조각 개수 (0번은 비용 없음 - 처음부터 해금)
     public long GetUnlockCost(int index)
     {
         if (index <= 0) return 0;
         return (long)(UnlockCostBase * Mathf.Pow(UnlockCostGrowth, index - 1));
     }
 
-    // (index-1)번째 오브젝트의 조각으로 index번째 오브젝트를 해금 시도.
-    // 바로 앞 오브젝트가 해금돼 있어야 하고, 그 조각이 충분해야 함 (트리 링크만으로는 갈래가 나뉘어 순서가 안 지켜져서 여기서 막음)
+    // 조각으로 index번째 오브젝트를 해금 시도.
+    // 바로 앞 오브젝트가 해금돼 있어야 하고, 조각이 충분해야 함 (트리 링크만으로는 갈래가 나뉘어 순서가 안 지켜져서 여기서 막음)
     public bool TryUnlock(int index)
     {
         if (index <= 0 || index >= objects.Count) return false;
@@ -259,18 +259,6 @@ public class ObjectManager : MonoBehaviour
         float objectFactor = Mathf.Pow(GainCostGrowthPerObject, index - 1);
         float levelFactor = Mathf.Pow(GainCostGrowthPerLevel, level);
         return (long)(GainCostBase * objectFactor * levelFactor);
-    }
-
-    // index번째 오브젝트의 획득량 증가 업그레이드를 0레벨부터 최대 레벨까지 다 올리는 데 드는 총 비용 (디버그용)
-    public long GetTotalGainCost(int index)
-    {
-        if (index <= 0) return 0;
-
-        long total = 0;
-        float objectFactor = Mathf.Pow(GainCostGrowthPerObject, index - 1);
-        for (int level = 0; level < MaxGainLevel; level++)
-            total += (long)(GainCostBase * objectFactor * Mathf.Pow(GainCostGrowthPerLevel, level));
-        return total;
     }
 
     // index번째 오브젝트가 파괴될 때마다 추가로 더 얻는 조각 개수 (획득량 증가 업그레이드 보너스)

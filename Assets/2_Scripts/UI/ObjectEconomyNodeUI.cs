@@ -35,8 +35,6 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     private bool _prereqResolved;        // _prereqNodes를 한 번 찾았는지 (씬의 링크는 안 바뀌니 최초 1회만 탐색)
     private string _tooltipText;         // Refresh()가 label에 쓴 것과 같은 문구 - 마우스 호버 툴팁에도 그대로 씀
 
-    public int ObjectIndex => objectIndex;
-    public bool IsGain => isGain;
     public RectTransform Rect => _rect != null ? _rect : (_rect = (RectTransform)transform);
 
     // 이 노드를 다른 노드의 anchor로 쓸 때 확인함: Gain 노드는 1레벨 이상 올렸는지, Unlock 노드는 해금 완료됐는지

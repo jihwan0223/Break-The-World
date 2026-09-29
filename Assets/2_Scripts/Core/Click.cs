@@ -12,7 +12,7 @@ public class Click : MonoBehaviour
     private AudioSource _audioSource;
     private Collider2D _collider; // 자동클릭/더블클릭처럼 실제 마우스 클릭이 없는 히트에서도 타격 연출 위치로 씀
 
-    [SerializeField] private int pieceReward = 1; // 이 오브젝트를 파괴했을 때 기본으로 지급되는 조각 개수 (그 오브젝트 종류의 조각)
+    [SerializeField] private int pieceReward = 1; // 이 오브젝트를 파괴했을 때 기본으로 지급되는 조각 개수
     [SerializeField] private float doubleClickDelaySeconds = 0.08f; // 더블클릭의 두 번째 타격이 첫 타격보다 이만큼 늦게 나옴
     [SerializeField] private bool swingOnSurface; // 켜두면 무기 타격 연출이 테두리가 아니라 오브젝트 면(안쪽) 아무 데나 나타남 - 책상처럼 화면을 크게 덮는 오브젝트용
     [SerializeField] private int fixedObjectIndex = -1; // -1이면 지금 장착 중인 오브젝트(가운데서 화살표로 스왑되는 것). 0 이상이면 그 인덱스 오브젝트 전용(해금돼서 옆에 놓인 것)

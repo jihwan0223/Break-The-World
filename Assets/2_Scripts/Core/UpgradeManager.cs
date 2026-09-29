@@ -228,24 +228,6 @@ public class UpgradeManager : MonoBehaviour
 
     public int GetLevel(string nodeId) => _levels.TryGetValue(nodeId, out int level) ? level : 0;
 
-    public int GetMaxLevel(string nodeId)
-    {
-        UpgradeNode node = GetNode(nodeId);
-        return node != null ? node.maxLevel : 0;
-    }
-
-    public string GetDisplayName(string nodeId)
-    {
-        UpgradeNode node = GetNode(nodeId);
-        return node != null ? node.displayName : "";
-    }
-
-    public string GetDescription(string nodeId)
-    {
-        UpgradeNode node = GetNode(nodeId);
-        return node != null ? node.description : "";
-    }
-
     // 다음 레벨 비용 (없거나 최대면 null)
     public PieceCost[] GetNextCost(string nodeId)
     {
@@ -284,7 +266,7 @@ public class UpgradeManager : MonoBehaviour
     public string LockedTargetHintText(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId); // 이 노드가 가리키는 오브젝트/무기를 찾기 위함
-        if (node == null) return "아직 해금할 수 없습니다"; // 못 찾으면 예전 문구로 대체
+        if (node == null) return "아직 해금할 수 없습니다"; // 못 찾으면 기본 문구로 대체
 
         if (IsTargetObjectLocked(node))
             return ObjectManager.Instance.NextRequiredUnlockHintText(node.targetObjectIndex);

@@ -13,7 +13,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(RectTransform))]
 public class UpgradeTreeLink : MonoBehaviour
 {
-    [SerializeField] private RectTransform fromNode; // 선행(부모) 노드 (1번째, 기존 씬 데이터 호환용 필드)
+    [SerializeField] private RectTransform fromNode; // 선행(부모) 노드 (1번째)
     [SerializeField] private RectTransform[] extraFromNodes = System.Array.Empty<RectTransform>(); // 추가 선행 노드(2번째부터) - fromNode와 합쳐 하나라도(OR) 충족되면 toNode가 열림
     [SerializeField] private RectTransform toNode;   // 이 링크가 가리키는 자식 노드
     [SerializeField] private UpgradeManager.LinkRouting routing = UpgradeManager.LinkRouting.Straight; // 선 모양 (모든 선행 노드에 공통 적용)
@@ -29,7 +29,6 @@ public class UpgradeTreeLink : MonoBehaviour
     private bool _dirty = true;
 
     // UpgradeManager/ObjectEconomyNodeUI가 선행관계(누가 누구의 선행인지)를 이 선으로 판단함
-    public RectTransform FromNode => fromNode; // 기존 코드 호환용 - 첫번째 선행 노드만 필요할 때 씀
     public RectTransform ToNode => toNode;
 
     // 이 링크가 요구하는 모든 선행 노드 (fromNode + extraFromNodes, null 제외)
