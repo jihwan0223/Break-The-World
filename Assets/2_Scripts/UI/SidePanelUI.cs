@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 [RequireComponent(typeof(UIDocument))]
@@ -18,7 +19,7 @@ public class SidePanelUI : MonoBehaviour
     [SerializeField] private GameObject upgradeTreePanel;
 
     private VisualElement _panel; // 튀어나오는 빈 팝업 패널 (Weapon/Object 전용)
-    private Label _panelTitle; // 팝업 좌상단 제목 ("Weapon" / "Object")
+    private Label _panelTitle; // 팝업 가운데 위 제목 ("무기" / "도감")
     private VisualElement _weaponContent; // 무기 팝업일 때만 보이는 영역
     private VisualElement _objectContent; // 오브젝트 팝업일 때만 보이는 영역
     private BrowseState _weaponBrowse = new BrowseState(); // 무기 화살표 미리보기 상태
@@ -52,6 +53,16 @@ public class SidePanelUI : MonoBehaviour
 
         // Canvas 업그레이드 화면이 열리고 닫힐 때도 버튼 줄을 같이 숨기고 보여주기 위해 구독
         UpgradeTreeUI.OnTreeToggled += HandleUpgradeTreeToggled;
+    }
+
+    // ESC로 지금 열려있는 창(무기/도감 팝업, 디버그, 업그레이드 화면) 닫기
+    void Update()
+    {
+        if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
+
+        if (_panel.style.display == DisplayStyle.Flex) ClosePanel();
+        else if (_debugPanel.style.display == DisplayStyle.Flex) CloseDebugPanel();
+        else if (_upgradeTreeOpen) UpgradeTreeUI.Instance?.Close();
     }
 
     void OnDisable()
@@ -101,22 +112,11 @@ public class SidePanelUI : MonoBehaviour
 
         // 화면 전체를 꽉 채우는 팝업 패널 - 업그레이드 화면과 동일하게 전체화면으로 덮고 X 버튼으로 닫음
         _panel = CreatePopupFrame(ClosePanel, out _panelTitle);
+        // 무기/도감 팝업은 무늬 없는 단색 배경 (색은 OpenPanel에서 팝업마다 지정)
+        _panel.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+        _panel.Q("pattern").RemoveFromHierarchy();
 
-        _weaponContent = BuildSelectorSection(
-            _weaponBrowse,
-            () => WeaponManager.Instance != null ? WeaponManager.Instance.WeaponCount : 0,
-            index => WeaponManager.Instance != null ? WeaponManager.Instance.GetWeaponAt(index).weaponName : "",
-            index => WeaponManager.Instance != null ? WeaponManager.Instance.GetWeaponAt(index).icon : null,
-            () => WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : 0,
-            index =>
-            {
-                Debug.Log("무기 선택 버튼 눌림");
-                WeaponManager.Instance?.Equip(index);
-            },
-            out _refreshWeaponSelector,
-            index => WeaponManager.Instance != null && !WeaponManager.Instance.IsUnlocked(index),
-            getBuyCost: index => WeaponManager.Instance != null && WeaponManager.Instance.IsUnlockOrderMet(index) ? WeaponManager.Instance.GetUnlockCost(index) : -1,
-            onBuy: index => WeaponManager.Instance != null && WeaponManager.Instance.TryUnlock(index));
+        _weaponContent = BuildWeaponSection(out _refreshWeaponSelector);
         _panel.Add(_weaponContent);
 
         _objectContent = BuildSelectorSection(
@@ -207,10 +207,9 @@ public class SidePanelUI : MonoBehaviour
         panel.style.backgroundColor = new Color(0.08f, 0.08f, 0.1f, 1f); // 업그레이드 화면처럼 불투명 단색(검정 대신 짙은 남색조)
 
         // 밋밋한 단색 대신 위쪽이 살짝 밝은 남색 그라데이션을 깔고, 그 위에 은은한 십자 점 무늬를 반복해서 깔아 꾸밈 (이미지 파일 없이 코드로 그림)
-        panel.style.backgroundImage = new StyleBackground(MakeTexture(1, 64, (x, y) =>
-            Color.Lerp(new Color(0.03f, 0.04f, 0.08f), new Color(0.13f, 0.16f, 0.26f), y / 63f).linear, FilterMode.Bilinear, TextureWrapMode.Clamp)); // .linear: 텍스처 색은 감마 보정 없이 그려져서 그냥 쓰면 훨씬 밝게 보임
+        panel.style.backgroundImage = GradientBackground(new Color(0.03f, 0.04f, 0.08f), new Color(0.13f, 0.16f, 0.26f));
 
-        var pattern = new VisualElement(); // 무늬 층 - 클릭은 통과시킴
+        var pattern = new VisualElement { name = "pattern" }; // 무늬 층 - 클릭은 통과시킴 (무기 팝업에서는 숨김)
         pattern.pickingMode = PickingMode.Ignore;
         pattern.style.position = Position.Absolute;
         pattern.style.left = 0;
@@ -232,10 +231,14 @@ public class SidePanelUI : MonoBehaviour
         panel.RegisterCallback<PointerEnterEvent>(_ => UIPointerGuard.IsPointerOverUI = true);
         panel.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
 
+        // 제목은 가운데 위 - 좌상단은 조각/결정 표시(PieceUI)가 항상 위에 떠 있어서 겹침
         titleLabel = new Label();
+        titleLabel.pickingMode = PickingMode.Ignore;
         titleLabel.style.position = Position.Absolute;
         titleLabel.style.top = 16;
-        titleLabel.style.left = 16;
+        titleLabel.style.left = 0;
+        titleLabel.style.right = 0;
+        titleLabel.style.unityTextAlign = TextAnchor.UpperCenter;
         titleLabel.style.fontSize = 22;
         titleLabel.style.color = Color.white;
         titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
@@ -260,6 +263,10 @@ public class SidePanelUI : MonoBehaviour
 
         return panel;
     }
+
+    // 아래(bottom) -> 위(top)로 이어지는 세로 그라데이션 배경. .linear: 텍스처 색은 감마 보정 없이 그려져서 그냥 쓰면 훨씬 밝게 보임
+    private static StyleBackground GradientBackground(Color bottom, Color top) =>
+        new StyleBackground(MakeTexture(1, 64, (x, y) => Color.Lerp(bottom, top, y / 63f).linear, FilterMode.Bilinear, TextureWrapMode.Clamp));
 
     // 픽셀마다 색을 계산해 작은 텍스처를 만듦 - 팝업 배경 장식용. 어두운 색에서 8비트 단계가 띠로 보이지 않도록 Half 포맷 사용
     private static Texture2D MakeTexture(int width, int height, System.Func<int, int, Color> pixel, FilterMode filter, TextureWrapMode wrap)
@@ -295,7 +302,8 @@ public class SidePanelUI : MonoBehaviour
         {
             CurrencyManager.Instance?.ResetAll();
             DebrisPool.Instance?.ClearAll();
-            return "조각과 결정을 0으로 되돌렸습니다";
+            if (PieceTutorial.Instance != null) PieceTutorial.Instance.Done = false; // 첫 파편 튜토리얼도 다시 볼 수 있게
+            return "조각과 결정을 0으로 되돌렸습니다 (첫 파편 튜토리얼 다시 나옴)";
         });
         AddDebugButton(list, "전체 해금", () =>
         {
@@ -385,9 +393,7 @@ public class SidePanelUI : MonoBehaviour
         System.Action<int> onSelect,
         out System.Action refresh,
         System.Func<int, bool> isLocked = null, // 잠긴 항목인지 - null이면 잠김 개념 자체가 없음
-        System.Func<int, (string label, string value, Color color)[]> getInfoRows = null, // Object 패널에서만 씀 - 도감 정보 카드의 (항목, 값, 값 색) 줄들. null이면 카드 없음
-        System.Func<int, long> getBuyCost = null, // Weapon 패널에서만 씀 - 잠긴 항목을 지금 살 수 있으면 가격, 아니면 -1
-        System.Func<int, bool> onBuy = null) // Weapon 패널에서만 씀 - 잠긴 항목 구매 시도 (성공하면 true)
+        System.Func<int, (string label, string value, Color color)[]> getInfoRows = null) // 도감 정보 카드의 (항목, 값, 값 색) 줄들. null이면 카드 없음
     {
         var content = new VisualElement();
         content.style.position = Position.Absolute;
@@ -450,7 +456,7 @@ public class SidePanelUI : MonoBehaviour
         previewImage.scaleMode = ScaleMode.ScaleToFit;
 
         // 미리보기 액자 - 반투명 어두운 판에 테두리를 둘러 도감 진열칸처럼 보이게 함
-        previewImage.style.backgroundColor = new Color(0.55f, 0.6f, 0.8f, 0.1f); // 어두운 배경 위에서도 새까만 그림자 모양이 보이도록 살짝 밝은 판
+        previewImage.style.backgroundColor = CollectionPreviewColor;
         previewImage.style.borderTopWidth = 3;
         previewImage.style.borderBottomWidth = 3;
         previewImage.style.borderLeftWidth = 3;
@@ -474,7 +480,7 @@ public class SidePanelUI : MonoBehaviour
         infoCard.style.paddingBottom = 10;
         infoCard.style.paddingLeft = 24;
         infoCard.style.paddingRight = 24;
-        infoCard.style.backgroundColor = new Color(0.03f, 0.04f, 0.08f, 0.8f);
+        infoCard.style.backgroundColor = CollectionPanelColor;
         infoCard.style.borderTopWidth = 3;
         infoCard.style.borderBottomWidth = 3;
         infoCard.style.borderLeftWidth = 3;
@@ -492,12 +498,7 @@ public class SidePanelUI : MonoBehaviour
         selectButton.clicked += () =>
         {
             if (isLocked != null && isLocked(browse.index))
-            {
-                // 잠긴 항목은 선택 대신 구매 (무기). 오브젝트는 onBuy가 없어서 업그레이드 트리에서 먼저 해금해야 함
-                if (onBuy != null && onBuy(browse.index))
-                    redraw();
-                return;
-            }
+                return; // 잠긴 오브젝트는 여기서 선택 안 됨 - 업그레이드 트리에서 먼저 해금해야 함
 
             onSelect(browse.index);
             redraw();
@@ -542,13 +543,231 @@ public class SidePanelUI : MonoBehaviour
         content.Add(arrowRow);
 
         // 외부(Start, OpenPanel)에서 필요할 때마다 최신 상태로 다시 그릴 수 있도록 넘겨줌
-        redraw = () => RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, infoCard, getName, getIcon, getEquippedIndex, getInfoRows, browse.index, isLocked, getBuyCost);
+        redraw = () => RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, infoCard, getName, getIcon, getEquippedIndex, getInfoRows, browse.index, isLocked);
         refresh = redraw;
 
         return content;
     }
 
-    private static readonly Color InfoBorderColor = new Color(0.32f, 0.38f, 0.55f); // 도감 카드/미리보기 액자 테두리색
+    // 도감 팝업 색 - 짙은 청록 단색 배경에 청록 테두리
+    private static readonly Color CollectionBackgroundColor = new Color(0.05f, 0.12f, 0.13f);
+    private static readonly Color InfoBorderColor = new Color(0.28f, 0.6f, 0.58f); // 도감 카드/미리보기 액자 테두리색
+    private static readonly Color CollectionPanelColor = new Color(0.02f, 0.06f, 0.07f, 0.85f); // 도감 정보 카드 판
+    private static readonly Color CollectionPreviewColor = new Color(0.5f, 0.9f, 0.85f, 0.08f); // 도감 미리보기 판 - 검은 실루엣이 보이도록 살짝 밝게
+    private static readonly Color EquippedBorderColor = new Color(1f, 0.8f, 0.3f); // 무기 슬롯 - 장착 중인 무기 테두리색
+    // 무기 팝업 색 - 짙은 차콜 단색 배경에 강철색 테두리
+    private static readonly Color WeaponBackgroundColor = new Color(0.1f, 0.11f, 0.13f);
+    private static readonly Color WeaponBorderColor = new Color(0.62f, 0.67f, 0.74f);
+    private static readonly Color WeaponPanelColor = new Color(0.05f, 0.06f, 0.07f, 0.85f); // 정보 카드 판
+    private static readonly Color WeaponPreviewColor = new Color(0.8f, 0.85f, 0.95f, 0.08f); // 미리보기/슬롯 판 - 검은 실루엣이 보이도록 살짝 밝게
+    private static readonly Color GoodColor = new Color(0.5f, 0.9f, 0.5f); // 장착 중/해금 완료 표시색
+    private static readonly Color BadColor = new Color(0.95f, 0.45f, 0.4f); // 잠김 표시색
+    private static readonly Color HiddenColor = new Color(0.5f, 0.52f, 0.6f); // ???로 가린 값의 색
+
+    // 테두리 + 둥근 모서리를 한 번에 입힘
+    private static void SetFrame(VisualElement element, Color borderColor, float borderWidth, float radius)
+    {
+        element.style.borderTopWidth = borderWidth;
+        element.style.borderBottomWidth = borderWidth;
+        element.style.borderLeftWidth = borderWidth;
+        element.style.borderRightWidth = borderWidth;
+        element.style.borderTopColor = borderColor;
+        element.style.borderBottomColor = borderColor;
+        element.style.borderLeftColor = borderColor;
+        element.style.borderRightColor = borderColor;
+        element.style.borderTopLeftRadius = radius;
+        element.style.borderTopRightRadius = radius;
+        element.style.borderBottomLeftRadius = radius;
+        element.style.borderBottomRightRadius = radius;
+    }
+
+    // 무기 팝업: 좌우 화살표 사이에 [큰 미리보기 | 이름 + 정보 카드 + 장착/해금 버튼], 아래에 무기 10칸 슬롯 줄
+    private VisualElement BuildWeaponSection(out System.Action refresh)
+    {
+        var content = new VisualElement();
+        content.style.position = Position.Absolute;
+        content.style.left = 16;
+        content.style.right = 16;
+        content.style.top = 60;
+        content.style.bottom = 16;
+        content.style.display = DisplayStyle.None;
+
+        System.Action redraw = null; // 현재 _weaponBrowse.index 기준으로 전체를 다시 그림 (아래 끝에서 채움)
+
+        // 가운데 줄: < [미리보기] [이름/카드/버튼] >
+        var mainRow = new VisualElement();
+        mainRow.style.flexGrow = 1;
+        mainRow.style.flexDirection = FlexDirection.Row;
+        mainRow.style.alignItems = Align.Center;
+        mainRow.style.justifyContent = Justify.SpaceBetween;
+
+        var prevButton = new Button(() => { _weaponBrowse.index = Mathf.Max(0, _weaponBrowse.index - 1); redraw(); }) { text = "<" };
+        var nextButton = new Button(() => { _weaponBrowse.index = Mathf.Min(WeaponCount() - 1, _weaponBrowse.index + 1); redraw(); }) { text = ">" };
+        // 화살표는 배경/테두리 없이 큰 글자만 (닫기 X 버튼과 같은 방식)
+        foreach (Button arrow in new[] { prevButton, nextButton })
+        {
+            arrow.style.width = 140;
+            arrow.style.height = 220;
+            arrow.style.fontSize = 140;
+            arrow.style.unityFontStyleAndWeight = FontStyle.Bold;
+            arrow.style.color = Color.white;
+            arrow.style.backgroundColor = Color.clear;
+            SetFrame(arrow, Color.clear, 0, 0);
+        }
+
+        var center = new VisualElement();
+        center.style.flexDirection = FlexDirection.Row;
+        center.style.alignItems = Align.Center;
+
+        const float previewSize = 560f; // 미리보기 액자 한 변
+        var preview = new Image { scaleMode = ScaleMode.ScaleToFit };
+        preview.style.width = previewSize;
+        preview.style.height = previewSize;
+        preview.style.marginRight = 60;
+        preview.style.backgroundColor = WeaponPreviewColor;
+        SetFrame(preview, WeaponBorderColor, 3, 14);
+
+        var side = new VisualElement();
+        side.style.width = 480;
+
+        var nameLabel = new Label();
+        nameLabel.style.fontSize = 40;
+        nameLabel.style.color = Color.white;
+        nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+        nameLabel.style.marginBottom = 20;
+
+        var card = new VisualElement();
+        card.style.paddingTop = 24;
+        card.style.paddingBottom = 10;
+        card.style.paddingLeft = 24;
+        card.style.paddingRight = 24;
+        card.style.marginBottom = 24;
+        card.style.backgroundColor = WeaponPanelColor;
+        SetFrame(card, WeaponBorderColor, 3, 8);
+
+        var actionButton = new Button();
+        actionButton.style.height = 64;
+        actionButton.style.fontSize = 24;
+        actionButton.style.unityFontStyleAndWeight = FontStyle.Bold;
+        actionButton.style.color = Color.white;
+        actionButton.style.marginLeft = 0;
+        actionButton.style.marginRight = 0;
+        SetFrame(actionButton, WeaponBorderColor, 2, 8);
+        actionButton.clicked += () =>
+        {
+            WeaponManager weapons = WeaponManager.Instance; // 장착/해금 처리
+            if (weapons == null) return;
+
+            int index = _weaponBrowse.index; // 지금 보고 있는 무기
+            if (weapons.IsUnlocked(index)) weapons.Equip(index);
+            else weapons.TryUnlock(index);
+            redraw();
+        };
+
+        side.Add(nameLabel);
+        side.Add(card);
+        side.Add(actionButton);
+        center.Add(preview);
+        center.Add(side);
+
+        mainRow.Add(prevButton);
+        mainRow.Add(center);
+        mainRow.Add(nextButton);
+        content.Add(mainRow);
+
+        // 아래 줄: 무기 슬롯 10칸 - 누르면 그 무기로 바로 이동
+        var slotRow = new VisualElement();
+        slotRow.style.flexDirection = FlexDirection.Row;
+        slotRow.style.justifyContent = Justify.Center;
+        slotRow.style.marginBottom = 12;
+
+        var slots = new List<Image>(); // 무기 순서대로 슬롯 이미지
+        for (int i = 0; i < WeaponCount(); i++)
+        {
+            int index = i; // 클로저용 복사
+            var slot = new Image { scaleMode = ScaleMode.ScaleToFit };
+            slot.style.width = 96;
+            slot.style.height = 96;
+            slot.style.marginLeft = 6;
+            slot.style.marginRight = 6;
+            slot.style.backgroundColor = WeaponPreviewColor;
+            slot.RegisterCallback<ClickEvent>(_ => { _weaponBrowse.index = index; redraw(); });
+            slots.Add(slot);
+            slotRow.Add(slot);
+        }
+        content.Add(slotRow);
+
+        redraw = () => RefreshWeaponSection(prevButton, nextButton, preview, nameLabel, card, actionButton, slots);
+        refresh = redraw;
+        return content;
+    }
+
+    private static int WeaponCount() => WeaponManager.Instance != null ? WeaponManager.Instance.WeaponCount : 0;
+
+    private void RefreshWeaponSection(Button prevButton, Button nextButton, Image preview, Label nameLabel,
+        VisualElement card, Button actionButton, List<Image> slots)
+    {
+        WeaponManager weapons = WeaponManager.Instance; // 무기 데이터/해금 상태 조회
+        if (weapons == null) return;
+
+        int index = Mathf.Clamp(_weaponBrowse.index, 0, weapons.WeaponCount - 1); // 지금 보고 있는 무기
+        _weaponBrowse.index = index;
+        WeaponData data = weapons.GetWeaponAt(index);
+
+        bool unlocked = weapons.IsUnlocked(index);
+        bool equipped = weapons.EquippedIndex == index;
+        bool buyable = !unlocked && weapons.IsUnlockOrderMet(index); // 바로 다음에 살 수 있는 무기
+        bool hidden = !unlocked && !buyable; // 아직 살 수도 없는 무기는 이름/수치를 가림
+
+        prevButton.SetEnabled(index > 0);
+        nextButton.SetEnabled(index < weapons.WeaponCount - 1);
+
+        preview.sprite = data.icon;
+        preview.tintColor = unlocked ? Color.white : Color.black; // 잠긴 무기는 검은 실루엣
+        nameLabel.text = hidden ? "???" : data.weaponName;
+
+        int bonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetClickDamageBonus(index) : 0; // 업그레이드로 붙은 데미지
+        long cost = buyable ? weapons.GetUnlockCost(index) : 0; // 해금 가격
+
+        card.Clear();
+        card.Add(CreateInfoRow("공격력", hidden ? "???" : NumberFormatUtil.Format(data.clickDamage), hidden ? HiddenColor : Color.white));
+        card.Add(CreateInfoRow("강화 보너스", hidden ? "???" : $"+{NumberFormatUtil.Format(bonus)}", hidden ? HiddenColor : Color.white));
+        card.Add(CreateInfoRow("클릭당 합계", hidden ? "???" : NumberFormatUtil.Format(data.clickDamage + bonus), hidden ? HiddenColor : Color.white));
+        if (buyable)
+            card.Add(CreateInfoRow("해금 가격", $"{NumberFormatUtil.Format(cost)} 조각", Color.white));
+        card.Add(CreateInfoRow("상태", equipped ? "장착 중" : unlocked ? "해금됨" : "잠김", equipped || unlocked ? GoodColor : BadColor));
+
+        // 버튼: 장착하기 / 장착 중(비활성) / 해금(조각 부족하면 비활성) / 가려진 무기면 숨김
+        actionButton.style.display = hidden ? DisplayStyle.None : DisplayStyle.Flex;
+        if (equipped)
+        {
+            actionButton.text = "장착 중";
+            actionButton.SetEnabled(false);
+            actionButton.style.backgroundColor = WeaponPanelColor;
+        }
+        else if (unlocked)
+        {
+            actionButton.text = "장착하기";
+            actionButton.SetEnabled(true);
+            actionButton.style.backgroundColor = new Color(0.2f, 0.45f, 0.2f, 0.9f);
+        }
+        else
+        {
+            long have = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetPieces() : 0; // 보유 조각
+            actionButton.text = $"해금 ({NumberFormatUtil.Format(cost)} 조각)";
+            actionButton.SetEnabled(have >= cost);
+            actionButton.style.backgroundColor = new Color(0.3f, 0.42f, 0.58f, 0.9f); // 강철 청색 - 배경과 어울리게
+        }
+
+        for (int i = 0; i < slots.Count; i++)
+        {
+            slots[i].sprite = weapons.GetWeaponAt(i).icon;
+            slots[i].tintColor = weapons.IsUnlocked(i) ? Color.white : Color.black;
+            // 장착 중 = 금색, 지금 보고 있는 칸 = 흰색, 나머지 = 기본 테두리
+            Color border = i == weapons.EquippedIndex ? EquippedBorderColor : i == index ? Color.white : WeaponBorderColor;
+            SetFrame(slots[i], border, i == index || i == weapons.EquippedIndex ? 3 : 2, 10);
+        }
+    }
 
     // 도감 카드의 한 줄 - 항목 이름은 왼쪽, 값은 오른쪽 끝
     private VisualElement CreateInfoRow(string label, string value, Color valueColor)
@@ -607,12 +826,10 @@ public class SidePanelUI : MonoBehaviour
         System.Func<int> getEquippedIndex,
         System.Func<int, (string label, string value, Color color)[]> getInfoRows,
         int index,
-        System.Func<int, bool> isLocked = null,
-        System.Func<int, long> getBuyCost = null)
+        System.Func<int, bool> isLocked = null)
     {
-        bool locked = isLocked != null && isLocked(index); // 잠긴 항목인지
-        long buyCost = locked && getBuyCost != null ? getBuyCost(index) : -1; // 잠겼지만 지금 살 수 있으면 가격, 아니면 -1
-        nameLabel.text = locked && buyCost < 0 ? "???" : getName(index); // 아직 살 수도 없는 잠긴 항목은 이름도 가림
+        bool locked = isLocked != null && isLocked(index); // 잠긴 오브젝트인지
+        nameLabel.text = locked ? "???" : getName(index); // 잠긴 오브젝트는 이름도 가림
         previewImage.sprite = getIcon(index);
         previewImage.tintColor = locked ? Color.black : Color.white; // 잠겼으면 완전히 새까만 그림자로 (tint는 그림 색에 곱해지므로 검정이면 안쪽 무늬가 전부 사라지고 모양만 남음)
 
@@ -629,15 +846,6 @@ public class SidePanelUI : MonoBehaviour
         {
             selectButton.style.display = DisplayStyle.None;
             equippedLabel.style.display = DisplayStyle.None;
-            return;
-        }
-
-        // 잠긴 무기: 지금 살 수 있으면 해금 버튼, 아니면 버튼 없음
-        if (locked)
-        {
-            equippedLabel.style.display = DisplayStyle.None;
-            selectButton.style.display = buyCost >= 0 ? DisplayStyle.Flex : DisplayStyle.None;
-            selectButton.text = $"해금 ({NumberFormatUtil.Format(buyCost)} 조각)";
             return;
         }
 
@@ -705,6 +913,7 @@ public class SidePanelUI : MonoBehaviour
         _currentlyOpenContent = contentToShow;
         _weaponContent.style.display = contentToShow == _weaponContent ? DisplayStyle.Flex : DisplayStyle.None;
         _objectContent.style.display = contentToShow == _objectContent ? DisplayStyle.Flex : DisplayStyle.None;
+        _panel.style.backgroundColor = contentToShow == _weaponContent ? WeaponBackgroundColor : CollectionBackgroundColor;
         _panel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility(); // 팝업이 열렸으니 버튼 줄 숨김
 

@@ -5,16 +5,16 @@ using System;
 [Serializable]
 public class SavedUpgrade
 {
-    public string id; // UpgradeManager.UpgradeNode.id ("{템플릿id}#{tier}")
-    public int level; // 그 노드의 레벨
+    public string id;
+    public int level;
 }
 
-// 저장 파일에 그대로 직렬화되는 데이터. JsonUtility로 JSON 문자열로 변환됨
 [Serializable]
 public class SaveData
 {
-    public long pieces; // 보유 중인 통합 조각 개수
+    public long pieces; // 보유 중인 조각 개수
     public long crystals; // 보유 중인 결정 개수
+    public bool pieceTutorialDone; // 첫 파편 튜토리얼(줌인 + 깜빡임)을 이미 봤는지
     public bool[] unlockedObjects; // 오브젝트별 해금 여부 (ObjectManager 리스트 순서, 길이 ObjectManager.ObjectCount)
     public int[] gainLevels; // 오브젝트별 "획득량 증가" 업그레이드 레벨 (ObjectManager 리스트 순서)
     public int weaponIndex; // 장착 중인 무기의 WeaponManager 리스트 인덱스

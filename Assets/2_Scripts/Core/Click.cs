@@ -33,6 +33,7 @@ public class Click : MonoBehaviour
     private readonly List<GameObject> _flyingProjectiles = new List<GameObject>(); // 지금 날아가는 중인 투사체들 - 오브젝트가 꺼질 때 남지 않게 지우려고 기억
     private int _lastClickSoundIndex = -1; // 방금 재생한 사운드 인덱스 (바로 다음 클릭에서 같은 소리가 안 나오게 기억)
     private bool _projectilesLaunched; // 이번 자동클릭 주기에 투사체를 이미 날렸는지
+    private bool _lastHitFromAutoClick; // 마지막 타격이 자동클릭이었는지 - 그 타격으로 부서지면 파편 없이 바로 지급
     private float _autoClickTimer; // 자동클릭 업그레이드의 다음 발동까지 누적된 시간(초)
     private float _autoMineTimer; // 자동채굴 업그레이드의 다음 발동까지 누적된 시간(초)
 
@@ -93,8 +94,8 @@ public class Click : MonoBehaviour
         if (UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.ObjectDoubleDropChance(objectIndex))
             finalPieces *= 2;
 
-        // 보이는 존이면 파편으로 떨어뜨려 주워야 돈이 들어오고, 안 보이는 존(백그라운드 자동클릭)은 바로 지급
-        bool dropOnFloor = !IsZoneHidden && DebrisPool.Instance != null; // 파편으로 떨어뜨릴지 (false면 바로 지급)
+        // 직접 클릭으로 부수면 파편으로 떨어뜨려 주워야 돈이 들어오고, 자동클릭으로 부서지면(보는 존이든 아니든) 바로 지급
+        bool dropOnFloor = !_lastHitFromAutoClick && !IsZoneHidden && DebrisPool.Instance != null; // 파편으로 떨어뜨릴지 (false면 바로 지급)
         if (dropOnFloor)
             DebrisPool.Instance.DropPieces(transform.position, objectIndex, finalPieces);
         else
@@ -132,13 +133,14 @@ public class Click : MonoBehaviour
             index = (index + 1) % clickSounds.Length;
 
         _lastClickSoundIndex = index;
-        _audioSource.PlayOneShot(clickSounds[index]);
+        SfxPlayer.Play(_audioSource, clickSounds[index]);
     }
 
     // 클릭 한 번(플레이어 클릭/자동클릭/더블클릭 추가 타격 공용)의 데미지 계산 + 적용 + 연출.
     // 이미 죽어서 리스폰을 기다리는 중이면 아무것도 하지 않음 (더블클릭/자동클릭이 중복으로 때리는 걸 방지)
-    private void PerformClickHit(bool playWeaponSwing = true, Vector2? swingPoint = null)
+    private void PerformClickHit(bool playWeaponSwing = true, Vector2? swingPoint = null, bool fromAutoClick = false)
     {
+        _lastHitFromAutoClick = fromAutoClick; // TakeDamage에서 바로 죽으면 HandleDied가 이 값을 보고 보상 방식을 정함
         // 바로 부활형 오브젝트가 페이드아웃/부활 대기 중이면, 이 클릭이 씹히지 않게 즉시 되살림
         if (_health.IsDead)
         {
@@ -208,7 +210,7 @@ public class Click : MonoBehaviour
             return;
 
         for (int i = 0; i < clicks; i++)
-            PerformClickHit();
+            PerformClickHit(fromAutoClick: true);
     }
 
     // 화면 옆 밖에서 투사체가 날아와 오브젝트에 맞는 순간 타격을 넣음. 무기 타격 이미지는 대신 투사체라 안 나옴
@@ -220,7 +222,7 @@ public class Click : MonoBehaviour
         Camera cam = Camera.main; // 화면 밖 시작점을 구하려고 필요
         if (cam == null || _collider == null)
         {
-            PerformClickHit();
+            PerformClickHit(fromAutoClick: true);
             yield break;
         }
 
@@ -255,7 +257,7 @@ public class Click : MonoBehaviour
 
         _flyingProjectiles.Remove(projectile);
         Destroy(projectile);
-        PerformClickHit(false);
+        PerformClickHit(false, fromAutoClick: true);
     }
 
     // 투사체가 착지할 자리를 오브젝트 안쪽에서 몇 번 뽑아보고, 자기 자신 말고 다른 오브젝트(책상 위 접시 등)가 없는 자리를 고름.
@@ -326,8 +328,8 @@ public class Click : MonoBehaviour
         if (Mouse.current == null || !Mouse.current.leftButton.wasPressedThisFrame)
             return;
 
-        // 포인터가 UI(무기/오브젝트 팝업 등) 위에 있으면 그 뒤의 월드 오브젝트는 클릭 처리하지 않음
-        if (UIPointerGuard.IsPointerOverUI)
+        // 포인터가 UI(무기/오브젝트 팝업 등) 위에 있거나, 첫 파편 튜토리얼 줌인 중이면 오브젝트 클릭 처리하지 않음
+        if (UIPointerGuard.IsPointerOverUI || PieceTutorial.Active)
             return;
 
         Vector2 screenPos = Mouse.current.position.ReadValue();

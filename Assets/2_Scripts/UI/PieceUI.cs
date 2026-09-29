@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,11 +14,22 @@ public class PieceUI : MonoBehaviour
     [SerializeField] private int sortingOrder = 100; // 업그레이드/무기/오브젝트 화면 위에 그려지도록 높게 잡은 값
 
     private Label _pieceLabel; // 조각 개수를 표시하는 라벨
-    private long _lastAmount; // 직전에 표시했던 조각 개수 (늘었는지 판단용)
-    private Coroutine _pulseCoroutine; // 지금 재생 중인 펄스 연출 (연속으로 늘어날 때 중첩 재생 방지용)
+    private long _lastAmount; // 실제 조각 보유량 (화면 숫자가 따라갈 목표값)
+    private double _shownPieces; // 지금 화면에 보이는 조각 수 - 늘어날 땐 목표값까지 굴러 올라감
+    private bool _shownInitialized; // 처음 값은 굴러 올라가지 않고 바로 표시하기 위한 플래그
+    private const float CountUpSpeed = 8f; // 숫자가 목표값을 따라붙는 속도 (클수록 빨리 따라붙음, 대략 0.4초)
+    private const float CountUpMinPerSecond = 30f; // 차이가 작을 때 최소 초당 올라가는 양 - 작은 획득도 한 칸씩 올라가는 게 보이게
     private Label _crystalLabel; // 결정 개수를 표시하는 라벨
     private long _lastCrystals; // 직전에 표시했던 결정 개수 (늘었는지 판단용)
-    private Coroutine _crystalPulseCoroutine; // 결정 라벨의 펄스 연출
+
+    // 라벨 하나의 펄스 대기열 - 연속으로 늘어나면(빗자루로 줍는 중 등) 커졌다 작아졌다를 끊기지 않고 반복
+    private class PulseState
+    {
+        public int queued; // 지금 재생 중인 것 다음에 이어서 재생할 횟수
+        public bool running; // 재생 코루틴이 돌고 있는지
+    }
+    private const int MaxQueuedPulses = 1; // 미리 쌓아두는 펄스 수 상한 - 줍기를 멈추면 바로 멈추도록 작게
+    private readonly Dictionary<Label, PulseState> _pulses = new Dictionary<Label, PulseState>(); // 라벨별 펄스 대기열
 
     void OnEnable()
     {
@@ -108,31 +120,65 @@ public class PieceUI : MonoBehaviour
         _lastCrystals = amount;
 
         if (increased)
-        {
-            if (_crystalPulseCoroutine != null)
-                StopCoroutine(_crystalPulseCoroutine);
+            QueuePulse(_crystalLabel);
+    }
 
-            _crystalPulseCoroutine = StartCoroutine(PlayPieceGainPulse(_crystalLabel));
+    // 늘어날 때마다 펄스를 한 번 예약 - 이미 재생 중이면 끝난 뒤 이어서 재생
+    private void QueuePulse(Label label)
+    {
+        if (!_pulses.TryGetValue(label, out PulseState state))
+            _pulses[label] = state = new PulseState();
+
+        if (!state.running)
+        {
+            state.queued = 1;
+            StartCoroutine(RunPulses(label, state));
+        }
+        else
+        {
+            state.queued = Mathf.Min(state.queued + 1, MaxQueuedPulses);
         }
     }
 
-    // 조각 보유량이 바뀔 때마다 라벨 갱신 + 늘어났을 때 펄스 연출 재생
+    private IEnumerator RunPulses(Label label, PulseState state)
+    {
+        state.running = true;
+        while (state.queued > 0)
+        {
+            state.queued--;
+            yield return PlayPieceGainPulse(label);
+        }
+        state.running = false;
+    }
+
+    // 조각 보유량이 바뀔 때마다 목표값 갱신 - 늘어난 건 Update에서 숫자가 굴러 올라가듯 따라가고(좌라락), 줄어든 건(구매/초기화) 바로 반영
     private void UpdatePieceLabel(long amount)
     {
-        _pieceLabel.text = $"조각: {NumberFormatUtil.Format(amount)}";
-
         bool increased = amount > _lastAmount;
         _lastAmount = amount;
 
-        if (increased)
+        if (!increased || !_shownInitialized)
         {
-            // 이미 재생 중인 펄스가 있으면(연속으로 빠르게 늘어날 때) 멈추고 처음부터 다시 재생해서 크기가 안 꼬이게 함
-            if (_pulseCoroutine != null)
-                StopCoroutine(_pulseCoroutine);
-
-            _pulseCoroutine = StartCoroutine(PlayPieceGainPulse(_pieceLabel));
+            _shownPieces = amount;
+            _shownInitialized = true;
+            SetPieceText();
         }
     }
+
+    void Update()
+    {
+        if (_shownPieces >= _lastAmount) return;
+
+        // 남은 차이를 매 프레임 일정 비율씩 줄여 빠르게 따라붙고, 차이가 작을 땐 최소 속도로 한 칸씩 올라감
+        float dt = Time.unscaledDeltaTime; // 업그레이드 창 등으로 timeScale이 0이어도 올라가게
+        double gap = _lastAmount - _shownPieces; // 아직 못 따라간 양
+        double step = System.Math.Max(gap * (1 - Mathf.Exp(-CountUpSpeed * dt)), CountUpMinPerSecond * dt); // 이번 프레임에 올릴 양
+        _shownPieces = System.Math.Min(_lastAmount, _shownPieces + step);
+        SetPieceText();
+        QueuePulse(_pieceLabel); // 올라가는 동안 커졌다 작아졌다 반복 (대기열 상한이 있어서 멈추면 곧 멈춤)
+    }
+
+    private void SetPieceText() => _pieceLabel.text = $"조각: {NumberFormatUtil.Format((long)_shownPieces)}";
 
     // 조각을 얻은 라벨이 잠깐 커졌다가(ease-out) 다시 원래 크기로 줄어드는(ease-in) 연출
     private IEnumerator PlayPieceGainPulse(Label label)

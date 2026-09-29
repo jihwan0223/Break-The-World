@@ -40,6 +40,7 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("결정 드랍량 증가")] CrystalAmount,        // 결정이 나올 때 개수 +값
         [InspectorName("자동 줍기 해금")] AutoSweepUnlock,        // 주기마다 바닥을 쓸고 지나가며 파편을 주워주는 기능 해금
         [InspectorName("자동 줍기 주기 단축")] AutoSweepSpeed,    // 자동 줍기 주기 -값 초
+        [InspectorName("자동 줍기 한번에 줍는 수 증가")] AutoSweepCount, // 자동 줍기 한 번 지나갈 때 주울 수 있는 파편 +값 개
     }
 
     // 선행 노드와 잇는 선의 모양 (UpgradeTreeLink가 이 값을 보고 세그먼트를 배치함)
@@ -68,11 +69,12 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private float baseAutoMineInterval = 8f;    // 자동 채굴 기본 주기(초)
     [SerializeField] private float minAutoMineInterval = 2f;     // 자동 채굴 주기 하한
     [SerializeField] private int autoMineTierOffset = 3;         // 지금 캐는 오브젝트보다 몇 단계 전을 자동으로 캘지
-    [SerializeField] private int baseMaxGroundPieces = 10;       // 바닥 파편 최대 개수 기본값 - GroundPieceCap이 위에 더함
+    [SerializeField] private int baseMaxGroundPieces = 400;       // 바닥 파편 최대 개수 기본값 - GroundPieceCap이 위에 더함
     [SerializeField] private float baseCrystalChance = 0.01f;    // 오브젝트 처치 시 결정 기본 확률 (1%) - CrystalChance가 위에 더함
     [SerializeField] private int baseCrystalAmount = 1;          // 결정이 나올 때 기본 개수 - CrystalAmount가 위에 더함
     [SerializeField] private float baseAutoSweepInterval = 20f;  // 자동 줍기 기본 주기(초)
     [SerializeField] private float minAutoSweepInterval = 3f;    // 자동 줍기 주기 하한
+    [SerializeField] private int baseAutoSweepCount = 10;        // 자동 줍기 한 번 지나갈 때 기본으로 주울 수 있는 파편 수 - AutoSweepCount가 위에 더함
 
     // ---- 씬의 UpgradeNodeUI를 읽어 구성한 실제 노드 ----
 
@@ -506,6 +508,8 @@ public class UpgradeManager : MonoBehaviour
 
     public float AutoSweepIntervalSeconds =>
         Mathf.Max(minAutoSweepInterval, baseAutoSweepInterval - SumEffect(UpgradeEffect.AutoSweepSpeed));
+
+    public int AutoSweepPickupCount => baseAutoSweepCount + Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoSweepCount));
 
     // 이 무기를 장착하고 오브젝트를 처치했을 때 추가로 주는 파편 (전역 노드는 targetWeaponIndex -1이라 항상 포함)
     public long WeaponKillBonusPieces(int equippedWeaponIndex)

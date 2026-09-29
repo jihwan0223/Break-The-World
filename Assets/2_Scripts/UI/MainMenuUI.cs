@@ -34,10 +34,10 @@ public class MainMenuUI : MonoBehaviour
     private System.Action _confirmPendingAction; // "예"를 눌렀을 때 실행할 동작 (새 게임 시작 / 게임 종료)
 
     private VisualElement _settingsPanel; // 설정 전체화면 패널 (평소엔 숨김)
-    private VisualElement _volumeWrap; // 음량 슬라이더를 감싼 테두리용 컨테이너 (선택 강조 표시용)
-    private Slider _volumeSlider; // 마스터 음량 슬라이더
+    private readonly List<VisualElement> _sliderWraps = new List<VisualElement>(); // 슬라이더마다 감싼 테두리용 컨테이너 (선택 강조 표시용) - 마스터, 효과음 순
+    private readonly List<Slider> _sliders = new List<Slider>(); // _sliderWraps와 같은 순서의 슬라이더
     private Button _settingsBackButton; // 설정에서 메인 메뉴로 돌아가는 버튼
-    private int _settingsSelectedIndex; // 0=음량 슬라이더, 1=뒤로가기 버튼
+    private int _settingsSelectedIndex; // 0..슬라이더 수-1 = 슬라이더, 슬라이더 수 = 뒤로가기 버튼
 
     // 지금 방향키/엔터 입력을 메인 메뉴/확인창/설정 중 어디로 보낼지
     private enum InputMode { Menu, Confirm, Settings }
@@ -117,18 +117,25 @@ public class MainMenuUI : MonoBehaviour
             loadButton.style.opacity = 0.4f;
         }
 
-        menuColumn.Add(newGameButton);
-        menuColumn.Add(loadButton);
-        menuColumn.Add(settingsButton);
-        menuColumn.Add(quitButton);
-
-        _menuButtons.Add(newGameButton);
-        _menuActions.Add(newGameAction);
-        if (hasSave) // 비활성 버튼은 방향키 이동 대상에서 제외
+        // 저장 파일이 있으면 불러오기를 맨 위에 둬서 기본 선택이 되게 함 (엔터 한 번이면 이어하기)
+        if (hasSave)
         {
+            menuColumn.Add(loadButton);
+            menuColumn.Add(newGameButton);
             _menuButtons.Add(loadButton);
             _menuActions.Add(loadAction);
+            _menuButtons.Add(newGameButton);
+            _menuActions.Add(newGameAction);
         }
+        else
+        {
+            menuColumn.Add(newGameButton);
+            menuColumn.Add(loadButton); // 비활성 상태로 보이기만 하고 방향키 이동 대상에서는 제외
+            _menuButtons.Add(newGameButton);
+            _menuActions.Add(newGameAction);
+        }
+        menuColumn.Add(settingsButton);
+        menuColumn.Add(quitButton);
         _menuButtons.Add(settingsButton);
         _menuActions.Add(settingsAction);
         _menuButtons.Add(quitButton);
@@ -234,6 +241,8 @@ public class MainMenuUI : MonoBehaviour
         overlay.style.alignItems = Align.Center;
         overlay.style.justifyContent = Justify.Center;
         overlay.style.display = DisplayStyle.None;
+        // 확인창 밖(반투명 배경)을 누르면 "아니오"처럼 닫힘
+        overlay.RegisterCallback<ClickEvent>(evt => { if (evt.target == overlay) CloseConfirm(); });
 
         var box = new VisualElement();
         box.style.width = 560;
@@ -299,7 +308,9 @@ public class MainMenuUI : MonoBehaviour
 
     private void HandleConfirmKeyboard(Keyboard kb)
     {
-        if (kb.leftArrowKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame)
+        if (kb.escapeKey.wasPressedThisFrame)
+            CloseConfirm();
+        else if (kb.leftArrowKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame)
         {
             _confirmSelectedIndex = 1 - _confirmSelectedIndex;
             UpdateConfirmSelectionVisual();
@@ -315,69 +326,84 @@ public class MainMenuUI : MonoBehaviour
 
     private VisualElement BuildSettingsPanel()
     {
+        // 확인창처럼 반투명 배경 위 가운데 창 - 창 밖(배경)을 누르면 닫힘
         var panel = new VisualElement();
         panel.style.position = Position.Absolute;
         panel.style.left = 0;
         panel.style.right = 0;
         panel.style.top = 0;
         panel.style.bottom = 0;
-        panel.style.backgroundColor = PanelBg;
+        panel.style.backgroundColor = new Color(0f, 0f, 0f, 0.6f);
+        panel.style.alignItems = Align.Center;
+        panel.style.justifyContent = Justify.Center;
         panel.style.display = DisplayStyle.None;
+        panel.RegisterCallback<ClickEvent>(evt => { if (evt.target == panel) CloseSettings(); });
+
+        var column = new VisualElement(); // 설정 창 본체
+        column.style.paddingTop = 36;
+        column.style.paddingBottom = 20;
+        column.style.paddingLeft = 48;
+        column.style.paddingRight = 48;
+        column.style.backgroundColor = PanelBg;
+        column.style.alignItems = Align.Center;
+        SetBorderWidth(column, 2);
+        SetBorderColor(column, BorderColor);
+        SetBorderRadius(column, 10);
+        panel.Add(column);
 
         var title = new Label("설정");
-        title.style.position = Position.Absolute;
-        title.style.top = Length.Percent(18);
-        title.style.left = 0;
-        title.style.right = 0;
         title.style.fontSize = 44;
         title.style.unityFontStyleAndWeight = FontStyle.Bold;
         title.style.color = Color.white;
-        title.style.unityTextAlign = TextAnchor.MiddleCenter;
-        panel.Add(title);
+        title.style.marginBottom = 30;
+        column.Add(title);
 
-        var column = new VisualElement();
-        column.style.position = Position.Absolute;
-        column.style.left = 0;
-        column.style.right = 0;
-        column.style.top = Length.Percent(42);
-        column.style.alignItems = Align.Center;
-        panel.Add(column);
-
-        var volumeLabel = new Label("마스터 음량");
-        volumeLabel.style.fontSize = 24;
-        volumeLabel.style.color = Color.white;
-        volumeLabel.style.marginBottom = 14;
-        column.Add(volumeLabel);
-
-        _volumeWrap = new VisualElement(); // 슬라이더 자체엔 테두리가 안 어울려서, 감싸서 선택 강조 테두리를 줌
-        _volumeWrap.style.paddingTop = 10;
-        _volumeWrap.style.paddingBottom = 10;
-        _volumeWrap.style.paddingLeft = 16;
-        _volumeWrap.style.paddingRight = 16;
-        _volumeWrap.style.marginBottom = 30;
-        SetBorderWidth(_volumeWrap, 3);
-        SetBorderColor(_volumeWrap, Color.clear);
-        SetBorderRadius(_volumeWrap, 8);
-
-        _volumeSlider = new Slider(0f, 1f) { value = PlayerPrefs.GetFloat(MasterVolumeKey, 1f) };
-        _volumeSlider.focusable = false; // 버튼과 같은 이유로 네이티브 포커스/방향키 내비게이션 꺼둠 (좌우 조절은 HandleSettingsKeyboard가 직접 함)
-        _volumeSlider.style.width = 400;
-        AudioListener.volume = _volumeSlider.value; // 시작할 때 저장된 값으로 실제 음량도 맞춤
-        _volumeSlider.RegisterValueChangedCallback(evt =>
+        float masterVolume = PlayerPrefs.GetFloat(MasterVolumeKey, 1f); // 저장된 마스터 음량
+        AudioListener.volume = masterVolume; // 시작할 때 저장된 값으로 실제 음량도 맞춤
+        AddVolumeSlider(column, "마스터 음량", masterVolume, value =>
         {
-            AudioListener.volume = evt.newValue;
-            PlayerPrefs.SetFloat(MasterVolumeKey, evt.newValue);
+            AudioListener.volume = value;
+            PlayerPrefs.SetFloat(MasterVolumeKey, value);
         });
-        _volumeWrap.Add(_volumeSlider);
-        column.Add(_volumeWrap);
+        AddVolumeSlider(column, "효과음 (클릭/파괴 소리)", SfxPlayer.Volume, value => SfxPlayer.Volume = value);
 
         _settingsBackButton = CreateMenuButton("뒤로가기", CloseSettings);
         column.Add(_settingsBackButton);
-
-        _volumeWrap.RegisterCallback<PointerEnterEvent>(_ => { _settingsSelectedIndex = 0; UpdateSettingsSelectionVisual(); });
-        _settingsBackButton.RegisterCallback<PointerEnterEvent>(_ => { _settingsSelectedIndex = 1; UpdateSettingsSelectionVisual(); });
+        _settingsBackButton.RegisterCallback<PointerEnterEvent>(_ => { _settingsSelectedIndex = _sliders.Count; UpdateSettingsSelectionVisual(); });
 
         return panel;
+    }
+
+    // 이름 + 슬라이더 한 줄을 추가 (슬라이더는 선택 강조 테두리용 컨테이너로 감쌈)
+    private void AddVolumeSlider(VisualElement column, string label, float value, System.Action<float> onChanged)
+    {
+        var title = new Label(label);
+        title.style.fontSize = 24;
+        title.style.color = Color.white;
+        title.style.marginBottom = 14;
+        column.Add(title);
+
+        var wrap = new VisualElement(); // 슬라이더 자체엔 테두리가 안 어울려서, 감싸서 선택 강조 테두리를 줌
+        wrap.style.paddingTop = 10;
+        wrap.style.paddingBottom = 10;
+        wrap.style.paddingLeft = 16;
+        wrap.style.paddingRight = 16;
+        wrap.style.marginBottom = 30;
+        SetBorderWidth(wrap, 3);
+        SetBorderColor(wrap, Color.clear);
+        SetBorderRadius(wrap, 8);
+
+        var slider = new Slider(0f, 1f) { value = value };
+        slider.focusable = false; // 버튼과 같은 이유로 네이티브 포커스/방향키 내비게이션 꺼둠 (좌우 조절은 HandleSettingsKeyboard가 직접 함)
+        slider.style.width = 400;
+        slider.RegisterValueChangedCallback(evt => onChanged(evt.newValue));
+        wrap.Add(slider);
+        column.Add(wrap);
+
+        int index = _sliders.Count; // 이 슬라이더의 선택 인덱스
+        wrap.RegisterCallback<PointerEnterEvent>(_ => { _settingsSelectedIndex = index; UpdateSettingsSelectionVisual(); });
+        _sliderWraps.Add(wrap);
+        _sliders.Add(slider);
     }
 
     private void OpenSettings()
@@ -396,25 +422,35 @@ public class MainMenuUI : MonoBehaviour
 
     private void UpdateSettingsSelectionVisual()
     {
-        SetBorderColor(_volumeWrap, _settingsSelectedIndex == 0 ? SelectedColor : Color.clear);
-        SetBorderColor(_settingsBackButton, _settingsSelectedIndex == 1 ? SelectedColor : Color.clear);
+        for (int i = 0; i < _sliderWraps.Count; i++)
+            SetBorderColor(_sliderWraps[i], _settingsSelectedIndex == i ? SelectedColor : Color.clear);
+        SetBorderColor(_settingsBackButton, _settingsSelectedIndex == _sliders.Count ? SelectedColor : Color.clear);
     }
 
     private void HandleSettingsKeyboard(Keyboard kb)
     {
-        if (kb.upArrowKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame)
+        int itemCount = _sliders.Count + 1; // 슬라이더들 + 뒤로가기 버튼
+        bool onSlider = _settingsSelectedIndex < _sliders.Count; // 지금 슬라이더가 선택돼 있는지
+
+        if (kb.escapeKey.wasPressedThisFrame)
         {
-            _settingsSelectedIndex = 1 - _settingsSelectedIndex;
+            CloseSettings();
+        }
+        else if (kb.upArrowKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame)
+        {
+            int step = kb.downArrowKey.wasPressedThisFrame ? 1 : -1; // 위/아래 이동 방향
+            _settingsSelectedIndex = (_settingsSelectedIndex + step + itemCount) % itemCount;
             UpdateSettingsSelectionVisual();
         }
-        else if (_settingsSelectedIndex == 0 && (kb.leftArrowKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame))
+        else if (onSlider && (kb.leftArrowKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame))
         {
             float delta = kb.rightArrowKey.wasPressedThisFrame ? VolumeStep : -VolumeStep; // 슬라이더가 선택돼 있을 땐 좌우 방향키로 값 조절
-            _volumeSlider.value = Mathf.Clamp01(_volumeSlider.value + delta); // value 대입이 곧 RegisterValueChangedCallback을 태워서 저장까지 됨
+            Slider slider = _sliders[_settingsSelectedIndex];
+            slider.value = Mathf.Clamp01(slider.value + delta); // value 대입이 곧 RegisterValueChangedCallback을 태워서 저장까지 됨
         }
         else if (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
         {
-            if (_settingsSelectedIndex == 1)
+            if (!onSlider)
                 CloseSettings();
         }
     }

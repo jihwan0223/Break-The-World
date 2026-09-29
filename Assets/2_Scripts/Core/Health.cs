@@ -132,7 +132,7 @@ public class Health : MonoBehaviour
                 : ObjectManager.Instance.CurrentObject.breakSound;
         }
         if (breakSound != null && !(ZoneManager.Instance != null && ZoneManager.Instance.IsHidden(transform))) // 안 보이는 존이면 소리 안 냄
-            _audioSource.PlayOneShot(breakSound);
+            SfxPlayer.Play(_audioSource, breakSound, priority: true);
 
         // 파편은 Click.HandleDied가 "획득한 조각 수만큼" 떨어뜨림 (여기서 안 함)
 

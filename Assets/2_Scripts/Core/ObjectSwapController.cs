@@ -56,7 +56,7 @@ public class ObjectSwapController : MonoBehaviour
 
         // 날아간(기존) 오브젝트가 사라지는 시점에 그 오브젝트의 파괴 사운드 재생
         if (oldObject != null && oldObject.breakSound != null)
-            _audioSource.PlayOneShot(oldObject.breakSound);
+            SfxPlayer.Play(_audioSource, oldObject.breakSound, priority: true);
 
         // 화면 중앙(오브젝트가 있던 깊이 기준)으로 순간 이동
         transform.position = GetScreenCenterWorldPosition();

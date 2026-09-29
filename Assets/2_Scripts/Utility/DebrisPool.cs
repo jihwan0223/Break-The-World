@@ -30,6 +30,10 @@ public class DebrisPool : MonoBehaviour
         public bool isCrystal; // 결정인지 (결정은 바닥 최대 개수에 안 들어감)
         public int zone; // 떨어진 존 번호 (그 존을 보고 있을 때만 보이고 주울 수 있음)
         public bool landed; // 착지를 마쳤는지
+        public bool expiring; // 바닥 최대 개수를 넘어서 새 파편에 덮여 교체될 예정인지 (최대 개수 계산에서 빠짐)
+        public int generation; // 풀에서 꺼낼 때마다 1씩 늘어남 - 교체 대기 중에 주워져서 다른 파편으로 재사용됐는지 구분용
+        public Piece replaces; // 이 파편이 착지하면서 덮어 없앨 오래된 파편 (없으면 null)
+        public int replacesGeneration; // 그 오래된 파편의 generation - 떨어지는 사이 주워졌는지 확인용
     }
 
     private readonly List<Piece> _groundPieces = new List<Piece>(); // 지금 바닥에 있거나 떨어지는 중인 파편들
@@ -38,8 +42,15 @@ public class DebrisPool : MonoBehaviour
     private Color _currentColor = Color.white; // ObjectManager를 못 찾을 때 폴백으로 쓸 색
     private Sprite _fallbackSprite; // pieceSprites가 비어있을 때 대신 쓸 흰색 정사각형 스프라이트
 
+    // 오브젝트를 부숴 파편을 새로 떨어뜨릴 때마다 그 파편들을 전달 (결정 제외) - 첫 파편 튜토리얼 등이 구독
+    public event System.Action<IReadOnlyList<Transform>> OnPiecesDropped;
+    // 파편(결정 포함)을 주울 때마다 그 파편을 전달
+    public event System.Action<Transform> OnPieceCollected;
+
+    public float FallDuration => fallDuration; // 부서진 지점에서 바닥까지 떨어지는 시간(초)
+
     private int CurrentZone => ZoneManager.Instance != null ? ZoneManager.Instance.CurrentZone : 0; // 지금 보고 있는 존
-    private int MaxGroundPieces => UpgradeManager.Instance != null ? UpgradeManager.Instance.MaxGroundPieces : 10; // 한 존 바닥에 동시에 있을 수 있는 파편 수
+    private int MaxGroundPieces => UpgradeManager.Instance != null ? UpgradeManager.Instance.MaxGroundPieces : 400; // 한 존 바닥에 동시에 있을 수 있는 파편 수
 
     void Awake()
     {
@@ -86,32 +97,55 @@ public class DebrisPool : MonoBehaviour
 
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
 
-        // 파편은 오브젝트보다 앞에 그려져서 Click.TopmostAt도 파편을 맨 위로 봄 - 파편을 누르면 뒤 오브젝트는 안 맞음
+        // 파편은 오브젝트보다 앞에 그려져서 Click.TopmostAt도 파편을 맨 위로 봄 - 파편을 누르면 뒤 오브젝트는 안 맞음.
+        // 줍기 판정 원이 그림보다 커서 여러 파편이 겹칠 수 있음 - 그중 중심이 마우스에 가장 가까운 것 하나만 주움
+        Piece nearest = null; // 지금까지 찾은 가장 가까운 파편
+        float nearestDistance = float.MaxValue; // 그 파편까지 거리(제곱)
         foreach (Collider2D hit in Physics2D.OverlapPointAll(worldPos))
         {
-            if (_pieceByCollider.TryGetValue(hit, out Piece piece) && piece.collider.enabled)
+            if (!_pieceByCollider.TryGetValue(hit, out Piece piece) || !piece.collider.enabled) continue;
+
+            float distance = ((Vector2)piece.renderer.transform.position - worldPos).sqrMagnitude;
+            if (distance < nearestDistance)
             {
-                Collect(piece);
-                return; // 한 번 클릭에 하나만 주움
+                nearest = piece;
+                nearestDistance = distance;
             }
         }
+        if (nearest != null) Collect(nearest);
     }
 
-    // 오브젝트를 부쉈을 때 호출 - reward 조각을 파편 여러 개에 나눠 담아 fromPosition에서 떨어뜨림.
-    // 이 존 바닥이 이미 꽉 찼으면 아무것도 안 떨어짐(조각도 못 얻음)
+    // 오브젝트를 부쉈을 때 호출 - reward 조각을 파편 여러 개(최대 maxPiecesPerBreak개)에 나눠 담아 fromPosition에서 떨어뜨림.
+    // 이 존 바닥이 꽉 차 있어도 파편은 계속 떨어지고, 넘친 만큼은 가장 먼저 떨어진 파편 자리로 떨어져 착지하는 순간
+    // 그 파편을 덮어 교체하면서 값을 이어받음 - 사라지는 모습이 안 보이고, 줍기 전에 교체된 값도 남아있어서 놓치는 게 없음
     public void DropPieces(Vector3 fromPosition, int objectIndex, long reward)
     {
-        int zone = CurrentZone; // 떨어뜨릴 존
-        int freeSlots = MaxGroundPieces - CountInZone(zone); // 이 존 바닥에 남은 자리
-        if (freeSlots <= 0 || reward <= 0) return;
+        if (reward <= 0) return;
 
-        int count = (int)System.Math.Min(reward, System.Math.Min(maxPiecesPerBreak, freeSlots)); // 실제로 떨어뜨릴 파편 수
+        int zone = CurrentZone; // 떨어뜨릴 존
+        int count = (int)System.Math.Min(reward, maxPiecesPerBreak); // 나눠 담을 파편 수
         long baseValue = reward / count; // 파편 하나당 기본 값
         long remainder = reward % count; // 나누고 남은 조각 - 앞쪽 파편들에 1개씩 더 얹음
         Color color = PileColorFor(objectIndex);
+        int excess = CountInZone(zone) + count - MaxGroundPieces; // 이번 파편들로 바닥 최대 개수를 넘는 수 = 교체할 오래된 파편 수
 
+        var dropped = new List<Transform>(count); // 이번에 떨어뜨린 파편들
         for (int i = 0; i < count; i++)
-            Spawn(fromPosition, zone, baseValue + (i < remainder ? 1 : 0), false, color, pieceSize);
+        {
+            Piece oldest = i < excess ? OldestLandedPieceInZone(zone) : null; // 이 파편이 덮어 교체할 오래된 파편
+            if (oldest != null) oldest.expiring = true;
+            dropped.Add(Spawn(fromPosition, zone, baseValue + (i < remainder ? 1 : 0), false, color, pieceSize, oldest));
+        }
+
+        OnPiecesDropped?.Invoke(dropped);
+    }
+
+    // 이 존에서 가장 먼저 떨어진, 착지했고 아직 교체될 예정이 아닌 파편 (결정 제외). 없으면 null
+    private Piece OldestLandedPieceInZone(int zone)
+    {
+        foreach (Piece piece in _groundPieces) // 떨어진 순서대로 들어있음
+            if (piece.zone == zone && piece.landed && !piece.isCrystal && !piece.expiring) return piece;
+        return null;
     }
 
     // 결정 하나를 떨어뜨림 (amount개짜리 한 덩어리). 바닥이 꽉 차 있어도 떨어짐
@@ -121,13 +155,18 @@ public class DebrisPool : MonoBehaviour
         Spawn(fromPosition, CurrentZone, amount, true, crystalColor, pieceSize * crystalSizeMultiplier);
     }
 
-    private void Spawn(Vector3 fromPosition, int zone, long value, bool isCrystal, Color color, float size)
+    // replaces가 있으면 그 파편 자리로 떨어져서 착지할 때 덮어 교체함
+    private Transform Spawn(Vector3 fromPosition, int zone, long value, bool isCrystal, Color color, float size, Piece replaces = null)
     {
         Piece piece = _pool.Count > 0 ? _pool.Pop() : CreatePiece();
         piece.value = value;
         piece.isCrystal = isCrystal;
         piece.zone = zone;
         piece.landed = false;
+        piece.expiring = false;
+        piece.generation++;
+        piece.replaces = replaces;
+        piece.replacesGeneration = replaces != null ? replaces.generation : 0;
         piece.renderer.sprite = GetRandomPieceSprite();
         piece.renderer.color = color;
         piece.renderer.sortingOrder = isCrystal ? 11 : 10; // 결정이 파편 더미에 묻히지 않게 위에 그림 (클릭도 우선)
@@ -140,7 +179,9 @@ public class DebrisPool : MonoBehaviour
         piece.collider.radius = Mathf.Max(extents.x, extents.y) * pickupColliderScale;
 
         _groundPieces.Add(piece);
-        StartCoroutine(FallThenSettle(piece, fromPosition, GetLandingPoint(fromPosition, zone)));
+        Vector3 landingPoint = replaces != null ? replaces.renderer.transform.position : GetLandingPoint(fromPosition, zone); // 교체할 파편이 있으면 정확히 그 위로
+        StartCoroutine(FallThenSettle(piece, fromPosition, landingPoint));
+        return piece.renderer.transform;
     }
 
     // 바닥 범위 (자동 줍기가 이 폭을 가로질러 지나감)
@@ -155,16 +196,21 @@ public class DebrisPool : MonoBehaviour
         return false;
     }
 
-    // 지금 보는 존에서 x 이하(왼쪽)에 있는 착지한 파편을 전부 주움 - 자동 줍기가 지나간 자리
-    public void CollectLandedUpTo(float x)
+    // 지금 보는 존에서 x 이하(왼쪽)에 있는 착지한 파편을 최대 maxCount개까지 주움 - 자동 줍기가 지나간 자리. 실제로 주운 개수를 반환
+    public int CollectLandedUpTo(float x, int maxCount)
     {
         int zone = CurrentZone; // 지금 보고 있는 존
-        for (int i = _groundPieces.Count - 1; i >= 0; i--)
+        int collected = 0; // 이번에 주운 개수
+        for (int i = _groundPieces.Count - 1; i >= 0 && collected < maxCount; i--)
         {
             Piece piece = _groundPieces[i];
             if (piece.zone == zone && piece.landed && piece.renderer.transform.position.x <= x)
+            {
                 Collect(piece);
+                collected++;
+            }
         }
+        return collected;
     }
 
     private void Collect(Piece piece)
@@ -173,6 +219,7 @@ public class DebrisPool : MonoBehaviour
             CurrencyManager.Instance?.AddCrystals(piece.value);
         else
             CurrencyManager.Instance?.AddPieces(piece.value);
+        OnPieceCollected?.Invoke(piece.renderer.transform);
         ReturnToPool(piece);
     }
 
@@ -196,7 +243,7 @@ public class DebrisPool : MonoBehaviour
     {
         int count = 0;
         foreach (Piece piece in _groundPieces)
-            if (piece.zone == zone && !piece.isCrystal) count++;
+            if (piece.zone == zone && !piece.isCrystal && !piece.expiring) count++;
         return count;
     }
 
@@ -231,6 +278,15 @@ public class DebrisPool : MonoBehaviour
         pieceTransform.position = landingPoint;
         piece.landed = true;
         ApplyVisibility(piece);
+
+        // 덮어 교체할 파편이 아직 그대로 있으면(떨어지는 사이 안 주워졌으면) 값을 이어받고 없앰
+        Piece replaced = piece.replaces; // 이 파편 밑에 깔린 오래된 파편
+        piece.replaces = null;
+        if (replaced != null && replaced.generation == piece.replacesGeneration && _groundPieces.Contains(replaced))
+        {
+            piece.value += replaced.value;
+            ReturnToPool(replaced);
+        }
     }
 
     // 존을 넘기면 그 존의 파편만 보이고 주울 수 있게 함 (다른 존 파편은 그대로 남아있음)

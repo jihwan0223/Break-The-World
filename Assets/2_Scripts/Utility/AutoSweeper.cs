@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 // 자동 줍기 - 업그레이드로 해금되면 주기마다 바닥 왼쪽 밖에서 튀어나와 오른쪽 끝까지 지나가며,
-// 지나간 자리에 있는 파편(결정 포함)을 주워서 조각/결정을 지급함. 지금 보고 있는 존 바닥만 쓺.
+// 지나간 자리에 있는 파편(결정 포함)을 한 번에 정해진 개수까지 주워서 조각/결정을 지급함. 지금 보고 있는 존 바닥만 쓺.
 // 그림 크기는 프레임 스프라이트의 Pixels Per Unit으로 맞춤
 [RequireComponent(typeof(SpriteRenderer))]
 public class AutoSweeper : MonoBehaviour
@@ -48,6 +48,7 @@ public class AutoSweeper : MonoBehaviour
         float endX = floor.max.x + halfWidth; // 도착 x
         float y = floor.center.y + heightOffset; // 지나가는 높이
         float elapsed = 0f; // 애니메이션용 경과 시간
+        int remaining = UpgradeManager.Instance.AutoSweepPickupCount; // 이번에 더 주울 수 있는 파편 수
 
         _renderer.enabled = true;
         while (x < endX)
@@ -59,7 +60,8 @@ public class AutoSweeper : MonoBehaviour
             if (frames != null && frames.Length > 0)
                 _renderer.sprite = frames[(int)(elapsed * framesPerSecond) % frames.Length];
 
-            DebrisPool.Instance.CollectLandedUpTo(x); // 그림 중앙이 지나간 자리까지 주움
+            if (remaining > 0)
+                remaining -= DebrisPool.Instance.CollectLandedUpTo(x, remaining); // 그림 중앙이 지나간 자리까지, 남은 개수만큼 주움
             yield return null;
         }
 

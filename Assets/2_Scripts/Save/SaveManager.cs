@@ -121,6 +121,7 @@ public class SaveManager : MonoBehaviour
             unlockedWeapons = unlockedWeapons,
             pieces = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetPieces() : 0,
             crystals = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetCrystals() : 0,
+            pieceTutorialDone = PieceTutorial.Instance != null && PieceTutorial.Instance.Done,
             unlockedObjects = unlockedObjects,
             gainLevels = gainLevels,
             weaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : 0,
@@ -149,6 +150,9 @@ public class SaveManager : MonoBehaviour
             CurrencyManager.Instance.SetPieces(data.pieces);
             CurrencyManager.Instance.SetCrystals(data.crystals);
         }
+
+        if (PieceTutorial.Instance != null)
+            PieceTutorial.Instance.Done = data.pieceTutorialDone;
 
         // 해금 상태를 먼저 복원해야 그 다음 Equip()이 막히지 않음
         if (ObjectManager.Instance != null && data.unlockedObjects != null)

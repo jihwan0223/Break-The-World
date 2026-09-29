@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// 콤보(ComboManager)가 활성화된 동안 화면 하단 중앙에 "콤보 x배율 (남은시간)"을 표시. 비활성일 땐 안 보임
+// 콤보(ComboManager)가 활성화된 동안 화면 위쪽 중앙에 "콤보 x배율 (남은시간)"을 표시. 비활성일 땐 안 보임
 [RequireComponent(typeof(UIDocument))]
 public class ComboUI : MonoBehaviour
 {
-    [SerializeField] private float bottomOffset = 60f; // 화면 하단 기준 여백
+    [SerializeField] private float topOffset = 150f; // 화면 상단 기준 여백 - 우상단 버튼 줄(높이 110) 바로 아래
 
     private VisualElement _background;
     private Label _label;
@@ -31,7 +31,7 @@ public class ComboUI : MonoBehaviour
 
         _background = new VisualElement();
         _background.style.position = Position.Absolute;
-        _background.style.bottom = bottomOffset;
+        _background.style.top = topOffset;
         _background.style.left = Length.Percent(50);
         _background.style.translate = new Translate(Length.Percent(-50), 0); // 폭이 텍스트마다 달라서 marginLeft 대신 -50% 이동으로 정중앙 정렬
         _background.style.paddingLeft = 16;
