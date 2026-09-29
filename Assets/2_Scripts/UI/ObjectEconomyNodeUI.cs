@@ -159,8 +159,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             else
             {
                 long cost = ObjectManager.Instance.GetUnlockCost(objectIndex);
-                string prevName = ObjectManager.Instance.GetObjectAt(objectIndex - 1).objectName;
-                _tooltipText = $"해금\n{objectName}\n{NumberFormatUtil.Format(cost)} {prevName}";
+                _tooltipText = $"해금\n{objectName}\n{NumberFormatUtil.Format(cost)} 조각";
             }
             if (label != null) label.text = _tooltipText;
 
@@ -172,7 +171,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             int level = ObjectManager.Instance.GetGainLevel(objectIndex);
             bool maxed = level >= 5;
 
-            string costLine = maxed ? "최대" : $"{NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))} {ObjectManager.Instance.GetObjectAt(objectIndex - 1).objectName}";
+            string costLine = maxed ? "최대" : $"{NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))} 조각";
             _tooltipText = $"{objectName} 획득량\n{level}/5\n{costLine}";
             if (label != null) label.text = _tooltipText;
 
@@ -192,7 +191,6 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         if (ObjectManager.Instance == null) return new UpgradeTooltip.Content { title = "" };
 
         string objectName = ObjectManager.Instance.GetObjectAt(objectIndex).objectName;
-        string prevName = objectIndex > 0 ? ObjectManager.Instance.GetObjectAt(objectIndex - 1).objectName : objectName;
 
         if (!isGain)
         {
@@ -209,7 +207,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
                 title = $"{objectName} 해금",
                 description = $"{objectName}을(를) 해금합니다.",
                 level = "0 / 1",
-                price = $"{NumberFormatUtil.Format(cost)} {prevName}",
+                price = $"{NumberFormatUtil.Format(cost)} 조각",
             };
         }
 
@@ -219,9 +217,9 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         return new UpgradeTooltip.Content
         {
             title = $"{objectName} 획득량 증가",
-            description = "처치 시 추가로 얻는 파편이 늘어납니다.",
+            description = "처치 시 추가로 얻는 조각이 늘어납니다.",
             level = nextGain != null ? $"{level} / 5  (다음 {nextGain})" : $"{level} / 5",
-            price = maxed ? "최대" : $"{NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))} {prevName}",
+            price = maxed ? "최대" : $"{NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))} 조각",
         };
     }
 

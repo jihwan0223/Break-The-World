@@ -1,30 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-// 오브젝트를 부술 때마다, 그 오브젝트의 파편 레벨에 비례한 개수만큼 조각이 부서진 지점에서 떨어져 바닥(spawnArea) 안 랜덤한 위치로 쌓이는 시스템.
-// 최대 개수에 도달한 상태에서 새 조각이 착지하면, 가장 먼저 쌓였던 조각이 자연스럽게 페이드아웃되며 사라짐.
-// 업그레이드/무기/오브젝트 탭이 열리면 바닥에 쌓인 조각을 전부 즉시 치움. 선택된 오브젝트가 바뀔 때도 전부 리셋됨.
+// 오브젝트를 부수면 얻은 조각만큼 파편이 부서진 지점에서 떨어져 바닥(spawnArea)에 쌓이고, 파편을 클릭해서 주워야 조각(돈)이 들어오는 시스템.
+// 파편 하나가 여러 조각 값을 들고 있을 수 있음 (한 번에 떨어뜨리는 개수에 상한이 있어서 총액을 나눠 담음).
+// 파편은 존별로 따로 쌓이고, 지금 보는 존의 파편만 보이고 주울 수 있음. 주울 때까지 사라지지 않음
 public class DebrisPool : MonoBehaviour
 {
     // 씬 어디서든 DebrisPool.Instance로 접근하기 위한 싱글톤
     public static DebrisPool Instance { get; private set; }
 
     [SerializeField] private Collider2D spawnArea; // 조각이 떨어질 바닥 범위 콜라이더 (이 안 랜덤한 위치로 떨어짐)
-    [SerializeField] private int maxPieces = 2000; // 바닥에 동시에 쌓일 수 있는 최대 조각 개수
-    [SerializeField] private int maxPiecesPerBreak = 300; // 한 번 부술 때 떨어뜨릴 파편 수의 절대 상한 (풀을 미리 채워두는 개수이기도 함)
-    [SerializeField] private int piecesAtMaxLevel = 30; // 파편 레벨이 만렙일 때 한 번 부술 때 떨어지는 파편 수. 레벨이 낮으면 비율만큼 줄어들고 0레벨은 1개 - 조각 획득량과는 무관
+    [SerializeField] private int maxPiecesPerBreak = 50; // 한 번 부술 때 떨어뜨릴 파편 수의 상한 (렉 방지 - 넘치는 조각은 파편 하나에 합쳐 담음)
     [SerializeField] private float pieceSize = 1f; // 조각 하나의 크기 (월드 유닛)
+    [SerializeField] private float pickupColliderScale = 1.4f; // 줍기 판정 콜라이더를 파편 그림보다 이 배율만큼 크게 (잘 주워지게)
     [SerializeField] private Sprite[] pieceSprites; // 조각으로 쓸 스프라이트들 (Object-Break.png의 서브 스프라이트들). 색은 부순 오브젝트의 pileColor로 입힘
     [SerializeField] private float initialSpread = 1f; // 처음엔 오브젝트 바로 아래 이 반경(월드 유닛) 안으로만 떨어지고, 쌓일수록 spawnArea 폭까지 점점 넓어짐
     [SerializeField] private float fallDuration = 0.4f; // 부서진 지점에서 바닥까지 떨어지는 데 걸리는 시간(초)
-    [SerializeField] private float fadeOutDuration = 0.5f; // 가장 오래된 조각이 사라질 때 페이드아웃되는 시간(초)
+    [SerializeField] private Color crystalColor = new Color(0.45f, 0.9f, 1f); // 결정 색 (전용 이미지가 생기기 전까지 파편 그림에 이 색을 입혀 구분)
+    [SerializeField] private float crystalSizeMultiplier = 1.6f; // 결정을 파편보다 이 배율만큼 크게
 
-    private readonly List<SpriteRenderer> _pilePieces = new List<SpriteRenderer>(); // 지금 쌓여있는 조각들 (0번이 가장 오래됨)
-    private readonly Stack<SpriteRenderer> _pool = new Stack<SpriteRenderer>(); // 재사용 가능한(비활성) 조각 오브젝트들
+    // 바닥에 떨어져 있는(또는 떨어지는 중인) 파편 하나
+    private class Piece
+    {
+        public SpriteRenderer renderer; // 파편 그림
+        public CircleCollider2D collider; // 줍기 판정 (착지 후에만 켜짐)
+        public long value; // 주웠을 때 들어오는 조각(결정이면 결정) 개수
+        public bool isCrystal; // 결정인지 (결정은 바닥 최대 개수에 안 들어감)
+        public int zone; // 떨어진 존 번호 (그 존을 보고 있을 때만 보이고 주울 수 있음)
+        public bool landed; // 착지를 마쳤는지
+    }
+
+    private readonly List<Piece> _groundPieces = new List<Piece>(); // 지금 바닥에 있거나 떨어지는 중인 파편들
+    private readonly Dictionary<Collider2D, Piece> _pieceByCollider = new Dictionary<Collider2D, Piece>(); // 클릭된 콜라이더로 파편을 찾기 위한 표
+    private readonly Stack<Piece> _pool = new Stack<Piece>(); // 재사용 가능한(비활성) 파편들
     private Color _currentColor = Color.white; // ObjectManager를 못 찾을 때 폴백으로 쓸 색
     private Sprite _fallbackSprite; // pieceSprites가 비어있을 때 대신 쓸 흰색 정사각형 스프라이트
-    private int _lastZone; // 직전에 보고 있던 존 번호 (존이 실제로 바뀔 때만 조각을 치우려고 기억해둠)
+
+    private int CurrentZone => ZoneManager.Instance != null ? ZoneManager.Instance.CurrentZone : 0; // 지금 보고 있는 존
+    private int MaxGroundPieces => UpgradeManager.Instance != null ? UpgradeManager.Instance.MaxGroundPieces : 10; // 한 존 바닥에 동시에 있을 수 있는 파편 수
 
     void Awake()
     {
@@ -41,25 +56,16 @@ public class DebrisPool : MonoBehaviour
 
     void Start()
     {
-        // ObjectManager가 이미 씬에 있으면 현재 선택된 오브젝트 색으로 시작
         if (ObjectManager.Instance != null)
         {
             ObjectManager.Instance.OnObjectChanged += HandleObjectChanged;
             _currentColor = ObjectManager.Instance.CurrentObject.pileColor;
         }
 
-        // 어떤 탭(업그레이드 화면 / 무기·오브젝트 팝업)이든 열리면 바닥 조각을 전부 치움
-        UpgradeTreeUI.OnTreeToggled += HandleTabToggled;
-        SidePanelUI.OnSelectorPanelToggled += HandleTabToggled;
-
-        // 존을 넘기면 앞 존에서 쌓인 조각을 치움
         if (ZoneManager.Instance != null)
-        {
-            _lastZone = ZoneManager.Instance.CurrentZone;
-            ZoneManager.Instance.OnZoneChanged += HandleZoneChanged;
-        }
+            ZoneManager.Instance.OnZoneChanged += RefreshVisibility;
 
-        // 첫 몇 번 부술 때 조각 GameObject를 한꺼번에 만드느라 프레임이 튀는 걸 막으려고 풀을 미리 채워둠
+        // 첫 몇 번 부술 때 파편 GameObject를 한꺼번에 만드느라 프레임이 튀는 걸 막으려고 풀을 미리 채워둠
         for (int i = 0; i < maxPiecesPerBreak; i++)
             _pool.Push(CreatePiece());
     }
@@ -69,30 +75,105 @@ public class DebrisPool : MonoBehaviour
         if (ObjectManager.Instance != null)
             ObjectManager.Instance.OnObjectChanged -= HandleObjectChanged;
 
-        UpgradeTreeUI.OnTreeToggled -= HandleTabToggled;
-        SidePanelUI.OnSelectorPanelToggled -= HandleTabToggled;
-
         if (ZoneManager.Instance != null)
-            ZoneManager.Instance.OnZoneChanged -= HandleZoneChanged;
+            ZoneManager.Instance.OnZoneChanged -= RefreshVisibility;
     }
 
-    // 오브젝트를 부술 때 호출 - objectIndex 오브젝트의 색으로, 그 오브젝트의 파편 레벨에 비례한 개수(0레벨 1개 ~ 만렙 piecesAtMaxLevel개)만큼 조각이 fromPosition에서 떨어짐.
-    // 조각 지급은 Click에서 이미 끝난 상태라 여기서는 화면 연출만 함
-    public void AddPiece(Vector3 fromPosition, int objectIndex)
+    void Update()
     {
-        float levelRatio = ObjectManager.Instance != null ? ObjectManager.Instance.PieceLevelRatio(objectIndex) : 0f; // 파편 레벨 진행도 0~1 (인스펙터 값을 바꿔도 바로 반영되게 매번 계산)
-        int amount = Mathf.Clamp(1 + Mathf.RoundToInt((piecesAtMaxLevel - 1) * levelRatio), 1, maxPiecesPerBreak);
+        if (Mouse.current == null || !Mouse.current.leftButton.wasPressedThisFrame) return;
+        if (UIPointerGuard.IsPointerOverUI) return;
+
+        Vector2 worldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+
+        // 파편은 오브젝트보다 앞에 그려져서 Click.TopmostAt도 파편을 맨 위로 봄 - 파편을 누르면 뒤 오브젝트는 안 맞음
+        foreach (Collider2D hit in Physics2D.OverlapPointAll(worldPos))
+        {
+            if (_pieceByCollider.TryGetValue(hit, out Piece piece) && piece.collider.enabled)
+            {
+                Collect(piece);
+                return; // 한 번 클릭에 하나만 주움
+            }
+        }
+    }
+
+    // 오브젝트를 부쉈을 때 호출 - reward 조각을 파편 여러 개에 나눠 담아 fromPosition에서 떨어뜨림.
+    // 이 존 바닥이 이미 꽉 찼으면 아무것도 안 떨어짐(조각도 못 얻음)
+    public void DropPieces(Vector3 fromPosition, int objectIndex, long reward)
+    {
+        int zone = CurrentZone; // 떨어뜨릴 존
+        int freeSlots = MaxGroundPieces - CountInZone(zone); // 이 존 바닥에 남은 자리
+        if (freeSlots <= 0 || reward <= 0) return;
+
+        int count = (int)System.Math.Min(reward, System.Math.Min(maxPiecesPerBreak, freeSlots)); // 실제로 떨어뜨릴 파편 수
+        long baseValue = reward / count; // 파편 하나당 기본 값
+        long remainder = reward % count; // 나누고 남은 조각 - 앞쪽 파편들에 1개씩 더 얹음
         Color color = PileColorFor(objectIndex);
 
-        for (int i = 0; i < amount; i++)
-        {
-            SpriteRenderer piece = GetPieceFromPool();
-            piece.sprite = GetRandomPieceSprite();
-            piece.color = color; // 알파 포함 원래 색으로 초기화 (재사용된 조각이 이전에 페이드아웃됐을 수 있으므로)
+        for (int i = 0; i < count; i++)
+            Spawn(fromPosition, zone, baseValue + (i < remainder ? 1 : 0), false, color, pieceSize);
+    }
 
-            Vector3 landingPoint = GetLandingPoint(fromPosition);
-            StartCoroutine(FallThenSettle(piece, fromPosition, landingPoint));
-        }
+    // 결정 하나를 떨어뜨림 (amount개짜리 한 덩어리). 바닥이 꽉 차 있어도 떨어짐
+    public void DropCrystal(Vector3 fromPosition, long amount)
+    {
+        if (amount <= 0) return;
+        Spawn(fromPosition, CurrentZone, amount, true, crystalColor, pieceSize * crystalSizeMultiplier);
+    }
+
+    private void Spawn(Vector3 fromPosition, int zone, long value, bool isCrystal, Color color, float size)
+    {
+        Piece piece = _pool.Count > 0 ? _pool.Pop() : CreatePiece();
+        piece.value = value;
+        piece.isCrystal = isCrystal;
+        piece.zone = zone;
+        piece.landed = false;
+        piece.renderer.sprite = GetRandomPieceSprite();
+        piece.renderer.color = color;
+        piece.renderer.sortingOrder = isCrystal ? 11 : 10; // 결정이 파편 더미에 묻히지 않게 위에 그림 (클릭도 우선)
+        piece.renderer.forceRenderingOff = false;
+        piece.renderer.transform.localScale = Vector3.one * size;
+        piece.collider.enabled = false;
+
+        // 스프라이트가 파편마다 달라서 콜라이더 반경을 매번 그림 크기에 맞춤 (로컬 기준이라 스케일은 자동 반영)
+        Vector3 extents = piece.renderer.sprite.bounds.extents;
+        piece.collider.radius = Mathf.Max(extents.x, extents.y) * pickupColliderScale;
+
+        _groundPieces.Add(piece);
+        StartCoroutine(FallThenSettle(piece, fromPosition, GetLandingPoint(fromPosition, zone)));
+    }
+
+    private void Collect(Piece piece)
+    {
+        if (piece.isCrystal)
+            CurrencyManager.Instance?.AddCrystals(piece.value);
+        else
+            CurrencyManager.Instance?.AddPieces(piece.value);
+        ReturnToPool(piece);
+    }
+
+    // 테스트용 - 모든 존의 바닥 파편을 조각 지급 없이 전부 치움
+    public void ClearAll()
+    {
+        StopAllCoroutines();
+        for (int i = _groundPieces.Count - 1; i >= 0; i--)
+            ReturnToPool(_groundPieces[i]);
+    }
+
+    private void ReturnToPool(Piece piece)
+    {
+        _groundPieces.Remove(piece);
+        piece.collider.enabled = false;
+        piece.renderer.gameObject.SetActive(false);
+        _pool.Push(piece);
+    }
+
+    private int CountInZone(int zone)
+    {
+        int count = 0;
+        foreach (Piece piece in _groundPieces)
+            if (piece.zone == zone && !piece.isCrystal) count++;
+        return count;
     }
 
     // objectIndex 오브젝트의 pileColor - 인덱스가 이상하면 마지막으로 알던 색으로 폴백
@@ -104,11 +185,12 @@ public class DebrisPool : MonoBehaviour
         return _currentColor;
     }
 
-    // fromPosition에서 landingPoint까지 중력처럼 가속하며 떨어진 뒤, 쌓여있는 조각 더미에 합류시킴
-    private IEnumerator FallThenSettle(SpriteRenderer piece, Vector3 fromPosition, Vector3 landingPoint)
+    // fromPosition에서 landingPoint까지 중력처럼 가속하며 떨어진 뒤 줍기 판정을 켬
+    private IEnumerator FallThenSettle(Piece piece, Vector3 fromPosition, Vector3 landingPoint)
     {
-        piece.transform.position = fromPosition;
-        piece.gameObject.SetActive(true);
+        Transform pieceTransform = piece.renderer.transform;
+        pieceTransform.position = fromPosition;
+        piece.renderer.gameObject.SetActive(true);
 
         float elapsed = 0f; // 코루틴 시작 후 흐른 시간
 
@@ -118,63 +200,48 @@ public class DebrisPool : MonoBehaviour
             float progress = Mathf.Clamp01(elapsed / fallDuration);
             float easedProgress = progress * progress; // 중력처럼 갈수록 빨라지는 가속 느낌 (ease-in)
 
-            piece.transform.position = Vector3.Lerp(fromPosition, landingPoint, easedProgress);
+            pieceTransform.position = Vector3.Lerp(fromPosition, landingPoint, easedProgress);
             yield return null;
         }
 
-        piece.transform.position = landingPoint;
-
-        // 착지 완료 - 더미가 꽉 차있다면 가장 오래된 조각을 자연스럽게 페이드아웃시켜 자리를 비움
-        if (_pilePieces.Count >= maxPieces)
-        {
-            SpriteRenderer oldest = _pilePieces[0];
-            _pilePieces.RemoveAt(0);
-            StartCoroutine(FadeOutAndReturnToPool(oldest));
-        }
-
-        _pilePieces.Add(piece);
+        pieceTransform.position = landingPoint;
+        piece.landed = true;
+        ApplyVisibility(piece);
     }
 
-    // 조각의 알파값을 서서히 0으로 낮춘 뒤 비활성화하고 풀로 반납
-    private IEnumerator FadeOutAndReturnToPool(SpriteRenderer piece)
+    // 존을 넘기면 그 존의 파편만 보이고 주울 수 있게 함 (다른 존 파편은 그대로 남아있음)
+    private void RefreshVisibility()
     {
-        Color startColor = piece.color;
-        float elapsed = 0f;
-
-        while (elapsed < fadeOutDuration)
-        {
-            elapsed += Time.deltaTime;
-            float progress = Mathf.Clamp01(elapsed / fadeOutDuration);
-
-            Color color = startColor;
-            color.a = Mathf.Lerp(startColor.a, 0f, progress);
-            piece.color = color;
-
-            yield return null;
-        }
-
-        piece.gameObject.SetActive(false);
-        _pool.Push(piece);
+        foreach (Piece piece in _groundPieces)
+            ApplyVisibility(piece);
     }
 
-    // 재사용 가능한 조각을 풀에서 꺼내거나, 없으면 새로 만듦
-    private SpriteRenderer GetPieceFromPool()
+    private void ApplyVisibility(Piece piece)
     {
-        return _pool.Count > 0 ? _pool.Pop() : CreatePiece();
+        bool visible = piece.zone == CurrentZone; // 지금 보는 존의 파편인지
+        piece.renderer.forceRenderingOff = !visible;
+        piece.collider.enabled = visible && piece.landed;
     }
 
-    // 비활성 상태의 새 조각 GameObject 하나를 만듦 (풀 채우기 / 부족할 때 공용)
-    private SpriteRenderer CreatePiece()
+    // 비활성 상태의 새 파편 GameObject 하나를 만듦 (풀 채우기 / 부족할 때 공용)
+    private Piece CreatePiece()
     {
         var pieceObject = new GameObject("Piece");
         pieceObject.transform.SetParent(transform);
         pieceObject.transform.localScale = Vector3.one * pieceSize;
 
-        var spriteRenderer = pieceObject.AddComponent<SpriteRenderer>();
-        spriteRenderer.sortingOrder = 10; // 파괴 대상 오브젝트들보다 위에 그려지도록
+        var piece = new Piece
+        {
+            renderer = pieceObject.AddComponent<SpriteRenderer>(),
+            collider = pieceObject.AddComponent<CircleCollider2D>(),
+        };
+        piece.renderer.sortingOrder = 10; // 파괴 대상 오브젝트들보다 위에 그려지도록 (클릭도 오브젝트보다 우선)
+        piece.collider.isTrigger = true;
+        piece.collider.enabled = false;
+        _pieceByCollider[piece.collider] = piece;
 
         pieceObject.SetActive(false);
-        return spriteRenderer;
+        return piece;
     }
 
     // pieceSprites 중 하나를 랜덤으로 골라줌 (비어있으면 흰색 정사각형으로 대체)
@@ -186,13 +253,13 @@ public class DebrisPool : MonoBehaviour
         return pieceSprites[Random.Range(0, pieceSprites.Length)];
     }
 
-    // 조각이 떨어질 지점 - 부순 오브젝트(fromPosition) 바로 아래에서 시작해서, 더미가 쌓일수록 좌우로 넓게 퍼짐.
+    // 조각이 떨어질 지점 - 부순 오브젝트(fromPosition) 바로 아래에서 시작해서, 그 존 바닥이 찰수록 좌우로 넓게 퍼짐.
     // x는 오브젝트 중심에서 뽑고, 폭은 initialSpread에서 spawnArea 절반 폭까지 채움 비율에 따라 늘어남. y는 spawnArea 세로 범위 안 랜덤.
-    private Vector3 GetLandingPoint(Vector3 fromPosition)
+    private Vector3 GetLandingPoint(Vector3 fromPosition, int zone)
     {
         Bounds bounds = spawnArea.bounds;
 
-        float fill = maxPieces > 0 ? (float)_pilePieces.Count / maxPieces : 1f; // 0(빔) ~ 1(꽉 참)
+        float fill = (float)CountInZone(zone) / Mathf.Max(1, MaxGroundPieces); // 0(빔) ~ 1(꽉 참)
         float halfWidth = Mathf.Lerp(initialSpread, bounds.extents.x, Mathf.Clamp01(fill)); // 쌓일수록 넓게
 
         for (int attempt = 0; attempt < 10; attempt++)
@@ -209,44 +276,9 @@ public class DebrisPool : MonoBehaviour
         return new Vector3(Mathf.Clamp(fromPosition.x, bounds.min.x, bounds.max.x), bounds.min.y, 0f);
     }
 
-    // 업그레이드/무기/오브젝트 탭이 열리면(open=true) 바닥 조각을 전부 즉시 치움
-    private void HandleTabToggled(bool open)
-    {
-        if (open) ReturnAllPieces();
-    }
-
-    // 존이 해금될 때도 이 이벤트가 오는데(화살표 등장), 그땐 보는 존이 그대로라서 방금 떨어진 조각을 치우면 안 됨
-    private void HandleZoneChanged()
-    {
-        int zone = ZoneManager.Instance.CurrentZone; // 지금 보고 있는 존
-        if (zone == _lastZone) return;
-
-        _lastZone = zone;
-        ReturnAllPieces();
-    }
-
     private void HandleObjectChanged(ObjectData newObject)
     {
-        ReturnAllPieces();
         _currentColor = newObject.pileColor;
-    }
-
-    // 쌓여있거나, 떨어지는 중이거나, 페이드아웃 중인 조각을 전부 즉시 풀로 되돌림
-    private void ReturnAllPieces()
-    {
-        StopAllCoroutines(); // 낙하/페이드 연출 중단
-
-        _pilePieces.Clear();
-
-        // _pilePieces에 아직 안 들어간(낙하 중) 조각까지 잡으려고 자식 전체를 훑음
-        foreach (Transform child in transform)
-        {
-            if (!child.gameObject.activeSelf) continue; // 이미 풀에 있는 비활성 조각은 건너뜀
-
-            child.gameObject.SetActive(false);
-            SpriteRenderer sr = child.GetComponent<SpriteRenderer>();
-            if (sr != null) _pool.Push(sr);
-        }
     }
 
     // 모든 조각이 공유할 4x4 흰색 정사각형 스프라이트를 코드로 생성 (별도 이미지 에셋 불필요)

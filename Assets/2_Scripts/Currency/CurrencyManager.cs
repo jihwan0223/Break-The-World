@@ -2,22 +2,38 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// 오브젝트별 조각을 각각 별개의 화폐로 관리하는 지갑. "골드/파편" 같은 단일 통합 화폐는 없고,
-// 항상 "몇 번 오브젝트의 조각이 몇 개"인지로 관리됨 (업그레이드/오브젝트 해금 비용도 전부 이 단위)
+// 모든 오브젝트가 공통으로 쌓는 단일 통합 화폐("조각")를 관리하는 지갑.
+// 예전엔 오브젝트별로 조각이 따로 쌓였지만, 이제는 뭘 부수든 같은 조각으로 합쳐짐
 public class CurrencyManager : MonoBehaviour
 {
     // 씬 어디서든 CurrencyManager.Instance로 접근하기 위한 싱글톤
     public static CurrencyManager Instance { get; private set; }
 
-    // 테스트용: 켜두면 모든 조각이 항상 최대치로 유지됨 (업그레이드 테스트할 때 조각 모으는 시간 아끼려고).
+    // 테스트용: 켜두면 조각이 항상 최대치로 유지됨 (업그레이드 테스트할 때 조각 모으는 시간 아끼려고).
     // 실제 재화 밸런스를 테스트할 땐 꺼두면 됨
     [SerializeField] private bool debugAlwaysMaxPieces = false;
     private const long DebugMaxPieceAmount = 999_999_999_999_999L; // 테스트용 최대 조각 값 (Q 단위 비용도 감당할 만큼 넉넉하게)
+    private const long DebugMaxCrystalAmount = 999_999L; // 디버그 "돈 최대"로 채워줄 결정 개수
 
-    private readonly Dictionary<int, long> _pieces = new Dictionary<int, long>(); // objectIndex -> 보유 조각 개수
+    private long _pieces; // 보유 중인 통합 조각 개수
+    private long _crystals; // 보유 중인 결정 개수 (오브젝트 처치 시 확률로 나오는 희귀 재화)
 
-    // 특정 오브젝트의 조각 보유량이 바뀔 때마다 (objectIndex, 새 보유량) 전달 - UI 등이 구독
-    public event Action<int, long> OnPiecesChanged;
+    // 조각 보유량이 바뀔 때마다 새 보유량 전달 - UI 등이 구독
+    public event Action<long> OnPiecesChanged;
+
+    // 결정 보유량이 바뀔 때마다 새 보유량 전달 - UI 등이 구독
+    public event Action<long> OnCrystalsChanged;
+
+    public long GetCrystals() => _crystals;
+
+    public void AddCrystals(long amount) => SetCrystals(_crystals + amount);
+
+    // 저장 파일을 불러올 때 값을 직접 세팅하기 위한 함수
+    public void SetCrystals(long amount)
+    {
+        _crystals = amount;
+        OnCrystalsChanged?.Invoke(_crystals);
+    }
 
     void Awake()
     {
@@ -31,84 +47,61 @@ public class CurrencyManager : MonoBehaviour
         Instance = this;
     }
 
-    public long GetPieces(int objectIndex)
+    public long GetPieces()
     {
-        // 테스트 모드에서는 한 번도 안 얻어본 조각 종류도 보유량 "표시"가 실제 구매 판정(TrySpendPieces)과 일치하도록 항상 최대치로 봄
-        if (debugAlwaysMaxPieces) return DebugMaxPieceAmount;
-
-        return _pieces.TryGetValue(objectIndex, out long amount) ? amount : 0L;
+        // 테스트 모드에서는 보유량 "표시"가 실제 구매 판정(TrySpendPieces)과 일치하도록 항상 최대치로 봄
+        return debugAlwaysMaxPieces ? DebugMaxPieceAmount : _pieces;
     }
 
-    public void AddPieces(int objectIndex, long amount)
+    public void AddPieces(long amount)
     {
-        long newValue = debugAlwaysMaxPieces ? DebugMaxPieceAmount : GetPieces(objectIndex) + amount;
-        _pieces[objectIndex] = newValue;
-        OnPiecesChanged?.Invoke(objectIndex, newValue);
+        _pieces = debugAlwaysMaxPieces ? DebugMaxPieceAmount : _pieces + amount;
+        OnPiecesChanged?.Invoke(_pieces);
     }
 
     // 저장 파일을 불러올 때 값을 직접 세팅하기 위한 함수 (증감이 아니라 절대값 지정)
-    public void SetPieces(int objectIndex, long amount)
+    public void SetPieces(long amount)
     {
-        long newValue = debugAlwaysMaxPieces ? DebugMaxPieceAmount : amount;
-        _pieces[objectIndex] = newValue;
-        OnPiecesChanged?.Invoke(objectIndex, newValue);
+        _pieces = debugAlwaysMaxPieces ? DebugMaxPieceAmount : amount;
+        OnPiecesChanged?.Invoke(_pieces);
     }
 
-    // 여러 종류의 조각을 동시에 요구하는 비용을 한 번에 확인 + 차감함.
-    // 하나라도 부족하면 아무것도 차감하지 않고 false를 반환 (전부 충분할 때만 전부 차감)
+    // 여러 항목의 비용을 한 번에 확인 + 차감함 (전부 같은 조각이라 amount를 그냥 합산함).
+    // 부족하면 아무것도 차감하지 않고 false를 반환
     public bool TrySpendPieces(IReadOnlyList<PieceCost> costs)
     {
         if (debugAlwaysMaxPieces)
             return true; // 테스트 모드에서는 항상 성공 - 잔액이 어차피 최대치로 유지되니 차감할 필요도 없음
 
-        bool enough = true; // 하나라도 부족하면 false로 바뀜 - 부족한 조각을 전부 로그로 남기기 위해 바로 return하지 않고 끝까지 훑음
+        long total = 0; // 요구되는 조각 총합
         foreach (PieceCost cost in costs)
-        {
-            long have = GetPieces(cost.objectIndex);
-            if (have < cost.amount)
-            {
-                string objectName = ObjectManager.Instance != null ? ObjectManager.Instance.GetObjectAt(cost.objectIndex).objectName : $"오브젝트 {cost.objectIndex}";
-                Debug.Log($"조각 부족: {objectName} 조각 {cost.amount}개 필요, 현재 {have}개 보유 (부족분 {cost.amount - have}개)");
-                enough = false;
-            }
-        }
-        if (!enough) return false;
+            total += cost.amount;
 
-        foreach (PieceCost cost in costs)
+        if (_pieces < total)
         {
-            long newValue = GetPieces(cost.objectIndex) - cost.amount;
-            _pieces[cost.objectIndex] = newValue;
-            OnPiecesChanged?.Invoke(cost.objectIndex, newValue);
+            Debug.Log($"조각 부족: {total}개 필요, 현재 {_pieces}개 보유 (부족분 {total - _pieces}개)");
+            return false;
         }
 
+        _pieces -= total;
+        OnPiecesChanged?.Invoke(_pieces);
         return true;
     }
 
-    // 지금 등록된 모든 조각 보유량을 (objectIndex, amount) 쌍으로 반환 - 저장할 때 사용
-    public IEnumerable<KeyValuePair<int, long>> GetAllPieces() => _pieces;
-
-    // 테스트용 - 보유 중인 모든 조각을 0으로 (UI도 다시 "미보유" 상태로 돌아가 안 보이게 됨)
+    // 테스트용 - 보유 중인 조각과 결정을 0으로
     public void ResetAll()
     {
-        var objectIndexes = new List<int>(_pieces.Keys);
-        _pieces.Clear();
-        foreach (int objectIndex in objectIndexes)
-            OnPiecesChanged?.Invoke(objectIndex, 0);
+        _pieces = 0;
+        OnPiecesChanged?.Invoke(0);
+        SetCrystals(0);
     }
 
-    // 테스트용 - 모든 업그레이드 노드/오브젝트 해금/획득량 업그레이드를 전부 살 수 있을 만큼만 각 조각을 채워줌
-    // (조각 종류별로 필요한 만큼만 - 이미 그보다 많이 갖고 있으면 안 건드림)
+    // 테스트용 - 모든 업그레이드 노드/오브젝트 해금/획득량 업그레이드를 전부 살 수 있을 만큼 조각을 채워줌
     public void MaxAllDebug()
     {
         if (ObjectManager.Instance == null) return;
 
-        var required = new Dictionary<int, long>(); // objectIndex(=조각 종류) -> 필요한 총량
-
-        void Add(int objectIndex, long amount)
-        {
-            required.TryGetValue(objectIndex, out long existing);
-            required[objectIndex] = existing + amount;
-        }
+        long required = 0; // 모든 비용의 합계
 
         if (UpgradeManager.Instance != null)
         {
@@ -119,22 +112,22 @@ public class CurrencyManager : MonoBehaviour
                     PieceCost[] costs = node.CostForLevel(level);
                     if (costs == null) continue;
                     foreach (PieceCost cost in costs)
-                        Add(cost.objectIndex, cost.amount);
+                        required += cost.amount;
                 }
             }
         }
 
         for (int i = 1; i < ObjectManager.Instance.ObjectCount; i++)
         {
-            Add(i - 1, ObjectManager.Instance.GetUnlockCost(i));
-            Add(i - 1, ObjectManager.Instance.GetTotalGainCost(i));
+            required += ObjectManager.Instance.GetUnlockCost(i);
+            required += ObjectManager.Instance.GetTotalGainCost(i);
         }
 
-        for (int i = 0; i < ObjectManager.Instance.ObjectCount; i++)
-        {
-            required.TryGetValue(i, out long need);
-            if (need > GetPieces(i))
-                SetPieces(i, need);
-        }
+        if (required > GetPieces())
+            SetPieces(required);
+
+        // 결정은 아직 쓰는 곳이 없어서 테스트용으로 넉넉하게만 채움
+        if (_crystals < DebugMaxCrystalAmount)
+            SetCrystals(DebugMaxCrystalAmount);
     }
 }

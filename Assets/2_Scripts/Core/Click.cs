@@ -93,11 +93,22 @@ public class Click : MonoBehaviour
         if (UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.ObjectDoubleDropChance(objectIndex))
             finalPieces *= 2;
 
-        CurrencyManager.Instance.AddPieces(objectIndex, finalPieces);
+        // 보이는 존이면 파편으로 떨어뜨려 주워야 돈이 들어오고, 안 보이는 존(백그라운드 자동클릭)은 바로 지급
+        bool dropOnFloor = !IsZoneHidden && DebrisPool.Instance != null; // 파편으로 떨어뜨릴지 (false면 바로 지급)
+        if (dropOnFloor)
+            DebrisPool.Instance.DropPieces(transform.position, objectIndex, finalPieces);
+        else
+            CurrencyManager.Instance.AddPieces(finalPieces);
 
-        // 바닥에 파편을 떨어뜨림 (연출). 개수는 획득한 조각 수와 무관하게 이 오브젝트의 파편 레벨로 DebrisPool이 정함
-        if (!IsZoneHidden)
-            DebrisPool.Instance?.AddPiece(transform.position, objectIndex);
+        // 확률로 결정이 나옴 - 조각과 같은 규칙으로 보이는 존이면 떨어뜨리고 아니면 바로 지급
+        if (UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.CrystalDropChance)
+        {
+            int crystals = UpgradeManager.Instance.CrystalDropAmount; // 이번에 나온 결정 개수
+            if (dropOnFloor)
+                DebrisPool.Instance.DropCrystal(transform.position, crystals);
+            else
+                CurrencyManager.Instance.AddCrystals(crystals);
+        }
     }
 
     // 현재 선택된 오브젝트(ObjectManager)의 clickSounds 중 하나를 랜덤 재생하되,
@@ -303,7 +314,7 @@ public class Click : MonoBehaviour
         long gainBonus = ObjectManager.Instance.GetGainBonus(targetIndex); // 항상 0 이상이라 별도로 최솟값 보정 안 해도 됨
         long yieldBonus = UpgradeManager.Instance.AutoMineYieldBonus; // 자동채굴 획득량 강화
         long amount = 1 + gainBonus + yieldBonus;
-        CurrencyManager.Instance.AddPieces(targetIndex, amount);
+        CurrencyManager.Instance.AddPieces(amount);
     }
 
     void Update()

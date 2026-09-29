@@ -31,10 +31,13 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("콤보 배율 증가")] ComboMultiplier,        // 콤보 활성 중 파편 배율 +값
         [InspectorName("럭키클릭 확률 증가")] LuckyClickChanceUp,  // 럭키클릭 확률 +값 %
         [InspectorName("더블클릭 확률 증가")] DoubleClickChanceUp, // 더블클릭 발동 확률 +값 %
-        [InspectorName("전역 파편 획득 증가")] PieceGainGlobal,    // 모든 오브젝트 파편 획득 +값 %
-        [InspectorName("오브젝트 파편 획득 증가")] PieceGainObject, // Target Object Name 오브젝트 파편 획득 +값 %
+        [InspectorName("전역 조각 획득 증가")] PieceGainGlobal,    // 모든 오브젝트 조각 획득 +값 %
+        [InspectorName("오브젝트 조각 획득 증가")] PieceGainObject, // Target Object Name 오브젝트 조각 획득 +값 %
         [InspectorName("오브젝트 2배 드랍 확률")] ObjectDoubleDrop, // Target Object Name 오브젝트 처치 시 파편 2배 확률 +값 %
-        [InspectorName("무기 처치 보너스 파편")] WeaponKillBonus,   // Target Weapon Name 무기로 처치 시 보너스 파편 +값
+        [InspectorName("무기 처치 보너스 조각")] WeaponKillBonus,   // Target Weapon Name 무기로 처치 시 보너스 조각 +값
+        [InspectorName("바닥 파편 최대 개수 증가")] GroundPieceCap, // 바닥에 동시에 떨어져 있을 수 있는 파편 최대 개수 +값
+        [InspectorName("결정 확률 증가")] CrystalChance,          // 오브젝트 처치 시 결정이 나올 확률 +값 %
+        [InspectorName("결정 드랍량 증가")] CrystalAmount,        // 결정이 나올 때 개수 +값
     }
 
     // 선행 노드와 잇는 선의 모양 (UpgradeTreeLink가 이 값을 보고 세그먼트를 배치함)
@@ -63,6 +66,9 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private float baseAutoMineInterval = 8f;    // 자동 채굴 기본 주기(초)
     [SerializeField] private float minAutoMineInterval = 2f;     // 자동 채굴 주기 하한
     [SerializeField] private int autoMineTierOffset = 3;         // 지금 캐는 오브젝트보다 몇 단계 전을 자동으로 캘지
+    [SerializeField] private int baseMaxGroundPieces = 10;       // 바닥 파편 최대 개수 기본값 - GroundPieceCap이 위에 더함
+    [SerializeField] private float baseCrystalChance = 0.01f;    // 오브젝트 처치 시 결정 기본 확률 (1%) - CrystalChance가 위에 더함
+    [SerializeField] private int baseCrystalAmount = 1;          // 결정이 나올 때 기본 개수 - CrystalAmount가 위에 더함
 
     // ---- 씬의 UpgradeNodeUI를 읽어 구성한 실제 노드 ----
 
@@ -476,20 +482,14 @@ public class UpgradeManager : MonoBehaviour
     public float ObjectDoubleDropChance(int objectIndex) =>
         Mathf.Clamp01(SumEffect(UpgradeEffect.ObjectDoubleDrop, objectIndex) / 100f);
 
-    // 이 오브젝트 대상 "오브젝트 파편 획득 증가"(드랍량 강화) 노드들의 현재 레벨 합과 만렙 합 - 바닥에 떨어지는 파편 개수(연출) 계산용
-    public (int level, int maxLevel) PieceGainLevels(int objectIndex)
-    {
-        int level = 0; // 현재 레벨 합
-        int maxLevel = 0; // 만렙 합
-        foreach (UpgradeNode node in _nodes)
-        {
-            if (node.effect != UpgradeEffect.PieceGainObject || node.targetObjectIndex != objectIndex) continue;
+    // 바닥(한 존)에 동시에 떨어져 있을 수 있는 파편 최대 개수
+    public int MaxGroundPieces => baseMaxGroundPieces + Mathf.RoundToInt(SumEffect(UpgradeEffect.GroundPieceCap));
 
-            level += GetLevel(node.id);
-            maxLevel += node.maxLevel;
-        }
-        return (level, maxLevel);
-    }
+    // 오브젝트 처치 시 결정이 나올 확률 (0~1)
+    public float CrystalDropChance => Mathf.Clamp01(baseCrystalChance + SumEffect(UpgradeEffect.CrystalChance) / 100f);
+
+    // 결정이 나올 때 한 번에 나오는 개수
+    public int CrystalDropAmount => baseCrystalAmount + Mathf.RoundToInt(SumEffect(UpgradeEffect.CrystalAmount));
 
     // 이 무기를 장착하고 오브젝트를 처치했을 때 추가로 주는 파편 (전역 노드는 targetWeaponIndex -1이라 항상 포함)
     public long WeaponKillBonusPieces(int equippedWeaponIndex)

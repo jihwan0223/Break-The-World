@@ -279,22 +279,6 @@ public class ObjectManager : MonoBehaviour
         return level * Mathf.Max(1, index); // 오브젝트가 늦게 나올수록(index가 클수록) 레벨당 보너스도 커짐
     }
 
-    // 이 오브젝트의 "파편 레벨" 진행도(0~1) - 드랍량 강화 노드 레벨 + 획득량 증가 레벨을 합쳐 만렙 합으로 나눈 값.
-    // 바닥에 떨어지는 파편 개수(연출)에만 씀 - 실제 조각 획득량과는 무관
-    public float PieceLevelRatio(int index)
-    {
-        int level = GetGainLevel(index);
-        int maxLevel = index > 0 ? MaxGainLevel : 0; // 0번 오브젝트는 획득량 증가 대상이 아님
-        if (UpgradeManager.Instance != null)
-        {
-            var (nodeLevel, nodeMaxLevel) = UpgradeManager.Instance.PieceGainLevels(index);
-            level += nodeLevel;
-            maxLevel += nodeMaxLevel;
-        }
-
-        return maxLevel > 0 ? Mathf.Clamp01(level / (float)maxLevel) : 0f;
-    }
-
     public bool TryUpgradeGain(int index)
     {
         if (index <= 0 || index >= objects.Count) return false;

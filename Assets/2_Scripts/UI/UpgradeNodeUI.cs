@@ -17,7 +17,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] private UpgradeManager.UpgradeEffect effect;   // 이 업그레이드가 건드리는 수치
     [Tooltip("무기 대상 효과(클릭 데미지 / 무기 처치 보너스)에서 씀. 특정 무기 전용이면 그 무기, 전역이면 \"전체 (전역)\"")]
     [ObjectNameField(ObjectNameFieldSource.Weapon)] [SerializeField] private string targetWeaponName;
-    [Tooltip("오브젝트 대상 효과(자동클릭 계열 / 오브젝트 파편 획득 / 2배 드랍 확률)에서 씀. 그 오브젝트 장착 중일 때만 작동")]
+    [Tooltip("오브젝트 대상 효과(자동클릭 계열 / 오브젝트 조각 획득 / 2배 드랍 확률)에서 씀. 그 오브젝트 장착 중일 때만 작동")]
     [ObjectNameField] [SerializeField] private string targetObjectName;
     [Min(1)] [SerializeField] private int maxLevel = 5;             // 업그레이드 가능 횟수
     [SerializeField] private float[] valuePerLevel = { 1f };        // 레벨별 효과값 (배열이 짧으면 마지막 값 반복)
@@ -132,6 +132,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.PieceGainGlobal:
             case UpgradeManager.UpgradeEffect.PieceGainObject:
             case UpgradeManager.UpgradeEffect.ObjectDoubleDrop:
+            case UpgradeManager.UpgradeEffect.CrystalChance:
                 return $"+{value:0.##}%"; // 확률/비율계 효과
 
             case UpgradeManager.UpgradeEffect.AutoClickSpeed:
@@ -155,13 +156,10 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         PieceCost[] cost = UpgradeManager.Instance?.GetNextCost(Id);
         if (cost == null || cost.Length == 0) return "";
 
-        string text = "";
+        long total = 0; // 통합 화폐라 여러 항목이어도 하나로 합산해서 보여줌
         for (int i = 0; i < cost.Length; i++)
-        {
-            string objectName = ObjectManager.Instance != null ? ObjectManager.Instance.GetObjectAt(cost[i].objectIndex).objectName : "";
-            text += (i > 0 ? " + " : "") + $"{NumberFormatUtil.Format(cost[i].amount)} {objectName}";
-        }
-        return text;
+            total += cost[i].amount;
+        return $"{NumberFormatUtil.Format(total)} 조각";
     }
 
     // 공개 여부만 갱신 (노드 자체엔 표시할 게 없음). UpgradeTreeUI가 새로고침할 때마다 호출.

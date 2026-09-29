@@ -36,7 +36,10 @@ public class SaveManager : MonoBehaviour
         Load();
 
         if (CurrencyManager.Instance != null)
-            CurrencyManager.Instance.OnPiecesChanged += (_, __) => MarkDirty();
+        {
+            CurrencyManager.Instance.OnPiecesChanged += _ => MarkDirty();
+            CurrencyManager.Instance.OnCrystalsChanged += _ => MarkDirty();
+        }
 
         if (WeaponManager.Instance != null)
             WeaponManager.Instance.OnWeaponChanged += _ => MarkDirty();
@@ -92,14 +95,6 @@ public class SaveManager : MonoBehaviour
             }
         }
 
-        // 보유 조각(0개가 아닌 것만)을 배열로 채움
-        var pieces = new List<SavedPiece>();
-        if (CurrencyManager.Instance != null)
-        {
-            foreach (var entry in CurrencyManager.Instance.GetAllPieces())
-                pieces.Add(new SavedPiece { objectIndex = entry.Key, amount = entry.Value });
-        }
-
         // 오브젝트별 해금 상태 / 획득량 업그레이드 레벨
         int objectCount = ObjectManager.Instance != null ? ObjectManager.Instance.ObjectCount : 0;
         var unlockedObjects = new bool[objectCount];
@@ -115,7 +110,8 @@ public class SaveManager : MonoBehaviour
 
         var data = new SaveData
         {
-            pieces = pieces.ToArray(),
+            pieces = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetPieces() : 0,
+            crystals = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetCrystals() : 0,
             unlockedObjects = unlockedObjects,
             gainLevels = gainLevels,
             weaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : 0,
@@ -139,10 +135,10 @@ public class SaveManager : MonoBehaviour
         string json = File.ReadAllText(SavePath);
         SaveData data = JsonUtility.FromJson<SaveData>(json);
 
-        if (CurrencyManager.Instance != null && data.pieces != null)
+        if (CurrencyManager.Instance != null)
         {
-            foreach (SavedPiece piece in data.pieces)
-                CurrencyManager.Instance.SetPieces(piece.objectIndex, piece.amount);
+            CurrencyManager.Instance.SetPieces(data.pieces);
+            CurrencyManager.Instance.SetCrystals(data.crystals);
         }
 
         // 해금 상태를 먼저 복원해야 그 다음 Equip()이 막히지 않음

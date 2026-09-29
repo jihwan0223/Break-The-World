@@ -286,12 +286,13 @@ public class SidePanelUI : MonoBehaviour
         AddDebugButton(list, "돈 최대", () =>
         {
             CurrencyManager.Instance?.MaxAllDebug();
-            return "모든 조각을 최대치로 채웠습니다";
+            return "조각과 결정을 최대치로 채웠습니다";
         });
         AddDebugButton(list, "돈 초기화", () =>
         {
             CurrencyManager.Instance?.ResetAll();
-            return "모든 조각을 0으로 되돌렸습니다";
+            DebrisPool.Instance?.ClearAll();
+            return "조각과 결정을 0으로 되돌렸습니다";
         });
         AddDebugButton(list, "전체 해금", () =>
         {
@@ -350,7 +351,7 @@ public class SidePanelUI : MonoBehaviour
         RefreshButtonRowVisibility(); // 팝업이 열렸으니 버튼 줄 숨김
 
         Time.timeScale = 0f; // 다른 팝업과 동일 - 열려있는 동안 게임 시간 정지
-        OnSelectorPanelToggled?.Invoke(true); // DebrisPool 등에게 팝업 열림을 알림
+        OnSelectorPanelToggled?.Invoke(true); // ZoneArrowsUI 등에게 팝업 열림을 알림
     }
 
     private void CloseDebugPanel()
@@ -569,7 +570,7 @@ public class SidePanelUI : MonoBehaviour
         {
             ("지역", locked ? "???" : ObjectManager.ZoneNameOf(index), locked ? hidden : Color.white),
             ("체력", locked ? "???" : NumberFormatUtil.Format(ObjectManager.MaxHPOf(index)), locked ? hidden : Color.white),
-            ("획득 파편", locked ? "???" : $"{NumberFormatUtil.Format(manager.ExpectedPieces(index))}개", locked ? hidden : Color.white),
+            ("획득 조각",locked ? "???" : $"{NumberFormatUtil.Format(manager.ExpectedPieces(index))}개", locked ? hidden : Color.white),
             ("상태", locked ? "잠김" : "해금 완료", locked ? bad : good),
         };
 
@@ -680,7 +681,7 @@ public class SidePanelUI : MonoBehaviour
 
         Time.timeScale = 0f; // 열려있는 동안 자동클릭/자동채굴 등이 계속 진행되는 걸 막음 (업그레이드 화면과 동일)
 
-        OnSelectorPanelToggled?.Invoke(true); // DebrisPool 등에게 팝업 열림을 알림
+        OnSelectorPanelToggled?.Invoke(true); // ZoneArrowsUI 등에게 팝업 열림을 알림
 
         // 열 때마다 항상 최신 상태로 다시 그려서, 이름이 비어 보이는 경우가 없게 함
         _refreshWeaponSelector?.Invoke();
@@ -699,7 +700,7 @@ public class SidePanelUI : MonoBehaviour
 
         Time.timeScale = 1f; // 멈춰뒀던 게임 시간을 다시 정상 속도로
 
-        OnSelectorPanelToggled?.Invoke(false); // DebrisPool 등에게 팝업 닫힘을 알림
+        OnSelectorPanelToggled?.Invoke(false); // ZoneArrowsUI 등에게 팝업 닫힘을 알림
 
         // Object 팝업이 열려있는 동안 선택이 바뀌었다면, 닫히는 지금 전환 애니메이션 재생
         if (_currentlyOpenContent == _objectContent && ObjectManager.Instance != null)
