@@ -864,6 +864,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponSwingEffect
   swingSize: 0.05
   swingDuration: 0.15
+  viewMargin: 0.8
 --- !u!60 &112946962
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -1990,6 +1991,7 @@ GameObject:
   - component: {fileID: 172956268}
   - component: {fileID: 172956267}
   - component: {fileID: 172956266}
+  - component: {fileID: 172956274}
   m_Layer: 0
   m_Name: "Object_\uB3C4\uB85C"
   m_TagString: Untagged
@@ -2304,6 +2306,26 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &172956274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 172956263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89900db4fd9b80440a49876c75e59708, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ZoneBreaker
+  zoneRoot: {fileID: 1610872450}
+  unlockZone: 2
+  unlockEffect: {fileID: 1797684722}
+  shockwaveSpeed: 12
+  shockwaveWidth: 0.15
+  shockwaveColor: {r: 1, g: 1, b: 1, a: 0.8}
+  shakeAmount: 0.15
+  shakeDuration: 0.3
 --- !u!114 &178488021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3509,7 +3531,8 @@ MonoBehaviour:
   zoneRoots:
   - {fileID: 1630271655}
   - {fileID: 1610872449}
-  zoneFirstObjects: ffffffff05000000
+  - {fileID: 558599199}
+  zoneFirstObjects: ffffffff05000000ffffffff
 --- !u!1001 &257300340
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4165,8 +4188,6 @@ MonoBehaviour:
   fallDuration: 0.4
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 1}
   crystalSizeMultiplier: 1.6
-  overflowExpireDelay: 3
-  overflowFadeDuration: 1.5
 --- !u!61 &289043390
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4201,7 +4222,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 3, y: -0.4}
+  m_Offset: {x: 3, y: -0.39999998}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -4211,7 +4232,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 14, y: 1}
+  m_Size: {x: 14.5, y: 1}
   m_EdgeRadius: 0
 --- !u!114 &289043391
 MonoBehaviour:
@@ -5466,6 +5487,37 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!1 &558599199
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 558599200}
+  m_Layer: 0
+  m_Name: "Zone3_\uACF5\uC0AC\uC7A5"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &558599200
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 558599199}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &572558696
 GameObject:
   m_ObjectHideFlags: 0
@@ -25201,6 +25253,11 @@ MonoBehaviour:
   zoneRoot: {fileID: 1630271656}
   unlockZone: 1
   unlockEffect: {fileID: 1797684722}
+  shockwaveSpeed: 12
+  shockwaveWidth: 0.15
+  shockwaveColor: {r: 1, g: 1, b: 1, a: 0.8}
+  shakeAmount: 0.15
+  shakeDuration: 0.3
 --- !u!60 &1601500303
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -44119,3 +44176,4 @@ SceneRoots:
   - {fileID: 1630271656}
   - {fileID: 1610872450}
   - {fileID: 380148628}
+  - {fileID: 558599200}

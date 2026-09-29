@@ -54,8 +54,7 @@ public class ZoneUnlockEffect : MonoBehaviour
         root.Add(flash);
         root.Add(banner);
 
-        Camera cam = Camera.main; // 흔들 카메라 (카메라는 안 움직이는 고정 시점이라 원래 위치로 그대로 되돌리면 됨)
-        Vector3 camHome = cam != null ? cam.transform.position : Vector3.zero;
+        CameraShake.Shake(shakeAmount, shakeDuration);
         float bannerEnd = bannerDelay + bannerFadeIn + bannerHold + bannerFadeOut; // 연출이 전부 끝나는 시점
         bool unlocked = false; // 존 해금을 이미 했는지
 
@@ -63,11 +62,6 @@ public class ZoneUnlockEffect : MonoBehaviour
         for (float t = 0f; t < bannerEnd; t += Time.unscaledDeltaTime)
         {
             flash.style.opacity = 1f - Mathf.Clamp01(t / flashDuration);
-
-            if (cam != null)
-                cam.transform.position = camHome + (t < shakeDuration
-                    ? (Vector3)(Random.insideUnitCircle * shakeAmount * (1f - t / shakeDuration))
-                    : Vector3.zero);
 
             if (!unlocked && t >= unlockDelay)
             {
@@ -82,7 +76,6 @@ public class ZoneUnlockEffect : MonoBehaviour
             yield return null;
         }
 
-        if (cam != null) cam.transform.position = camHome;
         root.Remove(flash);
         root.Remove(banner);
         _playing = false;

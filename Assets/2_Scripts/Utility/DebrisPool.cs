@@ -41,6 +41,7 @@ public class DebrisPool : MonoBehaviour
     private readonly Stack<Piece> _pool = new Stack<Piece>(); // 재사용 가능한(비활성) 파편들
     private Color _currentColor = Color.white; // ObjectManager를 못 찾을 때 폴백으로 쓸 색
     private Sprite _fallbackSprite; // pieceSprites가 비어있을 때 대신 쓸 흰색 정사각형 스프라이트
+    private PickupPopup _popup; // 주운 자리에 "+N"을 띄우는 연출 (같은 오브젝트에 없으면 자동으로 붙임)
 
     // 오브젝트를 부숴 파편을 새로 떨어뜨릴 때마다 그 파편들을 전달 (결정 제외) - 첫 파편 튜토리얼 등이 구독
     public event System.Action<IReadOnlyList<Transform>> OnPiecesDropped;
@@ -63,6 +64,8 @@ public class DebrisPool : MonoBehaviour
 
         Instance = this;
         _fallbackSprite = CreateDotSprite();
+        _popup = GetComponent<PickupPopup>();
+        if (_popup == null) _popup = gameObject.AddComponent<PickupPopup>();
     }
 
     void Start()
@@ -112,7 +115,7 @@ public class DebrisPool : MonoBehaviour
                 nearestDistance = distance;
             }
         }
-        if (nearest != null) Collect(nearest);
+        if (nearest != null) Collect(nearest, false);
     }
 
     // 오브젝트를 부쉈을 때 호출 - reward 조각을 파편 여러 개(최대 maxPiecesPerBreak개)에 나눠 담아 fromPosition에서 떨어뜨림.
@@ -187,34 +190,37 @@ public class DebrisPool : MonoBehaviour
     // 바닥 범위 (자동 줍기가 이 폭을 가로질러 지나감)
     public Bounds FloorBounds => spawnArea.bounds;
 
-    // 지금 보는 존에 착지한 파편이 하나라도 있는지 (자동 줍기가 빈 바닥이면 안 나오게)
-    public bool HasLandedPiecesInView()
+    // 어느 존이든 착지한 파편이 하나라도 있는지 (자동 줍기가 빈 바닥이면 안 나오게)
+    public bool HasLandedPieces()
     {
-        int zone = CurrentZone; // 지금 보고 있는 존
         foreach (Piece piece in _groundPieces)
-            if (piece.zone == zone && piece.landed) return true;
+            if (piece.landed) return true;
         return false;
     }
 
-    // 지금 보는 존에서 x 이하(왼쪽)에 있는 착지한 파편을 최대 maxCount개까지 주움 - 자동 줍기가 지나간 자리. 실제로 주운 개수를 반환
-    public int CollectLandedUpTo(float x, int maxCount)
+    // zone 존에서 fromX 초과 ~ toX 이하 구간에 있는 착지한 파편을 최대 maxCount개까지 주움 - 자동 줍기가 이번 프레임에 지나간 구간.
+    // 이미 지나간 자리(fromX 이하)에 새로 떨어진 파편은 안 주움. 존마다 바닥 위치가 같아서 안 보이는 존도 같은 구간으로 주움. 실제로 주운 개수를 반환
+    public int CollectLandedBetween(float fromX, float toX, int zone, int maxCount)
     {
-        int zone = CurrentZone; // 지금 보고 있는 존
         int collected = 0; // 이번에 주운 개수
         for (int i = _groundPieces.Count - 1; i >= 0 && collected < maxCount; i--)
         {
             Piece piece = _groundPieces[i];
-            if (piece.zone == zone && piece.landed && piece.renderer.transform.position.x <= x)
+            float pieceX = piece.renderer.transform.position.x; // 이 파편의 가로 위치
+            if (piece.zone == zone && piece.landed && pieceX > fromX && pieceX <= toX)
             {
-                Collect(piece);
+                Collect(piece, true);
                 collected++;
             }
         }
         return collected;
     }
 
-    private void Collect(Piece piece)
+    // bySweeper면 빗자루가 주운 것 - "+N"을 근처 것끼리 합쳐서 띄움 (안 보이는 존에서 주운 건 안 띄움)
+    private void Collect(Piece piece, bool bySweeper)
     {
+        if (piece.zone == CurrentZone)
+            _popup.Show(piece.renderer.transform.position, piece.value, piece.isCrystal, bySweeper);
         if (piece.isCrystal)
             CurrencyManager.Instance?.AddCrystals(piece.value);
         else

@@ -13,6 +13,7 @@ public class WeaponSwingEffect : MonoBehaviour
 
     [SerializeField] private float swingSize = 0.05f; // 무기 이미지가 표시될 크기 (월드 유닛)
     [SerializeField] private float swingDuration = 0.15f; // 타격 연출이 재생되는 시간(초)
+    [SerializeField] private float viewMargin = 0.8f; // 랜덤 위치 타격 연출이 화면 가장자리에서 최소 이만큼(월드 유닛) 안쪽에 나오게
 
     private readonly Stack<SpriteRenderer> _pool = new Stack<SpriteRenderer>(); // 재사용 가능한(비활성) 타격 연출 오브젝트들
     private Vector3? _lastPoint; // 바로 직전 타격 연출이 나타났던 위치 - 다음 연출이 그 자리와 겹치지 않게 확인하는 데 씀
@@ -40,7 +41,7 @@ public class WeaponSwingEffect : MonoBehaviour
         if (cursorPoint.HasValue)
             point = new Vector3(cursorPoint.Value.x, cursorPoint.Value.y, hitCollider.bounds.center.z);
         else
-            point = onSurface ? GetRandomPointInsideCollider(hitCollider) : GetRandomPointOnColliderEdge(hitCollider);
+            point = ClampToView(onSurface ? GetRandomPointInsideCollider(hitCollider) : GetRandomPointOnColliderEdge(hitCollider));
 
         // 이미지의 "위쪽"(로컬 +Y)이 그 지점에서 콜라이더 중심을 향하도록 회전 계산
         Vector2 towardCollider = (Vector2)(hitCollider.bounds.center - point);
@@ -75,6 +76,20 @@ public class WeaponSwingEffect : MonoBehaviour
 
         spriteRenderer.gameObject.SetActive(false);
         _pool.Push(spriteRenderer);
+    }
+
+    // 도로처럼 화면보다 큰 오브젝트는 랜덤 지점이 화면 밖으로 나갈 수 있어서, 화면 가장자리에서 viewMargin만큼 안쪽으로 당김
+    private Vector3 ClampToView(Vector3 point)
+    {
+        Camera cam = Camera.main; // 화면 범위를 구할 카메라
+        if (cam == null || !cam.orthographic) return point;
+
+        float halfHeight = cam.orthographicSize - viewMargin; // 연출이 들어갈 수 있는 세로 절반 범위
+        float halfWidth = cam.orthographicSize * cam.aspect - viewMargin; // 연출이 들어갈 수 있는 가로 절반 범위
+        Vector3 center = cam.transform.position; // 화면 중심
+        point.x = Mathf.Clamp(point.x, center.x - halfWidth, center.x + halfWidth);
+        point.y = Mathf.Clamp(point.y, center.y - halfHeight, center.y + halfHeight);
+        return point;
     }
 
     // 재사용 가능한 연출 오브젝트를 풀에서 꺼내거나, 없으면(동시에 여러 개가 떠 있는 상황) 새로 만듦

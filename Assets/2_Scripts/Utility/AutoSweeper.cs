@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 // 자동 줍기 - 업그레이드로 해금되면 주기마다 바닥 왼쪽 밖에서 튀어나와 오른쪽 끝까지 지나가며,
-// 지나간 자리에 있는 파편(결정 포함)을 한 번에 정해진 개수까지 주워서 조각/결정을 지급함. 지금 보고 있는 존 바닥만 쓺.
+// 지나가는 자리에 있는 파편(결정 포함)을 한 번에 정해진 개수까지 주워서 조각/결정을 지급함. 이미 지나간 자리에 새로 떨어진 건 안 주움. 지금 안 보는 존의 바닥도 같이 쓺 (개수 제한은 존마다 따로).
 // 그림 크기는 프레임 스프라이트의 Pixels Per Unit으로 맞춤
 [RequireComponent(typeof(SpriteRenderer))]
 public class AutoSweeper : MonoBehaviour
@@ -30,7 +30,7 @@ public class AutoSweeper : MonoBehaviour
         _timer += Time.deltaTime; // 업그레이드/무기 화면이 열려 timeScale이 0이면 같이 멈춤
         if (_timer < UpgradeManager.Instance.AutoSweepIntervalSeconds) return;
 
-        if (!DebrisPool.Instance.HasLandedPiecesInView()) return; // 쓸 게 없으면 주울 게 생길 때까지 대기
+        if (!DebrisPool.Instance.HasLandedPieces()) return; // 어느 존에도 쓸 게 없으면 주울 게 생길 때까지 대기
 
         _timer = 0f;
         StartCoroutine(Sweep());
@@ -48,11 +48,15 @@ public class AutoSweeper : MonoBehaviour
         float endX = floor.max.x + halfWidth; // 도착 x
         float y = floor.center.y + heightOffset; // 지나가는 높이
         float elapsed = 0f; // 애니메이션용 경과 시간
-        int remaining = UpgradeManager.Instance.AutoSweepPickupCount; // 이번에 더 주울 수 있는 파편 수
+        int zoneCount = ZoneManager.Instance != null ? Mathf.Max(1, ZoneManager.Instance.ZoneCount) : 1; // 쓸고 지나갈 존 수
+        int[] remaining = new int[zoneCount]; // 존마다 이번에 더 주울 수 있는 파편 수
+        for (int zone = 0; zone < zoneCount; zone++)
+            remaining[zone] = UpgradeManager.Instance.AutoSweepPickupCount;
 
         _renderer.enabled = true;
         while (x < endX)
         {
+            float prevX = x; // 이번 프레임 이동 전 x
             x += moveSpeed * Time.deltaTime;
             elapsed += Time.deltaTime;
             transform.position = new Vector3(x, y, transform.position.z);
@@ -60,8 +64,9 @@ public class AutoSweeper : MonoBehaviour
             if (frames != null && frames.Length > 0)
                 _renderer.sprite = frames[(int)(elapsed * framesPerSecond) % frames.Length];
 
-            if (remaining > 0)
-                remaining -= DebrisPool.Instance.CollectLandedUpTo(x, remaining); // 그림 중앙이 지나간 자리까지, 남은 개수만큼 주움
+            for (int zone = 0; zone < zoneCount; zone++)
+                if (remaining[zone] > 0)
+                    remaining[zone] -= DebrisPool.Instance.CollectLandedBetween(prevX, x, zone, remaining[zone]); // 그림 중앙이 이번 프레임에 지나간 구간만, 남은 개수만큼 주움
             yield return null;
         }
 
