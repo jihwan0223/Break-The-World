@@ -300,6 +300,13 @@ public class SidePanelUI : MonoBehaviour
             UpgradeTreeUI.Instance?.RefreshAll();
             return "모든 업그레이드와 오브젝트를 해금했습니다";
         });
+        AddDebugButton(list, "전체 만렙", () =>
+        {
+            UpgradeManager.Instance?.MaxAllDebug();
+            ObjectManager.Instance?.MaxAllDebug();
+            UpgradeTreeUI.Instance?.RefreshAll();
+            return "모든 업그레이드와 오브젝트 획득량을 만렙으로 채웠습니다";
+        });
         AddDebugButton(list, "업그레이드 초기화", () =>
         {
             UpgradeManager.Instance?.ResetAll();

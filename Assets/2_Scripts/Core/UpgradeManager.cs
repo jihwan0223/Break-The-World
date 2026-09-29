@@ -332,6 +332,13 @@ public class UpgradeManager : MonoBehaviour
             SetLevelInternal(node.id, 1);
     }
 
+    // 테스트용 - 모든 업그레이드 노드를 만렙으로 (조각 소모 없음)
+    public void MaxAllDebug()
+    {
+        foreach (UpgradeNode node in _nodes)
+            SetLevelInternal(node.id, node.maxLevel);
+    }
+
     // 테스트용 - 모든 업그레이드 레벨을 0으로 (조각 환불은 없음)
     public void ResetAll()
     {

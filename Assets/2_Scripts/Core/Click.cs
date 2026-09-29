@@ -218,8 +218,7 @@ public class Click : MonoBehaviour
         float halfWidth = cam.orthographicSize * cam.aspect; // 화면 가로 절반(월드 유닛)
         Vector3 start = new Vector3(cam.transform.position.x + side * (halfWidth + 1f),
             bounds.center.y + bounds.extents.y * Random.Range(0.2f, 0.9f), transform.position.z); // 화면 밖 오른쪽/왼쪽, 오브젝트 위쪽 높이
-        Vector3 end = new Vector3(bounds.center.x + bounds.extents.x * Random.Range(-0.4f, 0.4f),
-            bounds.center.y + bounds.extents.y * Random.Range(-0.4f, 0.4f), transform.position.z); // 오브젝트 안쪽 한 점
+        Vector3 end = PickClearLandingPoint(bounds); // 오브젝트 안쪽 한 점 - 책상 위 접시처럼 다른 오브젝트가 놓인 자리는 피함
 
         var projectile = new GameObject("AutoClickProjectile"); // 날아가는 그림 하나
         var projectileRenderer = projectile.AddComponent<SpriteRenderer>(); // 투사체 그림을 그리는 렌더러
@@ -246,6 +245,34 @@ public class Click : MonoBehaviour
         _flyingProjectiles.Remove(projectile);
         Destroy(projectile);
         PerformClickHit(false);
+    }
+
+    // 투사체가 착지할 자리를 오브젝트 안쪽에서 몇 번 뽑아보고, 자기 자신 말고 다른 오브젝트(책상 위 접시 등)가 없는 자리를 고름.
+    // 몇 번을 시도해도 못 찾으면(그 자리가 전부 다른 오브젝트로 덮여있으면) 마지막으로 뽑은 자리를 그냥 씀
+    private Vector3 PickClearLandingPoint(Bounds bounds)
+    {
+        const int maxAttempts = 8; // 빈 자리를 찾을 때까지 다시 뽑아볼 횟수
+        Vector3 candidate = bounds.center;
+
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            candidate = new Vector3(bounds.center.x + bounds.extents.x * Random.Range(-0.4f, 0.4f),
+                bounds.center.y + bounds.extents.y * Random.Range(-0.4f, 0.4f), transform.position.z);
+
+            if (!IsOccupiedByOtherObject(candidate))
+                return candidate;
+        }
+
+        return candidate;
+    }
+
+    // 이 자리에 자기 자신(콜라이더) 말고 다른 오브젝트의 콜라이더가 있는지
+    private bool IsOccupiedByOtherObject(Vector2 point)
+    {
+        Collider2D[] hits = Physics2D.OverlapPointAll(point);
+        foreach (Collider2D hit in hits)
+            if (hit != _collider) return true;
+        return false;
     }
 
     // 자동채굴 업그레이드가 켜져있으면 일정 주기마다, 지금 캐는 오브젝트보다 몇 단계 전 오브젝트를 자동으로 캐서 조각을 지급함

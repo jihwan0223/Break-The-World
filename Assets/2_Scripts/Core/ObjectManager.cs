@@ -44,7 +44,7 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(3, 2, "자전거", new Color(0.23f, 0.24f, 0.30f)),
         new ObjectData(3, 3, "가로수", new Color(0.24f, 0.59f, 0.32f)),
         new ObjectData(4, 1, "자동차", new Color(0.70f, 0.69f, 0.71f)),
-        new ObjectData(4, 2, "보도블록", new Color(0.62f, 0.60f, 0.58f)) { hpMultiplier = 2f }, // ★ -> 존3
+        new ObjectData(4, 2, "도로", new Color(0.62f, 0.60f, 0.58f)) { hpMultiplier = 2f }, // ★ -> 존3
         // --- 존3: 공사장 / 건물 (유압 브레이커 t5 / 다이너마이트 t6) ---
         new ObjectData(5, 1, "컨테이너 박스", new Color(0.55f, 0.45f, 0.35f)),
         new ObjectData(5, 2, "포크레인", new Color(0.85f, 0.70f, 0.20f)),
@@ -329,6 +329,15 @@ public class ObjectManager : MonoBehaviour
             _unlocked[i] = true;
             OnUnlockChanged?.Invoke(i);
         }
+    }
+
+    // 테스트용 - 모든 오브젝트를 해금하고 획득량 업그레이드도 전부 만렙으로 (조각 소모 없음)
+    public void MaxAllDebug()
+    {
+        UnlockAllDebug();
+
+        for (int i = 0; i < _gainLevel.Length; i++)
+            SetGainLevel(i, MaxGainLevel);
     }
 
     // 테스트용 - 0번(처음부터 해금)만 남기고 모든 오브젝트 해금/획득량 업그레이드를 초기 상태로 되돌림 (조각은 환불하지 않음)
