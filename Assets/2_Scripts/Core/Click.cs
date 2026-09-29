@@ -312,8 +312,8 @@ public class Click : MonoBehaviour
             return;
 
         long gainBonus = ObjectManager.Instance.GetGainBonus(targetIndex); // 항상 0 이상이라 별도로 최솟값 보정 안 해도 됨
-        long yieldBonus = UpgradeManager.Instance.AutoMineYieldBonus; // 자동채굴 획득량 강화
-        long amount = 1 + gainBonus + yieldBonus;
+        long yieldBonus = UpgradeManager.Instance.AutoMineYieldBonus; // 자동채굴 획득량 강화 - 레벨당 기본 보상 1배씩 추가
+        long amount = ObjectManager.Instance.GetBaseReward(targetIndex) * (1 + yieldBonus) + gainBonus;
         CurrencyManager.Instance.AddPieces(amount);
     }
 

@@ -143,6 +143,30 @@ public class DebrisPool : MonoBehaviour
         StartCoroutine(FallThenSettle(piece, fromPosition, GetLandingPoint(fromPosition, zone)));
     }
 
+    // 바닥 범위 (자동 줍기가 이 폭을 가로질러 지나감)
+    public Bounds FloorBounds => spawnArea.bounds;
+
+    // 지금 보는 존에 착지한 파편이 하나라도 있는지 (자동 줍기가 빈 바닥이면 안 나오게)
+    public bool HasLandedPiecesInView()
+    {
+        int zone = CurrentZone; // 지금 보고 있는 존
+        foreach (Piece piece in _groundPieces)
+            if (piece.zone == zone && piece.landed) return true;
+        return false;
+    }
+
+    // 지금 보는 존에서 x 이하(왼쪽)에 있는 착지한 파편을 전부 주움 - 자동 줍기가 지나간 자리
+    public void CollectLandedUpTo(float x)
+    {
+        int zone = CurrentZone; // 지금 보고 있는 존
+        for (int i = _groundPieces.Count - 1; i >= 0; i--)
+        {
+            Piece piece = _groundPieces[i];
+            if (piece.zone == zone && piece.landed && piece.renderer.transform.position.x <= x)
+                Collect(piece);
+        }
+    }
+
     private void Collect(Piece piece)
     {
         if (piece.isCrystal)

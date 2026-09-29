@@ -113,7 +113,10 @@ public class SidePanelUI : MonoBehaviour
                 Debug.Log("무기 선택 버튼 눌림");
                 WeaponManager.Instance?.Equip(index);
             },
-            out _refreshWeaponSelector);
+            out _refreshWeaponSelector,
+            index => WeaponManager.Instance != null && !WeaponManager.Instance.IsUnlocked(index),
+            getBuyCost: index => WeaponManager.Instance != null && WeaponManager.Instance.IsUnlockOrderMet(index) ? WeaponManager.Instance.GetUnlockCost(index) : -1,
+            onBuy: index => WeaponManager.Instance != null && WeaponManager.Instance.TryUnlock(index));
         _panel.Add(_weaponContent);
 
         _objectContent = BuildSelectorSection(
@@ -285,8 +288,8 @@ public class SidePanelUI : MonoBehaviour
         // 각 동작은 눌린 결과를 한 줄 문구로 돌려줌 - 화면이 팝업에 가려져서 눌렀는지 알 수 없기 때문
         AddDebugButton(list, "돈 최대", () =>
         {
-            CurrencyManager.Instance?.MaxAllDebug();
-            return "조각과 결정을 최대치로 채웠습니다";
+            CurrencyManager.Instance?.StartDebugRefill();
+            return "지금 살 수 있는 가장 비싼 가격만큼 조각이 계속 채워집니다 (돈 초기화로 끔)";
         });
         AddDebugButton(list, "돈 초기화", () =>
         {
@@ -298,8 +301,9 @@ public class SidePanelUI : MonoBehaviour
         {
             UpgradeManager.Instance?.UnlockAllDebug();
             ObjectManager.Instance?.UnlockAllDebug();
+            WeaponManager.Instance?.UnlockAllDebug();
             UpgradeTreeUI.Instance?.RefreshAll();
-            return "모든 업그레이드와 오브젝트를 해금했습니다";
+            return "모든 업그레이드, 오브젝트, 무기를 해금했습니다";
         });
         AddDebugButton(list, "전체 만렙", () =>
         {
@@ -314,6 +318,13 @@ public class SidePanelUI : MonoBehaviour
             ObjectManager.Instance?.ResetAll();
             UpgradeTreeUI.Instance?.RefreshAll();
             return "업그레이드와 오브젝트 해금을 처음 상태로 되돌렸습니다";
+        });
+        AddDebugButton(list, "무기 해금 초기화", () =>
+        {
+            WeaponManager.Instance?.ResetUnlocks();
+            _weaponBrowse.index = 0;
+            UpgradeTreeUI.Instance?.RefreshAll();
+            return "맨손만 남기고 모든 무기를 잠갔습니다";
         });
         AddDebugButton(list, "존 해금 초기화", () =>
         {
@@ -373,8 +384,10 @@ public class SidePanelUI : MonoBehaviour
         System.Func<int> getEquippedIndex,
         System.Action<int> onSelect,
         out System.Action refresh,
-        System.Func<int, bool> isLocked = null, // Object 패널에서만 씀 - null이면(Weapon) 잠김 개념 자체가 없음
-        System.Func<int, (string label, string value, Color color)[]> getInfoRows = null) // Object 패널에서만 씀 - 도감 정보 카드의 (항목, 값, 값 색) 줄들. null이면 카드 없음
+        System.Func<int, bool> isLocked = null, // 잠긴 항목인지 - null이면 잠김 개념 자체가 없음
+        System.Func<int, (string label, string value, Color color)[]> getInfoRows = null, // Object 패널에서만 씀 - 도감 정보 카드의 (항목, 값, 값 색) 줄들. null이면 카드 없음
+        System.Func<int, long> getBuyCost = null, // Weapon 패널에서만 씀 - 잠긴 항목을 지금 살 수 있으면 가격, 아니면 -1
+        System.Func<int, bool> onBuy = null) // Weapon 패널에서만 씀 - 잠긴 항목 구매 시도 (성공하면 true)
     {
         var content = new VisualElement();
         content.style.position = Position.Absolute;
@@ -479,7 +492,12 @@ public class SidePanelUI : MonoBehaviour
         selectButton.clicked += () =>
         {
             if (isLocked != null && isLocked(browse.index))
-                return; // 잠긴 오브젝트는 여기서 선택 안 됨 - 업그레이드 트리에서 먼저 해금해야 함
+            {
+                // 잠긴 항목은 선택 대신 구매 (무기). 오브젝트는 onBuy가 없어서 업그레이드 트리에서 먼저 해금해야 함
+                if (onBuy != null && onBuy(browse.index))
+                    redraw();
+                return;
+            }
 
             onSelect(browse.index);
             redraw();
@@ -524,7 +542,7 @@ public class SidePanelUI : MonoBehaviour
         content.Add(arrowRow);
 
         // 외부(Start, OpenPanel)에서 필요할 때마다 최신 상태로 다시 그릴 수 있도록 넘겨줌
-        redraw = () => RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, infoCard, getName, getIcon, getEquippedIndex, getInfoRows, browse.index, isLocked);
+        redraw = () => RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, infoCard, getName, getIcon, getEquippedIndex, getInfoRows, browse.index, isLocked, getBuyCost);
         refresh = redraw;
 
         return content;
@@ -589,10 +607,12 @@ public class SidePanelUI : MonoBehaviour
         System.Func<int> getEquippedIndex,
         System.Func<int, (string label, string value, Color color)[]> getInfoRows,
         int index,
-        System.Func<int, bool> isLocked = null)
+        System.Func<int, bool> isLocked = null,
+        System.Func<int, long> getBuyCost = null)
     {
-        bool locked = isLocked != null && isLocked(index); // 잠긴 오브젝트인지
-        nameLabel.text = locked ? "???" : getName(index); // 잠긴 오브젝트는 이름도 가림
+        bool locked = isLocked != null && isLocked(index); // 잠긴 항목인지
+        long buyCost = locked && getBuyCost != null ? getBuyCost(index) : -1; // 잠겼지만 지금 살 수 있으면 가격, 아니면 -1
+        nameLabel.text = locked && buyCost < 0 ? "???" : getName(index); // 아직 살 수도 없는 잠긴 항목은 이름도 가림
         previewImage.sprite = getIcon(index);
         previewImage.tintColor = locked ? Color.black : Color.white; // 잠겼으면 완전히 새까만 그림자로 (tint는 그림 색에 곱해지므로 검정이면 안쪽 무늬가 전부 사라지고 모양만 남음)
 
@@ -609,6 +629,15 @@ public class SidePanelUI : MonoBehaviour
         {
             selectButton.style.display = DisplayStyle.None;
             equippedLabel.style.display = DisplayStyle.None;
+            return;
+        }
+
+        // 잠긴 무기: 지금 살 수 있으면 해금 버튼, 아니면 버튼 없음
+        if (locked)
+        {
+            equippedLabel.style.display = DisplayStyle.None;
+            selectButton.style.display = buyCost >= 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            selectButton.text = $"해금 ({NumberFormatUtil.Format(buyCost)} 조각)";
             return;
         }
 

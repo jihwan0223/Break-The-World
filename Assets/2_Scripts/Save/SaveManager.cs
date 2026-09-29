@@ -42,7 +42,10 @@ public class SaveManager : MonoBehaviour
         }
 
         if (WeaponManager.Instance != null)
+        {
             WeaponManager.Instance.OnWeaponChanged += _ => MarkDirty();
+            WeaponManager.Instance.OnUnlockChanged += _ => MarkDirty();
+        }
 
         if (ObjectManager.Instance != null)
         {
@@ -108,8 +111,14 @@ public class SaveManager : MonoBehaviour
             }
         }
 
+        int weaponCount = WeaponManager.Instance != null ? WeaponManager.Instance.WeaponCount : 0;
+        var unlockedWeapons = new bool[weaponCount];
+        for (int i = 0; i < weaponCount; i++)
+            unlockedWeapons[i] = WeaponManager.Instance.IsUnlocked(i);
+
         var data = new SaveData
         {
+            unlockedWeapons = unlockedWeapons,
             pieces = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetPieces() : 0,
             crystals = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetCrystals() : 0,
             unlockedObjects = unlockedObjects,
@@ -156,6 +165,12 @@ public class SaveManager : MonoBehaviour
 
         ZoneManager.Instance?.SetState(data.unlockedMaxZone, data.currentZone);
 
+        // 해금 상태를 먼저 복원해야 장착이 막히지 않음
+        if (WeaponManager.Instance != null && data.unlockedWeapons != null)
+        {
+            for (int i = 0; i < data.unlockedWeapons.Length; i++)
+                WeaponManager.Instance.SetUnlocked(i, data.unlockedWeapons[i]);
+        }
         WeaponManager.Instance?.Equip(data.weaponIndex);
         ObjectManager.Instance?.Equip(data.objectIndex);
 

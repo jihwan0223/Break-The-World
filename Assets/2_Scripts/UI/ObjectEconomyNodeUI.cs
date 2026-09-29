@@ -213,7 +213,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
 
         int level = ObjectManager.Instance.GetGainLevel(objectIndex);
         bool maxed = level >= 5;
-        string nextGain = maxed ? null : $"+{Mathf.Max(1, objectIndex)}개"; // 레벨당 이 오브젝트 처치 시 더 주는 파편 개수(고정값, ObjectManager.GetGainBonus와 동일 공식)
+        string nextGain = maxed ? null : $"+{NumberFormatUtil.Format(ObjectManager.Instance.GainBonusPerLevel(objectIndex))}개"; // 레벨당 이 오브젝트 처치 시 더 주는 조각 개수
         return new UpgradeTooltip.Content
         {
             title = $"{objectName} 획득량 증가",

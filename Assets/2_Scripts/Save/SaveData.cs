@@ -18,6 +18,7 @@ public class SaveData
     public bool[] unlockedObjects; // 오브젝트별 해금 여부 (ObjectManager 리스트 순서, 길이 ObjectManager.ObjectCount)
     public int[] gainLevels; // 오브젝트별 "획득량 증가" 업그레이드 레벨 (ObjectManager 리스트 순서)
     public int weaponIndex; // 장착 중인 무기의 WeaponManager 리스트 인덱스
+    public bool[] unlockedWeapons; // 무기별 해금 여부 (WeaponManager 리스트 순서)
     public int objectIndex; // 선택된 오브젝트의 ObjectManager 리스트 인덱스
     public int unlockedMaxZone; // 해금된 마지막 존 번호 (0 = 첫 존만 열림, 옛 세이브에는 없어서 0으로 읽힘)
     public int currentZone; // 보고 있던 존 번호

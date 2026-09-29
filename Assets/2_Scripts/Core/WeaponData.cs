@@ -9,16 +9,14 @@ public class WeaponData
     public int tier; // 몇 번째 무기인지 (1부터 시작, 1=맨손)
     public string weaponName; // 화면에 보일 무기 이름 (영어)
     public int clickDamage; // 이 무기 장착 시 클릭 한 번당 데미지
-    public int unlockCost; // 이 무기를 해금하는 데 필요한 골드 (지금은 사용 안 하지만 나중을 위해 미리 정의)
     public Sprite icon; // 타격 연출 등에 쓸 무기 이미지. 생성자가 아니라 WeaponManager가 인스펙터 배열로 나중에 채워줌
     // sizeMultiplier/rotationOffset은 여기 저장하지 않고, WeaponManager.GetSizeMultiplier/GetRotationOffset으로 그때그때 조회함
     // (Awake 시점에 한 번만 복사해두면 플레이 중 인스펙터 값 수정이 반영되지 않는 문제가 있어서)
 
-    public WeaponData(int tier, string weaponName, int clickDamage, int unlockCost)
+    public WeaponData(int tier, string weaponName, int clickDamage)
     {
         this.tier = tier;
         this.weaponName = weaponName;
         this.clickDamage = clickDamage;
-        this.unlockCost = unlockCost;
     }
 }

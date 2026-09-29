@@ -22,21 +22,20 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [Min(1)] [SerializeField] private int maxLevel = 5;             // 업그레이드 가능 횟수
     [SerializeField] private float[] valuePerLevel = { 1f };        // 레벨별 효과값 (배열이 짧으면 마지막 값 반복)
 
-    [Tooltip("이 업그레이드 한 번 올리는 데 드는 조각들. 여러 종류를 동시에 요구할 수 있음 (전부 있어야 구매됨)")]
+    [Tooltip("이 업그레이드 한 번 올리는 데 드는 비용들. 조각과 결정을 동시에 요구할 수 있음 (전부 있어야 구매됨)")]
     [SerializeField] private NodeCost[] costs = { new NodeCost() };
 
     [Tooltip("1레벨 이상 찍으면 바뀔 스프라이트 (비워두면 기본 이미지 그대로 유지)")]
     [SerializeField] private Sprite upgradedSprite;
 
-    // 조각 비용 한 줄 = 조각 한 종류 + 레벨별 증가 공식. 노드 하나가 여러 줄을 가질 수 있음
+    // 비용 한 줄 = 조각 또는 결정 + 레벨별 증가 공식. 노드 하나가 여러 줄을 가질 수 있음
     [Serializable]
     public class NodeCost
     {
-        [Tooltip("비우면 Target Object Name 걸로 따라감, 그것도 비었으면 0번 오브젝트 조각")]
-        [ObjectNameField(emptyOptionLabel: "비움 (대상 오브젝트 따라감)")]
-        public string objectName;
+        [Tooltip("체크하면 조각 대신 결정으로 결제")]
+        public bool useCrystals;
         [Min(1)] public long baseAmount = 10;   // 0->1레벨 비용
-        public float levelGrowth = 2f;          // 레벨 오를 때마다 이 조각 요구량에 곱해지는 배율
+        public float levelGrowth = 2f;          // 레벨 오를 때마다 요구량에 곱해지는 배율
     }
 
     private Button _button;
@@ -77,8 +76,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         _icon.sprite = level >= 1 ? upgradedSprite : _baseSprite;
     }
 
-    // 이 노드가 아직 해금 안 된 오브젝트 대상이라 툴팁을 "???"로 가려야 하는지 - 그 오브젝트를 해금하면 원래 설명으로 돌아옴
-    private bool IsMasked() => UpgradeManager.Instance != null && UpgradeManager.Instance.IsTargetObjectLocked(Id);
+    // 이 노드가 아직 해금 안 된 오브젝트/무기 대상이라 툴팁을 "???"로 가려야 하는지 - 그걸 해금하면 원래 설명으로 돌아옴
+    private bool IsMasked() => UpgradeManager.Instance != null && UpgradeManager.Instance.IsTargetLocked(Id);
 
     private void HandleClicked()
     {
@@ -123,6 +122,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.LuckyClick:
             case UpgradeManager.UpgradeEffect.DoubleClick:
             case UpgradeManager.UpgradeEffect.AutoMineUnlock:
+            case UpgradeManager.UpgradeEffect.AutoSweepUnlock:
                 return null; // 해금류는 숫자가 아니라 on/off라 표시 안 함
 
             case UpgradeManager.UpgradeEffect.CritChance:
@@ -138,6 +138,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.AutoClickSpeed:
             case UpgradeManager.UpgradeEffect.ComboCooldown:
             case UpgradeManager.UpgradeEffect.AutoMineSpeed:
+            case UpgradeManager.UpgradeEffect.AutoSweepSpeed:
                 return $"-{value:0.##}초"; // 주기가 줄어드는 효과
 
             case UpgradeManager.UpgradeEffect.ComboDuration:
@@ -148,7 +149,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         }
     }
 
-    // 다음 레벨 비용을 "123K 화분 + 45 접시" 형태 문구로. 최대 레벨이면 "최대"
+    // 다음 레벨 비용을 "123K 조각 + 5 결정" 형태 문구로. 최대 레벨이면 "최대"
     private string NextCostText(int level)
     {
         if (level >= maxLevel) return "최대";
@@ -156,10 +157,17 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         PieceCost[] cost = UpgradeManager.Instance?.GetNextCost(Id);
         if (cost == null || cost.Length == 0) return "";
 
-        long total = 0; // 통합 화폐라 여러 항목이어도 하나로 합산해서 보여줌
-        for (int i = 0; i < cost.Length; i++)
-            total += cost[i].amount;
-        return $"{NumberFormatUtil.Format(total)} 조각";
+        long pieces = 0; // 조각 비용 합
+        long crystals = 0; // 결정 비용 합
+        foreach (PieceCost c in cost)
+        {
+            if (c.isCrystal) crystals += c.amount;
+            else pieces += c.amount;
+        }
+
+        string piecesText = pieces > 0 ? $"{NumberFormatUtil.Format(pieces)} 조각" : "";
+        string crystalsText = crystals > 0 ? $"{NumberFormatUtil.Format(crystals)} 결정" : "";
+        return pieces > 0 && crystals > 0 ? $"{piecesText} + {crystalsText}" : piecesText + crystalsText;
     }
 
     // 공개 여부만 갱신 (노드 자체엔 표시할 게 없음). UpgradeTreeUI가 새로고침할 때마다 호출.

@@ -71,10 +71,10 @@ public class ObjectManager : MonoBehaviour
     // ---- 오브젝트 해금 시스템 ----
     // N번째 오브젝트는 (N-1)번째 오브젝트의 조각으로 해금해야 장착 가능. 0번(Plate)은 처음부터 해금된 상태로 시작
     private bool[] _unlocked;
-    // 해금 비용 시작값 (1번 오브젝트 기준) - 오브젝트 해금은 새 오브젝트/화폐 하나가 통째로 열리는 중요한 업그레이드라
-    // 일반 트리 노드의 해금류 효과(AutoClickUnlock 등)와 같은 비중(4배)으로 잡음
-    private const long UnlockCostBase = 12;
-    private const float UnlockCostGrowth = 6f; // 오브젝트 하나 넘어갈 때마다 해금 비용이 늘어나는 배율 - 마지막 티어(19번)가 Q(10^15) 단위에 오도록 맞춘 값
+    // 해금 비용 = 직전 오브젝트를 몇 번 부숴야 하는지로 맞춤. 보상이 4.5배씩 늘 때 비용은 4.88배씩 늘어서
+    // 필요한 부수기 횟수가 유리컵 15번 -> 우주 약 60번으로 조금씩 늘어남 (무기 해금 비용도 이 곡선을 따라감)
+    public const long UnlockCostBase = 15;
+    public const float UnlockCostGrowth = 4.88f;
 
     // 오브젝트가 새로 해금될 때 (objectIndex) 전달 - Object 선택 UI 등이 구독
     public event Action<int> OnUnlockChanged;
@@ -83,8 +83,8 @@ public class ObjectManager : MonoBehaviour
     // N번째 오브젝트의 획득량 증가 업그레이드는 (N-1)번째 오브젝트의 조각으로 구매. 0번은 대상 아님(항상 0레벨)
     private int[] _gainLevel;
     private const int MaxGainLevel = 5;
-    private const long GainCostBase = 15; // 비용 시작값
-    private const float GainCostGrowthPerObject = 4f; // 오브젝트가 늦게 나올수록(index가 클수록) 비용이 늘어나는 배율
+    private const long GainCostBase = 8; // 비용 시작값 - 그 오브젝트 해금 비용의 약 절반
+    private const float GainCostGrowthPerObject = UnlockCostGrowth; // 해금 비용 곡선과 같은 배율
     private const float GainCostGrowthPerLevel = 1.8f; // 같은 업그레이드 안에서 레벨마다 늘어나는 배율
 
     // 오브젝트의 획득량 업그레이드 레벨이 바뀔 때 (objectIndex, 새 레벨) 전달
@@ -182,6 +182,9 @@ public class ObjectManager : MonoBehaviour
         zoneNames[Mathf.Clamp((objects[index].tier - 1) / 2, 0, zoneNames.Length - 1)];
 
     // index번째 오브젝트의 최대 체력 - Health가 실제로 쓰는 공식과 같음
+    // 이 무기 티어를 쓰는 첫 오브젝트의 인덱스 (없으면 -1) - 무기 해금 비용 기준
+    public static int FirstIndexOfTier(int tier) => objects.FindIndex(o => o.tier == tier);
+
     public static int MaxHPOf(int index) =>
         Health.ComputeMaxHP(objects[index].tier, objects[index].indexInTier, objects[index].hpMultiplier);
 
@@ -225,7 +228,7 @@ public class ObjectManager : MonoBehaviour
         if (_unlocked[index]) return true; // 이미 해금됨
         if (!IsUnlockOrderMet(index)) return false; // 앞 오브젝트를 먼저 해금해야 함
 
-        var cost = new List<PieceCost> { new PieceCost(index - 1, GetUnlockCost(index)) };
+        var cost = new List<PieceCost> { new PieceCost(GetUnlockCost(index)) };
         if (CurrencyManager.Instance == null || !CurrencyManager.Instance.TrySpendPieces(cost))
             return false;
 
@@ -271,13 +274,10 @@ public class ObjectManager : MonoBehaviour
     }
 
     // index번째 오브젝트가 파괴될 때마다 추가로 더 얻는 조각 개수 (획득량 증가 업그레이드 보너스)
-    public long GetGainBonus(int index)
-    {
-        int level = GetGainLevel(index);
-        if (level <= 0) return 0;
+    public long GetGainBonus(int index) => GetGainLevel(index) * GainBonusPerLevel(index);
 
-        return level * Mathf.Max(1, index); // 오브젝트가 늦게 나올수록(index가 클수록) 레벨당 보너스도 커짐
-    }
+    // 획득량 증가 1레벨당 보너스 - 기본 보상의 20% (만렙 5레벨이면 +100%)
+    public long GainBonusPerLevel(int index) => Math.Max(1L, GetBaseReward(index) / 5);
 
     public bool TryUpgradeGain(int index)
     {
@@ -287,7 +287,7 @@ public class ObjectManager : MonoBehaviour
         long cost = GetNextGainCost(index);
         if (cost < 0) return false; // 대상 아니거나 이미 최대 레벨
 
-        var pieceCost = new List<PieceCost> { new PieceCost(index - 1, cost) };
+        var pieceCost = new List<PieceCost> { new PieceCost(cost) };
         if (CurrencyManager.Instance == null || !CurrencyManager.Instance.TrySpendPieces(pieceCost))
             return false;
 
