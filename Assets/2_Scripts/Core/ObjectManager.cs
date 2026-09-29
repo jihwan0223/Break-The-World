@@ -158,6 +158,22 @@ public class ObjectManager : MonoBehaviour
     // index번째 오브젝트를 해금할 순서가 됐는지 - 바로 앞 오브젝트가 해금돼 있어야 함 (트리가 세 갈래로 나뉘어 있어서 순서는 여기서 지킴)
     public bool IsUnlockOrderMet(int index) => index <= 0 || IsUnlocked(index - 1);
 
+    // index를 해금하려면 지금 당장 해금해야 하는 오브젝트의 인덱스 - 해금은 항상 0번부터 순서대로라
+    // 앞에서부터 훑어 아직 안 풀린 첫 번째가 곧 "다음 할 일"임. 이미 순서가 충족됐으면 index 그대로 반환
+    public int NextRequiredUnlockIndex(int index)
+    {
+        for (int i = 0; i < index; i++) // index 앞쪽만 확인 - 뒤쪽은 순서상 아직 볼 필요 없음
+            if (!IsUnlocked(i)) return i;
+        return index;
+    }
+
+    // index를 해금하기 위해 지금 당장 해금해야 하는 오브젝트 이름을 담은 안내 문구 (UI 툴팁용)
+    public string NextRequiredUnlockHintText(int index)
+    {
+        string nextName = GetObjectAt(NextRequiredUnlockIndex(index)).objectName; // 다음에 해금해야 할 오브젝트 이름
+        return $"{nextName}을(를) 먼저 해금하세요";
+    }
+
     // ---- 도감(오브젝트 팝업) 표시용 조회 ----
     private static readonly string[] zoneNames = { "책상 위", "길거리", "공사장", "우주" }; // 위 objects 목록의 존 구분과 같음 (무기 티어 2개당 존 1개, 우주만 티어 4개)
 

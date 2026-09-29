@@ -100,7 +100,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         return new UpgradeTooltip.Content
         {
             title = IsMasked() ? "???" : displayName,
-            description = IsMasked() ? "아직 해금할 수 없습니다" : description,
+            description = IsMasked() ? UpgradeManager.Instance.LockedTargetHintText(Id) : description,
             level = nextEffect != null ? $"{level} / {maxLevel}  (다음 {nextEffect})" : $"{level} / {maxLevel}",
             price = IsMasked() ? "" : NextCostText(level), // 가려진 노드는 가격도 숨김
         };

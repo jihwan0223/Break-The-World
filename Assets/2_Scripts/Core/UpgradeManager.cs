@@ -264,6 +264,15 @@ public class UpgradeManager : MonoBehaviour
                && !ObjectManager.Instance.IsUnlocked(node.targetObjectIndex);
     }
 
+    // IsTargetObjectLocked가 true일 때 툴팁에 보여줄 안내 문구 - 대상 오브젝트를 해금하려면 지금 뭘 먼저 해금해야 하는지
+    public string LockedTargetHintText(string nodeId)
+    {
+        UpgradeNode node = GetNode(nodeId); // 이 노드가 가리키는 오브젝트(targetObjectIndex)를 찾기 위함
+        if (node == null || ObjectManager.Instance == null) return "아직 해금할 수 없습니다"; // 못 찾으면 예전 문구로 대체
+
+        return ObjectManager.Instance.NextRequiredUnlockHintText(node.targetObjectIndex);
+    }
+
     public bool TryUpgrade(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId);
