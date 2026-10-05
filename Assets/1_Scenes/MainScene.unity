@@ -4635,10 +4635,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AutoSweeper
   frames:
-  - {fileID: 21300000, guid: 9234428043c0db84da887c2d4181a407, type: 3}
+  - {fileID: 21300000, guid: 5fc0730b644318643a8cfd44c10a24e5, type: 3}
   framesPerSecond: 12
   moveSpeed: 8
-  heightOffset: 0
+  heightOffset: 2.05
+  swayAngle: 12
+  swaysPerSecond: 3
 --- !u!212 &380148627
 SpriteRenderer:
   serializedVersion: 2
@@ -4708,7 +4710,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -7681,6 +7683,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &801542349
 RectTransform:
@@ -7737,6 +7740,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &801938095
 RectTransform:
@@ -7829,6 +7833,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &804367175
 MonoBehaviour:
@@ -7849,6 +7854,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &804482573
 MonoBehaviour:
@@ -7869,6 +7875,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &804736701
 RectTransform:
@@ -7927,6 +7934,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &805424824
 RectTransform:
@@ -7966,6 +7974,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &805866236
 RectTransform:
@@ -8005,6 +8014,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &806444303
 MonoBehaviour:
@@ -8025,6 +8035,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &806491020
 MonoBehaviour:
@@ -8045,6 +8056,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &806569642
 RectTransform:
@@ -8103,6 +8115,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &807218360
 GameObject:
@@ -8157,6 +8170,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &807735587
 GameObject:
@@ -8213,6 +8227,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &808414302
 RectTransform:
@@ -8252,6 +8267,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &808775006
 GameObject:
@@ -8342,6 +8358,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &809236479
 MonoBehaviour:
@@ -8362,6 +8379,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &809542508
 RectTransform:
@@ -8418,6 +8436,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &810709511
 GameObject:
@@ -8510,6 +8529,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &811738381
 RectTransform:
@@ -8549,6 +8569,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &811856114
 MonoBehaviour:
@@ -8569,6 +8590,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &811934483
 GameObject:
@@ -8661,6 +8683,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &812765844
 GameObject:
@@ -8751,6 +8774,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &813426037
 MonoBehaviour:
@@ -8771,6 +8795,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &814176067
 MonoBehaviour:
@@ -8791,6 +8816,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &814225020
 MonoBehaviour:
@@ -8811,6 +8837,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &814267285
 GameObject:
@@ -8848,6 +8875,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &814865215
 RectTransform:
@@ -8904,6 +8932,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &816010381
 GameObject:
@@ -9064,6 +9093,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &817595171
 GameObject:
@@ -9118,6 +9148,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &818229881
 RectTransform:
@@ -9191,6 +9222,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &818786432
 MonoBehaviour:
@@ -9211,6 +9243,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &818900235
 RectTransform:
@@ -9250,6 +9283,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &819195778
 MonoBehaviour:
@@ -9270,6 +9304,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &819680903
 GameObject:
@@ -9345,6 +9380,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &820596935
 MonoBehaviour:
@@ -9365,6 +9401,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &820989213
 GameObject:
@@ -9402,6 +9439,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &821361157
 RectTransform:
@@ -9530,6 +9568,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &822948897
 MonoBehaviour:
@@ -9550,6 +9589,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &823013789
 RectTransform:
@@ -9589,6 +9629,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &823236787
 RectTransform:
@@ -9698,6 +9739,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &824840509
 GameObject:
@@ -9769,6 +9811,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &825095988
 RectTransform:
@@ -9827,6 +9870,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &826368022
 RectTransform:
@@ -9866,6 +9910,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &826906363
 MonoBehaviour:
@@ -9886,6 +9931,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &826944824
 GameObject:
@@ -9978,6 +10024,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &827587707
 GameObject:
@@ -10034,6 +10081,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &828223977
 MonoBehaviour:
@@ -10054,6 +10102,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &828344164
 GameObject:
@@ -10230,6 +10279,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &828749986
 RectTransform:
@@ -10318,6 +10368,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &829484420
 GameObject:
@@ -10372,6 +10423,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &830046536
 RectTransform:
@@ -10464,6 +10516,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &830475665
 MonoBehaviour:
@@ -10484,6 +10537,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!82 &830523020
 AudioSource:
@@ -10652,6 +10706,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &831651401
 MonoBehaviour:
@@ -10672,6 +10727,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &831845570
 RectTransform:
@@ -10747,6 +10803,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &832276746
 MonoBehaviour:
@@ -10767,6 +10824,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &832329180
 MonoBehaviour:
@@ -10787,6 +10845,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &832401576
 GameObject:
@@ -10877,6 +10936,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &833814419
 MonoBehaviour:
@@ -10897,6 +10957,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &833967854
 MonoBehaviour:
@@ -10917,6 +10978,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &834095773
 RectTransform:
@@ -11030,6 +11092,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &834889798
 MonoBehaviour:
@@ -11050,6 +11113,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &835285505
 MonoBehaviour:
@@ -11070,6 +11134,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &835330695
 MonoBehaviour:
@@ -11090,6 +11155,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &835564013
 RectTransform:
@@ -11129,6 +11195,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &835887694
 RectTransform:
@@ -11204,6 +11271,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &836359090
 MonoBehaviour:
@@ -11224,6 +11292,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &836699610
 GameObject:
@@ -11278,6 +11347,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &837155111
 RectTransform:
@@ -11353,6 +11423,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &837497187
 MonoBehaviour:
@@ -11373,6 +11444,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &837620016
 GameObject:
@@ -11427,6 +11499,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &838027500
 MonoBehaviour:
@@ -11447,6 +11520,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &838150708
 MonoBehaviour:
@@ -11467,6 +11541,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &838221583
 RectTransform:
@@ -11538,6 +11613,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &838587801
 RectTransform:
@@ -11577,6 +11653,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &838870791
 GameObject:
@@ -11614,6 +11691,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &839523387
 MonoBehaviour:
@@ -11634,6 +11712,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &839803755
 GameObject:
@@ -11794,6 +11873,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &841081082
 RectTransform:
@@ -11833,6 +11913,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &841406860
 RectTransform:
@@ -11906,6 +11987,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &841694582
 RectTransform:
@@ -11945,6 +12027,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &842066560
 RectTransform:
@@ -12079,6 +12162,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &843442674
 MonoBehaviour:
@@ -12099,6 +12183,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &843503284
 RectTransform:
@@ -12191,6 +12276,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &845157647
 GameObject:
@@ -12228,6 +12314,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &845945745
 MonoBehaviour:
@@ -12248,6 +12335,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &845953827
 GameObject:
@@ -12285,6 +12373,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &846449534
 GameObject:
@@ -12322,6 +12411,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &847112053
 GameObject:
@@ -12412,6 +12502,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &848686294
 GameObject:
@@ -12449,6 +12540,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &848867091
 RectTransform:
@@ -12526,6 +12618,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &849367885
 GameObject:
@@ -12582,6 +12675,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &851490597
 GameObject:
@@ -12619,6 +12713,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &851655689
 MonoBehaviour:
@@ -12639,6 +12734,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &851666114
 MonoBehaviour:
@@ -12659,6 +12755,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!4 &852219517
 Transform:
@@ -12694,6 +12791,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &852698723
 RectTransform:
@@ -12769,6 +12867,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &853360580
 RectTransform:
@@ -12916,6 +13015,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &855795695
 MonoBehaviour:
@@ -12936,6 +13036,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &855887890
 GameObject:
@@ -12992,6 +13093,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &856239388 stripped
 RectTransform:
@@ -13036,6 +13138,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &856359266
 GameObject:
@@ -13109,6 +13212,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &856696501
 RectTransform:
@@ -13220,6 +13324,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &857904857
 GameObject:
@@ -13337,6 +13442,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &858496854
 MonoBehaviour:
@@ -13357,6 +13463,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &858914730
 MonoBehaviour:
@@ -13377,6 +13484,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &859434022
 RectTransform:
@@ -13648,6 +13756,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &860830174
 GameObject:
@@ -13846,6 +13955,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &864625528
 RectTransform:
@@ -13919,6 +14029,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &865917883
 RectTransform:
@@ -14064,6 +14175,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &867463963
 MonoBehaviour:
@@ -14084,6 +14196,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &867485196
 GameObject:
@@ -14159,6 +14272,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &867887298
 MonoBehaviour:
@@ -14179,6 +14293,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &868040020
 MonoBehaviour:
@@ -14199,6 +14314,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &868098125
 GameObject:
@@ -14255,6 +14371,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &868554716
 GameObject:
@@ -14345,6 +14462,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &869703720
 RectTransform:
@@ -14384,6 +14502,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &869974695
 GameObject:
@@ -14478,6 +14597,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &873056616
 RectTransform:
@@ -14517,6 +14637,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &873354544
 RectTransform:
@@ -14626,6 +14747,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &875663969
 MonoBehaviour:
@@ -14646,6 +14768,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &875829884
 RectTransform:
@@ -14685,6 +14808,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &876354931
 GameObject:
@@ -14722,6 +14846,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &876947756
 MonoBehaviour:
@@ -14742,6 +14867,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &877597105
 GameObject:
@@ -14779,6 +14905,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &877854213
 MonoBehaviour:
@@ -14799,6 +14926,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &877858638
 RectTransform:
@@ -14838,6 +14966,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &878036093
 GameObject:
@@ -14875,6 +15004,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &878513486
 GameObject:
@@ -14984,6 +15114,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &879740599
 MonoBehaviour:
@@ -15004,6 +15135,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &879801011
 RectTransform:
@@ -15043,6 +15175,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &879956442
 GameObject:
@@ -15097,6 +15230,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &880323812
 RectTransform:
@@ -15174,6 +15308,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &881021981
 RectTransform:
@@ -15247,6 +15382,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &881666767
 RectTransform:
@@ -15286,6 +15422,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &881924476
 GameObject:
@@ -15380,6 +15517,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &883242165
 RectTransform:
@@ -15551,6 +15689,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &885576692
 GameObject:
@@ -15588,6 +15727,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &885762484
 MonoBehaviour:
@@ -15608,6 +15748,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &885838252
 RectTransform:
@@ -15683,6 +15824,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &886649976
 MonoBehaviour:
@@ -15703,6 +15845,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &886844540
 MonoBehaviour:
@@ -15723,6 +15866,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &886853232
 GameObject:
@@ -15760,6 +15904,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &886958067
 MonoBehaviour:
@@ -15780,6 +15925,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &886974959
 GameObject:
@@ -15817,6 +15963,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &887367301
 MonoBehaviour:
@@ -15837,6 +15984,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &887823305
 RectTransform:
@@ -16026,6 +16174,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &889590966
 RectTransform:
@@ -16118,6 +16267,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &890374906
 RectTransform:
@@ -16157,6 +16307,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &891040016
 GameObject:
@@ -16230,6 +16381,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &891649011
 GameObject:
@@ -16303,6 +16455,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &892653777
 RectTransform:
@@ -16359,6 +16512,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &893390858
 GameObject:
@@ -16415,6 +16569,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &893762984
 GameObject:
@@ -16613,6 +16768,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &896233546
 MonoBehaviour:
@@ -16633,6 +16789,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &896472565
 GameObject:
@@ -16670,6 +16827,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &896802662
 GameObject:
@@ -16800,6 +16958,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &898317856
 GameObject:
@@ -16856,6 +17015,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &899116151
 RectTransform:
@@ -17105,6 +17265,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+--- !u!1 &901516909
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 901516910}
+  - component: {fileID: 901516911}
+  m_Layer: 0
+  m_Name: "Link_3_\uACE1\uAD2D\uC774_\uB370\uBBF8\uC9C0_\uAC15\uD654_to_162_\uBE57\uC790\uB8E8_\uB4F1\uC7A5_\uC18D\uB3C4_\uC99D\uAC00"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &901516910
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 901516909}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1140785107}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &901516911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 901516909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6760eb25c92123649be66727efa77b94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeTreeLink
+  fromNode: {fileID: 911113178}
+  extraFromNodes: []
+  toNode: {fileID: 1975185458}
+  routing: 0
+  thickness: 40
+  bendRatio: 0.5
+  color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
+  segmentSprite: {fileID: 0}
 --- !u!224 &903730395 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
@@ -21437,6 +21654,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1001 &1130668918
 PrefabInstance:
@@ -21784,6 +22002,8 @@ RectTransform:
   - {fileID: 889330055}
   - {fileID: 1115619923}
   - {fileID: 1605067844}
+  - {fileID: 901516910}
+  - {fileID: 1313793629}
   m_Father: {fileID: 1972268500}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -22785,6 +23005,63 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
   m_PrefabInstance: {fileID: 1300008335}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1313793628
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1313793629}
+  - component: {fileID: 1313793630}
+  m_Layer: 0
+  m_Name: "Link_162_\uBE57\uC790\uB8E8_\uB4F1\uC7A5_\uC18D\uB3C4_\uC99D\uAC00_to_163_\uBE57\uC790\uB8E8_\uC90D\uB294_\uC218_\uC99D\uAC00"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1313793629
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1313793628}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1140785107}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1313793630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1313793628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6760eb25c92123649be66727efa77b94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeTreeLink
+  fromNode: {fileID: 1975185458}
+  extraFromNodes: []
+  toNode: {fileID: 26067272}
+  routing: 0
+  thickness: 40
+  bendRatio: 0.5
+  color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
+  segmentSprite: {fileID: 0}
 --- !u!1001 &1314152780
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25426,6 +25703,7 @@ MonoBehaviour:
   thickness: 40
   bendRatio: 0.5
   color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &1610872449
 GameObject:

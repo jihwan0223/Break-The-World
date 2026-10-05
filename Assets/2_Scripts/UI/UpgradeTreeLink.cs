@@ -20,6 +20,7 @@ public class UpgradeTreeLink : MonoBehaviour
     [SerializeField] private float thickness = 40f;  // 선 두께(px)
     [SerializeField, Range(0f, 1f)] private float bendRatio = 0.5f; // 계단형에서 꺾이는 지점 (from→to 사이 비율)
     [SerializeField] private Color color = new Color(1f, 1f, 1f, 0.5f); // 선 색
+    [SerializeField] private Color crystalColor = new Color(0.45f, 0.9f, 1f, 0.7f); // toNode가 결정으로 사는 노드일 때의 선 색 (선행 노드가 일반 노드여도 이 색)
     [SerializeField] private Sprite segmentSprite; // 세그먼트 스프라이트 (비우면 기본 흰 사각형)
 
     private readonly Dictionary<RectTransform, List<Image>> _segmentGroups = new Dictionary<RectTransform, List<Image>>(); // 선행 노드별 세그먼트 풀
@@ -27,6 +28,7 @@ public class UpgradeTreeLink : MonoBehaviour
     private readonly Dictionary<RectTransform, System.Func<bool>> _completionCheckCache = new Dictionary<RectTransform, System.Func<bool>>(); // 선행 노드별 IsLeveled 체크 캐시 (OR일 때 실제로 충족한 선만 그리기 위함)
     private Vector2 _lastTo; // 직전에 그린 toNode 위치
     private bool _dirty = true;
+    private Color _lastColor; // 직전에 칠한 선 색 - toNode의 결제 방식이 바뀌면 다시 칠하려고 기억
 
     // UpgradeManager/ObjectEconomyNodeUI가 선행관계(누가 누구의 선행인지)를 이 선으로 판단함
     public RectTransform ToNode => toNode;
@@ -72,6 +74,13 @@ public class UpgradeTreeLink : MonoBehaviour
     {
         if (toNode == null) return;
 
+        Color currentColor = CurrentColor(); // 지금 칠해야 할 선 색
+        if (currentColor != _lastColor)
+        {
+            _lastColor = currentColor;
+            _dirty = true;
+        }
+
         bool toVisible = toNode.gameObject.activeInHierarchy;
         Vector2 b = toNode.anchoredPosition;
         bool toMoved = _dirty || b != _lastTo;
@@ -106,6 +115,16 @@ public class UpgradeTreeLink : MonoBehaviour
         }
 
         _dirty = false;
+    }
+
+    // toNode가 결정으로 사는 업그레이드 노드면 crystalColor, 아니면 기본 color
+    private Color CurrentColor()
+    {
+        UpgradeNodeUI node = toNode.GetComponent<UpgradeNodeUI>(); // 이 선이 가리키는 업그레이드 노드 (해금/획득 노드면 null)
+        if (node != null && node.Costs != null)
+            foreach (UpgradeNodeUI.NodeCost cost in node.Costs)
+                if (cost != null && cost.useCrystals) return crystalColor;
+        return color;
     }
 
     // source(선행 노드)가 실제로 충족(업그레이드면 레벨업, 해금/획득 노드면 IsLeveled)됐는지 - 결과를 캐싱해둠
@@ -257,7 +276,7 @@ public class UpgradeTreeLink : MonoBehaviour
             segments[i].enabled = on;
             if (on)
             {
-                segments[i].color = color;
+                segments[i].color = _lastColor;
                 segments[i].sprite = segmentSprite;
             }
         }
