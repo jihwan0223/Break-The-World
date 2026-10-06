@@ -11,6 +11,10 @@ public class UnlockGate : MonoBehaviour
     // 켜두면 해금 전에도 그림은 그대로 보이고 클릭만 막음 - 책상처럼 오브젝트 자체가 배경인 경우에 씀
     [SerializeField] private bool keepVisibleWhenLocked;
 
+    // 0이면 기본으로 놓이는 오브젝트. 1 이상이면 "오브젝트 추가 배치" 업그레이드로 이 수만큼 더 배치돼야 나타나는 추가분
+    // (같은 오브젝트의 2번째 = 1, 3번째 = 2, 4번째 = 3). 추가분은 기본 오브젝트를 복제해서 원하는 자리에 놓고 이 값만 바꾸면 됨
+    [SerializeField] private int requiredExtraCopies;
+
     // 자동으로 못 찾는 걸 추가로 끄고 싶을 때만 채움 (보통 비워둠)
     [SerializeField] private Behaviour[] extraBehaviours;
     [SerializeField] private Renderer[] extraRenderers;
@@ -41,6 +45,8 @@ public class UnlockGate : MonoBehaviour
     void Update()
     {
         bool show = ObjectManager.Instance == null || ObjectManager.Instance.IsUnlocked(objectIndex);
+        if (show && requiredExtraCopies > 0) // 추가분은 업그레이드로 그만큼 더 배치했을 때만
+            show = UpgradeManager.Instance != null && UpgradeManager.Instance.ExtraObjectCopies(objectIndex) >= requiredExtraCopies;
         if (_applied && show == _shown) return; // 상태 안 바뀌었으면 아무것도 안 함 (대부분의 프레임)
 
         _applied = true;

@@ -3,6 +3,7 @@ using UnityEngine;
 
 // 책상처럼 "존 하나를 대표하는" 오브젝트. 부수면 같은 존에 놓인 다른 오브젝트도 전부 같이 부서져 조각이 들어오고,
 // 처음 부술 때는 다음 존을 해금하는 연출(ZoneUnlockEffect)을 재생한다. 이후엔 부술 때마다 존 전체 수확만 함.
+// 결정 업그레이드(존 자동 파괴 해금)를 사면 이 오브젝트가 갈라진 상태가 되어, 직접 부수지 않아도 autoBreakInterval마다 존 전체가 계속 부서진다.
 // shockwaveSpeed를 넣으면 이 오브젝트에서 충격파가 퍼져나가며 가까운 오브젝트부터 차례로 부서짐 (0이면 전부 동시에)
 [RequireComponent(typeof(Health))]
 public class ZoneBreaker : MonoBehaviour
@@ -15,17 +16,42 @@ public class ZoneBreaker : MonoBehaviour
     [SerializeField] private Color shockwaveColor = new Color(1f, 1f, 1f, 0.8f); // 충격파 고리 색
     [SerializeField] private float shakeAmount = 0.15f; // 충격파 때 카메라 흔들림 최대 세기(월드 유닛) - 존 해금 연출이 나올 땐 그쪽 흔들림을 씀
     [SerializeField] private float shakeDuration = 0.3f; // 카메라 흔들림 시간(초)
+    [SerializeField] private float autoBreakInterval = 5f; // 존 자동 파괴를 해금하면 이 주기(초)마다 존 안의 다른 오브젝트가 전부 부서짐
+    [SerializeField] private GameObject unlockedVisual; // 존 자동 파괴를 해금하면 켜지는 연출 오브젝트 (책상 균열 / 도로 싱크홀 그림 - 비워둬도 됨)
 
     private const int RingSegments = 64; // 충격파 고리를 이루는 점 개수
 
     private Health _health; // 이 오브젝트(책상/도로)의 체력
     private LineRenderer _ring; // 충격파 고리 (처음 쓸 때 만듦)
+    private Click _click; // 이 오브젝트의 클릭 처리 - 오브젝트 번호를 알아내는 데 씀
+    private float _autoBreakTimer; // 마지막 자동 파괴 이후 흐른 시간(초)
     private int _waveId; // 가장 최근 충격파 번호 - 연타로 겹치면 고리는 최신 충격파만 그림
 
     void Start()
     {
         _health = GetComponent<Health>();
         _health.OnDied += HandleDied;
+        _click = GetComponent<Click>();
+    }
+
+    void Update()
+    {
+        // 존 자동 파괴(결정 업그레이드)를 해금했으면 갈라진 연출을 켜고, 주기마다 존 전체를 부숨. 안 보는 존에서도 계속 돎
+        bool unlocked = _click != null && UpgradeManager.Instance != null
+            && UpgradeManager.Instance.ZoneAutoBreakIsUnlockedFor(_click.ObjectIndex); // 이 오브젝트의 자동 파괴를 해금했는지
+        if (unlockedVisual != null && unlockedVisual.activeSelf != unlocked) unlockedVisual.SetActive(unlocked);
+        if (!unlocked)
+        {
+            _autoBreakTimer = 0f;
+            return;
+        }
+
+        _autoBreakTimer += Time.deltaTime; // 업그레이드 화면이 열려 timeScale이 0이면 같이 멈춤
+        if (_autoBreakTimer < autoBreakInterval) return;
+
+        _autoBreakTimer = 0f;
+        if (shockwaveSpeed > 0f) StartCoroutine(Shockwave(false)); // 주기마다 흔들리면 거슬려서 카메라 흔들림은 뺌
+        else HarvestZone();
     }
 
     void OnDestroy()
@@ -61,8 +87,11 @@ public class ZoneBreaker : MonoBehaviour
 
     private void Break(Health h)
     {
-        if (h != _health && h.enabled)
-            h.TakeDamage(h.CurrentHP);
+        if (h == _health || !h.enabled) return;
+
+        Click click = h.GetComponent<Click>(); // 대상의 클릭 처리 - 있으면 "직접 부순 것"으로 쳐서 보상이 파편으로 떨어지게 함
+        if (click != null && click.enabled) click.BreakByZone();
+        else h.TakeDamage(h.CurrentHP);
     }
 
     // 이 오브젝트 중심에서 고리가 퍼져나가고, 고리가 닿은 오브젝트부터 부서짐

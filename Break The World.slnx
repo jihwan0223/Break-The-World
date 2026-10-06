@@ -5,5 +5,7 @@
   <Project Path="Lofelt.NiceVibrations.Demo.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="UnityPlayModeSaverEditor.csproj" />
+  <Project Path="UnityPlayModeSaver.csproj" />
   <Project Path="Lofelt.NiceVibrations.Editor.csproj" />
 </Solution>

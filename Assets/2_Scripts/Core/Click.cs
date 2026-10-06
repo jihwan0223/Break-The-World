@@ -62,6 +62,15 @@ public class Click : MonoBehaviour
             _health.OnDied -= HandleDied;
     }
 
+    public int ObjectIndex => ObjIndex; // 이 오브젝트의 번호 (ZoneBreaker가 자기 업그레이드를 찾을 때 씀)
+
+    // 존 전체 파괴(ZoneBreaker)용 - 남은 체력만큼 한 번에 깎아 부숨. 직접 부순 것으로 쳐서, 보고 있는 존이면 보상이 파편으로 떨어짐
+    public void BreakByZone()
+    {
+        _lastHitFromAutoClick = false;
+        _health.TakeDamage(_health.CurrentHP);
+    }
+
     private void HandleDied()
     {
         // 바로 아래에서 ObjectManager.Instance도 참조하니 둘 다 확인해야 함 (CurrencyManager만 확인하면 널 참조 위험)

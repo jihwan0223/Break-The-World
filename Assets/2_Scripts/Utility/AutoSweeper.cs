@@ -2,7 +2,8 @@ using System.Collections;
 using UnityEngine;
 
 // 자동 줍기 - 업그레이드로 해금되면 주기마다 바닥 왼쪽 밖에서 튀어나와 오른쪽 끝까지 지나가며,
-// 지나가는 자리에 있는 파편(결정 포함)을 한 번에 정해진 개수까지 주워서 조각/결정을 지급함. 이미 지나간 자리에 새로 떨어진 건 안 주움. 지금 안 보는 존의 바닥도 같이 쓺 (개수 제한은 존마다 따로).
+// 지나가는 자리에 있는 파편을 맨 위층부터 업그레이드된 층 수만큼 전부 주워서 조각/결정을 지급함 (개수 제한 없음, 결정은 층과 상관없이 주움).
+// 이미 지나간 자리와 출발한 뒤에 떨어진 파편은 안 주움. 지금 안 보는 존의 바닥도 같이 쓺.
 // 그림 크기는 프레임 스프라이트의 Pixels Per Unit으로 맞춤. 스프라이트 Pivot(손잡이 끝)을 축으로 좌우로 흔들리며 쓰는 것처럼 보임
 [RequireComponent(typeof(SpriteRenderer))]
 public class AutoSweeper : MonoBehaviour
@@ -50,10 +51,7 @@ public class AutoSweeper : MonoBehaviour
         float endX = floor.max.x + halfWidth; // 도착 x
         float y = floor.center.y + heightOffset; // 지나가는 높이
         float elapsed = 0f; // 애니메이션용 경과 시간
-        int zoneCount = ZoneManager.Instance != null ? Mathf.Max(1, ZoneManager.Instance.ZoneCount) : 1; // 쓸고 지나갈 존 수
-        int[] remaining = new int[zoneCount]; // 존마다 이번에 더 주울 수 있는 파편 수
-        for (int zone = 0; zone < zoneCount; zone++)
-            remaining[zone] = UpgradeManager.Instance.AutoSweepPickupCount;
+        DebrisPool.Instance.MarkTopLayersForSweep(UpgradeManager.Instance.AutoSweepLayers); // 출발하는 순간, 위층부터 몇 층을 쓸지 정함
 
         _renderer.enabled = true;
         while (x < endX)
@@ -67,9 +65,7 @@ public class AutoSweeper : MonoBehaviour
             if (frames != null && frames.Length > 0)
                 _renderer.sprite = frames[(int)(elapsed * framesPerSecond) % frames.Length];
 
-            for (int zone = 0; zone < zoneCount; zone++)
-                if (remaining[zone] > 0)
-                    remaining[zone] -= DebrisPool.Instance.CollectLandedBetween(prevX, x, zone, remaining[zone]); // 그림 중앙이 이번 프레임에 지나간 구간만, 남은 개수만큼 주움
+            DebrisPool.Instance.CollectMarkedBetween(prevX, x); // 그림 중앙이 이번 프레임에 지나간 구간의 대상 파편을 전부 주움
             yield return null;
         }
 

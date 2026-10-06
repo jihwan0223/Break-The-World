@@ -84,7 +84,6 @@ public class ObjectManager : MonoBehaviour
     private int[] _gainLevel;
     private const int MaxGainLevel = 5;
     private const long GainCostBase = 8; // 비용 시작값 - 그 오브젝트 해금 비용의 약 절반
-    private const float GainCostGrowthPerObject = UnlockCostGrowth; // 해금 비용 곡선과 같은 배율
     private const float GainCostGrowthPerLevel = 1.8f; // 같은 업그레이드 안에서 레벨마다 늘어나는 배율
 
     // 오브젝트의 획득량 업그레이드 레벨이 바뀔 때 (objectIndex, 새 레벨) 전달
@@ -208,16 +207,27 @@ public class ObjectManager : MonoBehaviour
     // 기본 보상이 고정값(예: 1개)이면 콤보/업그레이드 배율을 아무리 곱해도(배율은 곱셈일 뿐 밑변이 1이면 그대로
     // 작은 수) 후반 티어 가격을 절대 못 따라잡음. 그래서 기본 보상도 오브젝트 티어마다 기하급수적으로 커지게 함.
     private const long BaseRewardStart = 1; // 0번 오브젝트 기본 보상
-    private const float BaseRewardGrowth = 4.5f; // 오브젝트 하나 넘어갈 때마다 곱해지는 배율 - 콤보/업그레이드 배율까지 곱해졌을 때 후반 가격대와 맞도록 잡은 값
+    private const float BaseRewardGrowth = 4.5f; // 같은 맵 안에서 오브젝트 하나 넘어갈 때마다 곱해지는 배율
+    private const int ObjectsPerMap = 5; // 맵 하나에 들어있는 오브젝트 수 (접시~책상 / 가로등~도로 / 컨테이너 박스~콘크리트 바닥 / 그 뒤는 우주)
+    private const float MapRewardJump = 5.42f; // 다음 맵으로 넘어가는 순간 추가로 곱해지는 배율 - 새 맵을 열면 확 많이 들어오는 느낌용 (가로등 기본 보상 = 1845 x 5.42 = 약 10,000)
 
-    public long GetBaseReward(int index) =>
-        Math.Max(1L, (long)(BaseRewardStart * Mathf.Pow(BaseRewardGrowth, Mathf.Max(0, index))));
+    public long GetBaseReward(int index) => Math.Max(1L, (long)RawBaseReward(index));
+
+    // 소수점을 버리기 전의 기본 보상 - 해금 비용이 이 값을 기준으로 계산됨
+    private static double RawBaseReward(int index)
+    {
+        int safeIndex = Mathf.Max(0, index); // 음수 방지
+        return BaseRewardStart * Math.Pow(BaseRewardGrowth, safeIndex) * Math.Pow(MapRewardJump, safeIndex / ObjectsPerMap);
+    }
 
     // index번째 오브젝트를 해금하는 데 필요한 조각 개수 (0번은 비용 없음 - 처음부터 해금)
     public long GetUnlockCost(int index)
     {
         if (index <= 0) return 0;
-        return (long)(UnlockCostBase * Mathf.Pow(UnlockCostGrowth, index - 1));
+        // 바로 앞 오브젝트를 몇 번 부숴야 살 수 있는지(15번에서 시작해 오브젝트마다 약 8%씩 늘어남) x 앞 오브젝트의 기본 보상.
+        // 보상이 맵 경계에서 확 뛰어도 "부숴야 하는 횟수"는 일정하게 유지됨
+        double breaksNeeded = UnlockCostBase * Math.Pow(UnlockCostGrowth / BaseRewardGrowth, index - 1); // 앞 오브젝트를 부숴야 하는 횟수
+        return (long)(breaksNeeded * RawBaseReward(index - 1));
     }
 
     // 조각으로 index번째 오브젝트를 해금 시도.
@@ -256,9 +266,8 @@ public class ObjectManager : MonoBehaviour
         int level = GetGainLevel(index);
         if (level >= MaxGainLevel) return -1;
 
-        float objectFactor = Mathf.Pow(GainCostGrowthPerObject, index - 1);
-        float levelFactor = Mathf.Pow(GainCostGrowthPerLevel, level);
-        return (long)(GainCostBase * objectFactor * levelFactor);
+        double levelFactor = Math.Pow(GainCostGrowthPerLevel, level); // 레벨이 오를수록 비싸지는 배율
+        return (long)(GetUnlockCost(index) * (GainCostBase / (double)UnlockCostBase) * levelFactor); // 그 오브젝트 해금 비용의 약 절반에서 시작
     }
 
     // index번째 오브젝트가 파괴될 때마다 추가로 더 얻는 조각 개수 (획득량 증가 업그레이드 보너스)

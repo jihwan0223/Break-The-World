@@ -40,7 +40,10 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("결정 드랍량 증가")] CrystalAmount,        // 결정이 나올 때 개수 +값
         [InspectorName("자동 줍기 해금")] AutoSweepUnlock,        // 주기마다 바닥을 쓸고 지나가며 파편을 주워주는 기능 해금
         [InspectorName("자동 줍기 주기 단축")] AutoSweepSpeed,    // 자동 줍기 주기 -값 초
-        [InspectorName("자동 줍기 한번에 줍는 수 증가")] AutoSweepCount, // 자동 줍기 한 번 지나갈 때 주울 수 있는 파편 +값 개
+        [InspectorName("자동 줍기 층 증가")] AutoSweepLayers,     // 자동 줍기가 한 번 지나갈 때 쓸어 담는 파편 층 +값 (맨 위층부터)
+        [InspectorName("호버 줍기 해금")] HoverPickupUnlock,       // 커서를 파편 위에 올리기만 해도 맨 위 파편부터 주워지는 기능 해금
+        [InspectorName("존 자동 파괴 해금")] ZoneAutoBreakUnlock,   // Target Object Name(책상/도로)이 갈라져서 그 존의 다른 오브젝트가 주기마다 계속 부서지는 기능 해금
+        [InspectorName("오브젝트 추가 배치")] ObjectExtraCopies,   // Target Object Name 오브젝트(비우면 모든 오브젝트)를 +값 개 더 배치. 추가분은 씬에 미리 놓아두고 UnlockGate로 켬
     }
 
     // 선행 노드와 잇는 선의 모양 (UpgradeTreeLink가 이 값을 보고 세그먼트를 배치함)
@@ -74,7 +77,7 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private int baseCrystalAmount = 1;          // 결정이 나올 때 기본 개수 - CrystalAmount가 위에 더함
     [SerializeField] private float baseAutoSweepInterval = 20f;  // 자동 줍기 기본 주기(초)
     [SerializeField] private float minAutoSweepInterval = 3f;    // 자동 줍기 주기 하한
-    [SerializeField] private int baseAutoSweepCount = 10;        // 자동 줍기 한 번 지나갈 때 기본으로 주울 수 있는 파편 수 - AutoSweepCount가 위에 더함
+    [SerializeField] private int baseAutoSweepLayers = 1;        // 자동 줍기가 기본으로 쓸어 담는 파편 층 수 (맨 위층부터) - AutoSweepLayers가 위에 더함
 
     // ---- 씬의 UpgradeNodeUI를 읽어 구성한 실제 노드 ----
 
@@ -487,11 +490,19 @@ public class UpgradeManager : MonoBehaviour
     public int CrystalDropAmount => baseCrystalAmount + Mathf.RoundToInt(SumEffect(UpgradeEffect.CrystalAmount));
 
     public bool AutoSweepIsUnlocked => AnyUnlocked(UpgradeEffect.AutoSweepUnlock);
+    // objectIndex(책상/도로)의 "갈라져서 존 전체가 계속 부서지는" 기능을 해금했는지
+    public bool ZoneAutoBreakIsUnlockedFor(int objectIndex) => AnyUnlocked(UpgradeEffect.ZoneAutoBreakUnlock, objectIndex);
+    // objectIndex 오브젝트를 업그레이드로 몇 개 더 배치했는지 (모든 오브젝트 대상 노드 + 그 오브젝트 전용 노드 합산)
+    public int ExtraObjectCopies(int objectIndex) =>
+        Mathf.RoundToInt(SumEffect(UpgradeEffect.ObjectExtraCopies, -1) + SumEffect(UpgradeEffect.ObjectExtraCopies, objectIndex));
+    public bool HoverPickupIsUnlocked => AnyUnlocked(UpgradeEffect.HoverPickupUnlock); // 호버 줍기 해금 여부
 
     public float AutoSweepIntervalSeconds =>
         Mathf.Max(minAutoSweepInterval, baseAutoSweepInterval - SumEffect(UpgradeEffect.AutoSweepSpeed));
 
-    public int AutoSweepPickupCount => baseAutoSweepCount + Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoSweepCount));
+    // 자동 줍기가 한 번 지나갈 때 쓸어 담는 파편 층 수 (1 = 맨 위층만, DebrisPool.LayerCount = 전부)
+    public int AutoSweepLayers =>
+        Mathf.Clamp(baseAutoSweepLayers + Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoSweepLayers)), 1, DebrisPool.LayerCount);
 
     // 이 무기를 장착하고 오브젝트를 처치했을 때 추가로 주는 파편 (전역 노드는 targetWeaponIndex -1이라 항상 포함)
     public long WeaponKillBonusPieces(int equippedWeaponIndex)

@@ -97,19 +97,10 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         int level = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetLevel(Id) : 0;
         string nextEffect = IsMasked() ? null : NextLevelEffectText(level); // 다음 레벨에서 늘어나는 수치 문구 ("+3", "+15%" 등) - 해금류/최대레벨이면 null, 가려진 노드는 효과 종류가 드러나지 않게 null
 
-        // 빗자루 줍는 수의 마지막 레벨은 사실상 제한 해제라, 숫자 대신 그렇게 안내함
-        string shownDescription = description; // 툴팁 설명
-        bool sweepUnlimited = effect == UpgradeManager.UpgradeEffect.AutoSweepCount && level >= maxLevel - 1; // 다음(또는 이미 찍은) 레벨이 제한 해제인지
-        if (sweepUnlimited)
-        {
-            shownDescription = level >= maxLevel ? "빗자루가 파편을 제한 없이 주워줍니다." : "마지막 강화 - 빗자루가 파편을 줍는 개수 제한이 없어집니다.";
-            if (nextEffect != null) nextEffect = "제한 없음";
-        }
-
         return new UpgradeTooltip.Content
         {
             title = IsMasked() ? "???" : displayName,
-            description = IsMasked() ? UpgradeManager.Instance.LockedTargetHintText(Id) : shownDescription,
+            description = IsMasked() ? UpgradeManager.Instance.LockedTargetHintText(Id) : description,
             level = nextEffect != null ? $"{level} / {maxLevel}  (다음 {nextEffect})" : $"{level} / {maxLevel}",
             price = IsMasked() ? "" : NextCostText(level), // 가려진 노드는 가격도 숨김
         };
@@ -133,6 +124,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.DoubleClick:
             case UpgradeManager.UpgradeEffect.AutoMineUnlock:
             case UpgradeManager.UpgradeEffect.AutoSweepUnlock:
+            case UpgradeManager.UpgradeEffect.HoverPickupUnlock:
+            case UpgradeManager.UpgradeEffect.ZoneAutoBreakUnlock:
                 return null; // 해금류는 숫자가 아니라 on/off라 표시 안 함
 
             case UpgradeManager.UpgradeEffect.CritChance:
@@ -153,6 +146,12 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
             case UpgradeManager.UpgradeEffect.ComboDuration:
                 return $"+{value:0.##}초"; // 지속시간이 늘어나는 효과
+
+            case UpgradeManager.UpgradeEffect.ObjectExtraCopies:
+                return $"+{value:0.##}개"; // 더 놓이는 개수
+
+            case UpgradeManager.UpgradeEffect.AutoSweepLayers:
+                return $"+{value:0.##}층"; // 쓸어 담는 층이 늘어나는 효과
 
             default: // ClickDamage, AutoClickCount, AutoMineYield, ComboMultiplier, WeaponKillBonus 등 순수 수치형
                 return $"+{value:0.##}";
