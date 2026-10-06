@@ -12,7 +12,6 @@ public class CurrencyManager : MonoBehaviour
     // 실제 재화 밸런스를 테스트할 땐 꺼두면 됨
     [SerializeField] private bool debugAlwaysMaxPieces = false;
     private const long DebugMaxPieceAmount = 999_999_999_999_999L; // 테스트용 최대 조각 값 (Q 단위 비용도 감당할 만큼 넉넉하게)
-    private bool _debugRefill; // 디버그 "돈 최대"로 켜지는 자동 충전 모드 - 켜져 있으면 매 프레임 조각을 구매 가능한 최고가만큼 채움
 
     private long _pieces; // 보유 중인 통합 조각 개수
     private long _crystals; // 보유 중인 결정 개수 (오브젝트 처치 시 확률로 나오는 희귀 재화)
@@ -108,65 +107,8 @@ public class CurrencyManager : MonoBehaviour
     // 테스트용 - 보유 중인 조각과 결정을 0으로
     public void ResetAll()
     {
-        _debugRefill = false;
         _pieces = 0;
         OnPiecesChanged?.Invoke(0);
         SetCrystals(0);
-    }
-
-    // 테스트용 - 켜두면 조각/결정이 "지금 살 수 있는 것 중 가장 비싼 가격"보다 적을 때마다 그만큼 다시 채워짐 (ResetAll로 꺼짐)
-    public void StartDebugRefill() => _debugRefill = true;
-
-    void LateUpdate()
-    {
-        if (!_debugRefill) return;
-
-        var (pieces, crystals) = MaxAvailableCost(); // 지금 구매 가능한 것 중 가장 비싼 가격
-        if (_pieces < pieces) SetPieces(pieces);
-        if (_crystals < crystals) SetCrystals(crystals);
-    }
-
-    // 공개된 업그레이드 노드 + 해금 가능한 오브젝트/무기 + 획득량 업그레이드 중 가장 비싼 다음 가격 (조각, 결정 따로)
-    private (long pieces, long crystals) MaxAvailableCost()
-    {
-        long maxPieces = 0, maxCrystals = 0; // 지금까지 찾은 가장 비싼 조각/결정 가격
-
-        UpgradeManager upgrades = UpgradeManager.Instance;
-        if (upgrades != null)
-        {
-            foreach (UpgradeManager.UpgradeNode node in upgrades.Nodes)
-            {
-                if (!upgrades.IsRevealed(node.id) || upgrades.IsTargetLocked(node.id)) continue;
-
-                PieceCost[] costs = node.CostForLevel(upgrades.GetLevel(node.id)); // 최대 레벨이면 null
-                if (costs == null) continue;
-
-                var (pieces, crystals) = Sum(costs);
-                maxPieces = Math.Max(maxPieces, pieces);
-                maxCrystals = Math.Max(maxCrystals, crystals);
-            }
-        }
-
-        ObjectManager objects = ObjectManager.Instance;
-        if (objects != null)
-        {
-            for (int i = 1; i < objects.ObjectCount; i++)
-            {
-                if (objects.IsUnlocked(i))
-                    maxPieces = Math.Max(maxPieces, objects.GetNextGainCost(i)); // 최대 레벨이면 -1이라 자동으로 무시됨
-                else if (objects.IsUnlockOrderMet(i))
-                    maxPieces = Math.Max(maxPieces, objects.GetUnlockCost(i));
-            }
-        }
-
-        WeaponManager weapons = WeaponManager.Instance;
-        if (weapons != null)
-        {
-            for (int i = 1; i < weapons.WeaponCount; i++)
-                if (!weapons.IsUnlocked(i) && weapons.IsUnlockOrderMet(i))
-                    maxPieces = Math.Max(maxPieces, weapons.GetUnlockCost(i));
-        }
-
-        return (maxPieces, maxCrystals);
     }
 }

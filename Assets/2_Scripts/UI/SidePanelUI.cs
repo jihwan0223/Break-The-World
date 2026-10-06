@@ -295,8 +295,9 @@ public class SidePanelUI : MonoBehaviour
         // 각 동작은 눌린 결과를 한 줄 문구로 돌려줌 - 화면이 팝업에 가려져서 눌렀는지 알 수 없기 때문
         AddDebugButton(list, "돈 최대", () =>
         {
-            CurrencyManager.Instance?.StartDebugRefill();
-            return "지금 살 수 있는 가장 비싼 가격만큼 조각이 계속 채워집니다 (돈 초기화로 끔)";
+            CurrencyManager.Instance?.AddPieces(10_000_000_000L);
+            CurrencyManager.Instance?.AddCrystals(1000);
+            return "조각 100억 개와 결정 1,000개를 지급했습니다";
         });
         AddDebugButton(list, "돈 초기화", () =>
         {
@@ -305,7 +306,7 @@ public class SidePanelUI : MonoBehaviour
             if (PieceTutorial.Instance != null) PieceTutorial.Instance.Done = false; // 첫 파편 튜토리얼도 다시 볼 수 있게
             return "조각과 결정을 0으로 되돌렸습니다 (첫 파편 튜토리얼 다시 나옴)";
         });
-        AddDebugButton(list, "전체 해금", () =>
+        AddDebugButton(list, "업그레이드 해금", () =>
         {
             UpgradeManager.Instance?.UnlockAllDebug();
             ObjectManager.Instance?.UnlockAllDebug();
@@ -313,31 +314,47 @@ public class SidePanelUI : MonoBehaviour
             UpgradeTreeUI.Instance?.RefreshAll();
             return "모든 업그레이드, 오브젝트, 무기를 해금했습니다";
         });
-        AddDebugButton(list, "전체 만렙", () =>
+        AddDebugButton(list, "업그레이드 만렙", () =>
         {
             UpgradeManager.Instance?.MaxAllDebug();
             ObjectManager.Instance?.MaxAllDebug();
             UpgradeTreeUI.Instance?.RefreshAll();
             return "모든 업그레이드와 오브젝트 획득량을 만렙으로 채웠습니다";
         });
-        AddDebugButton(list, "업그레이드 초기화", () =>
+        AddDebugButton(list, "업글 초기화", () =>
         {
             UpgradeManager.Instance?.ResetAll();
             ObjectManager.Instance?.ResetAll();
             UpgradeTreeUI.Instance?.RefreshAll();
             return "업그레이드와 오브젝트 해금을 처음 상태로 되돌렸습니다";
         });
-        AddDebugButton(list, "무기 해금 초기화", () =>
+        AddDebugButton(list, "무기 초기화", () =>
         {
             WeaponManager.Instance?.ResetUnlocks();
             _weaponBrowse.index = 0;
             UpgradeTreeUI.Instance?.RefreshAll();
             return "맨손만 남기고 모든 무기를 잠갔습니다";
         });
-        AddDebugButton(list, "존 해금 초기화", () =>
+        AddDebugButton(list, "맵 해금 초기화", () =>
         {
             ZoneManager.Instance?.ResetAll();
             return "존1만 열린 상태로 되돌렸습니다. 책상을 부수면 해금 연출이 나옵니다";
+        });
+        AddDebugButton(list, "전체 초기화", () =>
+        {
+            // 위 초기화들을 한 번에 - 새 게임을 시작한 것과 같은 상태로 만들고 바로 저장함
+            CurrencyManager.Instance?.ResetAll();
+            DebrisPool.Instance?.ClearAll();
+            if (PieceTutorial.Instance != null) PieceTutorial.Instance.Done = false;
+            UpgradeManager.Instance?.ResetAll();
+            ObjectManager.Instance?.ResetAll();
+            ObjectManager.Instance?.Equip(0); // 잠긴 오브젝트를 들고 있지 않게 접시로
+            WeaponManager.Instance?.ResetUnlocks();
+            _weaponBrowse.index = 0;
+            ZoneManager.Instance?.ResetAll();
+            UpgradeTreeUI.Instance?.RefreshAll();
+            SaveManager.Instance?.SaveNow();
+            return "모든 데이터를 처음 상태로 되돌렸습니다";
         });
         _debugPanel.Add(list);
 
