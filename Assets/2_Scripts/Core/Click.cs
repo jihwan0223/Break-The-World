@@ -43,6 +43,10 @@ public class Click : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _collider = GetComponent<Collider2D>();
         _health.OnDied += HandleDied;
+
+        // 맞을 때 움찔하는 연출이 안 붙어 있는 오브젝트(책상 등)에도 붙여서, 어떤 오브젝트든 맞는 게 보이게 함
+        if (GetComponent<HitFeedback>() == null && GetComponent<SpriteRenderer>() != null)
+            gameObject.AddComponent<HitFeedback>();
     }
 
     void OnDisable()
@@ -180,7 +184,20 @@ public class Click : MonoBehaviour
         if (!willDie && !IsZoneHidden)
             PlayRandomClickSound();
 
+        bool wasAlive = _health.CurrentHP > 0; // 이미 부서져 있던 걸 때린 게 아닌지
         _health.TakeDamage(damage);
+
+        // 맞은 자리에 부스러기 + 데미지 숫자 - 체력이 많은 오브젝트도 맞고 있다는 게 보이게.
+        // 숫자는 남은 체력으로 자르지 않고 때린 데미지 그대로 보여줌
+        if (!IsZoneHidden && _collider != null && wasAlive && damage > 0)
+        {
+            Bounds bounds = _collider.bounds; // 맞은 자리를 정할 오브젝트 범위
+            Vector2 hitPoint = swingPoint ?? (Vector2)bounds.center + Vector2.Scale(Random.insideUnitCircle, bounds.extents) * 0.5f; // 커서로 때렸으면 그 자리, 아니면 오브젝트 안쪽 아무 데나
+            int objectIndex = ObjIndex; // 부스러기 색을 정할 오브젝트 번호
+            Color chipColor = ObjectManager.Instance != null && objectIndex >= 0 && objectIndex < ObjectManager.StaticObjectCount
+                ? ObjectManager.Instance.GetObjectAt(objectIndex).pileColor : Color.white; // 그 오브젝트의 파편 색과 같은 색
+            HitEffects.Play(hitPoint, damage, isCrit || isLucky, chipColor);
+        }
 
         // 콜라이더 테두리 위 랜덤한 지점에 현재 무기 이미지로 타격 연출 재생
         if (playWeaponSwing && !IsZoneHidden && WeaponManager.Instance != null && _collider != null)
@@ -344,17 +361,36 @@ public class Click : MonoBehaviour
         Vector2 screenPos = Mouse.current.position.ReadValue();
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
 
-        // 클릭한 월드 좌표에서 맨 위에 그려진 오브젝트가 "나 자신"일 때만 반응
-        if (TopmostAt(worldPos) == gameObject)
+        if (IsClickTarget(worldPos))
         {
             Debug.Log("Click");
-            PerformClickHit(true, worldPos); // 직접 클릭은 타격 연출이 커서 위치에서 나옴
+            PerformClickHit(true, _collider.ClosestPoint(worldPos)); // 타격 연출은 커서 위치에서, 커서 범위 가장자리에 걸쳐 맞았으면 커서에 가장 가까운 자리에서 나옴
 
             // 더블클릭 업그레이드 - 확률 판정 성공 시 살짝 늦게 두 번째 타격을 처리
             // (첫 타격에 죽었으면 지연된 PerformClickHit이 알아서 무시함 - IsDead 체크가 있음)
             if (UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.DoubleClickChanceValue)
                 StartCoroutine(PerformDelayedDoubleClickHit());
         }
+    }
+
+    // 이번 클릭에 이 오브젝트가 맞는지.
+    // 커서가 직접 가리키는(클릭한 점에서 맨 위에 그려진) 오브젝트는 항상 맞음 - 책상/도로 같은 지형도 직접 겨누면 맞음.
+    // 커서 범위 업그레이드가 있으면 범위 원에 걸친 다른 오브젝트도 같이 맞음. 단, 지형은 화면 전체를 덮고 있어서
+    // 원에 걸친 것만으로는 안 맞음 (안 그러면 소품을 누를 때마다 지형이 같이 맞게 됨)
+    private bool IsClickTarget(Vector2 worldPos)
+    {
+        GameObject top = TopmostAt(worldPos); // 클릭한 점에서 맨 위에 그려진 것
+        if (top == gameObject) return true;
+
+        float radius = UpgradeManager.Instance != null ? UpgradeManager.Instance.CursorRadius : 0f; // 커서 범위 반지름
+        if (radius <= 0f) return false; // 범위가 없으면 직접 가리킨 것만
+        if (top != null && top.GetComponent<Click>() == null) return false; // 커서 바로 밑이 파편이면 파편 줍기가 우선
+        if (GetComponent<ZoneBreaker>() != null) return false; // 지형은 직접 겨눴을 때만
+        if (IsZoneHidden) return false; // 안 보이는 존의 오브젝트
+
+        foreach (Collider2D hit in Physics2D.OverlapCircleAll(worldPos, radius))
+            if (hit == _collider) return true;
+        return false;
     }
 
     private IEnumerator PerformDelayedDoubleClickHit()

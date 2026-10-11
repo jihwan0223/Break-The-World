@@ -58,6 +58,10 @@ public class ZoneManager : MonoBehaviour
         SetState(0, 0);
     }
 
+    // 조각으로 사는 게 아니라 존이 열릴 때 공짜로 풀리는 오브젝트인지 (가로등 등)
+    public bool IsZoneFirstObject(int objectIndex) =>
+        objectIndex >= 0 && zoneFirstObjects != null && Array.IndexOf(zoneFirstObjects, objectIndex) >= 1;
+
     // 해당 존을 해금 (이미 열려있으면 무시). 실제 호출은 ★ 오브젝트 첫 파괴 시점
     public void UnlockZone(int zone)
     {

@@ -16,6 +16,10 @@ public class PickupPopup : MonoBehaviour
     [SerializeField] private int sortingOrder = 30; // 파편/결정보다 위에 그려지도록
     [SerializeField] private Color pieceColor = Color.white; // 조각 숫자 색
     [SerializeField] private Color crystalColor = new Color(0.55f, 0.9f, 1f); // 결정 숫자 색 (좌상단 결정 라벨과 같은 하늘색)
+    [SerializeField] private float popDuration = 0.16f; // 데미지 숫자가 튀어나오며 커지는 시간(초)
+    [SerializeField] private float popStartScale = 0.3f; // 데미지 숫자가 튀어나오기 시작할 때 크기 배율
+    [SerializeField] private float popDrift = 0.45f; // 데미지 숫자가 좌우로 흩어지는 최대 거리(월드 유닛)
+    [SerializeField] private float popTilt = 12f; // 데미지 숫자가 기울어지는 최대 각도
 
     // 떠 있는 숫자 하나
     private class Popup
@@ -26,6 +30,9 @@ public class PickupPopup : MonoBehaviour
         public long amount; // 지금 표시 중인 합계
         public bool isCrystal; // 결정 숫자인지
         public bool mergeable; // 빗자루 숫자인지 (빗자루 숫자끼리만 합침)
+        public string sign; // 숫자 앞에 붙는 부호 - 줍기는 "+", 데미지는 "-"
+        public bool pops; // 데미지 숫자인지 - 튀어나오듯 커졌다가 옆으로 흩어지며 떠오름
+        public float drift; // 떠오르는 동안 옆으로 흘러가는 거리 (데미지 숫자만)
     }
 
     private readonly List<Popup> _active = new List<Popup>(); // 지금 떠 있는 숫자들 (오래된 순)
@@ -49,6 +56,24 @@ public class PickupPopup : MonoBehaviour
             }
         }
 
+        Popup popup = Begin(position, amount, isCrystal ? crystalColor : pieceColor, "+", 1f); // 새로 띄운 숫자
+        popup.isCrystal = isCrystal;
+        popup.mergeable = merge;
+    }
+
+    // 맞은 자리에 -amount를 띄움 (데미지 숫자). 줍기 숫자와 섞이지 않게 HitEffects가 따로 둔 인스턴스에서 씀
+    public void ShowDamage(Vector3 position, long amount, Color color, float sizeScale)
+    {
+        Popup popup = Begin(position, amount, color, "-", sizeScale); // 새로 띄운 데미지 숫자
+        popup.pops = true;
+        popup.drift = Random.Range(-popDrift, popDrift);
+        popup.text.transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(-popTilt, popTilt));
+        popup.text.transform.localScale = Vector3.one * popStartScale;
+    }
+
+    // 숫자 하나를 꺼내(없으면 만들고, 꽉 찼으면 가장 오래된 걸 재사용) position에서 떠오르기 시작하게 함
+    private Popup Begin(Vector3 position, long amount, Color color, string sign, float sizeScale)
+    {
         Popup popup; // 새로 띄울 숫자
         if (_active.Count >= maxActive)
         {
@@ -63,13 +88,20 @@ public class PickupPopup : MonoBehaviour
         popup.start = position + Vector3.up * heightOffset;
         popup.age = 0f;
         popup.amount = amount;
-        popup.isCrystal = isCrystal;
-        popup.mergeable = merge;
-        popup.text.color = isCrystal ? crystalColor : pieceColor;
+        popup.isCrystal = false;
+        popup.mergeable = false;
+        popup.sign = sign;
+        popup.pops = false;
+        popup.drift = 0f;
+        popup.text.transform.rotation = Quaternion.identity;
+        popup.text.transform.localScale = Vector3.one;
+        popup.text.color = color;
+        popup.text.fontSize = fontSize * sizeScale;
         popup.text.transform.position = popup.start;
         popup.text.gameObject.SetActive(true);
         SetText(popup);
         _active.Add(popup);
+        return popup;
     }
 
     void Update()
@@ -87,7 +119,15 @@ public class PickupPopup : MonoBehaviour
                 continue;
             }
 
-            popup.text.transform.position = popup.start + Vector3.up * (riseDistance * (1f - (1f - progress) * (1f - progress))); // 처음엔 빠르게, 끝에 느리게 (ease-out)
+            float eased = 1f - (1f - progress) * (1f - progress); // 처음엔 빠르게, 끝에 느리게 (ease-out)
+            popup.text.transform.position = popup.start + new Vector3(popup.drift * eased, riseDistance * eased, 0f);
+            if (popup.pops)
+            {
+                const float overshoot = 1.70158f; // 끝에서 살짝 넘쳤다 돌아오는 정도 (표준 back 이징 값)
+                float back = Mathf.Clamp01(popup.age / popDuration) - 1f; // -1~0, 0이면 다 커진 것
+                float pop = 1f + (overshoot + 1f) * back * back * back + overshoot * back * back; // 넘쳤다 돌아오는 진행도
+                popup.text.transform.localScale = Vector3.one * Mathf.LerpUnclamped(popStartScale, 1f, pop);
+            }
             Color color = popup.text.color; // 투명도만 바꿔 다시 넣을 색
             color.a = progress < 0.5f ? 1f : 1f - (progress - 0.5f) / 0.5f;
             popup.text.color = color;
@@ -95,7 +135,7 @@ public class PickupPopup : MonoBehaviour
     }
 
     private void SetText(Popup popup) =>
-        popup.text.text = $"+{NumberFormatUtil.Format(popup.amount)}";
+        popup.text.text = $"{popup.sign}{NumberFormatUtil.Format(popup.amount)}";
 
     private Popup CreatePopup()
     {

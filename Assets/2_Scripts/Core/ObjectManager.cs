@@ -29,7 +29,7 @@ public class ObjectManager : MonoBehaviour
 
     [SerializeField] private bool debugUnlockAll = false; // 테스트용 - 켜면 모든 오브젝트가 처음부터 해금됨 (업그레이드 무관)
 
-    // 파괴 대상 오브젝트 19종 - 책상 위 소품에서 시작해 지형(책상/길바닥/공사장 지반)을 부수며 우주 스케일까지. ★=마일스톤(체력 x2)
+    // 파괴 대상 오브젝트 19종 - 책상 위 소품에서 시작해 지형(책상/길바닥)과 공사장 아파트를 부수며 우주 스케일까지. ★=마일스톤(체력 x2)
     // 티어 구성은 ObjectHealthCalculator.tierSizes = {3,2,3,2,3,2,1,1,1,1} 와 순서/개수가 정확히 일치해야 함
     private static readonly List<ObjectData> objects = new List<ObjectData>
     {
@@ -46,11 +46,11 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(4, 1, "자동차", new Color(0.70f, 0.69f, 0.71f)),
         new ObjectData(4, 2, "도로", new Color(0.62f, 0.60f, 0.58f)) { hpMultiplier = 2f }, // ★ -> 존3
         // --- 존3: 공사장 / 건물 (유압 브레이커 t5 / 다이너마이트 t6) ---
-        new ObjectData(5, 1, "컨테이너 박스", new Color(0.55f, 0.45f, 0.35f)),
+        new ObjectData(5, 1, "컨테이너 박스", new Color(0.72f, 0.22f, 0.16f)),
         new ObjectData(5, 2, "포크레인", new Color(0.85f, 0.70f, 0.20f)),
-        new ObjectData(5, 3, "저층 건물", new Color(0.60f, 0.58f, 0.55f)),
-        new ObjectData(6, 1, "고층 빌딩", new Color(0.50f, 0.55f, 0.62f)),
-        new ObjectData(6, 2, "콘크리트 바닥", new Color(0.55f, 0.55f, 0.55f)) { hpMultiplier = 2f }, // ★ -> 존4
+        new ObjectData(5, 3, "타워 크레인", new Color(0.92f, 0.58f, 0.10f)),
+        new ObjectData(6, 1, "철구 크레인", new Color(0.90f, 0.68f, 0.15f)),
+        new ObjectData(6, 2, "아파트", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 2f }, // ★ -> 존4
         // --- 존4: 우주 (폭탄 t7 / 미사일 t8 / 운석 t9 / 빅뱅 t10) ---
         new ObjectData(7, 1, "지구", new Color(0.30f, 0.50f, 0.70f)),
         new ObjectData(8, 1, "달", new Color(0.80f, 0.80f, 0.78f)),
@@ -169,8 +169,16 @@ public class ObjectManager : MonoBehaviour
     // index를 해금하기 위해 지금 당장 해금해야 하는 오브젝트 이름을 담은 안내 문구 (UI 툴팁용)
     public string NextRequiredUnlockHintText(int index)
     {
-        string nextName = GetObjectAt(NextRequiredUnlockIndex(index)).objectName; // 다음에 해금해야 할 오브젝트 이름
-        return $"{nextName}을(를) 먼저 해금하세요";
+        int next = NextRequiredUnlockIndex(index); // 다음에 해금해야 할 오브젝트
+        if (OpensNextZone(next - 1)) // 해금 노드가 없고 바로 앞 오브젝트(책상 등)를 부숴야 열리는 오브젝트
+            return $"{GetObjectAt(next - 1).objectName}을(를) 부수면 열립니다";
+        return $"{GetObjectAt(next).objectName}을(를) 먼저 해금하세요";
+    }
+
+    // index번째 오브젝트를 부수면 다음 맵이 열리는지 - 바로 다음 오브젝트가 맵이 열릴 때 공짜로 풀리는 오브젝트면 그렇게 봄
+    public bool OpensNextZone(int index)
+    {
+        return index >= 0 && ZoneManager.Instance != null && ZoneManager.Instance.IsZoneFirstObject(index + 1);
     }
 
     // ---- 도감(오브젝트 팝업) 표시용 조회 ----
@@ -208,7 +216,7 @@ public class ObjectManager : MonoBehaviour
     // 작은 수) 후반 티어 가격을 절대 못 따라잡음. 그래서 기본 보상도 오브젝트 티어마다 기하급수적으로 커지게 함.
     private const long BaseRewardStart = 1; // 0번 오브젝트 기본 보상
     private const float BaseRewardGrowth = 4.5f; // 같은 맵 안에서 오브젝트 하나 넘어갈 때마다 곱해지는 배율
-    private const int ObjectsPerMap = 5; // 맵 하나에 들어있는 오브젝트 수 (접시~책상 / 가로등~도로 / 컨테이너 박스~콘크리트 바닥 / 그 뒤는 우주)
+    private const int ObjectsPerMap = 5; // 맵 하나에 들어있는 오브젝트 수 (접시~책상 / 가로등~도로 / 컨테이너 박스~아파트 / 그 뒤는 우주)
     private const float MapRewardJump = 5.42f; // 다음 맵으로 넘어가는 순간 추가로 곱해지는 배율 - 새 맵을 열면 확 많이 들어오는 느낌용 (가로등 기본 보상 = 1845 x 5.42 = 약 10,000)
 
     public long GetBaseReward(int index) => Math.Max(1L, (long)RawBaseReward(index));

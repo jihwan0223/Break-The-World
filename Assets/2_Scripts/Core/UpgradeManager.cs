@@ -44,6 +44,7 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("호버 줍기 해금")] HoverPickupUnlock,       // 커서를 파편 위에 올리기만 해도 맨 위 파편부터 주워지는 기능 해금
         [InspectorName("존 자동 파괴 해금")] ZoneAutoBreakUnlock,   // Target Object Name(책상/도로)이 갈라져서 그 존의 다른 오브젝트가 주기마다 계속 부서지는 기능 해금
         [InspectorName("오브젝트 추가 배치")] ObjectExtraCopies,   // Target Object Name 오브젝트(비우면 모든 오브젝트)를 +값 개 더 배치. 추가분은 씬에 미리 놓아두고 UnlockGate로 켬
+        [InspectorName("커서 범위 증가")] CursorRange,          // 커서 범위 반지름 +값 (월드 단위). 범위에 걸친 오브젝트가 한 번에 클릭되고 커서 줍기도 이 범위로 주움
     }
 
     // 선행 노드와 잇는 선의 모양 (UpgradeTreeLink가 이 값을 보고 세그먼트를 배치함)
@@ -496,6 +497,7 @@ public class UpgradeManager : MonoBehaviour
     public int ExtraObjectCopies(int objectIndex) =>
         Mathf.RoundToInt(SumEffect(UpgradeEffect.ObjectExtraCopies, -1) + SumEffect(UpgradeEffect.ObjectExtraCopies, objectIndex));
     public bool HoverPickupIsUnlocked => AnyUnlocked(UpgradeEffect.HoverPickupUnlock); // 호버 줍기 해금 여부
+    public float CursorRadius => SumEffect(UpgradeEffect.CursorRange); // 커서 범위 반지름(월드 단위). 0이면 범위 없이 커서 한 점만
 
     public float AutoSweepIntervalSeconds =>
         Mathf.Max(minAutoSweepInterval, baseAutoSweepInterval - SumEffect(UpgradeEffect.AutoSweepSpeed));

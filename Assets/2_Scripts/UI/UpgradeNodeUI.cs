@@ -86,6 +86,9 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         {
             UpgradeTooltip.Instance?.UpdateContent(BuildTooltipContent()); // 마우스 계속 대고 있어도 레벨 숫자 즉시 갱신
             PlayShake();
+            bool crystal = Array.Exists(costs, cost => cost.useCrystals); // 결정으로 사는 노드면 연출 색이 다름
+            bool maxed = UpgradeManager.Instance.GetLevel(Id) >= maxLevel; // 방금 최대 레벨을 찍었으면 크게 터짐
+            NodePurchaseEffect.Play(_rect, crystal ? NodePurchaseEffect.CrystalColor : NodePurchaseEffect.NormalColor, maxed);
             UpgradeTooltip.Instance?.PlayShake(); // 호버로 떠있는 툴팁도 같이 흔들림
             UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true);
         }
@@ -199,7 +202,11 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (!isRevealed) return;
 
         UpdateIcon(UpgradeManager.Instance.GetLevel(Id));
-        if (justRevealed) PlayShake();
+        if (justRevealed)
+        {
+            PlayShake();
+            NodePurchaseEffect.PlayReveal(_rect);
+        }
     }
 
     // ---- 호버 툴팁 ----

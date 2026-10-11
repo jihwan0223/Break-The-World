@@ -108,7 +108,8 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         bool success = isGain ? ObjectManager.Instance.TryUpgradeGain(objectIndex) : ObjectManager.Instance.TryUnlock(objectIndex);
         if (!success) return; // 실패(조각 부족 등) 시 아무 반응 없음 - 일반 업그레이드 노드와 동일
 
-        PlayShake(); // 색 반짝임 없이 흔들림만 (일반 업그레이드 노드와 동일)
+        PlayShake();
+        NodePurchaseEffect.Play(_rect, NodePurchaseEffect.NormalColor, !isGain); // 해금은 크게 터짐
         UpgradeTooltip.Instance?.PlayShake(); // 호버로 떠있는 툴팁도 같이 흔들림
 
         UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true); // 방금 해금된 자식 노드들이 나타나도록 트리 전체를 새로고침 (등장 흔들림 재생)
@@ -138,7 +139,11 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         if (!isRevealed) return;
 
         UpdateIcon();
-        if (justRevealed) PlayShake();
+        if (justRevealed)
+        {
+            PlayShake();
+            NodePurchaseEffect.PlayReveal(_rect);
+        }
 
         string objectName = ObjectManager.Instance.GetObjectAt(objectIndex).objectName;
 
@@ -193,8 +198,11 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         if (!isGain)
         {
             bool unlocked = ObjectManager.Instance.IsUnlocked(objectIndex);
+            // 부수면 다음 맵이 열리는 오브젝트(책상 등)면 그 사실을 알려줌 - 다음 맵이 이미 열렸으면 생략
+            string zoneHint = ObjectManager.Instance.OpensNextZone(objectIndex) && !ObjectManager.Instance.IsUnlocked(objectIndex + 1)
+                ? $"{objectName}을(를) 부수면 다음 맵이 열립니다." : null;
             if (unlocked)
-                return new UpgradeTooltip.Content { title = $"{objectName} 해금", description = "이미 해금했습니다.", level = "완료" };
+                return new UpgradeTooltip.Content { title = $"{objectName} 해금", description = zoneHint ?? "이미 해금했습니다.", level = "완료" };
 
             if (!ObjectManager.Instance.IsUnlockOrderMet(objectIndex))
                 return new UpgradeTooltip.Content { title = "???", description = ObjectManager.Instance.NextRequiredUnlockHintText(objectIndex), level = "0 / 1" }; // 가격 대신 다음에 해금할 오브젝트 안내
@@ -203,7 +211,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             return new UpgradeTooltip.Content
             {
                 title = $"{objectName} 해금",
-                description = $"{objectName}을(를) 해금합니다.",
+                description = zoneHint != null ? $"{objectName}을(를) 해금합니다.\n{zoneHint}" : $"{objectName}을(를) 해금합니다.",
                 level = "0 / 1",
                 price = $"{NumberFormatUtil.Format(cost)} 조각",
             };

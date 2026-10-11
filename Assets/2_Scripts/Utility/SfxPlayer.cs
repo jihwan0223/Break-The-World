@@ -10,6 +10,7 @@ public static class SfxPlayer
 {
     private const float MinIntervalPerClip = 0.05f; // 같은 소리를 다시 울릴 수 있는 최소 간격(초)
     private const int MaxVoices = 5; // 동시에 울릴 수 있는 효과음 수
+    private const float VoiceHoldSeconds = 0.3f; // 소리 하나가 "울리는 중"으로 세어지는 최대 시간 - 뒤쪽 여운까지 다 세면 긴 소리 몇 개만으로 한도가 차서 다음 클릭 소리가 통째로 빠짐
     private const float BusyWindow = 0.5f; // 최근 몇 초 동안의 재생 횟수로 "연타 중"을 판단할지
     private const int QuietStart = 4; // 최근 재생 횟수가 이 이상이면 볼륨을 줄이기 시작
     private const int QuietFull = 14; // 이 이상이면 최소 볼륨
@@ -53,7 +54,7 @@ public static class SfxPlayer
         source.PlayOneShot(clip, Volume * Mathf.Lerp(1f, MinBusyVolume, busy));
 
         _lastPlayTime[clip] = now;
-        _voiceEndTimes.Add(now + clip.length / source.pitch);
+        _voiceEndTimes.Add(now + Mathf.Min(clip.length / source.pitch, VoiceHoldSeconds));
         _recentPlayTimes.Enqueue(now);
     }
 }

@@ -74,6 +74,7 @@ public class DebrisPool : MonoBehaviour
         _fallbackSprite = CreateDotSprite();
         _popup = GetComponent<PickupPopup>();
         if (_popup == null) _popup = gameObject.AddComponent<PickupPopup>();
+        if (GetComponent<CursorRangeIndicator>() == null) gameObject.AddComponent<CursorRangeIndicator>(); // 커서 범위 표시도 같은 식으로 자동으로 붙임
     }
 
     void Start()
@@ -146,12 +147,14 @@ public class DebrisPool : MonoBehaviour
         _hoverHits.Clear();
         Piece top = null; // 이번에 새로 올라간 파편 중 맨 위(가장 나중에 떨어진) 것
         int topOrder = -1; // 그 파편의 쌓인 순서
-        foreach (Collider2D hit in Physics2D.OverlapPointAll(worldPos))
+        float cursorRadius = UpgradeManager.Instance.CursorRadius; // 커서 범위 업그레이드로 넓어진 반지름 (없으면 0)
+        Collider2D[] hits = cursorRadius > 0f ? Physics2D.OverlapCircleAll(worldPos, cursorRadius) : Physics2D.OverlapPointAll(worldPos); // 커서(범위)에 걸친 콜라이더들
+        foreach (Collider2D hit in hits)
         {
             if (!_pieceByCollider.TryGetValue(hit, out Piece piece) || !piece.collider.enabled) continue;
 
             Transform pieceTransform = piece.renderer.transform; // 이 파편의 위치/크기
-            float radius = piece.collider.radius / pickupColliderScale * hoverPickupRadiusScale * pieceTransform.lossyScale.x; // 호버 판정 반경(월드)
+            float radius = piece.collider.radius / pickupColliderScale * hoverPickupRadiusScale * pieceTransform.lossyScale.x + cursorRadius; // 호버 판정 반경(월드)
             if (((Vector2)pieceTransform.position - worldPos).sqrMagnitude > radius * radius) continue;
 
             _hoverHits.Add(piece);
