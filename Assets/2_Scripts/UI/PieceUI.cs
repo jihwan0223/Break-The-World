@@ -19,6 +19,8 @@ public class PieceUI : MonoBehaviour
     private bool _shownInitialized; // 처음 값은 굴러 올라가지 않고 바로 표시하기 위한 플래그
     private const float CountUpSpeed = 8f; // 숫자가 목표값을 따라붙는 속도 (클수록 빨리 따라붙음, 대략 0.4초)
     private const float CountUpMinPerSecond = 30f; // 차이가 작을 때 최소 초당 올라가는 양 - 작은 획득도 한 칸씩 올라가는 게 보이게
+    private const float CountUpSeconds = 0.35f; // 한 번에 얼마를 얻든 이 시간 안에는 화면 숫자가 다 따라붙음 (큰 수일수록 끝자리가 오래 구르던 것 방지)
+    private double _countUpFloor; // 지금 따라붙는 동안의 최소 속도(초당) - 얻은 양이 클수록 커지고, 다 따라붙으면 0으로 돌아감
     private Label _crystalLabel; // 결정 개수를 표시하는 라벨
     private long _lastCrystals; // 직전에 표시했던 결정 개수 (늘었는지 판단용)
 
@@ -163,16 +165,26 @@ public class PieceUI : MonoBehaviour
             _shownInitialized = true;
             SetPieceText();
         }
+        else
+        {
+            _countUpFloor = System.Math.Max(_countUpFloor, (amount - _shownPieces) / CountUpSeconds); // 지금 벌어진 차이를 CountUpSeconds 안에 메울 속도
+        }
     }
 
     void Update()
     {
-        if (_shownPieces >= _lastAmount) return;
+        if (_shownPieces >= _lastAmount)
+        {
+            _countUpFloor = 0;
+            return;
+        }
 
-        // 남은 차이를 매 프레임 일정 비율씩 줄여 빠르게 따라붙고, 차이가 작을 땐 최소 속도로 한 칸씩 올라감
+        // 남은 차이를 매 프레임 일정 비율씩 줄여 빠르게 따라붙고, 끝자리는 최소 속도로 마저 올라감.
+        // 최소 속도는 얻은 양에 비례해서, 큰 수를 얻어도 작은 수를 얻을 때와 같은 시간 안에 끝남
         float dt = Time.unscaledDeltaTime; // 업그레이드 창 등으로 timeScale이 0이어도 올라가게
         double gap = _lastAmount - _shownPieces; // 아직 못 따라간 양
-        double step = System.Math.Max(gap * (1 - Mathf.Exp(-CountUpSpeed * dt)), CountUpMinPerSecond * dt); // 이번 프레임에 올릴 양
+        double floor = System.Math.Max(CountUpMinPerSecond, _countUpFloor); // 이번 프레임의 최소 속도(초당)
+        double step = System.Math.Max(gap * (1 - Mathf.Exp(-CountUpSpeed * dt)), floor * dt); // 이번 프레임에 올릴 양
         _shownPieces = System.Math.Min(_lastAmount, _shownPieces + step);
         SetPieceText();
         QueuePulse(_pieceLabel); // 올라가는 동안 커졌다 작아졌다 반복 (대기열 상한이 있어서 멈추면 곧 멈춤)

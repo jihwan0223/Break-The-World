@@ -5,7 +5,8 @@ using UnityEngine.InputSystem;
 
 // 오브젝트를 부수면 얻은 조각만큼 파편이 부서진 지점에서 떨어져 바닥(spawnArea)에 쌓이고, 파편을 클릭해서 주워야 조각(돈)이 들어오는 시스템.
 // 파편 하나가 여러 조각 값을 들고 있을 수 있음 (한 번에 떨어뜨리는 개수에 상한이 있어서 총액을 나눠 담음).
-// 파편은 존별로 따로 쌓이고, 지금 보는 존의 파편만 보이고 주울 수 있음. 주울 때까지 사라지지 않음
+// 파편은 존별로 따로 쌓이고, 지금 보는 존의 파편만 보이고 주울 수 있음. 주울 때까지 사라지지 않음.
+// 한 존의 파편 수는 바닥 최대 개수를 절대 넘지 않음 - 꽉 찬 뒤에 떨어지는 건 줍기 판정 없는 연출용 파티클이고, 값은 바닥에 있는 파편들에 더해짐
 public class DebrisPool : MonoBehaviour
 {
     // 씬 어디서든 DebrisPool.Instance로 접근하기 위한 싱글톤
@@ -18,10 +19,11 @@ public class DebrisPool : MonoBehaviour
     [SerializeField] private float pieceSize = 1f; // 조각 하나의 크기 (월드 유닛)
     [SerializeField] private float pickupColliderScale = 1.4f; // 줍기 판정 콜라이더를 파편 그림보다 이 배율만큼 크게 (잘 주워지게)
     [SerializeField] private Sprite[] pieceSprites; // 조각으로 쓸 스프라이트들 (BreakPieces 폴더의 파편 이미지들). 색은 부순 오브젝트의 pileColor로 입힘
-    [SerializeField] private float initialSpread = 1f; // 처음엔 오브젝트 바로 아래 이 반경(월드 유닛) 안으로만 떨어지고, 쌓일수록 spawnArea 폭까지 점점 넓어짐
+    [SerializeField] private float initialSpread = 1f; // 처음엔 바닥 가운데에서 좌우 이 거리(월드 유닛) 안으로만 떨어지고, 쌓일수록 spawnArea 폭까지 점점 넓어짐
     [SerializeField] private float fallDuration = 0.4f; // 부서진 지점에서 바닥까지 떨어지는 데 걸리는 시간(초)
     [SerializeField] private Color crystalColor = new Color(0.45f, 0.9f, 1f); // 결정 색 (전용 이미지가 생기기 전까지 파편 그림에 이 색을 입혀 구분)
     [SerializeField] private float crystalSizeMultiplier = 1.6f; // 결정을 파편보다 이 배율만큼 크게
+    [SerializeField] private int maxFallingShards = 2000; // 연출용 파편(파티클)이 동시에 떠 있을 수 있는 수
     [SerializeField] private float hoverPickupRadiusScale = 0.7f; // 호버 줍기 판정 크기 - 파편 그림 대비 배율 (작을수록 커서가 파편 한가운데에 정확히 올라가야 주워짐)
 
     // 바닥에 떨어져 있는(또는 떨어지는 중인) 파편 하나
@@ -33,11 +35,7 @@ public class DebrisPool : MonoBehaviour
         public bool isCrystal; // 결정인지 (결정은 바닥 최대 개수에 안 들어감)
         public int zone; // 떨어진 존 번호 (그 존을 보고 있을 때만 보이고 주울 수 있음)
         public bool landed; // 착지를 마쳤는지
-        public bool expiring; // 바닥 최대 개수를 넘어서 새 파편에 덮여 교체될 예정인지 (최대 개수 계산에서 빠짐)
-        public int generation; // 풀에서 꺼낼 때마다 1씩 늘어남 - 교체 대기 중에 주워져서 다른 파편으로 재사용됐는지 구분용
-        public Piece replaces; // 이 파편이 착지하면서 덮어 없앨 오래된 파편 (없으면 null)
         public bool sweepMarked; // 이번 자동 줍기가 쓸어 담을 대상인지 (자동 줍기가 출발할 때 위층부터 정해짐)
-        public int replacesGeneration; // 그 오래된 파편의 generation - 떨어지는 사이 주워졌는지 확인용
     }
 
     private readonly List<Piece> _groundPieces = new List<Piece>(); // 지금 바닥에 있거나 떨어지는 중인 파편들
@@ -50,6 +48,9 @@ public class DebrisPool : MonoBehaviour
     private Vector2 _lastMouseScreenPos; // 직전 프레임 마우스 화면 위치 - 마우스를 움직였는지 확인용
     private int _spawnSequence; // 지금까지 떨어뜨린 파편 수 - 나중에 떨어진 파편이 위에 그려지도록 깊이(z)를 정하는 데 씀
     private PickupPopup _popup; // 주운 자리에 "+N"을 띄우는 연출 (같은 오브젝트에 없으면 자동으로 붙임)
+    // 연출용 파편을 그리는 파티클 (파편 그림마다 하나씩, 처음 쓸 때 만듦). 에디터가 private 배열을 빈 배열로 채워두는 일이 있어서 저장 대상에서 뺌
+    [System.NonSerialized] private ParticleSystem[] _shardSystems;
+    private readonly List<Piece> _mergeTargets = new List<Piece>(); // 바닥이 꽉 찼을 때 값을 나눠 받을 파편들 (매번 재사용)
 
     // 오브젝트를 부숴 파편을 새로 떨어뜨릴 때마다 그 파편들을 전달 (결정 제외) - 첫 파편 튜토리얼 등이 구독
     public event System.Action<IReadOnlyList<Transform>> OnPiecesDropped;
@@ -177,58 +178,143 @@ public class DebrisPool : MonoBehaviour
     }
 
     // 오브젝트를 부쉈을 때 호출 - reward 조각을 파편 여러 개(최대 maxPiecesPerBreak개)에 나눠 담아 fromPosition에서 떨어뜨림.
-    // 이 존 바닥이 꽉 차 있어도 파편은 계속 떨어지고, 넘친 만큼은 가장 먼저 떨어진 파편 자리로 떨어져 착지하는 순간
-    // 그 파편을 덮어 교체하면서 값을 이어받음 - 사라지는 모습이 안 보이고, 줍기 전에 교체된 값도 남아있어서 놓치는 게 없음
+    // 이 존 바닥에 남은 자리만큼만 실제 파편이 되고, 자리가 없어서 못 만든 만큼은 줍기 판정 없는 연출용 파편으로 떨어짐 - 눈에는 똑같이 쏟아지지만
+    // 파편 수는 바닥 최대 개수를 넘지 않음. 값은 실제 파편들이 전부 나눠 갖고, 실제 파편을 하나도 못 만들면 바닥에 있던 파편들에 더해져서 놓치는 게 없음
     public void DropPieces(Vector3 fromPosition, int objectIndex, long reward)
     {
         if (reward <= 0) return;
 
         int zone = CurrentZone; // 떨어뜨릴 존
-        int count = (int)System.Math.Min(reward, maxPiecesPerBreak); // 나눠 담을 파편 수
-        long baseValue = reward / count; // 파편 하나당 기본 값
-        long remainder = reward % count; // 나누고 남은 조각 - 앞쪽 파편들에 1개씩 더 얹음
+        int count = (int)System.Math.Min(reward, maxPiecesPerBreak); // 눈에 보이게 떨어뜨릴 파편 수
+        int onFloor = CountInZone(zone); // 이 존에 지금 있는 파편 수 (떨어지는 중인 것 포함)
+        int real = Mathf.Clamp(MaxGroundPieces - onFloor, 0, count); // 그중 실제 파편으로 만들 수 있는 수 (남은 자리만큼)
+        float fill = (float)onFloor / Mathf.Max(1, MaxGroundPieces); // 바닥이 찬 정도 0~1 - 찰수록 넓게 퍼져 떨어짐
         Color color = PileColorFor(objectIndex);
-        int excess = CountInZone(zone) + count - MaxGroundPieces; // 이번 파편들로 바닥 최대 개수를 넘는 수 = 교체할 오래된 파편 수
 
-        var dropped = new List<Transform>(count); // 이번에 떨어뜨린 파편들
-        for (int i = 0; i < count; i++)
+        if (real > 0)
         {
-            Piece oldest = i < excess ? OldestLandedPieceInZone(zone) : null; // 이 파편이 덮어 교체할 오래된 파편
-            if (oldest != null) oldest.expiring = true;
-            dropped.Add(Spawn(fromPosition, zone, baseValue + (i < remainder ? 1 : 0), false, color, pieceSize, oldest));
+            long baseValue = reward / real; // 파편 하나당 기본 값
+            long remainder = reward % real; // 나누고 남은 조각 - 앞쪽 파편들에 1개씩 더 얹음
+            var dropped = new List<Transform>(real); // 이번에 떨어뜨린 실제 파편들
+            for (int i = 0; i < real; i++)
+                dropped.Add(Spawn(fromPosition, zone, baseValue + (i < remainder ? 1 : 0), false, color, pieceSize, fill));
+            OnPiecesDropped?.Invoke(dropped);
+        }
+        else
+        {
+            AddToFloorPieces(zone, reward, count);
         }
 
-        OnPiecesDropped?.Invoke(dropped);
+        for (int i = real; i < count; i++)
+            EmitShard(fromPosition, GetLandingPoint(fill), color);
     }
 
-    // 이 존에서 가장 먼저 떨어진, 착지했고 아직 교체될 예정이 아닌 파편 (결정 제외). 없으면 null
-    private Piece OldestLandedPieceInZone(int zone)
+    // 바닥이 꽉 차서 새 파편을 못 만들 때 - 이 존에 있는 파편 중 고르게 뽑은 최대 count개에 reward를 나눠 더함
+    private void AddToFloorPieces(int zone, long reward, int count)
     {
-        foreach (Piece piece in _groundPieces) // 떨어진 순서대로 들어있음
-            if (piece.zone == zone && piece.landed && !piece.isCrystal && !piece.expiring) return piece;
-        return null;
+        _mergeTargets.Clear();
+        foreach (Piece piece in _groundPieces)
+            if (piece.zone == zone && !piece.isCrystal) _mergeTargets.Add(piece);
+
+        if (_mergeTargets.Count == 0) // 바닥 최대 개수가 0 이하로 잡힌 경우 - 쌓을 곳이 없으니 바로 지급
+        {
+            CurrencyManager.Instance?.AddPieces(reward);
+            return;
+        }
+
+        int targets = Mathf.Min(count, _mergeTargets.Count); // 값을 나눠 받을 파편 수
+        long share = reward / targets; // 파편 하나가 받는 값
+        long remainder = reward % targets; // 나누고 남은 조각 - 앞쪽 파편들에 1개씩 더 얹음
+        int offset = Random.Range(0, _mergeTargets.Count); // 매번 같은 파편만 커지지 않게 시작 자리를 바꿈
+        for (int i = 0; i < targets; i++)
+        {
+            int index = (offset + (int)((long)i * _mergeTargets.Count / targets)) % _mergeTargets.Count; // 아래층부터 위층까지 고르게
+            _mergeTargets[index].value += share + (i < remainder ? 1 : 0);
+        }
+    }
+
+    // 줍기 판정 없이 fromPosition에서 landingPoint로 떨어지다 사라지는 연출용 파편 하나 (실제 파편과 같은 그림/색/속도).
+    // 게임 오브젝트를 만들지 않는 파티클이라 수백 개가 한꺼번에 떨어져도 가벼움
+    private void EmitShard(Vector3 fromPosition, Vector3 landingPoint, Color color)
+    {
+        if (_shardSystems == null || _shardSystems.Length == 0) CreateShardSystems();
+
+        Vector3 velocity = (landingPoint - fromPosition) / fallDuration; // 평균 속도 - 속도 배율 곡선(0 -> 2)이 곱해져 실제 파편처럼 점점 빨라짐
+        velocity.z = 0f;
+        var emit = new ParticleSystem.EmitParams
+        {
+            position = fromPosition,
+            velocity = velocity,
+            startLifetime = fallDuration,
+            startColor = color,
+        };
+        _shardSystems[Random.Range(0, _shardSystems.Length)].Emit(emit, 1);
+    }
+
+    // 파편 그림마다 파티클 시스템을 하나씩 만듦 (파티클 하나는 그림 하나만 쓸 수 있어서). 재질은 실제 파편과 같은 것을 써서 똑같이 보이게 함
+    private void CreateShardSystems()
+    {
+        Sprite[] sprites = pieceSprites != null && pieceSprites.Length > 0 ? pieceSprites : new[] { _fallbackSprite }; // 파편으로 쓰는 그림들
+        Piece sample = _groundPieces.Count > 0 ? _groundPieces[0] : _pool.Count > 0 ? _pool.Peek() : CreatePiece(); // 재질을 가져올 실제 파편
+        if (!_groundPieces.Contains(sample) && !_pool.Contains(sample)) _pool.Push(sample);
+
+        _shardSystems = new ParticleSystem[sprites.Length];
+        for (int i = 0; i < sprites.Length; i++)
+        {
+            var systemObject = new GameObject("FallingShards"); // 이 그림 전용 파티클
+            systemObject.transform.SetParent(transform, false);
+            ParticleSystem system = systemObject.AddComponent<ParticleSystem>();
+            system.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); // 설정을 바꾸려면 멈춰 있어야 함
+
+            ParticleSystem.MainModule main = system.main;
+            main.loop = true; // 스스로 멈추지 않게 (내보내는 건 Emit으로만 함)
+            main.playOnAwake = false;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.startSpeed = 0f;
+            main.gravityModifier = 0f;
+            main.maxParticles = Mathf.Max(1, maxFallingShards / sprites.Length);
+            Vector3 size = sprites[i].bounds.size * pieceSize; // 실제 파편과 같은 크기
+            main.startSize3D = true;
+            main.startSizeX = size.x;
+            main.startSizeY = size.y;
+            main.startSizeZ = 1f;
+
+            ParticleSystem.EmissionModule emission = system.emission;
+            emission.enabled = false;
+            ParticleSystem.ShapeModule shape = system.shape;
+            shape.enabled = false;
+
+            // 실제 파편은 떨어질수록 빨라짐(진행률의 제곱) - 속도 배율을 0에서 2로 올리면 같은 움직임이 됨
+            ParticleSystem.VelocityOverLifetimeModule speed = system.velocityOverLifetime;
+            speed.enabled = true;
+            speed.speedModifier = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0f, 0f, 1f, 2f));
+
+            var shardRenderer = systemObject.GetComponent<ParticleSystemRenderer>(); // 파티클 그리기 설정
+            shardRenderer.material = new Material(sample.renderer.sharedMaterial) { mainTexture = sprites[i].texture };
+            shardRenderer.sortingOrder = 10; // 실제 파편과 같은 순서
+
+            system.Play();
+            _shardSystems[i] = system;
+        }
     }
 
     // 결정 하나를 떨어뜨림 (amount개짜리 한 덩어리). 바닥이 꽉 차 있어도 떨어짐
     public void DropCrystal(Vector3 fromPosition, long amount)
     {
         if (amount <= 0) return;
-        Spawn(fromPosition, CurrentZone, amount, true, crystalColor, pieceSize * crystalSizeMultiplier);
+        int zone = CurrentZone; // 떨어뜨릴 존
+        Spawn(fromPosition, zone, amount, true, crystalColor, pieceSize * crystalSizeMultiplier, (float)CountInZone(zone) / Mathf.Max(1, MaxGroundPieces));
     }
 
-    // replaces가 있으면 그 파편 자리로 떨어져서 착지할 때 덮어 교체함
-    private Transform Spawn(Vector3 fromPosition, int zone, long value, bool isCrystal, Color color, float size, Piece replaces = null)
+    // fill = 이 존 바닥이 찬 정도(0~1) - 떨어질 자리를 얼마나 넓게 퍼뜨릴지 정함
+    private Transform Spawn(Vector3 fromPosition, int zone, long value, bool isCrystal, Color color, float size, float fill)
     {
         Piece piece = _pool.Count > 0 ? _pool.Pop() : CreatePiece();
         piece.value = value;
         piece.isCrystal = isCrystal;
         piece.zone = zone;
         piece.landed = false;
-        piece.expiring = false;
         piece.sweepMarked = false;
-        piece.generation++;
-        piece.replaces = replaces;
-        piece.replacesGeneration = replaces != null ? replaces.generation : 0;
         piece.renderer.sprite = GetRandomPieceSprite();
         piece.renderer.color = color;
         piece.renderer.sortingOrder = isCrystal ? 11 : 10; // 결정이 파편 더미에 묻히지 않게 위에 그림 (클릭도 우선)
@@ -241,7 +327,7 @@ public class DebrisPool : MonoBehaviour
         piece.collider.radius = Mathf.Max(extents.x, extents.y) * pickupColliderScale;
 
         _groundPieces.Add(piece);
-        Vector3 landingPoint = replaces != null ? replaces.renderer.transform.position : GetLandingPoint(fromPosition, zone); // 교체할 파편이 있으면 정확히 그 위로
+        Vector3 landingPoint = GetLandingPoint(fill);
         // 나중에 떨어진 파편일수록 카메라에 조금 더 가깝게 놓아서 항상 위에 그려지게 함 (층 순서 = 떨어진 순서 = 보이는 순서)
         // ponytail: 100만 개마다 깊이가 처음으로 돌아가서 그 순간 한 번 순서가 뒤집힘 - 문제가 되면 바닥 파편 깊이를 다시 매기는 식으로 바꿀 것
         landingPoint.z = -(_spawnSequence++ % 1000000) * 0.000001f;
@@ -330,7 +416,7 @@ public class DebrisPool : MonoBehaviour
     {
         int count = 0;
         foreach (Piece piece in _groundPieces)
-            if (piece.zone == zone && !piece.isCrystal && !piece.expiring) count++;
+            if (piece.zone == zone && !piece.isCrystal) count++;
         return count;
     }
 
@@ -365,15 +451,6 @@ public class DebrisPool : MonoBehaviour
         pieceTransform.position = landingPoint;
         piece.landed = true;
         ApplyVisibility(piece);
-
-        // 덮어 교체할 파편이 아직 그대로 있으면(떨어지는 사이 안 주워졌으면) 값을 이어받고 없앰
-        Piece replaced = piece.replaces; // 이 파편 밑에 깔린 오래된 파편
-        piece.replaces = null;
-        if (replaced != null && replaced.generation == piece.replacesGeneration && _groundPieces.Contains(replaced))
-        {
-            piece.value += replaced.value;
-            ReturnToPool(replaced);
-        }
     }
 
     // 존을 넘기면 그 존의 파편만 보이고 주울 수 있게 함 (다른 존 파편은 그대로 남아있음)
@@ -420,18 +497,18 @@ public class DebrisPool : MonoBehaviour
         return pieceSprites[Random.Range(0, pieceSprites.Length)];
     }
 
-    // 조각이 떨어질 지점 - 부순 오브젝트(fromPosition) 바로 아래에서 시작해서, 그 존 바닥이 찰수록 좌우로 넓게 퍼짐.
-    // x는 오브젝트 중심에서 뽑고, 폭은 initialSpread에서 spawnArea 절반 폭까지 채움 비율에 따라 늘어남. y는 spawnArea 세로 범위 안 랜덤.
-    private Vector3 GetLandingPoint(Vector3 fromPosition, int zone)
+    // 조각이 떨어질 지점 - 어느 오브젝트를 부쉈든 바닥 가운데부터 쌓이기 시작해서, 그 존 바닥이 찰수록(fill 0~1) 좌우로 넓게 퍼짐.
+    // 부순 오브젝트 밑으로 떨어뜨리면 한쪽 오브젝트만 부술 때 파편이 그쪽에만 몰려서, 가운데를 기준으로 삼음.
+    // x는 바닥 가운데에서 뽑고, 폭은 initialSpread에서 spawnArea 절반 폭까지 채움 비율에 따라 늘어남. y는 spawnArea 세로 범위 안 랜덤.
+    private Vector3 GetLandingPoint(float fill)
     {
         Bounds bounds = spawnArea.bounds;
 
-        float fill = (float)CountInZone(zone) / Mathf.Max(1, MaxGroundPieces); // 0(빔) ~ 1(꽉 참)
         float halfWidth = Mathf.Lerp(initialSpread, bounds.extents.x, Mathf.Clamp01(fill)); // 쌓일수록 넓게
 
         for (int attempt = 0; attempt < 10; attempt++)
         {
-            float x = Mathf.Clamp(fromPosition.x + Random.Range(-halfWidth, halfWidth), bounds.min.x, bounds.max.x);
+            float x = Mathf.Clamp(bounds.center.x + Random.Range(-halfWidth, halfWidth), bounds.min.x, bounds.max.x);
             float y = Random.Range(bounds.min.y, bounds.max.y);
             Vector2 point = new Vector2(x, y);
 
@@ -439,8 +516,8 @@ public class DebrisPool : MonoBehaviour
                 return point;
         }
 
-        // 10번 시도해도 콜라이더 안쪽을 못 찾으면 오브젝트 바로 아래(바닥 높이)로
-        return new Vector3(Mathf.Clamp(fromPosition.x, bounds.min.x, bounds.max.x), bounds.min.y, 0f);
+        // 10번 시도해도 콜라이더 안쪽을 못 찾으면 바닥 가운데(바닥 높이)로
+        return new Vector3(bounds.center.x, bounds.min.y, 0f);
     }
 
     private void HandleObjectChanged(ObjectData newObject)
