@@ -1800,7 +1800,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: aa79ff27b59918d4aa4e5a8244974664, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -1913,7 +1913,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: acfc9f72f6355cb46b1e869f7df6dec7, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetObjectName
       value: "\uD0C0\uC6CC \uD06C\uB808\uC778"
@@ -2109,6 +2109,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &123007890
 AudioSource:
   m_ObjectHideFlags: 0
@@ -3023,6 +3024,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &146821375
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4010,6 +4012,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 720
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!114 &172956270
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4281,6 +4284,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!1 &180455725
 GameObject:
   m_ObjectHideFlags: 0
@@ -5143,6 +5147,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &212293558
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5714,6 +5719,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &226856239
 AudioSource:
   m_ObjectHideFlags: 0
@@ -6398,6 +6404,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &242700853
 AudioSource:
   m_ObjectHideFlags: 0
@@ -7699,6 +7706,9 @@ MonoBehaviour:
   crystalSizeMultiplier: 1.6
   maxFallingShards: 800
   hoverPickupRadiusScale: 0.7
+  maxCarriedPieces: 80
+  carryPileWidth: 1.2
+  carryGatherSpeed: 12
 --- !u!61 &289043390
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7827,7 +7837,7 @@ MonoBehaviour:
   targetObjectName: 
   maxLevel: 10
   valuePerLevel:
-  - 0.9
+  - 0.09
   costs:
   - useCrystals: 1
     baseAmount: 2
@@ -8517,11 +8527,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AutoSweeper
   frames:
   - {fileID: 21300000, guid: 5fc0730b644318643a8cfd44c10a24e5, type: 3}
+  zoneSprites:
+  - {fileID: 21300000, guid: 5fc0730b644318643a8cfd44c10a24e5, type: 3}
+  - {fileID: 21300000, guid: e7f84e70d4046b44da72b4b7c63a4e5b, type: 3}
+  - {fileID: 21300000, guid: 300b7fb69fe6e16428d72752a78e95a2, type: 3}
   framesPerSecond: 12
   moveSpeed: 8
   heightOffset: 2.05
   swayAngle: 12
   swaysPerSecond: 3
+  pickupReach: 0.5
 --- !u!212 &380148627
 SpriteRenderer:
   serializedVersion: 2
@@ -8736,6 +8751,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 720
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!1 &404230147 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
@@ -8882,6 +8898,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &407977073
 AudioSource:
   m_ObjectHideFlags: 0
@@ -9623,7 +9640,7 @@ MonoBehaviour:
   minAutoMineInterval: 2
   autoMineTierOffset: 3
   baseMaxGroundPieces: 400
-  baseCrystalChance: 0.01
+  baseCrystalChance: 0.001
   baseCrystalAmount: 1
   baseAutoSweepInterval: 20
   minAutoSweepInterval: 3
@@ -10100,6 +10117,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 720
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &478413344
 AudioSource:
   m_ObjectHideFlags: 0
@@ -10584,6 +10602,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &489677545
 AudioSource:
   m_ObjectHideFlags: 0
@@ -11489,6 +11508,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &522958853
 AudioSource:
   m_ObjectHideFlags: 0
@@ -12429,6 +12449,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &561693580
 AudioSource:
   m_ObjectHideFlags: 0
@@ -13333,6 +13354,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &586884061
 AudioSource:
   m_ObjectHideFlags: 0
@@ -13754,6 +13776,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!1001 &608961923
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14048,6 +14071,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &611937860
 AudioSource:
   m_ObjectHideFlags: 0
@@ -14402,7 +14426,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: 44762af29654fd746bb589bc92912d0b, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -14519,7 +14543,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: 65e6678ac90ec3443ab8db425a007b72, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetObjectName
       value: "\uD0C0\uC6CC \uD06C\uB808\uC778"
@@ -15055,6 +15079,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &655712063
 AudioSource:
   m_ObjectHideFlags: 0
@@ -16024,6 +16049,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &688724101
 AudioSource:
   m_ObjectHideFlags: 0
@@ -17304,6 +17330,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &793812404
 AudioSource:
   m_ObjectHideFlags: 0
@@ -17968,6 +17995,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &805024287
 AudioSource:
   m_ObjectHideFlags: 0
@@ -20847,6 +20875,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &864231198
 AudioSource:
   m_ObjectHideFlags: 0
@@ -21524,6 +21553,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &868910191
 AudioSource:
   m_ObjectHideFlags: 0
@@ -22068,6 +22098,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &872359888
 AudioSource:
   m_ObjectHideFlags: 0
@@ -23439,6 +23470,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &935102240
 AudioSource:
   m_ObjectHideFlags: 0
@@ -24340,6 +24372,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &961455912
 AudioSource:
   m_ObjectHideFlags: 0
@@ -25223,6 +25256,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1024603802
 AudioSource:
   m_ObjectHideFlags: 0
@@ -25707,6 +25741,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1027820540
 AudioSource:
   m_ObjectHideFlags: 0
@@ -26196,6 +26231,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 720
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1033674468
 AudioSource:
   m_ObjectHideFlags: 0
@@ -27592,6 +27628,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1096956873
 AudioSource:
   m_ObjectHideFlags: 0
@@ -28087,6 +28124,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1108201132
 AudioSource:
   m_ObjectHideFlags: 0
@@ -28734,6 +28772,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 720
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1136812271
 AudioSource:
   m_ObjectHideFlags: 0
@@ -29879,6 +29918,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1193966247
 AudioSource:
   m_ObjectHideFlags: 0
@@ -31542,6 +31582,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1264050015
 AudioSource:
   m_ObjectHideFlags: 0
@@ -33320,6 +33361,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1380734804
 AudioSource:
   m_ObjectHideFlags: 0
@@ -33895,6 +33937,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1391835782
 AudioSource:
   m_ObjectHideFlags: 0
@@ -34436,6 +34479,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1410246378
 AudioSource:
   m_ObjectHideFlags: 0
@@ -35371,6 +35415,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1469939290
 AudioSource:
   m_ObjectHideFlags: 0
@@ -36073,6 +36118,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1514997102
 AudioSource:
   m_ObjectHideFlags: 0
@@ -38809,6 +38855,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!114 &1601500299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39900,6 +39947,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1638306660
 AudioSource:
   m_ObjectHideFlags: 0
@@ -42009,6 +42057,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1700476848
 AudioSource:
   m_ObjectHideFlags: 0
@@ -42945,6 +42994,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1748640135
 AudioSource:
   m_ObjectHideFlags: 0
@@ -43429,6 +43479,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1750351300
 AudioSource:
   m_ObjectHideFlags: 0
@@ -45787,6 +45838,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1829127148
 AudioSource:
   m_ObjectHideFlags: 0
@@ -46855,6 +46907,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1855964330
 AudioSource:
   m_ObjectHideFlags: 0
@@ -48775,6 +48828,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1921787891
 AudioSource:
   m_ObjectHideFlags: 0
@@ -49557,6 +49611,7 @@ MonoBehaviour:
   projectileFlightSeconds: 2
   projectileSpinDegreesPerSecond: 360
   projectileStaggerSeconds: 0.1
+  projectileFastestRatio: 0.35
 --- !u!82 &1953295638
 AudioSource:
   m_ObjectHideFlags: 0
@@ -51551,7 +51606,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: 370528bc58bde3a4dbee3078a0aa63e4, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -51664,7 +51719,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: 4ebd81035c0934d45a505a018157aab5, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetObjectName
       value: "\uCCA0\uAD6C \uD06C\uB808\uC778"
@@ -52176,7 +52231,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: 8822542f17b3b9b49b162e88dafaf48f, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -52289,7 +52344,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: 13fddbc746215ad4889b8fdb66865f33, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetObjectName
       value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4"
@@ -52506,7 +52561,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: 916683e5703462642b6c2cc849b96c19, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -52619,7 +52674,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: 2f383efe0fd61074eb95d301c1d57abd, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetObjectName
       value: "\uD3EC\uD06C\uB808\uC778"
@@ -53490,11 +53545,11 @@ PrefabInstance:
     - target: {fileID: -2551560563756291639, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: 464a9c16ff4d0ba4491a12e79bc3be82, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: cbef8003c15c4f740b67f638fe898590, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -56339,11 +56394,11 @@ PrefabInstance:
     - target: {fileID: -2551560563756291639, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: 1428518c79d340142a215d52a1653a64, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: 80294159faeac82469c4856f7754ff99, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -57123,11 +57178,11 @@ PrefabInstance:
     - target: {fileID: -2551560563756291639, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: 52084a00543603946ae59719f720b8fb, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: 1b6ca2f23459f05458a0c943c203a925, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -58091,11 +58146,11 @@ PrefabInstance:
     - target: {fileID: -2551560563756291639, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: 3fb3d815a44a1174f8db44069770e1cb, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: a2be4f3306b689e41988e6df2abb3ce4, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -58879,7 +58934,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: a90017ca68ae45d408893b4a0b632eae, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -58988,7 +59043,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: b2bbbe77f7e504f49bc64e757d54553c, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetObjectName
       value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4"
@@ -59198,7 +59253,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: 9307ce70457c4244eb56d7741de5278a, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -59310,7 +59365,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: 06e53c217fd938741aa8e0549fee8b62, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetObjectName
       value: "\uC544\uD30C\uD2B8"
@@ -59547,7 +59602,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: 2cfcf97f00c1b404da9228573a90d26a, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -59656,7 +59711,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: a2cb48aa59cbeb747a05fe9309c691fc, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetObjectName
       value: "\uD3EC\uD06C\uB808\uC778"
@@ -59727,7 +59782,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: 1dd58ec67747add4faa632455484a11b, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -59836,7 +59891,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: 4f03e979bdfa8f143a35e344a374a464, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetObjectName
       value: "\uCCA0\uAD6C \uD06C\uB808\uC778"
@@ -60406,11 +60461,11 @@ PrefabInstance:
     - target: {fileID: -2551560563756291639, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: 905a7f79b52803946b64ccc061d35ea9, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: 2de7f83f7f1bf2c4b9c9f9573d1f5226, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -61455,7 +61510,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+      objectReference: {fileID: 21300000, guid: c302a90b87f510d40952845b32077ad6, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -61564,7 +61619,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 1629616963312887904, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+      objectReference: {fileID: 21300000, guid: c787f2a53149fde4da2573ac0c22b7b1, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetObjectName
       value: "\uC544\uD30C\uD2B8"

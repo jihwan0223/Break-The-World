@@ -32,7 +32,7 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("럭키클릭 확률 증가")] LuckyClickChanceUp,  // 럭키클릭 확률 +값 %
         [InspectorName("더블클릭 확률 증가")] DoubleClickChanceUp, // 더블클릭 발동 확률 +값 %
         [InspectorName("전역 조각 획득 증가")] PieceGainGlobal,    // 모든 오브젝트 조각 획득 +값 %
-        [InspectorName("오브젝트 조각 획득 증가")] PieceGainObject, // Target Object Name 오브젝트 조각 획득 +값 %
+        [InspectorName("오브젝트 조각 획득 증가")] PieceGainObject, // Target Object Name 오브젝트 처치 시 조각 +(기본 보상의 값 %, 최소 1개)
         [InspectorName("오브젝트 2배 드랍 확률")] ObjectDoubleDrop, // Target Object Name 오브젝트 처치 시 파편 2배 확률 +값 %
         [InspectorName("무기 처치 보너스 조각")] WeaponKillBonus,   // Target Weapon Name 무기로 처치 시 보너스 조각 +값
         [InspectorName("바닥 파편 최대 개수 증가")] GroundPieceCap, // 바닥에 동시에 떨어져 있을 수 있는 파편 최대 개수 +값
@@ -75,7 +75,7 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private float minAutoMineInterval = 2f;     // 자동 채굴 주기 하한
     [SerializeField] private int autoMineTierOffset = 3;         // 지금 캐는 오브젝트보다 몇 단계 전을 자동으로 캘지
     [SerializeField] private int baseMaxGroundPieces = 400;       // 바닥 파편 최대 개수 기본값 - GroundPieceCap이 위에 더함
-    [SerializeField] private float baseCrystalChance = 0.01f;    // 오브젝트 처치 시 결정 기본 확률 (1%) - CrystalChance가 위에 더함
+    [SerializeField] private float baseCrystalChance = 0.001f;   // 오브젝트 처치 시 결정 기본 확률 (0.1%) - CrystalChance가 위에 더함
     [SerializeField] private int baseCrystalAmount = 1;          // 결정이 나올 때 기본 개수 - CrystalAmount가 위에 더함
     [SerializeField] private float baseAutoSweepInterval = 20f;  // 자동 줍기 기본 주기(초)
     [SerializeField] private float minAutoSweepInterval = 3f;    // 자동 줍기 주기 하한
@@ -473,11 +473,27 @@ public class UpgradeManager : MonoBehaviour
 
     // ---- 파편 획득 관련 (Click.HandleDied에서 사용) ----
 
-    // 파편 획득 배율 = 1 + (전역% + 이 오브젝트 대상%) / 100
-    public float PieceGainMultiplier(int objectIndex)
+    // 파편 획득 배율 = 1 + 전역% / 100 (오브젝트별 드랍량 강화는 배율이 아니라 ObjectPieceBonus로 개수를 더함)
+    public float PieceGainMultiplier() => 1f + SumEffect(UpgradeEffect.PieceGainGlobal) / 100f;
+
+    // 오브젝트 드랍량 강화 한 레벨이 더해주는 조각 수 = 그 오브젝트 기본 보상의 valuePercent%, 단 최소 1개.
+    // 기본 보상이 1~4개인 초반 오브젝트는 %로는 1개도 안 늘어서, 찍으면 반드시 1개는 늘어나게 함
+    public static double ObjectPieceBonusPerLevel(long baseReward, float valuePercent) =>
+        System.Math.Max(1.0, baseReward * (double)valuePercent / 100.0);
+
+    // objectIndex 오브젝트의 드랍량 강화로 처치 한 번마다 더 얻는 조각 수 (구매한 레벨들의 합)
+    public double ObjectPieceBonus(int objectIndex, long baseReward)
     {
-        float pct = SumEffect(UpgradeEffect.PieceGainGlobal) + SumEffect(UpgradeEffect.PieceGainObject, objectIndex);
-        return 1f + pct / 100f;
+        double total = 0; // 지금까지 더한 보너스 조각
+        foreach (UpgradeNode node in _nodes)
+        {
+            if (node.effect != UpgradeEffect.PieceGainObject || node.targetObjectIndex != objectIndex) continue;
+
+            int level = GetLevel(node.id); // 이 노드를 찍은 횟수
+            for (int L = 1; L <= level; L++)
+                total += ObjectPieceBonusPerLevel(baseReward, node.ValueAtLevel(L));
+        }
+        return total;
     }
 
     // 이 오브젝트 처치 시 파편이 2배로 나올 확률 (0~1)

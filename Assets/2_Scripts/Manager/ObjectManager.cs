@@ -201,13 +201,15 @@ public class ObjectManager : MonoBehaviour
     {
         float upgradeMultiplier = 1f; // 파편 획득 배율 업그레이드
         long weaponKillBonus = 0; // 장착 무기의 처치 보너스 파편
+        double objectBonus = 0; // 이 오브젝트 드랍량 강화로 더 얻는 조각 수
         if (UpgradeManager.Instance != null)
         {
-            upgradeMultiplier = UpgradeManager.Instance.PieceGainMultiplier(index);
+            upgradeMultiplier = UpgradeManager.Instance.PieceGainMultiplier();
             weaponKillBonus = UpgradeManager.Instance.WeaponKillBonusPieces(WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : -1);
+            objectBonus = UpgradeManager.Instance.ObjectPieceBonus(index, GetBaseReward(index));
         }
 
-        return Math.Max(1L, (long)Math.Round((GetBaseReward(index) + GetGainBonus(index) + weaponKillBonus) * (double)upgradeMultiplier));
+        return Math.Max(1L, (long)Math.Round((GetBaseReward(index) + GetGainBonus(index) + weaponKillBonus) * (double)upgradeMultiplier + objectBonus));
     }
 
     // ---- 클릭 시 기본 파편 보상 ----

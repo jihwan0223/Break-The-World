@@ -138,6 +138,14 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.DoubleClickChanceUp:
             case UpgradeManager.UpgradeEffect.PieceGainGlobal:
             case UpgradeManager.UpgradeEffect.PieceGainObject:
+            {
+                // 드랍량 강화는 %가 아니라 실제로 늘어나는 조각 수로 보여줌 (기본 보상의 value%, 최소 1개)
+                int objectIndex = ObjectManager.StaticIndexOfName(targetObjectName); // 이 노드가 강화하는 오브젝트
+                if (objectIndex < 0 || ObjectManager.Instance == null) return $"+{value:0.##}%";
+                double pieces = UpgradeManager.ObjectPieceBonusPerLevel(ObjectManager.Instance.GetBaseReward(objectIndex), value); // 다음 레벨에서 더 얻는 조각 수
+                return pieces < 100 ? $"+{pieces:0.#}개" : $"+{NumberFormatUtil.Format((long)Math.Round(pieces))}개";
+            }
+
             case UpgradeManager.UpgradeEffect.ObjectDoubleDrop:
             case UpgradeManager.UpgradeEffect.CrystalChance:
                 return $"+{value:0.##}%"; // 확률/비율계 효과

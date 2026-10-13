@@ -9,6 +9,7 @@ using UnityEngine;
 public class AutoSweeper : MonoBehaviour
 {
     [SerializeField] private Sprite[] frames; // 이동 중 반복 재생할 애니메이션 프레임 (GIF를 프레임별로 쪼갠 것)
+    [SerializeField] private Sprite[] zoneSprites; // 맵(존)별 빗자루 그림 (존 순서대로). 그 존 칸이 채워져 있으면 frames 대신 이 그림을 씀
     [SerializeField] private float framesPerSecond = 12f; // 애니메이션 재생 속도
     [SerializeField] private float moveSpeed = 8f; // 좌->우 이동 속도 (월드 유닛/초)
     [SerializeField] private float heightOffset = 0f; // 바닥 범위 세로 중앙에서 위(+)/아래(-)로 얼마나 띄울지 (월드 유닛) - 그림의 Pivot 위치 기준
@@ -40,12 +41,24 @@ public class AutoSweeper : MonoBehaviour
         StartCoroutine(Sweep());
     }
 
+    // 지금 보여줄 빗자루 그림 - 보고 있는 맵 전용 그림이 있으면 그걸, 없으면 frames 애니메이션의 elapsed초 시점 프레임
+    private Sprite SpriteAt(float elapsed)
+    {
+        int zone = ZoneManager.Instance != null ? ZoneManager.Instance.CurrentZone : 0; // 지금 보고 있는 맵 번호
+        if (zoneSprites != null && zone < zoneSprites.Length && zoneSprites[zone] != null)
+            return zoneSprites[zone];
+
+        if (frames != null && frames.Length > 0)
+            return frames[(int)(elapsed * framesPerSecond) % frames.Length];
+        return _renderer.sprite;
+    }
+
     private IEnumerator Sweep()
     {
         _sweeping = true;
 
         Bounds floor = DebrisPool.Instance.FloorBounds;
-        if (frames != null && frames.Length > 0) _renderer.sprite = frames[0];
+        _renderer.sprite = SpriteAt(0f);
 
         // 그림이 Pivot(손잡이 끝)에서 가장 멀리 뻗는 거리 - Pivot이 가운데가 아니고 흔들리며 돌기도 해서,
         // 절반 폭이 아니라 Pivot에서 가장 먼 모서리까지의 거리만큼 화면 밖에 있어야 완전히 안 보임
@@ -82,8 +95,7 @@ public class AutoSweeper : MonoBehaviour
             transform.position = new Vector3(x, y, transform.position.z);
             transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Sin(elapsed * swaysPerSecond * Mathf.PI * 2f) * swayAngle);
 
-            if (frames != null && frames.Length > 0)
-                _renderer.sprite = frames[(int)(elapsed * framesPerSecond) % frames.Length];
+            _renderer.sprite = SpriteAt(elapsed); // 쓰는 도중 다른 맵으로 넘어가면 그 맵 빗자루로 바뀜
 
             DebrisPool.Instance.CollectMarkedBetween(prevX, x + pickupReach); // 이번 프레임에 지나간 구간 + 앞쪽 범위 안의 대상 파편을 전부 주움
             DebrisPool.Instance.MoveCarried(x); // 주운 파편은 빗자루 앞에 모여서 같이 밀려감

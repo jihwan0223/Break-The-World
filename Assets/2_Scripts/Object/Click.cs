@@ -29,6 +29,7 @@ public class Click : MonoBehaviour
     [SerializeField] private float projectileFlightSeconds = 2f; // 타격 몇 초 전부터 날아오기 시작할지(초) - 자동클릭 주기보다 길면 주기만큼만 날아옴
     [SerializeField] private float projectileSpinDegreesPerSecond = 720f; // 날아오는 동안 도는 속도
     [SerializeField] private float projectileStaggerSeconds = 0.1f; // 한 번에 여러 번 때릴 때 투사체 사이의 간격(초)
+    [SerializeField, Range(0.1f, 1f)] private float projectileFastestRatio = 0.35f; // 가장 빠른 투사체의 비행 시간 비율 - 투사체마다 비행 시간이 (이 값 ~ 1) × 기본 시간 사이에서 랜덤. 1이면 전부 같은 속도
 
     private readonly List<GameObject> _flyingProjectiles = new List<GameObject>(); // 지금 날아가는 중인 투사체들 - 오브젝트가 꺼질 때 남지 않게 지우려고 기억
     private int _lastClickSoundIndex = -1; // 방금 재생한 사운드 인덱스 (바로 다음 클릭에서 같은 소리가 안 나오게 기억)
@@ -93,18 +94,25 @@ public class Click : MonoBehaviour
         long gainBonus = ObjectManager.Instance.GetGainBonus(objectIndex);
         float comboMultiplier = ComboManager.Instance != null ? ComboManager.Instance.ShardMultiplier : 1f;
 
-        // 업그레이드: 파편 획득 배율(전역+오브젝트별), 무기별 처치 보너스 파편
+        // 업그레이드: 파편 획득 배율(전역), 오브젝트 드랍량 강화(개수), 무기별 처치 보너스 파편
         float upgradeMultiplier = 1f;
         long weaponKillBonus = 0;
+        double objectBonus = 0; // 이 오브젝트 드랍량 강화로 더 얻는 조각 수
         if (UpgradeManager.Instance != null)
         {
-            upgradeMultiplier = UpgradeManager.Instance.PieceGainMultiplier(objectIndex);
+            upgradeMultiplier = UpgradeManager.Instance.PieceGainMultiplier();
             weaponKillBonus = UpgradeManager.Instance.WeaponKillBonusPieces(weaponIndex);
+            objectBonus = UpgradeManager.Instance.ObjectPieceBonus(objectIndex, baseReward);
         }
 
-        // 후반 티어는 값이 int 범위를 넘어설 수 있어서 double로 곱한 뒤 long으로 반올림함 (Mathf.RoundToInt는 int라 오버플로됨)
-        double rawTotal = (baseReward + gainBonus + weaponKillBonus) * (double)comboMultiplier * upgradeMultiplier;
-        long finalPieces = System.Math.Max(1L, (long)System.Math.Round(rawTotal));
+        // 후반 티어는 값이 int 범위를 넘어설 수 있어서 double로 계산함 (Mathf.RoundToInt는 int라 오버플로됨).
+        // 드랍량 강화는 전역 배율과 서로 곱해지지 않고 더해짐 (예전에 둘 다 %였을 때와 같은 결과)
+        double rawTotal = ((baseReward + gainBonus + weaponKillBonus) * (double)upgradeMultiplier + objectBonus) * comboMultiplier;
+        // 소수 부분은 반올림으로 버리지 않고 그만큼의 확률로 1개를 더 줌 - 평균은 계산값과 정확히 같음
+        long finalPieces = (long)System.Math.Floor(rawTotal);
+        if (Random.value < rawTotal - finalPieces)
+            finalPieces++;
+        finalPieces = System.Math.Max(1L, finalPieces);
 
         // 오브젝트별 "확률적 2배 드랍" 업그레이드
         if (UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.ObjectDoubleDropChance(objectIndex))
@@ -225,8 +233,9 @@ public class Click : MonoBehaviour
         {
             _projectilesLaunched = true;
             float remaining = Mathf.Max(interval - _autoClickTimer, 0.05f); // 타격까지 남은 시간 = 이번 비행 시간
+            // 투사체마다 비행 시간을 다르게 뽑아서 어떤 건 빠르게, 어떤 건 느리게 날아옴 (가장 느린 게 원래 속도라 타격이 늦어지진 않음)
             for (int i = 0; i < clicks; i++)
-                StartCoroutine(FlyProjectileThenHit(i * projectileStaggerSeconds, remaining));
+                StartCoroutine(FlyProjectileThenHit(i * projectileStaggerSeconds, remaining * Random.Range(projectileFastestRatio, 1f)));
         }
 
         if (_autoClickTimer < interval)
