@@ -385,15 +385,16 @@ public class DebrisPool : MonoBehaviour
             Piece piece = _groundPieces[i];
             float pieceX = piece.renderer.transform.position.x; // 이 파편의 가로 위치
             if (piece.sweepMarked && piece.landed && pieceX > fromX && pieceX <= toX)
-                Collect(piece, true);
+                Collect(piece, true, carry: true);
         }
     }
 
-    // bySweeper면 빗자루가 주운 것 - "+N"을 근처 것끼리 합쳐서 띄움 (안 보이는 존에서 주운 건 안 띄움)
-    private void Collect(Piece piece, bool bySweeper)
+    // mergePopup이면 "+N"을 근처 것끼리 합쳐서 띄움 (빗자루/호버 줍기처럼 연달아 줍는 경우. 안 보이는 존에서 주운 건 안 띄움).
+    // carry는 빗자루가 주울 때만 켬 - 그림을 바로 지우지 않고 빗자루 앞 더미에 넣음
+    private void Collect(Piece piece, bool mergePopup, bool carry = false)
     {
         if (piece.zone == CurrentZone)
-            _popup.Show(piece.renderer.transform.position, piece.value, piece.isCrystal, bySweeper);
+            _popup.Show(piece.renderer.transform.position, piece.value, piece.isCrystal, mergePopup);
         if (piece.isCrystal)
             CurrencyManager.Instance?.AddCrystals(piece.value);
         else
@@ -401,7 +402,7 @@ public class DebrisPool : MonoBehaviour
         OnPieceCollected?.Invoke(piece.renderer.transform);
 
         // 빗자루가 주운 건 바로 지우지 않고 빗자루 앞 더미에 넣어서, 쓸려 가는 게 눈에 보이게 함
-        if (bySweeper && piece.zone == CurrentZone && _carried.Count < maxCarriedPieces)
+        if (carry && piece.zone == CurrentZone && _carried.Count < maxCarriedPieces)
             Carry(piece);
         else
             ReturnToPool(piece);

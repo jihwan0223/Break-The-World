@@ -12269,7 +12269,7 @@ GameObject:
   m_Component:
   - component: {fileID: 558599200}
   m_Layer: 0
-  m_Name: "Zone3_\uACF5\uC0AC\uC7A5"
+  m_Name: Map3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39185,7 +39185,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1610872450}
   m_Layer: 0
-  m_Name: "Zone2_\uAE38\uAC70\uB9AC"
+  m_Name: Map2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39696,7 +39696,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1630271656}
   m_Layer: 0
-  m_Name: "Zone1_\uCC45\uC0C1\uC704"
+  m_Name: Map1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39783,6 +39783,7 @@ MonoBehaviour:
   leftOffset: 20
   topOffset: 20
   sortingOrder: 100
+  fontSize: 36
 --- !u!114 &1634612738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50552,8 +50553,12 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 344f620c2625c7d4e9f84e2564e82598, type: 3}
   - healthStages:
     - {fileID: 21300000, guid: b1034a0a4d592e34dbed355c33f79707, type: 3}
+    - {fileID: 21300000, guid: 6d151feb578247e43aecc723ac5b1b1c, type: 3}
+    - {fileID: 21300000, guid: f32a24bd1ae929a4292d4c35450573b8, type: 3}
+    - {fileID: 21300000, guid: 60f8fe2a330be664d9ec13d6b72af277, type: 3}
   - healthStages:
     - {fileID: 21300000, guid: aba7de352406de545a038beb0d5b9778, type: 3}
+    - {fileID: 21300000, guid: 1240a54f5c6eba943b33b13376145c74, type: 3}
   - healthStages: []
   - healthStages: []
   - healthStages: []

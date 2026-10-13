@@ -12,6 +12,7 @@ public class PieceUI : MonoBehaviour
     [SerializeField] private float leftOffset = 20f; // 화면 좌상단 기준 왼쪽 여백
     [SerializeField] private float topOffset = 20f; // 화면 좌상단 기준 위쪽 여백
     [SerializeField] private int sortingOrder = 100; // 업그레이드/무기/오브젝트 화면 위에 그려지도록 높게 잡은 값
+    [SerializeField] private float fontSize = GameFonts.UiColoredPixelSize; // 조각/결정 숫자 글자 크기(px) - 폰트를 찍어낸 크기와 같아야 번지지 않고 도트가 또렷함 (우상단 버튼 글자 34와 거의 같은 크기)
 
     private Label _pieceLabel; // 조각 개수를 표시하는 라벨
     private long _lastAmount; // 실제 조각 보유량 (화면 숫자가 따라갈 목표값)
@@ -50,6 +51,8 @@ public class PieceUI : MonoBehaviour
 
         VisualElement root = uiDocument.rootVisualElement;
         GameFonts.Apply(root);
+        if (GameFonts.UiColored != null)
+            root.style.unityFontDefinition = FontDefinition.FromSDFFont(GameFonts.UiColored); // 결정 글자를 하늘색으로 칠하려면 색이 먹는 폰트여야 함
         BuildContainer(root);
     }
 
@@ -82,35 +85,45 @@ public class PieceUI : MonoBehaviour
     {
         root.Clear();
 
+        // 우상단 버튼(SidePanelUI.CreateButton)과 같은 모양 - 같은 높이/배경색/모서리에, 버튼 테마 클래스를 붙여 테두리와 바깥 여백도 똑같이 맞춤
         var background = new VisualElement();
+        background.AddToClassList("unity-button");
+        background.pickingMode = PickingMode.Ignore; // 버튼처럼 생겼지만 누르는 게 아니라서 마우스에 반응하지 않게 (뒤쪽 클릭도 통과)
         background.style.position = Position.Absolute;
         background.style.top = topOffset;
         background.style.left = leftOffset;
-        background.style.paddingLeft = 12;
-        background.style.paddingRight = 12;
-        background.style.paddingTop = 6;
-        background.style.paddingBottom = 6;
-        background.style.backgroundColor = new Color(0f, 0f, 0f, 0.6f);
-        background.style.borderTopLeftRadius = 4;
-        background.style.borderTopRightRadius = 4;
-        background.style.borderBottomLeftRadius = 4;
-        background.style.borderBottomRightRadius = 4;
+        background.style.height = 110;
+        background.style.minWidth = 300;
+        background.style.paddingLeft = 18;
+        background.style.paddingRight = 18;
+        background.style.justifyContent = Justify.Center; // 두 줄을 상자 세로 가운데에
+        background.style.alignItems = Align.FlexStart;
+        background.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.85f);
+        background.style.borderTopLeftRadius = 6;
+        background.style.borderTopRightRadius = 6;
+        background.style.borderBottomLeftRadius = 6;
+        background.style.borderBottomRightRadius = 6;
 
         _pieceLabel = CreateLabel(Color.white);
         background.Add(_pieceLabel);
 
-        _crystalLabel = CreateLabel(new Color(0.55f, 0.9f, 1f)); // 결정은 하늘색으로 구분
+        _crystalLabel = CreateLabel(new Color(0.35f, 0.85f, 1f)); // 결정은 하늘색으로 구분
         background.Add(_crystalLabel);
 
         root.Add(background);
     }
 
-    private static Label CreateLabel(Color color)
+    private Label CreateLabel(Color color)
     {
         var label = new Label();
-        label.style.fontSize = 20;
+        label.style.fontSize = fontSize;
         label.style.color = color;
-        label.style.unityFontStyleAndWeight = FontStyle.Bold;
+        label.style.marginTop = 1;
+        label.style.marginBottom = 1;
+        label.style.paddingLeft = 0;
+        label.style.paddingRight = 0;
+        label.pickingMode = PickingMode.Ignore;
+        label.style.transformOrigin = new TransformOrigin(Length.Percent(0), Length.Percent(50)); // 커졌다 작아질 때 왼쪽 끝을 기준으로 - 글자가 상자 왼쪽 밖으로 삐져나가지 않게
         return label;
     }
 
@@ -196,7 +209,7 @@ public class PieceUI : MonoBehaviour
     private IEnumerator PlayPieceGainPulse(Label label)
     {
         const float duration = 0.25f; // 연출 총 시간(초)
-        const float peakScale = 1.3f; // 커질 때 최대 배율
+        const float peakScale = 1.15f; // 커질 때 최대 배율 (글자가 커진 만큼 줄임 - 상자 밖으로 많이 넘치지 않게)
 
         float elapsed = 0f; // 연출 시작 후 흐른 시간
 

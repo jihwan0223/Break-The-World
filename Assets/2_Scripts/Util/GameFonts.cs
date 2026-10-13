@@ -15,6 +15,27 @@ public static class GameFonts
 
     public static Font Ui => _ui != null ? _ui : (_ui = Resources.Load<Font>(FontName));
 
+    public const int UiColoredPixelSize = 36; // UiColored 글자를 찍어내는 크기(px) - 12px 픽셀 폰트의 3배. 이 크기(또는 그 배수)로 써야 도트가 또렷함
+
+    private static UnityEngine.TextCore.Text.FontAsset _uiColored; // UI 툴킷용 색이 먹는 폰트 (처음 쓸 때 한 번 만들어 캐시)
+
+    // UI 툴킷에서 글자색이 먹는 폰트. Ui(일반 Font)로 걸면 이 픽셀 폰트는 style.color를 줘도 항상 흰색으로 나와서,
+    // 색을 입혀야 하는 글자는 이걸 써야 함. 번짐 없이 도트 그대로 보이게 흑백 비트맵(RASTER)으로 찍고 텍스처도 Point로 둠
+    public static UnityEngine.TextCore.Text.FontAsset UiColored
+    {
+        get
+        {
+            if (_uiColored == null && Ui != null)
+            {
+                _uiColored = UnityEngine.TextCore.Text.FontAsset.CreateFontAsset(Ui, UiColoredPixelSize, 2,
+                    UnityEngine.TextCore.LowLevel.GlyphRenderMode.RASTER, 1024, 1024);
+                if (_uiColored != null && _uiColored.atlasTexture != null)
+                    _uiColored.atlasTexture.filterMode = FilterMode.Point;
+            }
+            return _uiColored;
+        }
+    }
+
     public static TMP_FontAsset Tmp =>
         _tmp != null ? _tmp
         : (_tmp = Resources.Load<TMP_FontAsset>(TmpFontName) ?? TMP_Settings.defaultFontAsset);
