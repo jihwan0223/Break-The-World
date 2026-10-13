@@ -25,6 +25,9 @@ public class DebrisPool : MonoBehaviour
     [SerializeField] private float crystalSizeMultiplier = 1.6f; // 결정을 파편보다 이 배율만큼 크게
     [SerializeField] private int maxFallingShards = 2000; // 연출용 파편(파티클)이 동시에 떠 있을 수 있는 수
     [SerializeField] private float hoverPickupRadiusScale = 0.7f; // 호버 줍기 판정 크기 - 파편 그림 대비 배율 (작을수록 커서가 파편 한가운데에 정확히 올라가야 주워짐)
+    [SerializeField] private int maxCarriedPieces = 80; // 빗자루가 앞에 모아서 밀고 갈 수 있는 파편 수 - 넘치는 건 주운 자리에서 바로 사라짐
+    [SerializeField] private float carryPileWidth = 1.2f; // 빗자루 앞 더미가 꽉 찼을 때의 가로 길이(월드 유닛) - 쓸어 담을수록 이 길이까지 앞으로 길어짐
+    [SerializeField] private float carryGatherSpeed = 12f; // 쓸린 파편이 더미 안 제자리로 끌려가는 속도 (클수록 빨리 붙음)
 
     // 바닥에 떨어져 있는(또는 떨어지는 중인) 파편 하나
     private class Piece
@@ -36,6 +39,8 @@ public class DebrisPool : MonoBehaviour
         public int zone; // 떨어진 존 번호 (그 존을 보고 있을 때만 보이고 주울 수 있음)
         public bool landed; // 착지를 마쳤는지
         public bool sweepMarked; // 이번 자동 줍기가 쓸어 담을 대상인지 (자동 줍기가 출발할 때 위층부터 정해짐)
+        public Vector2 carryOffset; // 빗자루에 쓸려 밀려갈 때 더미 안에서 놓일 자리 (빗자루 x, 바닥 아래끝 기준)
+        public Vector2 carryCurrent; // 지금 빗자루 기준으로 있는 자리 - 쓸린 자리에서 carryOffset으로 끌려감
     }
 
     private readonly List<Piece> _groundPieces = new List<Piece>(); // 지금 바닥에 있거나 떨어지는 중인 파편들
@@ -51,6 +56,7 @@ public class DebrisPool : MonoBehaviour
     // 연출용 파편을 그리는 파티클 (파편 그림마다 하나씩, 처음 쓸 때 만듦). 에디터가 private 배열을 빈 배열로 채워두는 일이 있어서 저장 대상에서 뺌
     [System.NonSerialized] private ParticleSystem[] _shardSystems;
     private readonly List<Piece> _mergeTargets = new List<Piece>(); // 바닥이 꽉 찼을 때 값을 나눠 받을 파편들 (매번 재사용)
+    private readonly List<Piece> _carried = new List<Piece>(); // 빗자루가 쓸어서 앞에 모아 밀고 가는 파편들 - 값은 이미 지급됐고 그림만 남은 것
 
     // 오브젝트를 부숴 파편을 새로 떨어뜨릴 때마다 그 파편들을 전달 (결정 제외) - 첫 파편 튜토리얼 등이 구독
     public event System.Action<IReadOnlyList<Transform>> OnPiecesDropped;
@@ -393,13 +399,59 @@ public class DebrisPool : MonoBehaviour
         else
             CurrencyManager.Instance?.AddPieces(piece.value);
         OnPieceCollected?.Invoke(piece.renderer.transform);
-        ReturnToPool(piece);
+
+        // 빗자루가 주운 건 바로 지우지 않고 빗자루 앞 더미에 넣어서, 쓸려 가는 게 눈에 보이게 함
+        if (bySweeper && piece.zone == CurrentZone && _carried.Count < maxCarriedPieces)
+            Carry(piece);
+        else
+            ReturnToPool(piece);
+    }
+
+    // 쓸린 파편을 바닥 목록에서 빼고 빗자루 앞 더미로 옮김. 더미는 쌓일수록 앞으로 길어지고, 앞쪽일수록 낮게 깔림
+    private void Carry(Piece piece)
+    {
+        _groundPieces.Remove(piece);
+        piece.collider.enabled = false;
+        piece.landed = false;
+
+        Bounds floor = spawnArea.bounds; // 더미 높이를 바닥 범위에 맞추려고 읽음
+        float pileLength = carryPileWidth * Mathf.Sqrt((_carried.Count + 1f) / Mathf.Max(1, maxCarriedPieces)); // 지금 더미의 가로 길이
+        float forward = Random.Range(0f, pileLength); // 더미 안에서 빗자루로부터 앞으로 떨어진 거리
+        float height = floor.size.y * (1f - 0.6f * forward / Mathf.Max(0.01f, carryPileWidth)); // 그 자리에서 쌓일 수 있는 높이
+        piece.carryOffset = new Vector2(forward, Random.Range(0f, height));
+        piece.carryCurrent = new Vector2(float.NaN, piece.renderer.transform.position.y - floor.min.y); // 쓸린 자리에서 출발 (가로는 빗자루 위치를 아는 MoveCarried에서 채움)
+        _carried.Add(piece);
+    }
+
+    // 자동 줍기가 매 프레임 호출 - 더미에 든 파편을 빗자루(broomX)와 같이 옮기면서 제자리로 끌어모음
+    public void MoveCarried(float broomX)
+    {
+        float floorY = spawnArea.bounds.min.y; // 더미가 놓이는 바닥 높이
+        float blend = 1f - Mathf.Exp(-carryGatherSpeed * Time.deltaTime); // 이번 프레임에 제자리로 다가가는 비율
+        foreach (Piece piece in _carried)
+        {
+            Transform pieceTransform = piece.renderer.transform; // 옮길 파편
+            if (float.IsNaN(piece.carryCurrent.x))
+                piece.carryCurrent.x = pieceTransform.position.x - broomX; // 방금 쓸린 파편 - 빗자루 앞쪽 범위에서 주웠으면 그 자리에서 끌려오게
+            piece.carryCurrent = Vector2.Lerp(piece.carryCurrent, piece.carryOffset, blend);
+            pieceTransform.position = new Vector3(broomX + piece.carryCurrent.x, floorY + piece.carryCurrent.y, pieceTransform.position.z);
+            piece.renderer.forceRenderingOff = piece.zone != CurrentZone; // 쓰는 도중 다른 존으로 넘어가면 숨김
+        }
+    }
+
+    // 자동 줍기가 끝나면(화면 밖으로 나가면) 호출 - 밀고 가던 파편을 전부 치움
+    public void ReleaseCarried()
+    {
+        foreach (Piece piece in _carried)
+            ReturnToPool(piece);
+        _carried.Clear();
     }
 
     // 테스트용 - 모든 존의 바닥 파편을 조각 지급 없이 전부 치움
     public void ClearAll()
     {
         StopAllCoroutines();
+        ReleaseCarried();
         for (int i = _groundPieces.Count - 1; i >= 0; i--)
             ReturnToPool(_groundPieces[i]);
     }

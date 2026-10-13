@@ -17,6 +17,6 @@ public class WeaponData
     {
         this.tier = tier;
         this.weaponName = weaponName;
-        this.clickDamage = clickDamage;
+        this.clickDamage = clickDamage * ObjectHealthCalculator.ScaleOfTier(tier); // 같은 티어 오브젝트의 체력과 같은 배율로 키움
     }
 }

@@ -36,12 +36,15 @@ public class Click : MonoBehaviour
     private bool _lastHitFromAutoClick; // 마지막 타격이 자동클릭이었는지 - 그 타격으로 부서지면 파편 없이 바로 지급
     private float _autoClickTimer; // 자동클릭 업그레이드의 다음 발동까지 누적된 시간(초)
     private float _autoMineTimer; // 자동채굴 업그레이드의 다음 발동까지 누적된 시간(초)
+    private float _hoverHitCooldown; // 커서 타격을 다시 넣을 수 있을 때까지 남은 시간(초) - 0 이하면 바로 때릴 수 있음
+    private bool _isTerrain; // 존 전체를 부수는 지형(책상/도로/아파트)인지 - 커서 타격 대상에서 뺌
 
     void Start()
     {
         _health = GetComponent<Health>();
         _audioSource = GetComponent<AudioSource>();
         _collider = GetComponent<Collider2D>();
+        _isTerrain = GetComponent<ZoneBreaker>() != null;
         _health.OnDied += HandleDied;
 
         // 맞을 때 움찔하는 연출이 안 붙어 있는 오브젝트(책상 등)에도 붙여서, 어떤 오브젝트든 맞는 게 보이게 함
@@ -174,10 +177,11 @@ public class Click : MonoBehaviour
         if (isCrit)
             damage = Mathf.RoundToInt(damage * UpgradeManager.Instance.CritMultiplierValue);
 
-        // 럭키 클릭 - 당첨되면 데미지 계산과 상관없이 즉시 파괴
+        // 럭키 클릭 - 당첨되면 데미지가 모자라도 즉시 파괴. 원래 데미지가 남은 체력보다 크면 그대로 둠
+        // (남은 체력으로 깎아버리면 뜨는 숫자가 무기 데미지가 아니라 체력만큼만 나옴)
         bool isLucky = UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.LuckyClickChance;
         if (isLucky)
-            damage = _health.CurrentHP;
+            damage = Mathf.Max(damage, _health.CurrentHP);
 
         // 이번 타격으로 죽는 게 아닐 때만 클릭 사운드 재생 (죽을 땐 파괴 사운드만 나오게)
         bool willDie = damage >= _health.CurrentHP;
@@ -350,8 +354,18 @@ public class Click : MonoBehaviour
         UpdateAutoClick();
         UpdateAutoMine();
 
+        if (Mouse.current == null)
+            return;
+
         // 새 Input System 기반 마우스 좌클릭 감지
-        if (Mouse.current == null || !Mouse.current.leftButton.wasPressedThisFrame)
+        bool pressed = Mouse.current.leftButton.wasPressedThisFrame; // 이번 프레임에 눌렀는지
+
+        // 커서 타격(업그레이드로 해금) - 누르지 않아도 커서가 올라가 있으면 간격마다 클릭 한 번으로 침.
+        // 지형(책상/도로/아파트)은 화면 전체라 직접 눌러야만 맞음
+        _hoverHitCooldown -= Time.deltaTime;
+        bool hover = !pressed && _hoverHitCooldown <= 0f && !_isTerrain && !IsZoneHidden
+            && UpgradeManager.Instance != null && UpgradeManager.Instance.HoverClickIsUnlocked; // 이번 프레임에 커서 타격을 시도할지
+        if (!pressed && !hover)
             return;
 
         // 포인터가 UI(무기/오브젝트 팝업 등) 위에 있거나, 첫 파편 튜토리얼 줌인 중이면 오브젝트 클릭 처리하지 않음
@@ -363,7 +377,10 @@ public class Click : MonoBehaviour
 
         if (IsClickTarget(worldPos))
         {
-            Debug.Log("Click");
+            if (hover)
+                _hoverHitCooldown = UpgradeManager.Instance.HoverClickIntervalSeconds;
+            else
+                Debug.Log("Click");
             PerformClickHit(true, _collider.ClosestPoint(worldPos)); // 타격 연출은 커서 위치에서, 커서 범위 가장자리에 걸쳐 맞았으면 커서에 가장 가까운 자리에서 나옴
 
             // 더블클릭 업그레이드 - 확률 판정 성공 시 살짝 늦게 두 번째 타격을 처리

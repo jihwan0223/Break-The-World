@@ -45,6 +45,7 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("존 자동 파괴 해금")] ZoneAutoBreakUnlock,   // Target Object Name(책상/도로)이 갈라져서 그 존의 다른 오브젝트가 주기마다 계속 부서지는 기능 해금
         [InspectorName("오브젝트 추가 배치")] ObjectExtraCopies,   // Target Object Name 오브젝트(비우면 모든 오브젝트)를 +값 개 더 배치. 추가분은 씬에 미리 놓아두고 UnlockGate로 켬
         [InspectorName("커서 범위 증가")] CursorRange,          // 커서 범위 반지름 +값 (월드 단위). 범위에 걸친 오브젝트가 한 번에 클릭되고 커서 줍기도 이 범위로 주움
+        [InspectorName("커서 타격 해금")] HoverClickUnlock,       // 클릭하지 않아도 커서를 오브젝트에 올려두면 일정 간격으로 계속 때리는 기능 해금 (지형 제외)
     }
 
     // 선행 노드와 잇는 선의 모양 (UpgradeTreeLink가 이 값을 보고 세그먼트를 배치함)
@@ -79,6 +80,7 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private float baseAutoSweepInterval = 20f;  // 자동 줍기 기본 주기(초)
     [SerializeField] private float minAutoSweepInterval = 3f;    // 자동 줍기 주기 하한
     [SerializeField] private int baseAutoSweepLayers = 1;        // 자동 줍기가 기본으로 쓸어 담는 파편 층 수 (맨 위층부터) - AutoSweepLayers가 위에 더함
+    [SerializeField] private float hoverClickInterval = 0.7f;    // 커서 타격이 같은 오브젝트를 다시 때리기까지의 간격(초)
 
     // ---- 씬의 UpgradeNodeUI를 읽어 구성한 실제 노드 ----
 
@@ -398,7 +400,8 @@ public class UpgradeManager : MonoBehaviour
             for (int L = 1; L <= level; L++)
                 total += node.ValueAtLevel(L);
         }
-        return Mathf.RoundToInt(total);
+        // 노드 값은 그대로 두고, 장착한 무기 티어의 배율(무기 데미지/체력과 같은 값)로 키움 - 전역 강화도 좋은 무기일수록 크게 붙음
+        return Mathf.RoundToInt(total * ObjectHealthCalculator.ScaleOfTier(equippedWeaponIndex + 1));
     }
 
     public float CritChanceValue
@@ -498,6 +501,8 @@ public class UpgradeManager : MonoBehaviour
         Mathf.RoundToInt(SumEffect(UpgradeEffect.ObjectExtraCopies, -1) + SumEffect(UpgradeEffect.ObjectExtraCopies, objectIndex));
     public bool HoverPickupIsUnlocked => AnyUnlocked(UpgradeEffect.HoverPickupUnlock); // 호버 줍기 해금 여부
     public float CursorRadius => SumEffect(UpgradeEffect.CursorRange); // 커서 범위 반지름(월드 단위). 0이면 범위 없이 커서 한 점만
+    public bool HoverClickIsUnlocked => AnyUnlocked(UpgradeEffect.HoverClickUnlock); // 커서 타격 해금 여부
+    public float HoverClickIntervalSeconds => Mathf.Max(0.02f, hoverClickInterval); // 커서 타격 간격(초) - 0 이하로 넣어도 매 프레임 때리지 않게 하한을 둠
 
     public float AutoSweepIntervalSeconds =>
         Mathf.Max(minAutoSweepInterval, baseAutoSweepInterval - SumEffect(UpgradeEffect.AutoSweepSpeed));

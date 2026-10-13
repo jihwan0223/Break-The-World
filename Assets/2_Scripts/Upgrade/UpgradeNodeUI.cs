@@ -129,6 +129,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.AutoSweepUnlock:
             case UpgradeManager.UpgradeEffect.HoverPickupUnlock:
             case UpgradeManager.UpgradeEffect.ZoneAutoBreakUnlock:
+            case UpgradeManager.UpgradeEffect.HoverClickUnlock:
                 return null; // 해금류는 숫자가 아니라 on/off라 표시 안 함
 
             case UpgradeManager.UpgradeEffect.CritChance:
@@ -156,7 +157,16 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.AutoSweepLayers:
                 return $"+{value:0.##}층"; // 쓸어 담는 층이 늘어나는 효과
 
-            default: // ClickDamage, AutoClickCount, AutoMineYield, ComboMultiplier, WeaponKillBonus 등 순수 수치형
+            case UpgradeManager.UpgradeEffect.ClickDamage:
+            {
+                int weaponIndex = WeaponManager.StaticIndexOfWeaponName(targetWeaponName); // 이 노드가 강화하는 무기 (전역이면 -1)
+                if (weaponIndex < 0 && WeaponManager.Instance != null)
+                    weaponIndex = WeaponManager.Instance.EquippedIndex; // 전역 강화는 지금 장착한 무기 기준으로 보여줌
+                int scale = ObjectHealthCalculator.ScaleOfTier(weaponIndex + 1); // 그 무기 티어의 데미지 배율
+                return $"+{NumberFormatUtil.Format(Mathf.RoundToInt(value * scale))}"; // 실제로 붙는 데미지(배율 적용 후)로 표시
+            }
+
+            default: // AutoClickCount, AutoMineYield, ComboMultiplier, WeaponKillBonus 등 순수 수치형
                 return $"+{value:0.##}";
         }
     }
