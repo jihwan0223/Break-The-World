@@ -30,6 +30,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     private Coroutine _shakeRoutine; // 지금 재생 중인 흔들림 (중첩 방지)
     private bool _wasRevealed; // 직전 Refresh 때 이 노드가 공개 상태였는지 - hidden→revealed로 바뀌는 "등장 순간"을 한 번만 잡으려고 추적
     private bool _refreshedOnce; // Refresh가 최소 한 번 돌았는지 - 첫 호출 때는 등장 흔들림을 재생 안 함(이미 열려있던 노드로 취급)
+    private GameObject _badge; // 지금 조각으로 살 수 있을 때 오른쪽 위에 뜨는 느낌표 (처음 필요할 때 만듦)
 
     private readonly List<MonoBehaviour> _prereqNodes = new List<MonoBehaviour>(); // 들어오는 링크(들)의 선행 노드 전부 (UpgradeNodeUI 또는 ObjectEconomyNodeUI). 비어있으면 링크 없음
     private bool _prereqResolved;        // _prereqNodes를 한 번 찾았는지 (씬의 링크는 안 바뀌니 최초 1회만 탐색)
@@ -40,6 +41,28 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     // 이 노드를 다른 노드의 anchor로 쓸 때 확인함: Gain 노드는 1레벨 이상 올렸는지, Unlock 노드는 해금 완료됐는지
     public bool IsLeveled() => ObjectManager.Instance != null &&
         (isGain ? ObjectManager.Instance.GetGainLevel(objectIndex) >= 1 : ObjectManager.Instance.IsUnlocked(objectIndex));
+
+    // 지금 조각으로 바로 살 수 있는지 (공개됨 + 순서 충족 + 완료/최대 아님 + 조각 충분) - 느낌표 표시용.
+    // 트리 화면이 꺼져 있어도(Awake 전이어도) 부를 수 있음
+    public bool CanBuy()
+    {
+        ObjectManager objects = ObjectManager.Instance; // 해금/획득 상태와 가격 조회
+        if (objects == null || CurrencyManager.Instance == null || objectIndex <= 0) return false;
+
+        long cost; // 이번에 내야 하는 조각
+        if (isGain)
+        {
+            if (!objects.IsUnlocked(objectIndex)) return false;
+            cost = objects.GetNextGainCost(objectIndex);
+            if (cost < 0) return false; // 최대 레벨
+        }
+        else
+        {
+            if (objects.IsUnlocked(objectIndex) || !objects.IsUnlockOrderMet(objectIndex) || !PrerequisiteSatisfied()) return false;
+            cost = objects.GetUnlockCost(objectIndex);
+        }
+        return CurrencyManager.Instance.GetPieces() >= cost;
+    }
 
     // 선행 노드(들) 중 하나라도 충족됐는지 - 이 노드로 들어오는 UpgradeTreeLink(들)의 선행 노드 중 하나라도(OR) 1레벨
     // 이상/해금 완료면 true. 들어오는 링크가 없으면 옛날 anchor 필드로 폴백, 그것도 없으면 루트로 보고 항상 true.
@@ -139,6 +162,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         if (!isRevealed) return;
 
         UpdateIcon();
+        NoticeBadge.Set(ref _badge, Rect, CanBuy());
         if (justRevealed)
         {
             PlayShake();

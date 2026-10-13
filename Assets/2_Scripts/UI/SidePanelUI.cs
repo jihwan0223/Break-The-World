@@ -32,6 +32,11 @@ public class SidePanelUI : MonoBehaviour
     private VisualElement _buttonRow; // 우상단 Upgrade/Weapon/Object 버튼 줄 - 셋 중 아무거나 하나라도 열려있으면 전부 숨김
     private bool _upgradeTreeOpen; // Canvas 업그레이드 화면이 지금 열려있는지 (UpgradeTreeUI.OnTreeToggled로 갱신됨)
 
+    private VisualElement _upgradeBadge; // 업그레이드 버튼의 느낌표 - 지금 살 수 있는 노드가 있을 때만 보임
+    private VisualElement _weaponBadge; // 무기 버튼의 느낌표 - 지금 해금할 수 있는 무기가 있을 때만 보임
+    private float _badgeTimer; // 느낌표를 다시 판단할 때까지 남은 시간(초)
+    private const float BadgeRefreshInterval = 0.25f; // 느낌표 판단 주기(초) - 매 프레임 트리 전체를 훑지 않게
+
     private VisualElement _debugPanel; // 디버그 팝업 (테스트용 버튼 모음)
     private Label _debugStatus; // 디버그 버튼을 누른 결과를 보여주는 줄
 
@@ -58,6 +63,8 @@ public class SidePanelUI : MonoBehaviour
     // ESC로 지금 열려있는 창(무기/도감 팝업, 디버그, 업그레이드 화면) 닫기
     void Update()
     {
+        RefreshBadges();
+
         if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
 
         if (_panel.style.display == DisplayStyle.Flex) ClosePanel();
@@ -68,6 +75,34 @@ public class SidePanelUI : MonoBehaviour
     void OnDisable()
     {
         UpgradeTreeUI.OnTreeToggled -= HandleUpgradeTreeToggled;
+    }
+
+    // 지금 재화로 살 수 있는 게 있으면 업그레이드/무기 버튼에 느낌표를 띄움. 버튼 줄이 보일 때만, 일정 주기로 판단
+    private void RefreshBadges()
+    {
+        _badgeTimer -= Time.unscaledDeltaTime;
+        if (_badgeTimer > 0f || _buttonRow == null || _buttonRow.style.display == DisplayStyle.None) return;
+        _badgeTimer = BadgeRefreshInterval;
+
+        bool upgrade = UpgradeManager.Instance != null && UpgradeManager.Instance.AnyUpgradeAvailable(); // 살 수 있는 노드가 있는지
+        bool weapon = WeaponManager.Instance != null && WeaponManager.Instance.AnyUnlockAffordable(); // 해금할 수 있는 무기가 있는지
+        _upgradeBadge.style.display = upgrade ? DisplayStyle.Flex : DisplayStyle.None;
+        _weaponBadge.style.display = weapon ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    // 버튼 오른쪽 위에 붙는 느낌표 (처음엔 숨김) - 트리 노드의 느낌표와 같은 그림
+    private static VisualElement CreateBadge()
+    {
+        var badge = new VisualElement();
+        badge.pickingMode = PickingMode.Ignore; // 버튼 클릭을 가로채지 않게
+        badge.style.position = Position.Absolute;
+        badge.style.top = -14;
+        badge.style.right = 4; // 옆 버튼에 가려지지 않게 버튼 안쪽에 둠
+        badge.style.width = 48; // 16px 그림의 3배
+        badge.style.height = 48;
+        badge.style.backgroundImage = new StyleBackground(NoticeBadge.Sprite);
+        badge.style.display = DisplayStyle.None;
+        return badge;
     }
 
     private void HandleUpgradeTreeToggled(bool open)
@@ -181,6 +216,11 @@ public class SidePanelUI : MonoBehaviour
             Debug.Log("디버그 버튼 눌림");
             OpenDebugPanel();
         });
+
+        _upgradeBadge = CreateBadge();
+        upgradeButton.Add(_upgradeBadge);
+        _weaponBadge = CreateBadge();
+        weaponButton.Add(_weaponBadge);
 
         debugButton.style.marginRight = 12; // 맨 왼쪽에 둠 - 줄이 오른쪽 기준 정렬이라 기존 3개 위치가 안 바뀜
         upgradeButton.style.marginRight = 12;

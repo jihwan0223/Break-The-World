@@ -130,6 +130,9 @@ public class PieceUI : MonoBehaviour
     private void UpdateCrystalLabel(long amount)
     {
         _crystalLabel.text = $"결정: {NumberFormatUtil.Format(amount)}";
+        // 결정을 한 번이라도 얻기 전에는 결정 줄을 숨김 (다 써서 0이 돼도 얻은 적이 있으면 계속 보임)
+        bool shown = amount > 0 || (CurrencyManager.Instance != null && CurrencyManager.Instance.EverHadCrystal); // 결정 줄을 보여줄지
+        _crystalLabel.style.display = shown ? DisplayStyle.Flex : DisplayStyle.None;
 
         bool increased = amount > _lastCrystals;
         _lastCrystals = amount;

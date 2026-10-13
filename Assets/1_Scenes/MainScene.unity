@@ -1446,7 +1446,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 72bff74ce100b064abf8ec10dbe83443, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costs.Array.data[0].baseAmount
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costs.Array.data[0].useCrystals
@@ -32925,6 +32925,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CurrencyManager
   debugAlwaysMaxPieces: 0
+  starterCrystalPieces: 50
 --- !u!1 &1353580938 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}

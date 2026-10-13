@@ -90,6 +90,17 @@ public class WeaponManager : MonoBehaviour
     public long GetUnlockCost(int index) =>
         ObjectManager.Instance != null ? ObjectManager.Instance.GetUnlockCost(ObjectManager.FirstIndexOfTier(weapons[index].tier)) : 0;
 
+    // 지금 조각으로 해금할 수 있는 무기가 있는지 - 무기 버튼 느낌표용
+    public bool AnyUnlockAffordable()
+    {
+        if (CurrencyManager.Instance == null) return false;
+
+        long have = CurrencyManager.Instance.GetPieces(); // 보유 조각
+        for (int i = 1; i < weapons.Count; i++)
+            if (!_unlocked[i] && IsUnlockOrderMet(i) && have >= GetUnlockCost(i)) return true;
+        return false;
+    }
+
     // 조각을 내고 무기 해금. 이미 해금됐거나 순서가 안 맞거나 조각이 부족하면 false
     public bool TryUnlock(int index)
     {

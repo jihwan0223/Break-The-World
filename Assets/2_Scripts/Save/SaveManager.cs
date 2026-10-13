@@ -121,6 +121,8 @@ public class SaveManager : MonoBehaviour
             unlockedWeapons = unlockedWeapons,
             pieces = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetPieces() : 0,
             crystals = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetCrystals() : 0,
+            totalPieces = CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalPieces : 0,
+            everHadCrystal = CurrencyManager.Instance != null && CurrencyManager.Instance.EverHadCrystal,
             pieceTutorialDone = PieceTutorial.Instance != null && PieceTutorial.Instance.Done,
             unlockedObjects = unlockedObjects,
             gainLevels = gainLevels,
@@ -146,10 +148,7 @@ public class SaveManager : MonoBehaviour
         SaveData data = JsonUtility.FromJson<SaveData>(json);
 
         if (CurrencyManager.Instance != null)
-        {
             CurrencyManager.Instance.SetPieces(data.pieces);
-            CurrencyManager.Instance.SetCrystals(data.crystals);
-        }
 
         if (PieceTutorial.Instance != null)
             PieceTutorial.Instance.Done = data.pieceTutorialDone;
@@ -184,6 +183,16 @@ public class SaveManager : MonoBehaviour
         {
             foreach (SavedUpgrade u in data.upgrades)
                 UpgradeManager.Instance.SetLevel(u.id, u.level);
+        }
+
+        // 결정은 업그레이드까지 복원한 뒤에 넣음 - 옛 세이브에는 누적 조각/결정 획득 여부가 없어서
+        // 보유량과 커서 줍기(결정으로 사는 첫 노드) 구매 여부로 채우고, 결정 표시가 그 값을 보고 그려지게 함
+        if (CurrencyManager.Instance != null)
+        {
+            bool hadCrystal = data.everHadCrystal || data.crystals > 0
+                || (UpgradeManager.Instance != null && UpgradeManager.Instance.HoverPickupIsUnlocked); // 결정을 얻은 적이 있는 세이브인지
+            CurrencyManager.Instance.SetProgress(System.Math.Max(data.totalPieces, data.pieces), hadCrystal);
+            CurrencyManager.Instance.SetCrystals(data.crystals);
         }
     }
 }

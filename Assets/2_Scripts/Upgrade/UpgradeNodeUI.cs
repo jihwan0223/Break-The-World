@@ -45,6 +45,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     private Coroutine _shakeRoutine; // 지금 재생 중인 흔들림 (중첩 방지)
     private bool _wasRevealed;   // 직전 Refresh 때 공개 상태였는지 - 등장 순간 1회 감지용
     private bool _refreshedOnce; // Refresh가 최소 한 번 돌았는지 - 첫 호출 땐 등장 흔들림 안 함
+    private GameObject _badge;   // 지금 재화로 살 수 있을 때 오른쪽 위에 뜨는 느낌표 (처음 필요할 때 만듦)
 
     public string Id => name; // 세이브/트리 조회 키 - 오브젝트 이름을 그대로 씀
     public string DisplayName => displayName;
@@ -220,6 +221,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (!isRevealed) return;
 
         UpdateIcon(UpgradeManager.Instance.GetLevel(Id));
+        NoticeBadge.Set(ref _badge, Rect, UpgradeManager.Instance.CanUpgrade(Id));
         if (justRevealed)
         {
             PlayShake();

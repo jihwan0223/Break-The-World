@@ -125,8 +125,10 @@ public class Click : MonoBehaviour
         else
             CurrencyManager.Instance.AddPieces(finalPieces);
 
-        // 확률로 결정이 나옴 - 조각과 같은 규칙으로 보이는 존이면 떨어뜨리고 아니면 바로 지급
-        if (UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.CrystalDropChance)
+        // 확률로 결정이 나옴 - 조각과 같은 규칙으로 보이는 존이면 떨어뜨리고 아니면 바로 지급.
+        // 결정을 아직 한 번도 못 얻었고 조각을 충분히 모았으면 첫 결정은 확정으로 나옴 (바닥에 떨어뜨릴 수 있을 때만)
+        bool starterCrystal = dropOnFloor && CurrencyManager.Instance.TakeStarterCrystal(); // 이번이 첫 결정 확정 드랍인지
+        if (UpgradeManager.Instance != null && (starterCrystal || Random.value < UpgradeManager.Instance.CrystalDropChance))
         {
             int crystals = UpgradeManager.Instance.CrystalDropAmount; // 이번에 나온 결정 개수
             if (dropOnFloor)

@@ -129,6 +129,7 @@ public class UpgradeManager : MonoBehaviour
     private readonly List<UpgradeNode> _nodes = new List<UpgradeNode>(); // 씬을 훑어 구성한 전체 노드 (Awake에서 구성)
     private readonly Dictionary<string, UpgradeNode> _nodeById = new Dictionary<string, UpgradeNode>();
     private readonly Dictionary<string, int> _levels = new Dictionary<string, int>(); // node.id -> 현재 레벨 (없으면 0)
+    private ObjectEconomyNodeUI[] _economyNodes = System.Array.Empty<ObjectEconomyNodeUI>(); // 씬의 오브젝트 해금/획득 노드 전부 (살 수 있는 게 있는지 훑을 때 씀)
 
     // 어떤 노드의 레벨이 바뀔 때마다 (node.id, 새 레벨) 전달 - 트리 UI, SaveManager 등이 구독
     public event Action<string, int> OnUpgradeChanged;
@@ -157,6 +158,7 @@ public class UpgradeManager : MonoBehaviour
 
         var nodeUis = FindObjectsByType<UpgradeNodeUI>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         var links = FindObjectsByType<UpgradeTreeLink>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        _economyNodes = FindObjectsByType<ObjectEconomyNodeUI>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
         // 각 노드로 들어오는 링크(들)의 선행 노드(들)를 전부 모아둠 - 링크 하나가 선행을 여러 개(fromNode+extraFromNodes)
         // 가질 수 있고, 같은 toNode를 가리키는 링크가 여러 개일 수도 있으므로 전부 합쳐서 하나라도(OR) 충족되면 공개됨.
@@ -278,6 +280,30 @@ public class UpgradeManager : MonoBehaviour
             return ObjectManager.Instance.NextRequiredUnlockHintText(node.targetObjectIndex);
 
         return $"{WeaponManager.StaticWeaponNameAt(node.targetWeaponIndex)} 무기 해금이 필요합니다";
+    }
+
+    // 지금 바로 한 레벨 올릴 수 있는지 (공개됨 + 대상 해금됨 + 최대 레벨 아님 + 재화 충분) - 느낌표 표시용
+    public bool CanUpgrade(string nodeId)
+    {
+        UpgradeNode node = GetNode(nodeId);
+        if (node == null || CurrencyManager.Instance == null) return false;
+
+        int level = GetLevel(nodeId); // 현재 레벨
+        return level < node.maxLevel && IsRevealed(nodeId) && !IsTargetLocked(nodeId)
+            && CurrencyManager.Instance.CanAfford(node.CostForLevel(level));
+    }
+
+    // 트리 안에 지금 살 수 있는 노드가 하나라도 있는지 (일반 노드 + 오브젝트 해금/획득 노드) - 업그레이드 버튼 느낌표용.
+    // 트리 화면을 한 번도 안 열어도(노드들이 꺼져 있어도) 판단할 수 있게 여기서 직접 훑음
+    public bool AnyUpgradeAvailable()
+    {
+        foreach (UpgradeNode node in _nodes)
+            if (CanUpgrade(node.id)) return true;
+
+        foreach (ObjectEconomyNodeUI node in _economyNodes)
+            if (node != null && node.CanBuy()) return true;
+
+        return false;
     }
 
     public bool TryUpgrade(string nodeId)

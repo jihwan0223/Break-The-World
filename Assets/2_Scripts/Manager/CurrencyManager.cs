@@ -22,9 +22,38 @@ public class CurrencyManager : MonoBehaviour
     // 결정 보유량이 바뀔 때마다 새 보유량 전달 - UI 등이 구독
     public event Action<long> OnCrystalsChanged;
 
+    [SerializeField] private long starterCrystalPieces = 50; // 조각을 누적 이만큼 얻으면 다음에 직접 부순 오브젝트가 첫 결정을 확정으로 떨어뜨림 (커서 줍기를 일찍 열어주려고)
+
+    private long _totalPieces; // 지금까지 얻은 조각 누적 (써도 줄지 않음) - 첫 결정 확정 드랍 시점 판단용
+    private bool _everHadCrystal; // 결정을 한 번이라도 얻었는지 - 얻기 전에는 결정 표시를 숨기고, 첫 결정 확정 드랍 대상
+    private bool _starterCrystalDropped; // 이번 실행에서 첫 결정을 이미 떨어뜨렸는지 (저장 안 함 - 안 줍고 껐으면 다음 실행에서 다시 떨어짐)
+
+    public long TotalPieces => _totalPieces;
+    public bool EverHadCrystal => _everHadCrystal;
+
+    // 저장 파일을 불러올 때 누적 조각 / 결정 획득 여부를 복원
+    public void SetProgress(long totalPieces, bool everHadCrystal)
+    {
+        _totalPieces = totalPieces;
+        _everHadCrystal = everHadCrystal;
+    }
+
+    // 첫 결정을 지금 확정으로 떨어뜨릴 차례면 true (실행당 한 번만 true)
+    public bool TakeStarterCrystal()
+    {
+        if (_everHadCrystal || _starterCrystalDropped || _totalPieces < starterCrystalPieces)
+            return false;
+        _starterCrystalDropped = true;
+        return true;
+    }
+
     public long GetCrystals() => _crystals;
 
-    public void AddCrystals(long amount) => SetCrystals(_crystals + amount);
+    public void AddCrystals(long amount)
+    {
+        if (amount > 0) _everHadCrystal = true; // 불러오기(SetCrystals)가 아니라 실제로 얻었을 때만
+        SetCrystals(_crystals + amount);
+    }
 
     // 저장 파일을 불러올 때 값을 직접 세팅하기 위한 함수
     public void SetCrystals(long amount)
@@ -53,6 +82,7 @@ public class CurrencyManager : MonoBehaviour
 
     public void AddPieces(long amount)
     {
+        if (amount > 0) _totalPieces += amount;
         _pieces = debugAlwaysMaxPieces ? DebugMaxPieceAmount : _pieces + amount;
         OnPiecesChanged?.Invoke(_pieces);
     }
@@ -62,6 +92,14 @@ public class CurrencyManager : MonoBehaviour
     {
         _pieces = debugAlwaysMaxPieces ? DebugMaxPieceAmount : amount;
         OnPiecesChanged?.Invoke(_pieces);
+    }
+
+    // 차감 없이 이 비용을 지금 낼 수 있는지만 확인 (느낌표 표시 등) - 비용이 없으면 true
+    public bool CanAfford(IReadOnlyList<PieceCost> costs)
+    {
+        if (costs == null) return true;
+        var (pieces, crystals) = Sum(costs);
+        return (debugAlwaysMaxPieces || _pieces >= pieces) && _crystals >= crystals;
     }
 
     // 여러 항목의 비용(조각/결정)을 한 번에 확인 + 차감함.
@@ -109,6 +147,9 @@ public class CurrencyManager : MonoBehaviour
     {
         _pieces = 0;
         OnPiecesChanged?.Invoke(0);
+        _totalPieces = 0;
+        _everHadCrystal = false;
+        _starterCrystalDropped = false;
         SetCrystals(0);
     }
 }
