@@ -5,7 +5,8 @@ using UnityEngine.InputSystem;
 
 // 오브젝트를 부수면 얻은 조각만큼 파편이 부서진 지점에서 떨어져 바닥(spawnArea)에 쌓이고, 파편을 클릭해서 주워야 조각(돈)이 들어오는 시스템.
 // 파편 하나가 여러 조각 값을 들고 있을 수 있음 (한 번에 떨어뜨리는 개수에 상한이 있어서 총액을 나눠 담음).
-// 파편은 존별로 따로 쌓이고, 지금 보는 존의 파편만 보이고 주울 수 있음. 주울 때까지 사라지지 않음.
+// 파편은 부서진 오브젝트가 있는 존 바닥에 따로 쌓이고(안 보는 존에서 부서져도), 지금 보는 존의 파편만 보이고 주울 수 있음.
+// 존을 옮겨도 그대로 남아 있고 주울 때까지 사라지지 않음.
 // 한 존의 파편 수는 바닥 최대 개수를 절대 넘지 않음 - 꽉 찬 뒤에 떨어지는 건 줍기 판정 없는 연출용 파티클이고, 값은 바닥에 있는 파편들에 더해짐
 public class DebrisPool : MonoBehaviour
 {
@@ -183,14 +184,16 @@ public class DebrisPool : MonoBehaviour
         Collect(top, true);
     }
 
-    // 오브젝트를 부쉈을 때 호출 - reward 조각을 파편 여러 개(최대 maxPiecesPerBreak개)에 나눠 담아 fromPosition에서 떨어뜨림.
+    // 오브젝트를 부쉈을 때 호출 - reward 조각을 파편 여러 개(최대 maxPiecesPerBreak개)에 나눠 담아 fromPosition에서 zone 바닥으로 떨어뜨림
+    // (zone이 -1이면 보고 있는 존. 안 보이는 존이면 떨어지는 모습 없이 그 존 바닥에 쌓이기만 함).
     // 이 존 바닥에 남은 자리만큼만 실제 파편이 되고, 자리가 없어서 못 만든 만큼은 줍기 판정 없는 연출용 파편으로 떨어짐 - 눈에는 똑같이 쏟아지지만
     // 파편 수는 바닥 최대 개수를 넘지 않음. 값은 실제 파편들이 전부 나눠 갖고, 실제 파편을 하나도 못 만들면 바닥에 있던 파편들에 더해져서 놓치는 게 없음
-    public void DropPieces(Vector3 fromPosition, int objectIndex, long reward)
+    public void DropPieces(Vector3 fromPosition, int objectIndex, long reward, int zone = -1)
     {
         if (reward <= 0) return;
 
-        int zone = CurrentZone; // 떨어뜨릴 존
+        if (zone < 0) zone = CurrentZone; // 떨어뜨릴 존
+        bool visible = zone == CurrentZone; // 지금 보는 존에 떨어지는지 - 아니면 연출(파티클/튜토리얼)은 생략
         int count = (int)System.Math.Min(reward, maxPiecesPerBreak); // 눈에 보이게 떨어뜨릴 파편 수
         int onFloor = CountInZone(zone); // 이 존에 지금 있는 파편 수 (떨어지는 중인 것 포함)
         int real = Mathf.Clamp(MaxGroundPieces - onFloor, 0, count); // 그중 실제 파편으로 만들 수 있는 수 (남은 자리만큼)
@@ -204,15 +207,16 @@ public class DebrisPool : MonoBehaviour
             var dropped = new List<Transform>(real); // 이번에 떨어뜨린 실제 파편들
             for (int i = 0; i < real; i++)
                 dropped.Add(Spawn(fromPosition, zone, baseValue + (i < remainder ? 1 : 0), false, color, pieceSize, fill));
-            OnPiecesDropped?.Invoke(dropped);
+            if (visible) OnPiecesDropped?.Invoke(dropped);
         }
         else
         {
             AddToFloorPieces(zone, reward, count);
         }
 
-        for (int i = real; i < count; i++)
-            EmitShard(fromPosition, GetLandingPoint(fill), color);
+        if (visible)
+            for (int i = real; i < count; i++)
+                EmitShard(fromPosition, GetLandingPoint(fill), color);
     }
 
     // 바닥이 꽉 차서 새 파편을 못 만들 때 - 이 존에 있는 파편 중 고르게 뽑은 최대 count개에 reward를 나눠 더함
@@ -304,11 +308,11 @@ public class DebrisPool : MonoBehaviour
         }
     }
 
-    // 결정 하나를 떨어뜨림 (amount개짜리 한 덩어리). 바닥이 꽉 차 있어도 떨어짐
-    public void DropCrystal(Vector3 fromPosition, long amount)
+    // 결정 하나를 zone 바닥에 떨어뜨림 (amount개짜리 한 덩어리, zone이 -1이면 보고 있는 존). 바닥이 꽉 차 있어도 떨어짐
+    public void DropCrystal(Vector3 fromPosition, long amount, int zone = -1)
     {
         if (amount <= 0) return;
-        int zone = CurrentZone; // 떨어뜨릴 존
+        if (zone < 0) zone = CurrentZone; // 떨어뜨릴 존
         Spawn(fromPosition, zone, amount, true, crystalColor, pieceSize * crystalSizeMultiplier, (float)CountInZone(zone) / Mathf.Max(1, MaxGroundPieces));
     }
 
@@ -324,7 +328,7 @@ public class DebrisPool : MonoBehaviour
         piece.renderer.sprite = GetRandomPieceSprite();
         piece.renderer.color = color;
         piece.renderer.sortingOrder = isCrystal ? 11 : 10; // 결정이 파편 더미에 묻히지 않게 위에 그림 (클릭도 우선)
-        piece.renderer.forceRenderingOff = false;
+        piece.renderer.forceRenderingOff = zone != CurrentZone; // 안 보이는 존에 떨어지는 건 처음부터 숨김
         piece.renderer.transform.localScale = Vector3.one * size;
         piece.collider.enabled = false;
 

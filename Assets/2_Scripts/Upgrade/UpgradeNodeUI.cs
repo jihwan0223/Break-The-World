@@ -36,6 +36,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         public bool useCrystals;
         [Min(1)] public long baseAmount = 10;   // 0->1레벨 비용
         public float levelGrowth = 2f;          // 레벨 오를 때마다 요구량에 곱해지는 배율
+        [Tooltip("0보다 크면 0->1레벨 비용만 이 값으로 (1레벨만 싸게). 2레벨부터는 위 공식 그대로")]
+        [Min(0)] public long firstLevelAmount;  // 첫 레벨만 따로 정한 비용 (0이면 안 씀)
     }
 
     private Button _button;

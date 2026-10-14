@@ -409,6 +409,7 @@ MonoBehaviour:
   - useCrystals: 1
     baseAmount: 20
     levelGrowth: 2
+    firstLevelAmount: 2
   upgradedSprite: {fileID: 21300000, guid: 72bff74ce100b064abf8ec10dbe83443, type: 3}
 --- !u!114 &26067274
 MonoBehaviour:
@@ -1434,7 +1435,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
       value: "\uCEE4\uC11C\uAC00 \uD30C\uD3B8\uC5D0 \uB2FF\uC73C\uBA74 \uD074\uB9AD\uD558\uC9C0
-        \uC54A\uC544\uB3C4 \uB9E8 \uC704 \uD30C\uD3B8\uC744 \uC90D\uC2B5\uB2C8\uB2E4."
+        \uC54A\uC544\uB3C4 \uB9E8 \uC704 \uD30C\uD3B8\uC744 \uC90D\uC2B5\uB2C8\uB2E4. \uCEE4\uC11C \uBC94\uC704\uB3C4 \uC0DD\uAE41\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -7842,6 +7843,7 @@ MonoBehaviour:
   - useCrystals: 1
     baseAmount: 2
     levelGrowth: 1.4
+    firstLevelAmount: 1
   upgradedSprite: {fileID: 21300000, guid: 72bff74ce100b064abf8ec10dbe83443, type: 3}
 --- !u!114 &297367150
 MonoBehaviour:
@@ -13906,6 +13908,10 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: 'valuePerLevel.Array.data[0]'
       value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: costs.Array.data[0].firstLevelAmount
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costs.Array.data[0].useCrystals
@@ -50290,6 +50296,7 @@ MonoBehaviour:
   - useCrystals: 1
     baseAmount: 8
     levelGrowth: 1.5
+    firstLevelAmount: 1
   upgradedSprite: {fileID: 21300000, guid: 72bff74ce100b064abf8ec10dbe83443, type: 3}
 --- !u!114 &1975185460
 MonoBehaviour:
@@ -50652,6 +50659,7 @@ MonoBehaviour:
   - useCrystals: 1
     baseAmount: 5
     levelGrowth: 1.4
+    firstLevelAmount: 2
   upgradedSprite: {fileID: 21300000, guid: 72bff74ce100b064abf8ec10dbe83443, type: 3}
 --- !u!114 &1998017417
 MonoBehaviour:

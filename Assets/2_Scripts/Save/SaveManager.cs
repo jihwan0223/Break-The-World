@@ -123,6 +123,7 @@ public class SaveManager : MonoBehaviour
             crystals = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetCrystals() : 0,
             totalPieces = CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalPieces : 0,
             everHadCrystal = CurrencyManager.Instance != null && CurrencyManager.Instance.EverHadCrystal,
+            killsSinceCrystal = CurrencyManager.Instance != null ? CurrencyManager.Instance.KillsSinceCrystal : 0,
             pieceTutorialDone = PieceTutorial.Instance != null && PieceTutorial.Instance.Done,
             unlockedObjects = unlockedObjects,
             gainLevels = gainLevels,
@@ -191,7 +192,7 @@ public class SaveManager : MonoBehaviour
         {
             bool hadCrystal = data.everHadCrystal || data.crystals > 0
                 || (UpgradeManager.Instance != null && UpgradeManager.Instance.HoverPickupIsUnlocked); // 결정을 얻은 적이 있는 세이브인지
-            CurrencyManager.Instance.SetProgress(System.Math.Max(data.totalPieces, data.pieces), hadCrystal);
+            CurrencyManager.Instance.SetProgress(System.Math.Max(data.totalPieces, data.pieces), hadCrystal, data.killsSinceCrystal);
             CurrencyManager.Instance.SetCrystals(data.crystals);
         }
     }

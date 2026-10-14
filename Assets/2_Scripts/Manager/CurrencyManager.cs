@@ -28,15 +28,26 @@ public class CurrencyManager : MonoBehaviour
     private bool _everHadCrystal; // 결정을 한 번이라도 얻었는지 - 얻기 전에는 결정 표시를 숨기고, 첫 결정 확정 드랍 대상
     private bool _starterCrystalDropped; // 이번 실행에서 첫 결정을 이미 떨어뜨렸는지 (저장 안 함 - 안 줍고 껐으면 다음 실행에서 다시 떨어짐)
 
+    [SerializeField] private int crystalPityKills = 200; // 결정 천장 - 오브젝트를 이만큼 부수는 동안 결정이 한 번도 안 나오면 이번 처치에 확정으로 나옴
+    private int _killsSinceCrystal; // 마지막으로 결정이 나온 뒤 부순 오브젝트 수 (천장 계산용, 저장됨)
+
     public long TotalPieces => _totalPieces;
     public bool EverHadCrystal => _everHadCrystal;
+    public int KillsSinceCrystal => _killsSinceCrystal;
 
-    // 저장 파일을 불러올 때 누적 조각 / 결정 획득 여부를 복원
-    public void SetProgress(long totalPieces, bool everHadCrystal)
+    // 저장 파일을 불러올 때 누적 조각 / 결정 획득 여부 / 천장 카운트를 복원
+    public void SetProgress(long totalPieces, bool everHadCrystal, int killsSinceCrystal)
     {
         _totalPieces = totalPieces;
         _everHadCrystal = everHadCrystal;
+        _killsSinceCrystal = killsSinceCrystal;
     }
+
+    // 오브젝트를 하나 부술 때마다 호출 - 결정 없이 천장 횟수를 채웠으면 true (이번에 확정으로 나와야 함)
+    public bool CountKillForPity() => ++_killsSinceCrystal >= crystalPityKills;
+
+    // 결정이 나왔을 때 호출 - 천장 카운트를 처음부터
+    public void ResetCrystalPity() => _killsSinceCrystal = 0;
 
     // 첫 결정을 지금 확정으로 떨어뜨릴 차례면 true (실행당 한 번만 true)
     public bool TakeStarterCrystal()
@@ -150,6 +161,7 @@ public class CurrencyManager : MonoBehaviour
         _totalPieces = 0;
         _everHadCrystal = false;
         _starterCrystalDropped = false;
+        _killsSinceCrystal = 0;
         SetCrystals(0);
     }
 }

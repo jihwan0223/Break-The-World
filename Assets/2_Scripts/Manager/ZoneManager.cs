@@ -100,14 +100,21 @@ public class ZoneManager : MonoBehaviour
     // 이 Transform이 지금 안 보이는 존 안에 있는지 - 안 보이는 존의 오브젝트는 계속 돌아가지만(자동클릭) 그림/소리/연출은 내지 않음
     public bool IsHidden(Transform target)
     {
-        if (zoneRoots == null) return false;
+        int zone = ZoneOf(target); // 이 Transform이 속한 존
+        return zone >= 0 && zone != _currentZone; // 어느 존에도 속하지 않으면 항상 보이는 것으로 취급
+    }
+
+    // 이 Transform이 속한 존 번호 (어느 존 루트 아래에도 없으면 -1)
+    public int ZoneOf(Transform target)
+    {
+        if (zoneRoots == null) return -1;
 
         for (Transform current = target; current != null; current = current.parent)
             for (int i = 0; i < zoneRoots.Length; i++)
                 if (zoneRoots[i] != null && zoneRoots[i].transform == current)
-                    return i != _currentZone;
+                    return i;
 
-        return false; // 어느 존에도 속하지 않으면 항상 보이는 것으로 취급
+        return -1;
     }
 
     // 모든 존 루트를 켜두고(자동클릭이 다른 존에서도 계속 돌게), 현재 존이 아닌 것은 그림만 끔.

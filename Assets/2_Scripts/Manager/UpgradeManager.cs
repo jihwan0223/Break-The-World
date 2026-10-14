@@ -77,6 +77,7 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private int baseMaxGroundPieces = 400;       // 바닥 파편 최대 개수 기본값 - GroundPieceCap이 위에 더함
     [SerializeField] private float baseCrystalChance = 0.001f;   // 오브젝트 처치 시 결정 기본 확률 (0.1%) - CrystalChance가 위에 더함
     [SerializeField] private int baseCrystalAmount = 1;          // 결정이 나올 때 기본 개수 - CrystalAmount가 위에 더함
+    [SerializeField] private float hoverPickupBaseRadius = 0.6f; // 커서 줍기를 해금하면 생기는 기본 커서 범위 반지름(월드) - CursorRange가 위에 더함
     [SerializeField] private float baseAutoSweepInterval = 20f;  // 자동 줍기 기본 주기(초)
     [SerializeField] private float minAutoSweepInterval = 3f;    // 자동 줍기 주기 하한
     [SerializeField] private int baseAutoSweepLayers = 1;        // 자동 줍기가 기본으로 쓸어 담는 파편 층 수 (맨 위층부터) - AutoSweepLayers가 위에 더함
@@ -97,7 +98,7 @@ public class UpgradeManager : MonoBehaviour
         public string prerequisiteId;     // 이 노드가 공개되려면 필요한 다른 노드 id (빈칸 = 루트) - 들어오는 링크로 결정됨. 표시/디버그용
         public System.Func<bool> prerequisiteSatisfied; // 선행 충족 검사 (null = 루트). 일반 노드면 레벨>=1, 오브젝트 해금/획득 노드면 그 노드 IsLeveled()
         public float[] valuePerLevel;
-        public (bool isCrystal, long baseAmount, float levelGrowth)[] costs; // 비용 줄별 공식 (조각/결정 동시 가능)
+        public (bool isCrystal, long baseAmount, float levelGrowth, long firstLevelAmount)[] costs; // 비용 줄별 공식 (조각/결정 동시 가능, firstLevelAmount > 0이면 첫 레벨만 그 값)
 
         // 이 노드의 level(1..maxLevel)에서 "그 레벨을 올렸을 때 추가되는" 효과 값
         public float ValueAtLevel(int level)
@@ -118,7 +119,9 @@ public class UpgradeManager : MonoBehaviour
             for (int i = 0; i < costs.Length; i++)
             {
                 // float로 곱하면 고레벨에서 long 범위를 넘어 음수로 뒤집히므로 double로 계산 후 long 최대값에서 자름
-                double raw = costs[i].baseAmount * System.Math.Pow(costs[i].levelGrowth, currentLevel);
+                double raw = currentLevel == 0 && costs[i].firstLevelAmount > 0
+                    ? costs[i].firstLevelAmount // 첫 레벨만 따로 싸게 정한 비용
+                    : costs[i].baseAmount * System.Math.Pow(costs[i].levelGrowth, currentLevel);
                 long amount = raw >= long.MaxValue ? long.MaxValue : (long)System.Math.Max(1d, raw);
                 result[i] = new PieceCost(amount, costs[i].isCrystal);
             }
@@ -216,13 +219,13 @@ public class UpgradeManager : MonoBehaviour
     }
 
     // UpgradeNodeUI의 비용 줄들을 노드 데이터로 옮김
-    private static (bool, long, float)[] ResolveCosts(UpgradeNodeUI.NodeCost[] uiCosts)
+    private static (bool, long, float, long)[] ResolveCosts(UpgradeNodeUI.NodeCost[] uiCosts)
     {
-        if (uiCosts == null || uiCosts.Length == 0) return System.Array.Empty<(bool, long, float)>();
+        if (uiCosts == null || uiCosts.Length == 0) return System.Array.Empty<(bool, long, float, long)>();
 
-        var result = new (bool, long, float)[uiCosts.Length];
+        var result = new (bool, long, float, long)[uiCosts.Length];
         for (int i = 0; i < uiCosts.Length; i++)
-            result[i] = (uiCosts[i].useCrystals, System.Math.Max(1L, uiCosts[i].baseAmount), uiCosts[i].levelGrowth);
+            result[i] = (uiCosts[i].useCrystals, System.Math.Max(1L, uiCosts[i].baseAmount), uiCosts[i].levelGrowth, uiCosts[i].firstLevelAmount);
         return result;
     }
 
@@ -542,7 +545,8 @@ public class UpgradeManager : MonoBehaviour
     public int ExtraObjectCopies(int objectIndex) =>
         Mathf.RoundToInt(SumEffect(UpgradeEffect.ObjectExtraCopies, -1) + SumEffect(UpgradeEffect.ObjectExtraCopies, objectIndex));
     public bool HoverPickupIsUnlocked => AnyUnlocked(UpgradeEffect.HoverPickupUnlock); // 호버 줍기 해금 여부
-    public float CursorRadius => SumEffect(UpgradeEffect.CursorRange); // 커서 범위 반지름(월드 단위). 0이면 범위 없이 커서 한 점만
+    // 커서 범위 반지름(월드 단위). 0이면 범위 없이 커서 한 점만. 커서 줍기를 해금하면 기본 범위가 생기고 범위 증가가 그 위에 더해짐
+    public float CursorRadius => SumEffect(UpgradeEffect.CursorRange) + (HoverPickupIsUnlocked ? hoverPickupBaseRadius : 0f);
     public bool HoverClickIsUnlocked => AnyUnlocked(UpgradeEffect.HoverClickUnlock); // 커서 타격 해금 여부
     public float HoverClickIntervalSeconds => Mathf.Max(0.02f, hoverClickInterval); // 커서 타격 간격(초) - 0 이하로 넣어도 매 프레임 때리지 않게 하한을 둠
 
