@@ -1190,6 +1190,7 @@ MonoBehaviour:
   - useCrystals: 1
     baseAmount: 10
     levelGrowth: 1
+    firstLevelAmount: 0
   upgradedSprite: {fileID: 21300000, guid: 72bff74ce100b064abf8ec10dbe83443, type: 3}
 --- !u!114 &72333252
 MonoBehaviour:
@@ -1435,7 +1436,8 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
       value: "\uCEE4\uC11C\uAC00 \uD30C\uD3B8\uC5D0 \uB2FF\uC73C\uBA74 \uD074\uB9AD\uD558\uC9C0
-        \uC54A\uC544\uB3C4 \uB9E8 \uC704 \uD30C\uD3B8\uC744 \uC90D\uC2B5\uB2C8\uB2E4. \uCEE4\uC11C \uBC94\uC704\uB3C4 \uC0DD\uAE41\uB2C8\uB2E4."
+        \uC54A\uC544\uB3C4 \uB9E8 \uC704 \uD30C\uD3B8\uC744 \uC90D\uC2B5\uB2C8\uB2E4.
+        \uCEE4\uC11C \uBC94\uC704\uB3C4 \uC0DD\uAE41\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -9644,6 +9646,7 @@ MonoBehaviour:
   baseMaxGroundPieces: 400
   baseCrystalChance: 0.001
   baseCrystalAmount: 1
+  hoverPickupBaseRadius: 0.6
   baseAutoSweepInterval: 20
   minAutoSweepInterval: 3
   baseAutoSweepLayers: 1
@@ -13910,11 +13913,11 @@ PrefabInstance:
       value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
-      propertyPath: costs.Array.data[0].firstLevelAmount
+      propertyPath: costs.Array.data[0].useCrystals
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
-      propertyPath: costs.Array.data[0].useCrystals
+      propertyPath: costs.Array.data[0].firstLevelAmount
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
@@ -32932,6 +32935,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CurrencyManager
   debugAlwaysMaxPieces: 0
   starterCrystalPieces: 50
+  crystalPityKills: 200
 --- !u!1 &1353580938 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
@@ -50453,18 +50457,38 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 0827866b02bb75746906ee0ab6486966, type: 3}
     - {fileID: 8300000, guid: 7fccbb4512c0ed84f8084b40722ac342, type: 3}
     breakSound: {fileID: 8300000, guid: 6a6a2af8e27ef9b43aa4c979173de8fc, type: 3}
-  - clickSounds: []
-    breakSound: {fileID: 0}
-  - clickSounds: []
-    breakSound: {fileID: 0}
-  - clickSounds: []
-    breakSound: {fileID: 0}
-  - clickSounds: []
-    breakSound: {fileID: 0}
-  - clickSounds: []
-    breakSound: {fileID: 0}
-  - clickSounds: []
-    breakSound: {fileID: 0}
+  - clickSounds:
+    - {fileID: 8300000, guid: 2d921c54691fccd41ae87694c0efa72a, type: 3}
+    - {fileID: 8300000, guid: 8225c87a8ea7481498b758325d455757, type: 3}
+    - {fileID: 8300000, guid: d6b5293e56a924d43ad2b7e2300e44f3, type: 3}
+    - {fileID: 8300000, guid: a96fc2a3be4a0504a98ba9dadd782769, type: 3}
+    breakSound: {fileID: 8300000, guid: cbf3d0e6c5667214d86cb40df40a505a, type: 3}
+  - clickSounds:
+    - {fileID: 8300000, guid: 527ebc5c3c01f9b4d93bd64ee02c16f2, type: 3}
+    - {fileID: 8300000, guid: 3a4e4ed8ce275de4ebecfdbbabd06e76, type: 3}
+    - {fileID: 8300000, guid: 39e6c3b5ca2f4c44086851c95be8abc2, type: 3}
+    breakSound: {fileID: 8300000, guid: f050315d9b1bc74469858be4cc440df1, type: 3}
+  - clickSounds:
+    - {fileID: 8300000, guid: 6c20aad10c5018d45ac4288b11433e40, type: 3}
+    - {fileID: 8300000, guid: 229ab549811c17641a2bbfca04723640, type: 3}
+    - {fileID: 8300000, guid: dc0d7a86edb3859409bc0cd7834723ca, type: 3}
+    breakSound: {fileID: 8300000, guid: daebbd7d3a6da9b499fef6beaebb2bbd, type: 3}
+  - clickSounds:
+    - {fileID: 8300000, guid: 7c046bd060d087247a89d1fb4bdaffe7, type: 3}
+    - {fileID: 8300000, guid: 1f959f27cfb984048b665812364986bf, type: 3}
+    - {fileID: 8300000, guid: d71e9373ec3713b42b484855d7c0ec36, type: 3}
+    breakSound: {fileID: 8300000, guid: 26a15f48b6120b14a931502abdde3249, type: 3}
+  - clickSounds:
+    - {fileID: 8300000, guid: 943ddf95c66318a4d997a6b8a68b357a, type: 3}
+    - {fileID: 8300000, guid: 776e37d73540fc04cb53b8017d2be7cd, type: 3}
+    - {fileID: 8300000, guid: e8fd5e2a39bd5f849b5e3e4782a87612, type: 3}
+    breakSound: {fileID: 8300000, guid: 82515c4a230b3b3468970501f9760645, type: 3}
+  - clickSounds:
+    - {fileID: 8300000, guid: 3e557ef7caff18742a15f687857bdf58, type: 3}
+    - {fileID: 8300000, guid: 658fbd618906a4e40b1c325ee0523a53, type: 3}
+    - {fileID: 8300000, guid: e3b4ef935eb3125469ea81fb1de16605, type: 3}
+    - {fileID: 8300000, guid: a8c63935b10dbc94a9a2cd4da71244cd, type: 3}
+    breakSound: {fileID: 8300000, guid: 3915fd72008d4a94ea4acc4b34ed04b9, type: 3}
   - clickSounds: []
     breakSound: {fileID: 0}
   - clickSounds: []
@@ -50567,6 +50591,7 @@ MonoBehaviour:
   - healthStages:
     - {fileID: 21300000, guid: aba7de352406de545a038beb0d5b9778, type: 3}
     - {fileID: 21300000, guid: 1240a54f5c6eba943b33b13376145c74, type: 3}
+    - {fileID: 21300000, guid: f4cd4294a7ffc474798cb02bb79d71ed, type: 3}
   - healthStages: []
   - healthStages: []
   - healthStages: []
