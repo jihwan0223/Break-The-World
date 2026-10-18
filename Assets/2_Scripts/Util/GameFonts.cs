@@ -36,6 +36,31 @@ public static class GameFonts
         }
     }
 
+    private const string TmpOutlineName = "MonaS12 SDF Outline"; // 검은 테두리를 켠 TMP 재질 이름 (Resources 안)
+    private static Material _tmpOutline; // 처음 쓸 때 한 번 불러와 캐시
+
+    // 검은 테두리가 켜진 MonaS12 재질 (데미지/줍기 숫자용). TMP 셰이더는 OUTLINE_ON 키워드가 켜진 재질이어야 테두리를 그림.
+    // 글자 아틀라스는 동적이라 실행 중 바뀌므로 지금 폰트 재질을 복사해서 쓰고, Resources의 재질 애셋에서는 테두리 값만 가져옴
+    // (그 애셋에 키워드가 켜져 있어야 빌드에 테두리 셰이더가 포함됨)
+    public static Material TmpOutline
+    {
+        get
+        {
+            if (_tmpOutline == null && Tmp != null)
+            {
+                Material preset = Resources.Load<Material>(TmpOutlineName); // 테두리 두께/색 기준
+                _tmpOutline = new Material(Tmp.material) { name = TmpOutlineName };
+                _tmpOutline.EnableKeyword("OUTLINE_ON");
+                _tmpOutline.SetFloat(ShaderUtilities.ID_OutlineWidth, preset != null ? preset.GetFloat(ShaderUtilities.ID_OutlineWidth) : 0.3f);
+                _tmpOutline.SetColor(ShaderUtilities.ID_OutlineColor, preset != null ? preset.GetColor(ShaderUtilities.ID_OutlineColor) : Color.black);
+                // 테두리는 글자 경계 안팎으로 반씩 그려져서 글자가 얇아지므로, 그만큼 글자를 부풀려 원래 굵기를 지킴
+                _tmpOutline.SetFloat(ShaderUtilities.ID_FaceDilate, preset != null ? preset.GetFloat(ShaderUtilities.ID_FaceDilate) : 0.3f);
+                ShaderUtilities.UpdateShaderRatios(_tmpOutline);
+            }
+            return _tmpOutline;
+        }
+    }
+
     public static TMP_FontAsset Tmp =>
         _tmp != null ? _tmp
         : (_tmp = Resources.Load<TMP_FontAsset>(TmpFontName) ?? TMP_Settings.defaultFontAsset);

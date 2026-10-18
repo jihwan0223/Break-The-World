@@ -148,7 +148,8 @@ public class PickupPopup : MonoBehaviour
         text.alignment = TextAlignmentOptions.Center;
         text.textWrappingMode = TextWrappingModes.NoWrap;
         text.sortingOrder = sortingOrder;
-        text.outlineWidth = 0.25f; // 파편 더미 위에서도 잘 보이게 검은 테두리
+        // 파편 더미/배경 위에서도 잘 보이게 검은 테두리가 켜진 재질 (두께는 8_Font/Resources/MonaS12 SDF Outline.mat에서 조절)
+        if (GameFonts.TmpOutline != null) text.fontSharedMaterial = GameFonts.TmpOutline;
         text.outlineColor = Color.black;
 
         return new Popup { text = text };

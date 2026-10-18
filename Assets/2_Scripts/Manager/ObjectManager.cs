@@ -15,7 +15,7 @@ public class ObjectManager : MonoBehaviour
         public AudioClip breakSound; // 파괴될 때 재생할 사운드
     }
 
-    [SerializeField] private ObjectSoundSet[] objectSounds; // objects 리스트와 같은 순서/개수로 채워야 함 (26개)
+    [SerializeField] private ObjectSoundSet[] objectSounds; // objects 리스트와 같은 순서/개수로 채워야 함 (15개)
 
     // 오브젝트 하나의 체력 단계별 스프라이트 묶음. 인스펙터에서 objects 리스트와 같은 순서로 채워 넣음
     [Serializable]
@@ -25,12 +25,12 @@ public class ObjectManager : MonoBehaviour
         // 크기는 코드에서 계산하지 않음 - 각 이미지의 Pixels Per Unit(Import Settings)으로 직접 맞출 것
     }
 
-    [SerializeField] private ObjectVisualSet[] objectVisuals; // objects 리스트와 같은 순서/개수로 채워야 함 (26개)
+    [SerializeField] private ObjectVisualSet[] objectVisuals; // objects 리스트와 같은 순서/개수로 채워야 함 (15개)
 
     [SerializeField] private bool debugUnlockAll = false; // 테스트용 - 켜면 모든 오브젝트가 처음부터 해금됨 (업그레이드 무관)
 
-    // 파괴 대상 오브젝트 19종 - 책상 위 소품에서 시작해 지형(책상/길바닥)과 공사장 아파트를 부수며 우주 스케일까지. ★=마일스톤(체력 x2)
-    // 티어 구성은 ObjectHealthCalculator.tierSizes = {3,2,3,2,3,2,1,1,1,1} 와 순서/개수가 정확히 일치해야 함
+    // 파괴 대상 오브젝트 15종(데모) - 책상 위 소품에서 시작해 지형(책상/길바닥)을 거쳐 공사장 아파트까지. ★=마일스톤(체력 x2)
+    // 티어 구성은 ObjectHealthCalculator.tierSizes = {3,2,3,2,3,2} 와 순서/개수가 정확히 일치해야 함
     private static readonly List<ObjectData> objects = new List<ObjectData>
     {
         // --- 존1: 책상 위 (맨손 t1 / 망치 t2) ---
@@ -50,12 +50,7 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(5, 2, "포크레인", new Color(0.85f, 0.70f, 0.20f)),
         new ObjectData(5, 3, "타워 크레인", new Color(0.92f, 0.58f, 0.10f)),
         new ObjectData(6, 1, "철구 크레인", new Color(0.90f, 0.68f, 0.15f)),
-        new ObjectData(6, 2, "아파트", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 2f }, // ★ -> 존4
-        // --- 존4: 우주 (폭탄 t7 / 미사일 t8 / 운석 t9 / 빅뱅 t10) ---
-        new ObjectData(7, 1, "지구", new Color(0.30f, 0.50f, 0.70f)),
-        new ObjectData(8, 1, "달", new Color(0.80f, 0.80f, 0.78f)),
-        new ObjectData(9, 1, "태양", new Color(1.00f, 0.75f, 0.20f)),
-        new ObjectData(10, 1, "우주", new Color(0.20f, 0.15f, 0.35f)),
+        new ObjectData(6, 2, "아파트", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 2f }, // ★ 데모 마지막 (아파트 이후 우주 맵은 데모에서 뺌)
     };
 
     private int equippedIndex; // 실제로 선택된 오브젝트의 objects 리스트 인덱스 (0부터 시작)
@@ -72,7 +67,7 @@ public class ObjectManager : MonoBehaviour
     // 오브젝트는 앞 오브젝트부터 순서대로 조각으로 해금해야 장착 가능. 0번(Plate)은 처음부터 해금된 상태로 시작
     private bool[] _unlocked;
     // 해금 비용 = 직전 오브젝트를 몇 번 부숴야 하는지로 맞춤. 보상이 4.5배씩 늘 때 비용은 4.88배씩 늘어서
-    // 필요한 부수기 횟수가 유리컵 15번 -> 우주 약 60번으로 조금씩 늘어남 (무기 해금 비용도 이 곡선을 따라감)
+    // 필요한 부수기 횟수가 유리컵 15번부터 오브젝트마다 조금씩 늘어남 (무기 해금 비용도 이 곡선을 따라감)
     public const long UnlockCostBase = 15;
     public const float UnlockCostGrowth = 4.88f;
 
@@ -182,7 +177,7 @@ public class ObjectManager : MonoBehaviour
     }
 
     // ---- 도감(오브젝트 팝업) 표시용 조회 ----
-    private static readonly string[] zoneNames = { "책상 위", "길거리", "공사장", "우주" }; // 위 objects 목록의 존 구분과 같음 (무기 티어 2개당 존 1개, 우주만 티어 4개)
+    private static readonly string[] zoneNames = { "책상 위", "길거리", "공사장" }; // 위 objects 목록의 존 구분과 같음 (무기 티어 2개당 존 1개)
 
     // index번째 오브젝트가 속한 존 이름
     public static string ZoneNameOf(int index) =>
@@ -218,7 +213,7 @@ public class ObjectManager : MonoBehaviour
     // 작은 수) 후반 티어 가격을 절대 못 따라잡음. 그래서 기본 보상도 오브젝트 티어마다 기하급수적으로 커지게 함.
     private const long BaseRewardStart = 1; // 0번 오브젝트 기본 보상
     private const float BaseRewardGrowth = 4.5f; // 같은 맵 안에서 오브젝트 하나 넘어갈 때마다 곱해지는 배율
-    private const int ObjectsPerMap = 5; // 맵 하나에 들어있는 오브젝트 수 (접시~책상 / 가로등~도로 / 컨테이너 박스~아파트 / 그 뒤는 우주)
+    private const int ObjectsPerMap = 5; // 맵 하나에 들어있는 오브젝트 수 (접시~책상 / 가로등~도로 / 컨테이너 박스~아파트)
     private const float MapRewardJump = 5.42f; // 다음 맵으로 넘어가는 순간 추가로 곱해지는 배율 - 새 맵을 열면 확 많이 들어오는 느낌용 (가로등 기본 보상 = 1845 x 5.42 = 약 10,000)
 
     public long GetBaseReward(int index) => Math.Max(1L, (long)RawBaseReward(index));

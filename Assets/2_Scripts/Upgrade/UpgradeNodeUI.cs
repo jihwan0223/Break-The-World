@@ -106,10 +106,34 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         return new UpgradeTooltip.Content
         {
             title = IsMasked() ? "???" : displayName,
-            description = IsMasked() ? UpgradeManager.Instance.LockedTargetHintText(Id) : description,
+            description = IsMasked() ? UpgradeManager.Instance.LockedTargetHintText(Id) : description.Replace("{n}", CurrentSecondsText()),
             level = nextEffect != null ? $"{level} / {maxLevel}  (다음 {nextEffect})" : $"{level} / {maxLevel}",
             price = IsMasked() ? "" : NextCostText(level), // 가려진 노드는 가격도 숨김
         };
+    }
+
+    // 설명 문구의 {n} 자리에 넣을 지금 시간(초) - 자동클릭/자동 줍기/콤보처럼 시간이 있는 효과만. 업그레이드로 줄어든 현재 값
+    private string CurrentSecondsText()
+    {
+        UpgradeManager upgrades = UpgradeManager.Instance; // 현재 수치 조회
+        int objectIndex = ObjectManager.StaticIndexOfName(targetObjectName); // 대상 오브젝트 (자동클릭/존 자동 파괴)
+        float seconds; // 표시할 시간(초)
+        switch (effect)
+        {
+            case UpgradeManager.UpgradeEffect.AutoClickUnlock:
+            case UpgradeManager.UpgradeEffect.AutoClickSpeed: seconds = upgrades.AutoClickIntervalSecondsFor(objectIndex); break;
+            case UpgradeManager.UpgradeEffect.AutoSweepUnlock:
+            case UpgradeManager.UpgradeEffect.AutoSweepSpeed: seconds = upgrades.AutoSweepIntervalSeconds; break;
+            case UpgradeManager.UpgradeEffect.ComboUnlock:
+            case UpgradeManager.UpgradeEffect.ComboCooldown: seconds = upgrades.ComboCooldownSeconds; break;
+            case UpgradeManager.UpgradeEffect.ComboDuration: seconds = upgrades.ComboDurationSeconds; break;
+            case UpgradeManager.UpgradeEffect.AutoMineUnlock:
+            case UpgradeManager.UpgradeEffect.AutoMineSpeed: seconds = upgrades.AutoMineIntervalSeconds; break;
+            case UpgradeManager.UpgradeEffect.HoverClickUnlock: seconds = upgrades.HoverClickIntervalSeconds; break;
+            case UpgradeManager.UpgradeEffect.ZoneAutoBreakUnlock: seconds = ZoneBreaker.AutoBreakIntervalFor(objectIndex); break;
+            default: return "?";
+        }
+        return seconds < 0f ? "?" : seconds.ToString("0.#");
     }
 
     // 다음 레벨을 올렸을 때 실제로 늘어나는 수치를 사람이 읽는 문구로("+3", "+15%", "-0.5초" 등).
@@ -133,6 +157,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.HoverPickupUnlock:
             case UpgradeManager.UpgradeEffect.ZoneAutoBreakUnlock:
             case UpgradeManager.UpgradeEffect.HoverClickUnlock:
+            case UpgradeManager.UpgradeEffect.PieceMergeDecoy:
                 return null; // 해금류는 숫자가 아니라 on/off라 표시 안 함
 
             case UpgradeManager.UpgradeEffect.CritChance:

@@ -18,7 +18,7 @@ public class HitEffects : MonoBehaviour
     private const float NumberScale = 1.35f;      // 보통 데미지 숫자 크기 배율 (줍기 숫자 대비)
     private const float StrongNumberScale = 2f;   // 치명타/럭키클릭 숫자 크기 배율
 
-    private static readonly Color DamageColor = new Color(1f, 0.45f, 0.35f);       // 보통 데미지 숫자 색 (줍기 "+N"의 흰색과 구분되게 붉은빛)
+    private static readonly Color DamageColor = Color.white;                        // 보통 데미지 숫자 색 (치명타/럭키클릭이 아닐 때)
     private static readonly Color StrongDamageColor = new Color(1f, 0.85f, 0.2f); // 치명타/럭키클릭 숫자 색
 
     // 날아가는 부스러기 하나

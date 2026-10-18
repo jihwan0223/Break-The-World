@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 // 파괴 대상 오브젝트 하나의 데이터. WeaponData와 같은 이유로 순수 C# 클래스로 둠
-// (ScriptableObject 애셋 26개를 에디터에서 직접 만들 필요 없이 코드에 바로 정의)
+// (ScriptableObject 애셋 15개를 에디터에서 직접 만들 필요 없이 코드에 바로 정의)
 [Serializable]
 public class ObjectData
 {

@@ -295,13 +295,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD074\uB9AD\uD558\uC9C0 \uC54A\uC544\uB3C4 \uCEE4\uC11C\uB97C \uC62C\uB824\uB454
-        \uC624\uBE0C\uC81D\uD2B8\uB97C \uACC4\uC18D \uB54C\uB9BD\uB2C8\uB2E4.\n\uCC45\uC0C1
-        \uAC19\uC740 \uC9C0\uD615\uC740 \uC9C1\uC811 \uD074\uB9AD\uD574\uC57C \uD569\uB2C8\uB2E4."
+      value: "\uCEE4\uC11C\uB97C \uC62C\uB824\uB454 \uC624\uBE0C\uC81D\uD2B8\uB97C
+        \uACC4\uC18D \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCEE4\uC11C \uD0C0\uACA9 \uD574\uAE08"
+      value: "\uCEE4\uC11C \uD0C0\uACA9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -394,11 +393,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49ec5c72bee8aec4da8558ac1ac58c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeNodeUI
-  displayName: "\uC790\uB3D9 \uC90D\uAE30 \uCE35 \uC99D\uAC00"
-  description: "\uC790\uB3D9 \uC90D\uAE30\uAC00 \uD55C \uBC88 \uC9C0\uB098\uAC08
-    \uB54C \uC4F8\uC5B4 \uB2F4\uB294 \uD30C\uD3B8 \uCE35\uC774 \uB808\uBCA8\uB9C8\uB2E4
-    \uD55C \uCE35\uC529 \uB298\uC5B4\uB0A9\uB2C8\uB2E4. (\uAE30\uBCF8 1\uCE35, \uCD5C\uB300
-    5\uCE35)"
+  displayName: "\uC790\uB3D9 \uC90D\uAE30 \uCE35"
+  description: "\uD55C \uBC88\uC5D0 \uC4F8\uC5B4 \uB2F4\uB294 \uCE35\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
   effect: 26
   targetWeaponName: 
   targetObjectName: 
@@ -407,9 +403,9 @@ MonoBehaviour:
   - 1
   costs:
   - useCrystals: 1
-    baseAmount: 20
-    levelGrowth: 2
-    firstLevelAmount: 2
+    baseAmount: 2
+    levelGrowth: 1.5
+    firstLevelAmount: 0
   upgradedSprite: {fileID: 21300000, guid: 72bff74ce100b064abf8ec10dbe83443, type: 3}
 --- !u!114 &26067274
 MonoBehaviour:
@@ -660,12 +656,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB9DD\uCE58 \uC7A5\uCC29 \uC911 \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uC7A5\uCC29 \uC2DC \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB9DD\uCE58 \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uB9DD\uCE58 \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -830,12 +825,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uBBF8\uC0AC\uC77C \uC7A5\uCC29 \uC911 \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uC7A5\uCC29 \uC2DC \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uBBF8\uC0AC\uC77C \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uBBF8\uC0AC\uC77C \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -1177,9 +1171,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49ec5c72bee8aec4da8558ac1ac58c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeNodeUI
-  displayName: "\uC790\uB3D9 \uC90D\uAE30 \uD574\uAE08"
-  description: "\uC8FC\uAE30\uB9C8\uB2E4 \uBC14\uB2E5\uC758 \uD30C\uD3B8\uC744 \uC790\uB3D9\uC73C\uB85C
-    \uC8FC\uC6CC\uC90D\uB2C8\uB2E4."
+  displayName: "\uC790\uB3D9 \uC90D\uAE30"
+  description: "\uC77C\uC815 \uC2DC\uAC04\uB9C8\uB2E4 \uBC14\uB2E5 \uD30C\uD3B8\uC744
+    \uC4F8\uC5B4 \uB2F4\uC2B5\uB2C8\uB2E4."
   effect: 24
   targetWeaponName: 
   targetObjectName: 
@@ -1188,7 +1182,7 @@ MonoBehaviour:
   - 1
   costs:
   - useCrystals: 1
-    baseAmount: 10
+    baseAmount: 2
     levelGrowth: 1
     firstLevelAmount: 0
   upgradedSprite: {fileID: 21300000, guid: 72bff74ce100b064abf8ec10dbe83443, type: 3}
@@ -1435,13 +1429,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCEE4\uC11C\uAC00 \uD30C\uD3B8\uC5D0 \uB2FF\uC73C\uBA74 \uD074\uB9AD\uD558\uC9C0
-        \uC54A\uC544\uB3C4 \uB9E8 \uC704 \uD30C\uD3B8\uC744 \uC90D\uC2B5\uB2C8\uB2E4.
-        \uCEE4\uC11C \uBC94\uC704\uB3C4 \uC0DD\uAE41\uB2C8\uB2E4."
+      value: "\uCEE4\uC11C\uC5D0 \uB2FF\uC740 \uD30C\uD3B8\uC744 \uC90D\uC2B5\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCEE4\uC11C \uC90D\uAE30 \uD574\uAE08"
+      value: "\uCEE4\uC11C \uC90D\uAE30"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -1748,11 +1740,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uAC00\uB85C\uB4F1 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uAC00\uB85C\uB4F1 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uAC00\uB85C\uB4F1 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -1902,12 +1894,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -2787,13 +2778,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCF64\uBCF4 \uAE30\uB2A5\uC774 \uD574\uAE08\uB429\uB2C8\uB2E4. \uC77C\uC815
-        \uC8FC\uAE30\uB9C8\uB2E4 \uCF64\uBCF4\uAC00 \uBC1C\uB3D9\uD574 \uC870\uAC01
-        \uD68D\uB4DD\uB7C9\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC77C\uC815 \uC2DC\uAC04\uB9C8\uB2E4 \uCF64\uBCF4\uAC00 \uBC1C\uB3D9\uD574
+        \uC870\uAC01\uC744 \uB354 \uC5BB\uC2B5\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCF64\uBCF4 \uD574\uAE08"
+      value: "\uCF64\uBCF4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -3696,12 +3686,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB354\uBE14\uD074\uB9AD \uBC1C\uB3D9 \uD655\uB960\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uB354\uBE14\uD074\uB9AD \uD655\uB960\uC774 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB354\uBE14\uD074\uB9AD \uD655\uB960 \uAC15\uD654"
+      value: "\uB354\uBE14\uD074\uB9AD \uD655\uB960"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -4620,12 +4609,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC811\uC2DC \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC811\uC2DC \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uC811\uC2DC \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -4803,8 +4791,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCC45\uC0C1\uC774 \uAC08\uB77C\uC9C0\uBA74\uC11C \uCC45\uC0C1 \uC704
-        \uC624\uBE0C\uC81D\uD2B8\uAC00 \uACC4\uC18D \uBD80\uC11C\uC9D1\uB2C8\uB2E4."
+      value: "\uCC45\uC0C1 \uC704 \uC624\uBE0C\uC81D\uD2B8\uAC00 \uACC4\uC18D \uBD80\uC11C\uC9D1\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -4820,7 +4807,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costs.Array.data[0].baseAmount
-      value: 15
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: costs.Array.data[0].levelGrowth
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costs.Array.data[0].useCrystals
@@ -4950,12 +4941,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uAC00\uB85C\uB4F1 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uAC00\uB85C\uB4F1 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uAC00\uB85C\uB4F1 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -6975,12 +6965,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC6B4\uC11D \uC7A5\uCC29 \uC911 \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uC7A5\uCC29 \uC2DC \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC6B4\uC11D \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uC6B4\uC11D \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -7216,12 +7205,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCE58\uBA85\uD0C0\uAC00 \uD130\uC9C8 \uD655\uB960\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4. (\uC804\uC5ED)"
+      value: "\uCE58\uBA85\uD0C0 \uD655\uB960\uC774 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCE58\uBA85\uD0C0 \uD655\uB960 \uAC15\uD654"
+      value: "\uCE58\uBA85\uD0C0 \uD655\uB960"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -7395,12 +7383,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB0AE\uC740 \uD655\uB960\uB85C \uD074\uB9AD \uD55C \uBC88\uC5D0 \uB300\uC0C1\uC744
-        \uC989\uC2DC \uD30C\uAD34\uD569\uB2C8\uB2E4."
+      value: "\uB0AE\uC740 \uD655\uB960\uB85C \uD55C \uBC88\uC5D0 \uBD80\uC229\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB7ED\uD0A4\uD074\uB9AD \uD574\uAE08"
+      value: "\uB7ED\uD0A4\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -7832,9 +7819,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49ec5c72bee8aec4da8558ac1ac58c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeNodeUI
-  displayName: "\uACB0\uC815 \uD655\uB960 \uAC15\uD654"
-  description: "\uC624\uBE0C\uC81D\uD2B8\uB97C \uBD80\uC220 \uB54C \uACB0\uC815\uC774
-    \uB098\uC62C \uD655\uB960\uC774 \uB808\uBCA8\uB9C8\uB2E4 % \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  displayName: "\uACB0\uC815 \uD655\uB960"
+  description: "\uACB0\uC815\uC774 \uB098\uC62C \uD655\uB960\uC774 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
   effect: 22
   targetWeaponName: 
   targetObjectName: 
@@ -8039,12 +8025,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC9C0\uAD6C \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC9C0\uAD6C \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uC9C0\uAD6C \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -8222,7 +8207,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4\uAC00 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -9385,12 +9370,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCF64\uBCF4 \uD65C\uC131 \uC911 \uC870\uAC01 \uD68D\uB4DD \uBC30\uC728\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uCF64\uBCF4 \uC911 \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCF64\uBCF4 \uBC30\uC728 \uAC15\uD654"
+      value: "\uCF64\uBCF4 \uBC30\uC728"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -9956,6 +9940,161 @@ MonoBehaviour:
   color: {r: 1, g: 1, b: 1, a: 0.5}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
+--- !u!1001 &468609361
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1589601379}
+    m_Modifications:
+    - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+    - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 240
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 240
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -6400
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -5600
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: effect
+      value: 32
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: maxLevel
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: description
+      value: "\uBC14\uB2E5\uC774 \uCC28\uBA74 \uC870\uAC01\uC774 \uD569\uCCD0\uC9D1\uB2C8\uB2E4."
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: displayName
+      value: "\uC870\uAC01 \uD569\uCE58\uAE30"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: upgradedSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: costs.Array.data[0].baseAmount
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: costs.Array.data[0].levelGrowth
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: costs.Array.data[0].useCrystals
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: m_Name
+      value: "182_\uC870\uAC01_\uD569\uCE58\uAE30"
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+--- !u!224 &468609362 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+  m_PrefabInstance: {fileID: 468609361}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &468609363 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+  m_PrefabInstance: {fileID: 468609361}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &474058751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11976,12 +12115,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD074\uB9AD \uC2DC \uC77C\uC815 \uD655\uB960\uB85C \uD55C \uBC88 \uB354
-        \uD0C0\uACA9\uD569\uB2C8\uB2E4."
+      value: "\uC77C\uC815 \uD655\uB960\uB85C \uD55C \uBC88 \uB354 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB354\uBE14\uD074\uB9AD \uD574\uAE08"
+      value: "\uB354\uBE14\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -13149,12 +13287,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB2E4\uC774\uB108\uB9C8\uC774\uD2B8 \uC7A5\uCC29 \uC911 \uD074\uB9AD
-        \uB370\uBBF8\uC9C0\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uC7A5\uCC29 \uC2DC \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB2E4\uC774\uB108\uB9C8\uC774\uD2B8 \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uB2E4\uC774\uB108\uB9C8\uC774\uD2B8 \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -13896,13 +14033,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCEE4\uC11C \uBC94\uC704\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB113\uC5B4\uC9D1\uB2C8\uB2E4.
-        \uBC94\uC704\uC5D0 \uB2FF\uC740 \uC624\uBE0C\uC81D\uD2B8\uB97C \uD55C \uBC88\uC5D0
-        \uD074\uB9AD\uD558\uACE0, \uCEE4\uC11C \uC90D\uAE30\uB3C4 \uB113\uAC8C \uC90D\uC2B5\uB2C8\uB2E4."
+      value: "\uCEE4\uC11C \uBC94\uC704\uAC00 \uB113\uC5B4\uC9D1\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCEE4\uC11C \uBC94\uC704 \uC99D\uAC00"
+      value: "\uCEE4\uC11C \uBC94\uC704"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -14538,12 +14673,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C
-        \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -16684,12 +16818,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC9C0\uAD6C \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC9C0\uAD6C \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uC9C0\uAD6C \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -16992,12 +17125,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC6B0\uC8FC \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD \uC218\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC6B0\uC8FC \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uC6B0\uC8FC \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -23236,7 +23368,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uAC00\uB85C\uB4F1\uC774 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -23953,12 +24085,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC6B0\uC8FC \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC6B0\uC8FC \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uC6B0\uC8FC \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -24902,12 +25033,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC811\uC2DC \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC811\uC2DC \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uC811\uC2DC \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -26698,8 +26828,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB3C4\uB85C\uC5D0 \uC2F1\uD06C\uD640\uC774 \uC0DD\uACA8\uC11C \uAE38\uAC70\uB9AC
-        \uC624\uBE0C\uC81D\uD2B8\uAC00 \uACC4\uC18D \uBD80\uC11C\uC9D1\uB2C8\uB2E4."
+      value: "\uAE38\uAC70\uB9AC \uC624\uBE0C\uC81D\uD2B8\uAC00 \uACC4\uC18D \uBD80\uC11C\uC9D1\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -26959,12 +27088,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCC45\uC0C1 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD \uC218\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCC45\uC0C1 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uCC45\uC0C1 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -27427,12 +27555,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD3ED\uD0C4 \uC7A5\uCC29 \uC911 \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uC7A5\uCC29 \uC2DC \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD3ED\uD0C4 \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uD3ED\uD0C4 \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -28596,11 +28723,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCC45\uC0C1 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCC45\uC0C1 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uCC45\uC0C1 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -29490,7 +29617,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD3EC\uD06C\uB808\uC778\uC774 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -29664,7 +29791,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uC804\uAC70\uAC00 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -30381,12 +30508,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC804\uB3D9 \uB4DC\uB9B4 \uC7A5\uCC29 \uC911 \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uC7A5\uCC29 \uC2DC \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC804\uB3D9 \uB4DC\uB9B4 \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uC804\uB3D9 \uB4DC\uB9B4 \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -30555,12 +30681,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCF64\uBCF4 \uBC1C\uB3D9 \uCFE8\uD0C0\uC784\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC904\uC5B4\uB4ED\uB2C8\uB2E4."
+      value: "\uCF64\uBCF4\uAC00 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCF64\uBCF4 \uCFE8\uD0C0\uC784 \uAC10\uC18C"
+      value: "\uCF64\uBCF4 \uCFE8\uD0C0\uC784"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -30744,7 +30869,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCCA0\uAD6C \uD06C\uB808\uC778\uC774 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -31013,12 +31138,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uBE45\uBC45 \uC7A5\uCC29 \uC911 \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uC7A5\uCC29 \uC2DC \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uBE45\uBC45 \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uBE45\uBC45 \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -31211,7 +31335,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD654\uBD84\uC774 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -32212,11 +32336,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC6B0\uC8FC \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC6B0\uC8FC \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uC6B0\uC8FC \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -32366,12 +32490,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uB3D9\uCC44\uAD74 1\uD68C\uB2F9 \uD68D\uB4DD\uD558\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uCC44\uAD74\uB85C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uB3D9\uCC44\uAD74 \uD68D\uB4DD\uB7C9 \uAC15\uD654"
+      value: "\uC790\uB3D9\uCC44\uAD74 \uD68D\uB4DD\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -32594,12 +32717,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC720\uC555 \uBE0C\uB808\uC774\uCEE4 \uC7A5\uCC29 \uC911 \uD074\uB9AD
-        \uB370\uBBF8\uC9C0\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uC7A5\uCC29 \uC2DC \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC720\uC555 \uBE0C\uB808\uC774\uCEE4 \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uC720\uC555 \uBE0C\uB808\uC774\uCEE4 \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -32844,7 +32966,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uB3D9\uCC28\uAC00 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -36707,11 +36829,11 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
       value: "\uBAA8\uB4E0 \uBB34\uAE30\uC758 \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+        \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC804\uC5ED \uD074\uB9AD \uB370\uBBF8\uC9C0 \uAC15\uD654 II"
+      value: "\uD074\uB9AD \uB370\uBBF8\uC9C0 II"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -36900,11 +37022,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC9C0\uAD6C \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC9C0\uAD6C \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uC9C0\uAD6C \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -37111,13 +37233,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4
-        \uAC15\uD654"
+      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -37420,12 +37540,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCF64\uBCF4 \uC9C0\uC18D \uC2DC\uAC04\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uAE38\uC5B4\uC9D1\uB2C8\uB2E4."
+      value: "\uCF64\uBCF4\uAC00 \uB354 \uC624\uB798 \uC9C0\uC18D\uB429\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCF64\uBCF4 \uC9C0\uC18D\uC2DC\uAC04 \uAC15\uD654 III"
+      value: "\uCF64\uBCF4 \uC9C0\uC18D\uC2DC\uAC04 III"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -37754,12 +37873,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB354\uBE14\uD074\uB9AD \uBC1C\uB3D9 \uD655\uB960\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uB354\uBE14\uD074\uB9AD \uD655\uB960\uC774 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB354\uBE14\uD074\uB9AD \uD655\uB960 \uAC15\uD654 II"
+      value: "\uB354\uBE14\uD074\uB9AD \uD655\uB960 II"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -37928,12 +38046,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uB3D9\uCC44\uAD74 \uBC1C\uB3D9 \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uCC44\uAD74\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uB3D9\uCC44\uAD74 \uC8FC\uAE30 \uB2E8\uCD95 II"
+      value: "\uC790\uB3D9\uCC44\uAD74 \uC18D\uB3C4 II"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -38107,7 +38224,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC811\uC2DC\uAC00 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -38267,12 +38384,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uB3D9\uCC44\uAD74 1\uD68C\uB2F9 \uD68D\uB4DD\uD558\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uCC44\uAD74\uB85C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uB3D9\uCC44\uAD74 \uD68D\uB4DD\uB7C9 \uAC15\uD654 III"
+      value: "\uC790\uB3D9\uCC44\uAD74 \uD68D\uB4DD\uB7C9 III"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -38497,6 +38613,7 @@ RectTransform:
   - {fileID: 2026194699}
   - {fileID: 83633460}
   - {fileID: 8783720}
+  - {fileID: 468609362}
   - {fileID: 297367148}
   - {fileID: 1998017415}
   - {fileID: 72333250}
@@ -39416,12 +39533,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCE58\uBA85\uD0C0\uAC00 \uD130\uC9C8 \uD655\uB960\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4. (\uC804\uC5ED)"
+      value: "\uCE58\uBA85\uD0C0 \uD655\uB960\uC774 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCE58\uBA85\uD0C0 \uD655\uB960 \uAC15\uD654 II"
+      value: "\uCE58\uBA85\uD0C0 \uD655\uB960 II"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -39652,7 +39768,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD0C0\uC6CC \uD06C\uB808\uC778\uC774 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -40480,12 +40596,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC6B0\uC8FC \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC6B0\uC8FC \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uC6B0\uC8FC \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -40673,11 +40788,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC811\uC2DC \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC811\uC2DC \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uC811\uC2DC \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -40945,12 +41060,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCF64\uBCF4 \uD65C\uC131 \uC911 \uC870\uAC01 \uD68D\uB4DD \uBC30\uC728\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uCF64\uBCF4 \uC911 \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCF64\uBCF4 \uBC30\uC728 \uAC15\uD654 III"
+      value: "\uCF64\uBCF4 \uBC30\uC728 III"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -41181,12 +41295,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB7ED\uD0A4\uD074\uB9AD \uBC1C\uB3D9 \uD655\uB960\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uB7ED\uD0A4\uD074\uB9AD \uD655\uB960\uC774 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB7ED\uD0A4\uD074\uB9AD \uD655\uB960 \uAC15\uD654 II"
+      value: "\uB7ED\uD0A4\uD074\uB9AD \uD655\uB960 II"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -41355,12 +41468,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0 \uBC30\uC728\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4. (\uC804\uC5ED)"
+      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0\uAC00 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0 \uAC15\uD654 III"
+      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0 III"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -41525,12 +41637,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCF64\uBCF4 \uBC1C\uB3D9 \uCFE8\uD0C0\uC784\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC904\uC5B4\uB4ED\uB2C8\uB2E4."
+      value: "\uCF64\uBCF4\uAC00 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCF64\uBCF4 \uCFE8\uD0C0\uC784 \uAC10\uC18C III"
+      value: "\uCF64\uBCF4 \uCFE8\uD0C0\uC784 III"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -41699,12 +41810,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uB3D9\uCC44\uAD74 1\uD68C\uB2F9 \uD68D\uB4DD\uD558\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uCC44\uAD74\uB85C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uB3D9\uCC44\uAD74 \uD68D\uB4DD\uB7C9 \uAC15\uD654 II"
+      value: "\uC790\uB3D9\uCC44\uAD74 \uD68D\uB4DD\uB7C9 II"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -41878,7 +41988,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uACC4\uC0B0\uAE30\uAC00 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -42681,12 +42791,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCE58\uBA85\uD0C0\uAC00 \uD130\uC9C8 \uD655\uB960\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4. (\uC804\uC5ED)"
+      value: "\uCE58\uBA85\uD0C0 \uD655\uB960\uC774 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCE58\uBA85\uD0C0 \uD655\uB960 \uAC15\uD654 III"
+      value: "\uCE58\uBA85\uD0C0 \uD655\uB960 III"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -43945,12 +44054,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB9E8\uC190 \uC7A5\uCC29 \uC911 \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uC7A5\uCC29 \uC2DC \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB9E8\uC190 \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uB9E8\uC190 \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -44148,12 +44256,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCF64\uBCF4 \uC9C0\uC18D \uC2DC\uAC04\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uAE38\uC5B4\uC9D1\uB2C8\uB2E4."
+      value: "\uCF64\uBCF4\uAC00 \uB354 \uC624\uB798 \uC9C0\uC18D\uB429\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCF64\uBCF4 \uC9C0\uC18D\uC2DC\uAC04 \uAC15\uD654"
+      value: "\uCF64\uBCF4 \uC9C0\uC18D\uC2DC\uAC04"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -44324,11 +44431,11 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
       value: "\uBAA8\uB4E0 \uBB34\uAE30\uC758 \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+        \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC804\uC5ED \uD074\uB9AD \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uD074\uB9AD \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -44647,11 +44754,11 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
       value: "\uBAA8\uB4E0 \uC624\uBE0C\uC81D\uD2B8\uC5D0\uC11C \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 % \uC99D\uAC00\uD569\uB2C8\uB2E4."
+        \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC804\uC5ED \uC870\uAC01 \uD68D\uB4DD \uAC15\uD654 II"
+      value: "\uC870\uAC01 \uD68D\uB4DD\uB7C9 II"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -44933,12 +45040,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0 \uBC30\uC728\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4. (\uC804\uC5ED)"
+      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0\uAC00 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0 \uAC15\uD654 II"
+      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0 II"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -45117,12 +45223,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCF64\uBCF4 \uC9C0\uC18D \uC2DC\uAC04\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uAE38\uC5B4\uC9D1\uB2C8\uB2E4."
+      value: "\uCF64\uBCF4\uAC00 \uB354 \uC624\uB798 \uC9C0\uC18D\uB429\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCF64\uBCF4 \uC9C0\uC18D\uC2DC\uAC04 \uAC15\uD654 II"
+      value: "\uCF64\uBCF4 \uC9C0\uC18D\uC2DC\uAC04 II"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -45287,12 +45392,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uB3D9\uCC44\uAD74 \uBC1C\uB3D9 \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uCC44\uAD74\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uB3D9\uCC44\uAD74 \uC8FC\uAE30 \uB2E8\uCD95 III"
+      value: "\uC790\uB3D9\uCC44\uAD74 \uC18D\uB3C4 III"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -45581,11 +45685,11 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
       value: "\uBAA8\uB4E0 \uC624\uBE0C\uC81D\uD2B8\uC5D0\uC11C \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 % \uC99D\uAC00\uD569\uB2C8\uB2E4."
+        \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC804\uC5ED \uC870\uAC01 \uD68D\uB4DD \uAC15\uD654 III"
+      value: "\uC870\uAC01 \uD68D\uB4DD\uB7C9 III"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -46366,12 +46470,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCC45\uC0C1 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCC45\uC0C1 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uCC45\uC0C1 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -46554,7 +46657,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC720\uB9AC\uCEF5\uC774 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -46713,12 +46816,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCF64\uBCF4 \uBC1C\uB3D9 \uCFE8\uD0C0\uC784\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC904\uC5B4\uB4ED\uB2C8\uB2E4."
+      value: "\uCF64\uBCF4\uAC00 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCF64\uBCF4 \uCFE8\uD0C0\uC784 \uAC10\uC18C II"
+      value: "\uCF64\uBCF4 \uCFE8\uD0C0\uC784 II"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -47382,12 +47484,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCF64\uBCF4 \uD65C\uC131 \uC911 \uC870\uAC01 \uD68D\uB4DD \uBC30\uC728\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uCF64\uBCF4 \uC911 \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCF64\uBCF4 \uBC30\uC728 \uAC15\uD654 II"
+      value: "\uCF64\uBCF4 \uBC30\uC728 II"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -47557,11 +47658,11 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
       value: "\uBAA8\uB4E0 \uBB34\uAE30\uC758 \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+        \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC804\uC5ED \uD074\uB9AD \uB370\uBBF8\uC9C0 \uAC15\uD654 III"
+      value: "\uD074\uB9AD \uB370\uBBF8\uC9C0 III"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -47860,12 +47961,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uAC00\uB85C\uB4F1 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uAC00\uB85C\uB4F1 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uAC00\uB85C\uB4F1 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -48048,12 +48148,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB354\uBE14\uD074\uB9AD \uBC1C\uB3D9 \uD655\uB960\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uB354\uBE14\uD074\uB9AD \uD655\uB960\uC774 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB354\uBE14\uD074\uB9AD \uD655\uB960 \uAC15\uD654 III"
+      value: "\uB354\uBE14\uD074\uB9AD \uD655\uB960 III"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -48387,12 +48486,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB7ED\uD0A4\uD074\uB9AD \uBC1C\uB3D9 \uD655\uB960\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uB7ED\uD0A4\uD074\uB9AD \uD655\uB960\uC774 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB7ED\uD0A4\uD074\uB9AD \uD655\uB960 \uAC15\uD654 III"
+      value: "\uB7ED\uD0A4\uD074\uB9AD \uD655\uB960 III"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -48634,12 +48732,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC811\uC2DC \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD \uC218\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC811\uC2DC \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uC811\uC2DC \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -49298,12 +49395,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB7ED\uD0A4\uD074\uB9AD \uBC1C\uB3D9 \uD655\uB960\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uB7ED\uD0A4\uD074\uB9AD \uD655\uB960\uC774 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB7ED\uD0A4\uD074\uB9AD \uD655\uB960 \uAC15\uD654"
+      value: "\uB7ED\uD0A4\uD074\uB9AD \uD655\uB960"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -50077,12 +50173,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uB3D9\uCC44\uAD74 \uBC1C\uB3D9 \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uCC44\uAD74\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uB3D9\uCC44\uAD74 \uC8FC\uAE30 \uB2E8\uCD95"
+      value: "\uC790\uB3D9\uCC44\uAD74 \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -50287,9 +50382,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49ec5c72bee8aec4da8558ac1ac58c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeNodeUI
-  displayName: "\uC790\uB3D9 \uC90D\uAE30 \uC18D\uB3C4 \uC99D\uAC00"
-  description: "\uC790\uB3D9 \uC90D\uAE30\uAC00 \uB098\uC624\uB294 \uC8FC\uAE30\uAC00
-    \uB808\uBCA8\uB9C8\uB2E4 \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+  displayName: "\uC790\uB3D9 \uC90D\uAE30 \uC18D\uB3C4"
+  description: "\uC790\uB3D9 \uC90D\uAE30\uAC00 \uB354 \uC790\uC8FC \uB098\uC635\uB2C8\uB2E4."
   effect: 25
   targetWeaponName: 
   targetObjectName: 
@@ -50298,9 +50392,9 @@ MonoBehaviour:
   - 2
   costs:
   - useCrystals: 1
-    baseAmount: 8
+    baseAmount: 2
     levelGrowth: 1.5
-    firstLevelAmount: 1
+    firstLevelAmount: 0
   upgradedSprite: {fileID: 21300000, guid: 72bff74ce100b064abf8ec10dbe83443, type: 3}
 --- !u!114 &1975185460
 MonoBehaviour:
@@ -50695,9 +50789,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49ec5c72bee8aec4da8558ac1ac58c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeNodeUI
-  displayName: "\uACB0\uC815 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
-  description: "\uACB0\uC815\uC774 \uB098\uC62C \uB54C \uD55C \uBC88\uC5D0 \uB098\uC624\uB294
-    \uAC1C\uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  displayName: "\uACB0\uC815 \uB4DC\uB78D\uB7C9"
+  description: "\uACB0\uC815\uC774 \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB098\uC635\uB2C8\uB2E4."
   effect: 23
   targetWeaponName: 
   targetObjectName: 
@@ -50964,12 +51057,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD0DC\uC591 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD \uC218\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD0DC\uC591 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uD0DC\uC591 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -51134,12 +51226,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD3EC\uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD
-        \uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD3EC\uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uD3EC\uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -51318,11 +51409,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uAC00\uB85C\uC218 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uAC00\uB85C\uC218 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uAC00\uB85C\uC218 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -51598,12 +51689,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC720\uB9AC\uCEF5 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC720\uB9AC\uCEF5 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uC720\uB9AC\uCEF5 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -51772,12 +51862,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C
-        \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -51918,12 +52007,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB2EC \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB2EC \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uB2EC \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -52218,12 +52306,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uB3D9\uCC28 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uB3D9\uCC28 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uC790\uB3D9\uCC28 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -52397,12 +52484,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C
-        \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -52548,12 +52634,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uB3D9\uCC28 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uB3D9\uCC28 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uC790\uB3D9\uCC28 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -52727,12 +52812,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD3EC\uD06C\uB808\uC778 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C
-        \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD3EC\uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uD3EC\uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -52998,12 +53082,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC544\uD30C\uD2B8 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC544\uD30C\uD2B8 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uC544\uD30C\uD2B8 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -53168,12 +53251,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC720\uB9AC\uCEF5 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD
-        \uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC720\uB9AC\uCEF5 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uC720\uB9AC\uCEF5 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -53363,12 +53445,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD654\uBD84 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD \uC218\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD654\uBD84 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uD654\uBD84 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -53533,12 +53614,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uACC4\uC0B0\uAE30 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uACC4\uC0B0\uAE30 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uACC4\uC0B0\uAE30 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -53828,12 +53908,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC9C0\uAD6C \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD \uC218\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC9C0\uAD6C \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uC9C0\uAD6C \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -53998,12 +54077,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uB3D9\uCC28 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD
-        \uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uB3D9\uCC28 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uC790\uB3D9\uCC28 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -54168,12 +54246,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD654\uBD84 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD654\uBD84 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uD654\uBD84 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -54400,12 +54477,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uACC4\uC0B0\uAE30 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD
-        \uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uACC4\uC0B0\uAE30 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uACC4\uC0B0\uAE30 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -54599,7 +54675,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uAC00\uB85C\uC218\uAC00 \uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
+      value: "\uD558\uB098 \uB354 \uB193\uC785\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
@@ -54811,13 +54887,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4
-        \uAC15\uD654"
+      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -55132,13 +55206,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9
-        \uD074\uB9AD \uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218
-        \uAC15\uD654"
+      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -55308,12 +55380,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB3C4\uB85C \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB3C4\uB85C \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uB3C4\uB85C \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -55482,11 +55553,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uC804\uAC70 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uC804\uAC70 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uC790\uC804\uAC70 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -55632,12 +55703,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uACE1\uAD2D\uC774 \uC7A5\uCC29 \uC911 \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uC7A5\uCC29 \uC2DC \uD074\uB9AD \uB370\uBBF8\uC9C0\uAC00 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uACE1\uAD2D\uC774 \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uACE1\uAD2D\uC774 \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -55977,12 +56047,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCC45\uC0C1 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCC45\uC0C1 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uCC45\uC0C1 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -56156,12 +56225,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uC804\uAC70 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD
-        \uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uC804\uAC70 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uC790\uC804\uAC70 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -56402,11 +56470,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uACC4\uC0B0\uAE30 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uACC4\uC0B0\uAE30 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uACC4\uC0B0\uAE30 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -56677,12 +56745,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uAC00\uB85C\uC218 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uAC00\uB85C\uC218 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uAC00\uB85C\uC218 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -56862,13 +56929,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9
-        \uD074\uB9AD \uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218
-        \uAC15\uD654"
+      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -57037,11 +57102,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB2EC \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB2EC \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uB2EC \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -57186,11 +57251,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD0DC\uC591 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD0DC\uC591 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uD0DC\uC591 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -57486,12 +57551,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD3EC\uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD3EC\uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uD3EC\uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -57660,11 +57724,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uB3D9\uCC28 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uB3D9\uCC28 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uC790\uB3D9\uCC28 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -57805,12 +57869,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD654\uBD84 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD654\uBD84 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uD654\uBD84 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -57975,12 +58038,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB3C4\uB85C \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD \uC218\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB3C4\uB85C \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uB3C4\uB85C \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -58154,11 +58216,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD654\uBD84 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD654\uBD84 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uD654\uBD84 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -58429,12 +58491,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uC804\uAC70 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uC804\uAC70 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uC790\uC804\uAC70 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -58599,12 +58660,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC720\uB9AC\uCEF5 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC720\uB9AC\uCEF5 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uC720\uB9AC\uCEF5 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -59096,12 +59156,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uCC98\uCE58 \uC2DC \uC5BB\uB294
-        \uC870\uAC01\uC774 \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uCEE8\uD14C\uC774\uB108 \uBC15\uC2A4 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -59270,11 +59329,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC720\uB9AC\uCEF5 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC720\uB9AC\uCEF5 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uC720\uB9AC\uCEF5 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -59419,11 +59478,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC544\uD30C\uD2B8 \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC544\uD30C\uD2B8 \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uC544\uD30C\uD2B8 \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -59584,12 +59643,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB2EC \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD \uC218\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB2EC \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uB2EC \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -59764,12 +59822,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD3EC\uD06C\uB808\uC778 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD3EC\uD06C\uB808\uC778 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uD3EC\uD06C\uB808\uC778 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -59944,12 +60001,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -60118,11 +60174,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB3C4\uB85C \uC7A5\uCC29 \uC911 \uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uB429\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uC73C\uB85C \uD074\uB9AD\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB3C4\uB85C \uC790\uB3D9\uD074\uB9AD \uD574\uAE08"
+      value: "\uB3C4\uB85C \uC790\uB3D9\uD074\uB9AD"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -60268,12 +60324,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC790\uC804\uAC70 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC790\uC804\uAC70 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uC790\uC804\uAC70 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -60443,13 +60498,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9
-        \uD074\uB9AD \uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218
-        \uAC15\uD654"
+      value: "\uD0C0\uC6CC \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -60744,12 +60797,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uAC00\uB85C\uC218 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uAC00\uB85C\uC218 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uAC00\uB85C\uC218 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -60919,12 +60971,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uACC4\uC0B0\uAE30 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uACC4\uC0B0\uAE30 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uACC4\uC0B0\uAE30 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -61089,13 +61140,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00
-        \uB808\uBCA8\uB9C8\uB2E4 \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4
-        \uAC15\uD654"
+      value: "\uCCA0\uAD6C \uD06C\uB808\uC778 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -61260,12 +61309,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD0DC\uC591 \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD0DC\uC591 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uD0DC\uC591 \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -61497,12 +61545,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB2EC \uC790\uB3D9\uD074\uB9AD \uC8FC\uAE30\uAC00 \uB808\uBCA8\uB9C8\uB2E4
-        \uC9E7\uC544\uC9D1\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD\uC774 \uB354 \uC790\uC8FC \uBC1C\uB3D9\uD569\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB2EC \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4 \uAC15\uD654"
+      value: "\uB2EC \uC790\uB3D9\uD074\uB9AD \uC18D\uB3C4"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -61672,12 +61719,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC544\uD30C\uD2B8 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC544\uD30C\uD2B8 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uC544\uD30C\uD2B8 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -61842,12 +61888,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uAC00\uB85C\uB4F1 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD
-        \uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uAC00\uB85C\uB4F1 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uAC00\uB85C\uB4F1 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -62027,12 +62072,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uC544\uD30C\uD2B8 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD
-        \uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC544\uD30C\uD2B8 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uC544\uD30C\uD2B8 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -62212,12 +62256,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uD0DC\uC591 \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uD0DC\uC591 \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uD0DC\uC591 \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -62392,12 +62435,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uB3C4\uB85C \uCC98\uCE58 \uC2DC \uC5BB\uB294 \uC870\uAC01\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      value: "\uBD80\uC220 \uB54C \uC5BB\uB294 \uC870\uAC01\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uB3C4\uB85C \uB4DC\uB78D\uB7C9 \uAC15\uD654"
+      value: "\uB3C4\uB85C \uB4DC\uB78D\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -62582,11 +62624,11 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
       value: "\uBAA8\uB4E0 \uC624\uBE0C\uC81D\uD2B8\uC5D0\uC11C \uC5BB\uB294 \uC870\uAC01\uC774
-        \uB808\uBCA8\uB9C8\uB2E4 % \uC99D\uAC00\uD569\uB2C8\uB2E4."
+        \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uC804\uC5ED \uC870\uAC01 \uD68D\uB4DD \uAC15\uD654"
+      value: "\uC870\uAC01 \uD68D\uB4DD\uB7C9"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName
@@ -62786,12 +62828,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uAC00\uB85C\uC218 \uC790\uB3D9\uD074\uB9AD 1\uD68C\uB2F9 \uD074\uB9AD
-        \uC218\uAC00 \uB808\uBCA8\uB9C8\uB2E4 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+      value: "\uC790\uB3D9\uD074\uB9AD \uD55C \uBC88\uC5D0 \uB354 \uB9CE\uC774 \uB54C\uB9BD\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uAC00\uB85C\uC218 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218 \uAC15\uD654"
+      value: "\uAC00\uB85C\uC218 \uC790\uB3D9\uD074\uB9AD \uD69F\uC218"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
@@ -63158,6 +63199,8 @@ MonoBehaviour:
     _prefab: Assets/5_Prefabs/UpgradeNode.prefab
   - _gameObject: {fileID: 8783721}
     _prefab: Assets/5_Prefabs/UpgradeNode.prefab
+  - _gameObject: {fileID: 468609363}
+    _prefab: Assets/5_Prefabs/UpgradeNode.prefab
   - _gameObject: {fileID: 781266712}
     _prefab: Assets/5_Prefabs/UpgradeNode.prefab
   - _gameObject: {fileID: 512733849}
@@ -63325,12 +63368,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: description
-      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0 \uBC30\uC728\uC774 \uB808\uBCA8\uB9C8\uB2E4
-        \uC99D\uAC00\uD569\uB2C8\uB2E4. (\uC804\uC5ED)"
+      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0\uAC00 \uC62C\uB77C\uAC11\uB2C8\uB2E4."
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: displayName
-      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0 \uAC15\uD654"
+      value: "\uCE58\uBA85\uD0C0 \uB370\uBBF8\uC9C0"
       objectReference: {fileID: 0}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costObjectName

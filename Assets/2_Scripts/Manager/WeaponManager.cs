@@ -7,7 +7,7 @@ public class WeaponManager : MonoBehaviour
     // 씬 어디서든 WeaponManager.Instance로 접근하기 위한 싱글톤
     public static WeaponManager Instance { get; private set; }
 
-    // 무기 10종 데이터. clickDamage는 ObjectHealthCalculator의 티어별 시작 체력(4,24,64,144,304,624,1264,2536,5080,10168)을
+    // 무기 6종 데이터(데모 - 우주 티어 무기 4종은 뺌). clickDamage는 ObjectHealthCalculator의 티어별 시작 체력(4,24,64,144,304,624)을
     // 대략 4로 나눈 값으로 잡아서, 같은 티어 오브젝트를 4~8클릭 정도면 부술 수 있게 맞춤.
     // 해금 비용은 GetUnlockCost에서 오브젝트 해금 곡선을 따라 계산함
     private static readonly List<WeaponData> weapons = new List<WeaponData>
@@ -18,10 +18,6 @@ public class WeaponManager : MonoBehaviour
         new WeaponData(4, "전동 드릴", 36),
         new WeaponData(5, "유압 브레이커", 76),
         new WeaponData(6, "다이너마이트", 156),
-        new WeaponData(7, "폭탄", 316),
-        new WeaponData(8, "미사일", 634),
-        new WeaponData(9, "운석", 1270),
-        new WeaponData(10, "빅뱅", 2542),
     };
 
     [SerializeField] private Sprite[] weaponIcons; // 무기별 이미지 (weapons 리스트와 같은 순서로 채워야 함, 아직 없는 무기는 비워둬도 됨)

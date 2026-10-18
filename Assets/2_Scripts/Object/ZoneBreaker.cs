@@ -27,6 +27,17 @@ public class ZoneBreaker : MonoBehaviour
     private float _autoBreakTimer; // 마지막 자동 파괴 이후 흐른 시간(초)
     private int _waveId; // 가장 최근 충격파 번호 - 연타로 겹치면 고리는 최신 충격파만 그림
 
+    // 오브젝트 번호로 그 오브젝트(책상/도로)의 존 자동 파괴 간격(초)을 찾음 - 업그레이드 설명에 "N초마다"를 넣는 데 씀 (못 찾으면 -1)
+    public static float AutoBreakIntervalFor(int objectIndex)
+    {
+        foreach (ZoneBreaker breaker in FindObjectsByType<ZoneBreaker>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            Click click = breaker.GetComponent<Click>(); // 이 존 파괴 오브젝트의 번호를 알아내려고
+            if (click != null && click.ObjectIndex == objectIndex) return breaker.autoBreakInterval;
+        }
+        return -1f;
+    }
+
     void Start()
     {
         _health = GetComponent<Health>();

@@ -46,6 +46,7 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("오브젝트 추가 배치")] ObjectExtraCopies,   // Target Object Name 오브젝트(비우면 모든 오브젝트)를 +값 개 더 배치. 추가분은 씬에 미리 놓아두고 UnlockGate로 켬
         [InspectorName("커서 범위 증가")] CursorRange,          // 커서 범위 반지름 +값 (월드 단위). 범위에 걸친 오브젝트가 한 번에 클릭되고 커서 줍기도 이 범위로 주움
         [InspectorName("커서 타격 해금")] HoverClickUnlock,       // 클릭하지 않아도 커서를 오브젝트에 올려두면 일정 간격으로 계속 때리는 기능 해금 (지형 제외)
+        [InspectorName("조각 합치기 (표시용)")] PieceMergeDecoy, // 실제 효과 없음 - 바닥이 차면 조각이 합쳐지는 건 원래 기능인데, 업그레이드로 얻은 것처럼 보이게 하는 노드용
     }
 
     // 선행 노드와 잇는 선의 모양 (UpgradeTreeLink가 이 값을 보고 세그먼트를 배치함)

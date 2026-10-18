@@ -224,7 +224,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             bool unlocked = ObjectManager.Instance.IsUnlocked(objectIndex);
             // 부수면 다음 맵이 열리는 오브젝트(책상 등)면 그 사실을 알려줌 - 다음 맵이 이미 열렸으면 생략
             string zoneHint = ObjectManager.Instance.OpensNextZone(objectIndex) && !ObjectManager.Instance.IsUnlocked(objectIndex + 1)
-                ? $"{objectName}을(를) 부수면 다음 맵이 열립니다." : null;
+                ? "부수면 다음 맵이 열립니다." : null;
             if (unlocked)
                 return new UpgradeTooltip.Content { title = $"{objectName} 해금", description = zoneHint ?? "이미 해금했습니다.", level = "완료" };
 
@@ -235,7 +235,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             return new UpgradeTooltip.Content
             {
                 title = $"{objectName} 해금",
-                description = zoneHint != null ? $"{objectName}을(를) 해금합니다.\n{zoneHint}" : $"{objectName}을(를) 해금합니다.",
+                description = zoneHint ?? "새 오브젝트가 등장합니다.",
                 level = "0 / 1",
                 price = $"{NumberFormatUtil.Format(cost)} 조각",
             };
@@ -246,8 +246,8 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         string nextGain = maxed ? null : $"+{NumberFormatUtil.Format(ObjectManager.Instance.GainBonusPerLevel(objectIndex))}개"; // 레벨당 이 오브젝트 처치 시 더 주는 조각 개수
         return new UpgradeTooltip.Content
         {
-            title = $"{objectName} 획득량 증가",
-            description = "처치 시 추가로 얻는 조각이 늘어납니다.",
+            title = $"{objectName} 획득량",
+            description = "부술 때 얻는 조각이 늘어납니다.",
             level = nextGain != null ? $"{level} / 5  (다음 {nextGain})" : $"{level} / 5",
             price = maxed ? "최대" : $"{NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))} 조각",
         };
