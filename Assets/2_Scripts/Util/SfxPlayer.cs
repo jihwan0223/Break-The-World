@@ -24,6 +24,17 @@ public static class SfxPlayer
     private static readonly List<float> _voiceEndTimes = new List<float>(); // 지금 울리고 있는 소리들이 끝나는 시각
     private static readonly Queue<float> _recentPlayTimes = new Queue<float>(); // 최근 재생 시각들 (연타 정도 판단용)
 
+    // 플레이를 새로 시작할 때마다 기록을 비움. 이 프로젝트는 플레이 시작 때 스크립트를 다시 불러오지 않게 설정돼 있어서(Enter Play Mode 옵션)
+    // 그냥 두면 지난 플레이의 재생 기록이 남는데, 시간은 0부터 다시 세서 그 기록이 "아직 울리는 중"으로 남아 동시 재생 한도를 막아버림 (클릭 소리가 안 나던 원인)
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetState()
+    {
+        _volume = null;
+        _lastPlayTime.Clear();
+        _voiceEndTimes.Clear();
+        _recentPlayTimes.Clear();
+    }
+
     // 효과음 볼륨 (0~1) - 설정에서 바꾸면 바로 저장됨
     public static float Volume
     {

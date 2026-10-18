@@ -1,11 +1,16 @@
 ﻿<Solution>
   <Project Path="MoreMountains.Tools.csproj" />
   <Project Path="MoreMountains.Tools.Editor.csproj" />
-  <Project Path="Lofelt.NiceVibrations.csproj" />
+  <Project Path="VHierarchy.csproj" />
+  <Project Path="VFavorites.csproj" />
   <Project Path="Lofelt.NiceVibrations.Demo.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
-  <Project Path="Assembly-CSharp-Editor.csproj" />
-  <Project Path="UnityPlayModeSaverEditor.csproj" />
+  <Project Path="VInspector.csproj" />
+  <Project Path="VTabs.csproj" />
   <Project Path="UnityPlayModeSaver.csproj" />
   <Project Path="Lofelt.NiceVibrations.Editor.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="VFolders.csproj" />
+  <Project Path="Lofelt.NiceVibrations.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="UnityPlayModeSaverEditor.csproj" />
 </Solution>

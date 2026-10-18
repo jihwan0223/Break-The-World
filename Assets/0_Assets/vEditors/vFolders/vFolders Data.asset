@@ -1,0 +1,168 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adb9c12a8c6c949f7af83a3d238359d0, type: 3}
+  m_Name: vFolders Data
+  m_EditorClassIdentifier: VFolders::VFolders.VFoldersData
+  folderDatas_byGuid:
+    keys:
+    - 87501dcdb5af6894fb801ce00f33901c
+    - 785ee34ae582b9843a5df7efc997233e
+    - b0c6290f0ee6648a8a99d31092cf78f6
+    - ad7b99d5e98dc40e58a04cea988ae9f6
+    - a502dec2e54274de294912cf5d937bfb
+    - 79dd17e91601c48c4b55be04217c40db
+    - 8c8d2225ebe7749f79e9d0bed1058c04
+    - 75bb8b6d4880e415995cf63d517e394a
+    - 29389daf133e5c44aa2a13f86492091d
+    - 534d862835a592a40bcc0b25024d425f
+    - 8ea6fc1cfc8e2f14f8dc789baeb4791e
+    - 0190d5c57f0e4f04ba451e321fc182cb
+    - e5594e1e7ea598d409319855db3fd1f5
+    - 7483a9cdca19dfc4793a1957fb4b9faa
+    - a3eb5a17a02938a60996e6f5bb426f56
+    - 75a4071c45f674c94b229f61c56351c6
+    - 90a409f6741114326bff84144132ddc3
+    - 00fa2b382621645718885e1f905d31a6
+    - f54d1bd14bd3ca042bd867b519fee8cc
+    - d1ca788797308d24c951832ca233407b
+    - 94c370f5891323146a4c967cfe6384aa
+    - 109e9bdd0fcc649c5bc59085c35bdc83
+    - 02c2626c2b287e5468df546cf6edaf74
+    - ed090fbb04076c4469bf1f2f6e280f33
+    - aa3848de01ff9a94390480d46ee378df
+    - 8e142c6d7b90d8146ba20f241413181e
+    - e7c6d6aa0dd49014288fe4b3158d0599
+    - 8e7ae43da02361148a75df36ebd71c5d
+    - 28e4909801f10fe41a948e1bf0ac52a5
+    - 7bbc9e329600a6448867b05295f89583
+    values:
+    - iconNameOrGuid: AssetLabelIconSquare
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: AssetLabelIconSquare
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: SceneAsset Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: cs Script Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: Sprite Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: Prefab Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: AnimationClip Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: Material Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: AssetLabelIconSquare
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: PrefabModel Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: MeshCollider Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: Settings Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: AssetLabelIconSquare
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: scenepicking_pickable_hover
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: AISparkle Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: AISparkle Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: ScriptableObject Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: Settings Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: GUIText Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: RenderPipelineAsset Icon
+      colorIndex: 0
+      isIconRecursive: 0
+      isColorRecursive: 0
+    - iconNameOrGuid: 
+      colorIndex: 5
+      isIconRecursive: 0
+      isColorRecursive: 1
+    - iconNameOrGuid: SceneAsset Icon
+      colorIndex: 1
+      isIconRecursive: 0
+      isColorRecursive: 1
+    - iconNameOrGuid: cs Script Icon
+      colorIndex: 7
+      isIconRecursive: 0
+      isColorRecursive: 1
+    - iconNameOrGuid: Texture Icon
+      colorIndex: 4
+      isIconRecursive: 0
+      isColorRecursive: 1
+    - iconNameOrGuid: AudioClip Icon
+      colorIndex: 2
+      isIconRecursive: 0
+      isColorRecursive: 1
+    - iconNameOrGuid: Prefab Icon
+      colorIndex: 6
+      isIconRecursive: 0
+      isColorRecursive: 1
+    - iconNameOrGuid: Material Icon
+      colorIndex: 9
+      isIconRecursive: 0
+      isColorRecursive: 1
+    - iconNameOrGuid: AnimationClip Icon
+      colorIndex: 3
+      isIconRecursive: 0
+      isColorRecursive: 1
+    - iconNameOrGuid: Font Icon
+      colorIndex: 10
+      isIconRecursive: 0
+      isColorRecursive: 1
+    - iconNameOrGuid: 
+      colorIndex: 8
+      isIconRecursive: 0
+      isColorRecursive: 1
+  bookmarks: []
