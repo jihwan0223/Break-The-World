@@ -16,6 +16,7 @@ public static class SfxPlayer
     private const int QuietFull = 14; // 이 이상이면 최소 볼륨
     private const float MinBusyVolume = 0.45f; // 연타가 가장 심할 때 볼륨 배율
     private const float PitchJitter = 0.06f; // 피치를 ±이만큼 랜덤으로 흔듦
+    private const float BaseVolume = 0.6f; // 오브젝트 타격/부서짐 소리 전체 크기 (설정의 효과음 볼륨에 곱해짐)
 
     public const string VolumeKey = "SfxVolume"; // 효과음 볼륨을 저장할 PlayerPrefs 키 (메인 메뉴 설정과 공유)
 
@@ -62,7 +63,7 @@ public static class SfxPlayer
 
         float busy = Mathf.InverseLerp(QuietStart, QuietFull, _recentPlayTimes.Count); // 0(한가) ~ 1(엄청 연타 중)
         source.pitch = 1f + Random.Range(-PitchJitter, PitchJitter);
-        source.PlayOneShot(clip, Volume * Mathf.Lerp(1f, MinBusyVolume, busy));
+        source.PlayOneShot(clip, BaseVolume * Volume * Mathf.Lerp(1f, MinBusyVolume, busy));
 
         _lastPlayTime[clip] = now;
         _voiceEndTimes.Add(now + Mathf.Min(clip.length / source.pitch, VoiceHoldSeconds));

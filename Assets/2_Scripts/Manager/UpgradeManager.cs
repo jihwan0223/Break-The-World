@@ -47,6 +47,8 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("커서 범위 증가")] CursorRange,          // 커서 범위 반지름 +값 (월드 단위). 범위에 걸친 오브젝트가 한 번에 클릭되고 커서 줍기도 이 범위로 주움
         [InspectorName("커서 타격 해금")] HoverClickUnlock,       // 클릭하지 않아도 커서를 오브젝트에 올려두면 일정 간격으로 계속 때리는 기능 해금 (지형 제외)
         [InspectorName("조각 합치기 (표시용)")] PieceMergeDecoy, // 실제 효과 없음 - 바닥이 차면 조각이 합쳐지는 건 원래 기능인데, 업그레이드로 얻은 것처럼 보이게 하는 노드용
+        [InspectorName("왁스 코팅 해금")] WaxCoatUnlock,          // Target Object Name 지형(책상/도로/아파트)에 왁스를 입힘 - 일반 오브젝트는 처음부터 왁스가 덮여 있음
+        [InspectorName("커서 줍기 층 증가")] HoverPickupLayers,  // 커서 줍기가 한 번에 줍는 파편 층 +값 (0이면 맨 위 파편 1개만, 1 이상이면 커서 밑의 위쪽 그 층 수만큼 전부)
     }
 
     // 선행 노드와 잇는 선의 모양 (UpgradeTreeLink가 이 값을 보고 세그먼트를 배치함)
@@ -78,7 +80,7 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private int baseMaxGroundPieces = 400;       // 바닥 파편 최대 개수 기본값 - GroundPieceCap이 위에 더함
     [SerializeField] private float baseCrystalChance = 0.001f;   // 오브젝트 처치 시 결정 기본 확률 (0.1%) - CrystalChance가 위에 더함
     [SerializeField] private int baseCrystalAmount = 1;          // 결정이 나올 때 기본 개수 - CrystalAmount가 위에 더함
-    [SerializeField] private float hoverPickupBaseRadius = 0.6f; // 커서 줍기를 해금하면 생기는 기본 커서 범위 반지름(월드) - CursorRange가 위에 더함
+    [SerializeField] private float hoverPickupBaseRadius = 0.2f; // 커서 줍기를 해금하면 생기는 기본 커서 범위 반지름(월드) - 마우스 커서보다 살짝 큰 정도. CursorRange가 위에 더함
     [SerializeField] private float baseAutoSweepInterval = 20f;  // 자동 줍기 기본 주기(초)
     [SerializeField] private float minAutoSweepInterval = 3f;    // 자동 줍기 주기 하한
     [SerializeField] private int baseAutoSweepLayers = 1;        // 자동 줍기가 기본으로 쓸어 담는 파편 층 수 (맨 위층부터) - AutoSweepLayers가 위에 더함
@@ -542,6 +544,7 @@ public class UpgradeManager : MonoBehaviour
     public bool AutoSweepIsUnlocked => AnyUnlocked(UpgradeEffect.AutoSweepUnlock);
     // objectIndex(책상/도로)의 "갈라져서 존 전체가 계속 부서지는" 기능을 해금했는지
     public bool ZoneAutoBreakIsUnlockedFor(int objectIndex) => AnyUnlocked(UpgradeEffect.ZoneAutoBreakUnlock, objectIndex);
+    public bool WaxIsUnlockedFor(int objectIndex) => AnyUnlocked(UpgradeEffect.WaxCoatUnlock, objectIndex); // 지형 왁스 코팅 해금 여부
     // objectIndex 오브젝트를 업그레이드로 몇 개 더 배치했는지 (모든 오브젝트 대상 노드 + 그 오브젝트 전용 노드 합산)
     public int ExtraObjectCopies(int objectIndex) =>
         Mathf.RoundToInt(SumEffect(UpgradeEffect.ObjectExtraCopies, -1) + SumEffect(UpgradeEffect.ObjectExtraCopies, objectIndex));
@@ -555,6 +558,9 @@ public class UpgradeManager : MonoBehaviour
         Mathf.Max(minAutoSweepInterval, baseAutoSweepInterval - SumEffect(UpgradeEffect.AutoSweepSpeed));
 
     // 자동 줍기가 한 번 지나갈 때 쓸어 담는 파편 층 수 (1 = 맨 위층만, DebrisPool.LayerCount = 전부)
+    // 커서 줍기가 한 번에 줍는 층 수 - 0이면 커서 밑 맨 위 파편 1개만 (층 업그레이드 전)
+    public int HoverPickupLayerCount => Mathf.Clamp(Mathf.RoundToInt(SumEffect(UpgradeEffect.HoverPickupLayers)), 0, DebrisPool.LayerCount);
+
     public int AutoSweepLayers =>
         Mathf.Clamp(baseAutoSweepLayers + Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoSweepLayers)), 1, DebrisPool.LayerCount);
 

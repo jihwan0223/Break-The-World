@@ -23,6 +23,23 @@ public class ObjectManager : MonoBehaviour
     {
         public Sprite[] healthStages; // 체력 100% -> 0% 순서 (예: Object1, Object1-1, Object1-2, Object1-3)
         // 크기는 코드에서 계산하지 않음 - 각 이미지의 Pixels Per Unit(Import Settings)으로 직접 맞출 것
+        public Color waxColor; // 이 오브젝트를 덮는 왁스 색 (투명도는 무시됨). 비워두면(완전 투명) 기본 파스텔 색
+    }
+
+    // 왁스 색을 안 정한 오브젝트에 쓰는 기본 파스텔 색 (오브젝트 순서대로 돌아가며)
+    private static readonly Color[] DefaultWaxColors =
+    {
+        new Color(1f, 0.72f, 0.78f), new Color(0.68f, 0.85f, 1f), new Color(1f, 0.88f, 0.6f), new Color(0.74f, 0.95f, 0.72f),
+        new Color(0.85f, 0.75f, 1f), new Color(1f, 0.8f, 0.65f), new Color(0.65f, 0.95f, 0.9f), new Color(1f, 0.7f, 0.9f),
+    };
+
+    // index번째 오브젝트의 왁스 색 - 인스펙터 값을 쓸 때마다 읽음 (플레이 중 바꿔도 다음 왁스부터 바로 반영)
+    public Color WaxColorOf(int index)
+    {
+        Color color = objectVisuals != null && index >= 0 && index < objectVisuals.Length ? objectVisuals[index].waxColor : default; // 인스펙터에서 정한 색
+        if (color.a <= 0f) color = DefaultWaxColors[Mathf.Abs(index) % DefaultWaxColors.Length];
+        color.a = 1f;
+        return color;
     }
 
     [SerializeField] private ObjectVisualSet[] objectVisuals; // objects 리스트와 같은 순서/개수로 채워야 함 (15개)

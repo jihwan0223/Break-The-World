@@ -182,6 +182,24 @@ public class DebrisPool : MonoBehaviour
         if (!mouseMoved || top == null) return; // 가만히 둔 커서 밑으로 떨어진 파편은 안 주움
         _hovered.Remove(top);
         Collect(top, true);
+
+        // 커서 줍기 층 업그레이드: 커서 밑 파편 중 위쪽 그 층 수 안에 드는 건 한 번에 전부 주움 (층 나누는 법은 자동 줍기와 같음)
+        int layers = UpgradeManager.Instance.HoverPickupLayerCount; // 한 번에 줍는 층 수 (0이면 위 1개만)
+        if (layers <= 0) return;
+        int layerSize = Mathf.Max(1, Mathf.CeilToInt(MaxGroundPieces / (float)LayerCount)); // 한 층에 들어가는 파편 수
+        long quota = layers >= LayerCount ? long.MaxValue : (long)layers * layerSize; // 위에서부터 이 순위 안의 파편까지 주움
+        int zone = CurrentZone; // 지금 보는 존 (커서로는 이 존 파편만 주움)
+        int rank = 0; // 위에서부터 센 순위 (나중에 떨어진 것이 위)
+        for (int i = _groundPieces.Count - 1; i >= 0; i--)
+        {
+            Piece piece = _groundPieces[i]; // 위에서부터 차례로
+            if (piece.zone != zone) continue;
+            bool inLayers = piece.isCrystal || rank < quota; // 결정은 층과 상관없이 대상
+            if (!piece.isCrystal) rank++;
+            if (!inLayers || !_hoverHits.Contains(piece)) continue;
+            _hovered.Remove(piece);
+            Collect(piece, true);
+        }
     }
 
     // 오브젝트를 부쉈을 때 호출 - reward 조각을 파편 여러 개(최대 maxPiecesPerBreak개)에 나눠 담아 fromPosition에서 zone 바닥으로 떨어뜨림

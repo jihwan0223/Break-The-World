@@ -38,6 +38,7 @@ public class Click : MonoBehaviour
     private float _autoMineTimer; // 자동채굴 업그레이드의 다음 발동까지 누적된 시간(초)
     private float _hoverHitCooldown; // 커서 타격을 다시 넣을 수 있을 때까지 남은 시간(초) - 0 이하면 바로 때릴 수 있음
     private bool _isTerrain; // 존 전체를 부수는 지형(책상/도로/아파트)인지 - 커서 타격 대상에서 뺌
+    private WaxCoating _wax; // 이 오브젝트를 덮은 왁스 (맞을 때 튀는 부스러기 색을 왁스 색으로)
 
     void Start()
     {
@@ -45,6 +46,8 @@ public class Click : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _collider = GetComponent<Collider2D>();
         _isTerrain = GetComponent<ZoneBreaker>() != null;
+        _wax = GetComponent<WaxCoating>(); // HealthSpriteSwitcher가 붙여둠 - 없으면(그림 단계가 없는 오브젝트) 여기서 붙임
+        if (_wax == null && GetComponent<SpriteRenderer>() != null) _wax = gameObject.AddComponent<WaxCoating>();
         _health.OnDied += HandleDied;
 
         // 맞을 때 움찔하는 연출이 안 붙어 있는 오브젝트(책상 등)에도 붙여서, 어떤 오브젝트든 맞는 게 보이게 함
@@ -212,7 +215,9 @@ public class Click : MonoBehaviour
             int objectIndex = ObjIndex; // 부스러기 색을 정할 오브젝트 번호
             Color chipColor = ObjectManager.Instance != null && objectIndex >= 0 && objectIndex < ObjectManager.StaticObjectCount
                 ? ObjectManager.Instance.GetObjectAt(objectIndex).pileColor : Color.white; // 그 오브젝트의 파편 색과 같은 색
+            if (_wax != null && _wax.TryGetChipColor(out Color waxColor)) chipColor = waxColor; // 왁스로 덮여 있으면 왁스 부스러기가 튐
             HitEffects.Play(hitPoint, damage, isCrit || isLucky, chipColor);
+            if (_wax != null) _wax.Hit(hitPoint, (float)damage / Mathf.Max(1, _health.MaxHP)); // 맞은 자리에서 왁스에 금이 뻗어나감
         }
 
         // 콜라이더 테두리 위 랜덤한 지점에 현재 무기 이미지로 타격 연출 재생

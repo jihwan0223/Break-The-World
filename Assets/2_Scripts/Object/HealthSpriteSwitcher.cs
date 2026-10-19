@@ -10,6 +10,14 @@ public class HealthSpriteSwitcher : MonoBehaviour
 
     private SpriteRenderer _spriteRenderer;
     private Health _health;
+    private WaxCoating _wax; // 오브젝트를 덮은 왁스 - 덮여 있는 동안은 오브젝트 그림을 깨진 단계로 안 바꿈 (끝에 한 번에 부서짐)
+
+    void Awake()
+    {
+        // 모든 파괴 오브젝트에 왁스를 자동으로 붙임 (씬의 오브젝트마다 따로 넣지 않아도 되게). Click보다 먼저 붙도록 Awake에서
+        _wax = GetComponent<WaxCoating>();
+        if (_wax == null) _wax = gameObject.AddComponent<WaxCoating>();
+    }
 
     void Start()
     {
@@ -41,6 +49,7 @@ public class HealthSpriteSwitcher : MonoBehaviour
         // 예: 4단계면 100~76% -> 0, 75~51% -> 1, 50~26% -> 2, 25~0% -> 3
         int stageIndex = Mathf.FloorToInt((1f - ratio) * healthStages.Length);
         stageIndex = Mathf.Clamp(stageIndex, 0, healthStages.Length - 1);
+        if (_wax != null && _wax.Covers) stageIndex = 0; // 왁스가 덮고 있으면 안의 오브젝트는 끝까지 멀쩡한 그림
 
         _spriteRenderer.sprite = healthStages[stageIndex];
     }

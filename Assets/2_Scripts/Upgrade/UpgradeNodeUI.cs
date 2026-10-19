@@ -158,6 +158,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.ZoneAutoBreakUnlock:
             case UpgradeManager.UpgradeEffect.HoverClickUnlock:
             case UpgradeManager.UpgradeEffect.PieceMergeDecoy:
+            case UpgradeManager.UpgradeEffect.WaxCoatUnlock:
                 return null; // 해금류는 숫자가 아니라 on/off라 표시 안 함
 
             case UpgradeManager.UpgradeEffect.CritChance:
@@ -191,6 +192,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
                 return $"+{value:0.##}개"; // 더 놓이는 개수
 
             case UpgradeManager.UpgradeEffect.AutoSweepLayers:
+            case UpgradeManager.UpgradeEffect.HoverPickupLayers:
                 return $"+{value:0.##}층"; // 쓸어 담는 층이 늘어나는 효과
 
             case UpgradeManager.UpgradeEffect.ClickDamage:

@@ -9073,7 +9073,7 @@ MonoBehaviour:
   baseMaxGroundPieces: 400
   baseCrystalChance: 0.001
   baseCrystalAmount: 1
-  hoverPickupBaseRadius: 0.6
+  hoverPickupBaseRadius: 0.2
   baseAutoSweepInterval: 20
   minAutoSweepInterval: 3
   baseAutoSweepLayers: 1
@@ -21960,6 +21960,154 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &903961193
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 903961194}
+  - component: {fileID: 903961198}
+  - component: {fileID: 903961197}
+  - component: {fileID: 903961196}
+  - component: {fileID: 903961195}
+  m_Layer: 5
+  m_Name: "186_\uCEE4\uC11C_\uC90D\uAE30_\uCE35_\uC99D\uAC00"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &903961194
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903961193}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1589601379}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 692.82, y: -2800}
+  m_SizeDelta: {x: 240, y: 240}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &903961195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903961193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49ec5c72bee8aec4da8558ac1ac58c2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeNodeUI
+  displayName: "\uCEE4\uC11C \uC90D\uAE30 \uCE35"
+  description: "\uCEE4\uC11C\uB85C \uD55C \uBC88\uC5D0 \uC90D\uB294 \uD30C\uD3B8
+    \uCE35\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+  effect: 34
+  targetWeaponName: 
+  targetObjectName: 
+  maxLevel: 4
+  valuePerLevel:
+  - 1
+  costs:
+  - useCrystals: 1
+    baseAmount: 5
+    levelGrowth: 2
+    firstLevelAmount: 0
+  upgradedSprite: {fileID: 21300000, guid: 72bff74ce100b064abf8ec10dbe83443, type: 3}
+--- !u!114 &903961196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903961193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 903961197}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &903961197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903961193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &903961198
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903961193}
+  m_CullTransparentMesh: 1
 --- !u!1001 &905843441
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23389,6 +23537,63 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
   m_PrefabInstance: {fileID: 2036290517}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &978217349
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 978217350}
+  - component: {fileID: 978217351}
+  m_Layer: 5
+  m_Name: "Link_164_\uCEE4\uC11C_\uC90D\uAE30_\uD574\uAE08_to_186_\uCEE4\uC11C_\uC90D\uAE30_\uCE35_\uC99D\uAC00"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &978217350
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 978217349}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1140785107}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &978217351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 978217349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6760eb25c92123649be66727efa77b94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeTreeLink
+  fromNode: {fileID: 83633460}
+  extraFromNodes: []
+  toNode: {fileID: 903961194}
+  routing: 0
+  thickness: 40
+  bendRatio: 0.5
+  color: {r: 1, g: 1, b: 1, a: 0.5}
+  crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
+  segmentSprite: {fileID: 0}
 --- !u!1 &991703504 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8404562449434951683, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
@@ -27758,6 +27963,7 @@ RectTransform:
   - {fileID: 1862667836}
   - {fileID: 1359352218}
   - {fileID: 54361184}
+  - {fileID: 978217350}
   - {fileID: 1273533534}
   - {fileID: 319306806}
   - {fileID: 658371604}
@@ -36219,6 +36425,7 @@ RectTransform:
   - {fileID: 1843640247}
   - {fileID: 1578222259}
   - {fileID: 608961924}
+  - {fileID: 903961194}
   m_Father: {fileID: 1972268500}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -47802,69 +48009,84 @@ MonoBehaviour:
     - {fileID: 21300000, guid: c64897a5fdfe8054c822834bafa25115, type: 3}
     - {fileID: 21300000, guid: 3729f18d6170ff2408614853ed75a711, type: 3}
     - {fileID: 21300000, guid: 8b68f34a2cf50564783e1b82667a4dc3, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: 92e942978e2e5584c82d296d11eeae78, type: 3}
     - {fileID: 21300000, guid: 9bdfaa37f70a63745a36390172d28e7c, type: 3}
     - {fileID: 21300000, guid: 89e6b07e62b9d68409723b6925b47e5f, type: 3}
     - {fileID: 21300000, guid: 41756f6c744ff704e9537f5bd7e160d2, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: 449a70378ca76d041a9afea5c1cdd735, type: 3}
     - {fileID: 21300000, guid: 1a4e300f6fb127449a8e1c876b7ffabb, type: 3}
     - {fileID: 21300000, guid: 5b725775c120ed64f81e90d30ea2784e, type: 3}
     - {fileID: 21300000, guid: 79dc079cb202ed94797f23e8b0e47edc, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: 4efafbdb776222a429515caa87439d23, type: 3}
     - {fileID: 21300000, guid: 9582be4b6f86c5f4fb1a4c300b8fddda, type: 3}
     - {fileID: 21300000, guid: c28bfeafd5b4cb54ea8aa45f9b9263b6, type: 3}
     - {fileID: 21300000, guid: 336a327e13b5c9d47acad3974dbcece9, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: 8b1e5afcd6b91d54dbffd1da8fe4d4d1, type: 3}
     - {fileID: 21300000, guid: 2231dca4837d49b4c89b3e98f60073b6, type: 3}
     - {fileID: 21300000, guid: c727a50b23e7ff54b954c618bccb5e53, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: f19af129fc3178b41b5609f1eb48ed4c, type: 3}
     - {fileID: 21300000, guid: 26534c42251f48740bbe0e5e73dd5fb6, type: 3}
     - {fileID: 21300000, guid: f3ae045247b60ce41b4d2fb9be6e0293, type: 3}
     - {fileID: 21300000, guid: bb8e6cf7c28da79458ab0a47f10c9722, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: 3b12926fff78f3a4f908758381752906, type: 3}
     - {fileID: 21300000, guid: fae22b6c4a412c04691f324db40a48e6, type: 3}
     - {fileID: 21300000, guid: 42afb587453df4c499f8905cd9578acb, type: 3}
     - {fileID: 21300000, guid: a7d9acd6cc9ae0e45b542a95588e49e6, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: 1f8f56c66b837f248b8d6ff41095894a, type: 3}
     - {fileID: 21300000, guid: f106c5676e4be11489d713e97fedc02a, type: 3}
     - {fileID: 21300000, guid: fd579bd4a77069d42a09c9365e7bcd15, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: fdccf771f31c9c44598f24e005ead3d9, type: 3}
     - {fileID: 21300000, guid: 454d0b32aa5d6884a8d0a1c6939d88d0, type: 3}
     - {fileID: 21300000, guid: e34afba5979e6ed4aa3c3985c3840d4b, type: 3}
     - {fileID: 21300000, guid: 240877b4c5655af41ab716ffe7d4657e, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: fd56242b6748d064db0eb8143e24d697, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: 2343a76020bf35e44a5de8064e64b162, type: 3}
     - {fileID: 21300000, guid: 9004491755a31c64db36df28484e1f61, type: 3}
     - {fileID: 21300000, guid: 2e66e66bd220fe145a439ed13641db11, type: 3}
     - {fileID: 21300000, guid: 5332b6d657fd93447abacd97294a521a, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: 9c5b58c3847fe8d4d8aa13c1ee4b28bd, type: 3}
     - {fileID: 21300000, guid: dcb04c1d67b7a154ba557af05b9272e3, type: 3}
     - {fileID: 21300000, guid: 72487d9774a1a084893a8226bd71cb9b, type: 3}
     - {fileID: 21300000, guid: a392393b71c374a49befd94a56c70696, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: c666050c9d6719e45b19a8ee609b6e9e, type: 3}
     - {fileID: 21300000, guid: 5812dcabb8db2e843bcaa4293a800885, type: 3}
     - {fileID: 21300000, guid: 344f620c2625c7d4e9f84e2564e82598, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: b1034a0a4d592e34dbed355c33f79707, type: 3}
     - {fileID: 21300000, guid: 6d151feb578247e43aecc723ac5b1b1c, type: 3}
     - {fileID: 21300000, guid: f32a24bd1ae929a4292d4c35450573b8, type: 3}
     - {fileID: 21300000, guid: 60f8fe2a330be664d9ec13d6b72af277, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   - healthStages:
     - {fileID: 21300000, guid: aba7de352406de545a038beb0d5b9778, type: 3}
     - {fileID: 21300000, guid: 1240a54f5c6eba943b33b13376145c74, type: 3}
     - {fileID: 21300000, guid: f4cd4294a7ffc474798cb02bb79d71ed, type: 3}
+    waxColor: {r: 0, g: 0, b: 0, a: 0}
   debugUnlockAll: 0
 --- !u!1 &1991812929 stripped
 GameObject:
