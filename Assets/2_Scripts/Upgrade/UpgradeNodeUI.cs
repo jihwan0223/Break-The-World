@@ -250,7 +250,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (!isRevealed) return;
 
         UpdateIcon(UpgradeManager.Instance.GetLevel(Id));
-        NoticeBadge.Set(ref _badge, Rect, UpgradeManager.Instance.CanUpgrade(Id));
+        NoticeBadge.Set(ref _badge, Rect, UpgradeManager.Instance.CanUpgrade(Id), UpgradeManager.Instance.UsesCrystals(Id)); // 결정 노드는 노란 느낌표
         if (justRevealed)
         {
             PlayShake();

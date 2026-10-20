@@ -23,4 +23,16 @@ public static class NumberFormatUtil
     }
 
     public static string Format(int value) => Format((long)value);
+
+    // 가격을 딱 떨어지는 수로 반올림 - 1,000 미만은 5 단위, 그 이상은 앞 세 자리만 남기되 셋째 자리를 0이나 5로 (예: 6 -> 5, 62 -> 60, 1,743 -> 1,750, 77,555 -> 77,500). 최소 5
+    public static long RoundPrice(long value)
+    {
+        if (value <= 0) return value;
+        long step = 5; // 반올림 단위
+        int digits = (int)System.Math.Floor(System.Math.Log10(value)) + 1; // 자릿수
+        for (int d = 4; d <= digits; d++) step *= 10; // 네 자리부터는 앞 세 자리 아래를 버림 (셋째 자리를 0이나 5로)
+        if (step <= 0 || step > long.MaxValue / 2) return value;
+        long rounded = (value + step / 2) / step * step; // 가장 가까운 단위로
+        return System.Math.Max(5L, rounded);
+    }
 }

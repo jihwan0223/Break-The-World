@@ -16,9 +16,15 @@ public class Health : MonoBehaviour
 
     private int maxHP; // weaponTier/objectIndexInTier(×hpMultiplier)로부터 자동 계산된 최대 체력
 
-    // 계산된 기본 체력에 배수를 곱해 반올림
+    private const float GlobalHpScale = 3f; // 모든 오브젝트(지형 포함) 체력에 곱하는 배율 - 해금하고 부수는 속도가 너무 빨라서 3배로 올림
+
+    // 맵(무기 티어 2개씩)마다 체력에 곱하는 배율 - 다음 맵 첫 오브젝트가 앞 맵 지형(책상/도로)보다 단단하게
+    private static readonly float[] MapHpScale = { 1f, 2f, 4f };
+
+    // 계산된 기본 체력에 배수, 맵 배율, 전체 배율을 곱해 반올림
     public static int ComputeMaxHP(int tier, int indexInTier, float multiplier) =>
-        Mathf.Max(1, Mathf.RoundToInt(ObjectHealthCalculator.Calculate(tier, indexInTier) * multiplier));
+        Mathf.Max(1, Mathf.RoundToInt(ObjectHealthCalculator.Calculate(tier, indexInTier) * multiplier
+            * MapHpScale[Mathf.Clamp((tier - 1) / 2, 0, MapHpScale.Length - 1)] * GlobalHpScale));
 
     public int MaxHP => maxHP;
     public int CurrentHP { get; private set; }

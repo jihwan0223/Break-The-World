@@ -126,6 +126,7 @@ public class UpgradeManager : MonoBehaviour
                     ? costs[i].firstLevelAmount // 첫 레벨만 따로 싸게 정한 비용
                     : costs[i].baseAmount * System.Math.Pow(costs[i].levelGrowth, currentLevel);
                 long amount = raw >= long.MaxValue ? long.MaxValue : (long)System.Math.Max(1d, raw);
+                if (!costs[i].isCrystal) amount = NumberFormatUtil.RoundPrice(amount); // 조각 가격은 딱 떨어지는 수로 (결정은 개수가 작아서 그대로)
                 result[i] = new PieceCost(amount, costs[i].isCrystal);
             }
             return result;
@@ -299,16 +300,28 @@ public class UpgradeManager : MonoBehaviour
             && CurrencyManager.Instance.CanAfford(node.CostForLevel(level));
     }
 
-    // 트리 안에 지금 살 수 있는 노드가 하나라도 있는지 (일반 노드 + 오브젝트 해금/획득 노드) - 업그레이드 버튼 느낌표용.
+    // 트리 안에 지금 살 수 있는 노드가 하나라도 있는지 - 업그레이드 버튼 느낌표용.
+    // crystal이면 결정으로 사는 노드만, 아니면 조각으로 사는 노드(일반 노드 + 오브젝트 해금/획득 노드)만 봄.
     // 트리 화면을 한 번도 안 열어도(노드들이 꺼져 있어도) 판단할 수 있게 여기서 직접 훑음
-    public bool AnyUpgradeAvailable()
+    public bool AnyUpgradeAvailable(bool crystal)
     {
         foreach (UpgradeNode node in _nodes)
-            if (CanUpgrade(node.id)) return true;
+            if (UsesCrystals(node.id) == crystal && CanUpgrade(node.id)) return true;
 
-        foreach (ObjectEconomyNodeUI node in _economyNodes)
-            if (node != null && node.CanBuy()) return true;
+        if (!crystal)
+            foreach (ObjectEconomyNodeUI node in _economyNodes)
+                if (node != null && node.CanBuy()) return true;
 
+        return false;
+    }
+
+    // 결정으로 사는 노드인지 (비용 줄 중 하나라도 결정이면)
+    public bool UsesCrystals(string nodeId)
+    {
+        UpgradeNode node = GetNode(nodeId);
+        if (node == null || node.costs == null) return false;
+        foreach (var cost in node.costs)
+            if (cost.isCrystal) return true;
         return false;
     }
 

@@ -51,6 +51,8 @@ public class WaxCoating : MonoBehaviour
     private float[] _crackAt; // 조각 경계 칸이 미리 금으로 보이기 시작하는 깎인 비율 (경계가 아니면 2)
     private byte[] _crack; // 칸별 금 상태 - 0 없음, 1 실금, 2 벌어진 틈 (맞은 자리에서 뻗어나가며 쌓임)
     private bool _dirty; // 새 금이 생겨서 다시 그려야 하는지
+    private int[] _rayStamp; // 칸별로 마지막에 칠한 금 줄기 번호 - 두껍게 칠한 자기 줄기를 다른 금으로 착각해 멈추지 않게
+    private int _rayId; // 지금 그리는 금 줄기 번호
     private float[] _chunkAt; // 칸별로 떨어져 나가는 깎인 비율 (안 떨어지면 2)
     private float _shownDamage = -1f; // 마지막으로 그린 깎인 비율 - 같으면 다시 안 그림
     private bool _broken; // 부서져서 왁스가 사라진 상태인지
@@ -178,6 +180,7 @@ public class WaxCoating : MonoBehaviour
         _wax.sprite = Sprite.Create(_texture, new Rect(0, 0, _shape.width, _shape.height), _shape.pivot, _shape.pixelsPerUnit, 0, SpriteMeshType.FullRect); // 그림이 계속 바뀌므로 투명 부분을 잘라내는 Tight 모양을 쓰면 안 됨
 
         _crack = new byte[count];
+        _rayStamp = new int[count];
         _dirty = true;
         PlanChunks();
     }
@@ -206,7 +209,15 @@ public class WaxCoating : MonoBehaviour
             float angle = baseAngle + r * Mathf.PI * 2f / rays + Random.Range(-0.4f, 0.4f); // 고르게 퍼지되 살짝 흐트러진 방향
             CrackRay(start % w + 0.5f, start / w + 0.5f, angle, Mathf.RoundToInt(reach * Random.Range(0.5f, 1.1f)), open, 1);
         }
-        _crack[start] = (byte)(open ? 2 : 1); // 맞은 점
+        // 맞은 점은 둥글게 패임
+        int sx = start % w, sy = start / w; // 맞은 칸 위치
+        for (int dy = -1; dy <= 1; dy++)
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                int nx = sx + dx, ny = sy + dy; // 둘레 칸
+                if (nx >= 0 && ny >= 0 && nx < w && ny < _shape.height && _shape.mask[ny * w + nx])
+                    _crack[ny * w + nx] = (byte)Mathf.Max(_crack[ny * w + nx], open ? 2 : 1);
+            }
         _dirty = true;
     }
 
@@ -214,6 +225,7 @@ public class WaxCoating : MonoBehaviour
     private void CrackRay(float x, float y, float angle, int length, bool open, int branches)
     {
         int w = _shape.width, h = _shape.height; // 칸 수
+        int ray = ++_rayId; // 이 줄기 번호
         for (int step = 1; step <= length; step++)
         {
             angle += Random.Range(-0.35f, 0.35f);
@@ -222,10 +234,22 @@ public class WaxCoating : MonoBehaviour
             if (x < 0 || y < 0 || x >= w || y >= h) return;
             int cell = (int)y * w + (int)x; // 지금 칸
             if (!_shape.mask[cell]) return;
-            if (_crack[cell] > 0 && step > 2 && Random.value < 0.75f) return; // 다른 금에 닿으면 거기서 이어지고 멈춤
+            if (_crack[cell] > 0 && _rayStamp[cell] != ray && step > 2 && Random.value < 0.75f) return; // 다른 금에 닿으면 거기서 이어지고 멈춤
 
             bool wide = open && step < length * 0.4f; // 시작 부분은 벌어진 틈
-            _crack[cell] = (byte)Mathf.Max(_crack[cell], wide ? 2 : 1);
+            float progress = (float)step / length; // 줄기 끝으로 갈수록 1
+            int thickness = progress > 0.8f ? 1 : wide ? 3 : 2; // 금 굵기(칸) - 끝으로 갈수록 가늘어짐
+            float px = -Mathf.Sin(angle), py = Mathf.Cos(angle); // 진행 방향에 수직인 방향 (굵기를 이쪽으로 칠함)
+            for (int k = 0; k < thickness; k++)
+            {
+                float offset = k - (thickness - 1) * 0.5f; // 가운데 기준 옆으로 몇 칸
+                int bx = Mathf.FloorToInt(x + px * offset), by = Mathf.FloorToInt(y + py * offset); // 칠할 칸
+                if (bx < 0 || by < 0 || bx >= w || by >= h) continue;
+                int brush = by * w + bx; // 칠할 칸 번호
+                if (!_shape.mask[brush]) continue;
+                _crack[brush] = (byte)Mathf.Max(_crack[brush], wide ? 2 : 1);
+                _rayStamp[brush] = ray;
+            }
             if (branches > 0 && step > 2 && Random.value < 0.08f)
                 CrackRay(x, y, angle + Random.Range(0.5f, 1.1f) * (Random.value < 0.5f ? -1f : 1f), (length - step) / 2, false, branches - 1);
         }
@@ -333,13 +357,15 @@ public class WaxCoating : MonoBehaviour
             else if (edge) { color *= 0.9f; } // 가장자리는 아주 살짝만 진하게 (딱딱한 윤곽선 없이 부드럽게)
 
             int crack = CrackAt(cell, damage); // 이 칸의 금 (0 없음, 1 실금, 2 벌어진 틈)
-            if (crack == 2) { color = _color * 0.38f; alpha = 1f; } // 벌어진 틈: 안쪽 그늘이 보이게 진하게
-            else if (crack == 1) { color = _color * 0.58f; alpha = 1f; } // 실금: 가늘고 어두운 선
+            // 왁스 금은 하얗게 질린 선 + 그 아래/오른쪽에 살짝 진 그림자로 갈라진 단차가 보이게 그림
+            if (crack == 2) { color = Color.Lerp(_color, Color.white, 0.55f); alpha = 1f; } // 벌어진 틈: 하얗게 질린 넓은 금
+            else if (crack == 1) { color = Color.Lerp(_color, Color.white, 0.68f); alpha = 1f; } // 실금: 더 하얗고 가는 금
             else
             {
-                int near = Mathf.Max(Mathf.Max(x > 0 ? CrackAt(cell - 1, damage) : 0, x < w - 1 ? CrackAt(cell + 1, damage) : 0),
-                                     Mathf.Max(y > 0 ? CrackAt(cell - w, damage) : 0, y < h - 1 ? CrackAt(cell + w, damage) : 0)); // 바로 옆 칸의 금
-                if (near > 0) color = Color.Lerp(color, Color.white, near == 2 ? 0.4f : 0.28f); // 금 둘레는 하얗게 질림 (왁스가 휘면서 생기는 응력 자국)
+                bool shadow = (x > 0 && CrackAt(cell - 1, damage) > 0) || (y < h - 1 && CrackAt(cell + w, damage) > 0); // 금의 오른쪽/아래 칸 - 갈라진 턱이 그늘짐
+                bool rim = (x < w - 1 && CrackAt(cell + 1, damage) > 0) || (y > 0 && CrackAt(cell - w, damage) > 0); // 금의 왼쪽/위 칸 - 빛 받는 턱
+                if (shadow) color *= 0.8f;
+                else if (rim) color = Color.Lerp(color, Color.white, 0.22f);
             }
 
             float spec = _shape.specular[cell]; // 반짝임

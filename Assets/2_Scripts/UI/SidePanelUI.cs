@@ -32,7 +32,8 @@ public class SidePanelUI : MonoBehaviour
     private VisualElement _buttonRow; // 우상단 Upgrade/Weapon/Object 버튼 줄 - 셋 중 아무거나 하나라도 열려있으면 전부 숨김
     private bool _upgradeTreeOpen; // Canvas 업그레이드 화면이 지금 열려있는지 (UpgradeTreeUI.OnTreeToggled로 갱신됨)
 
-    private VisualElement _upgradeBadge; // 업그레이드 버튼의 느낌표 - 지금 살 수 있는 노드가 있을 때만 보임
+    private VisualElement _upgradeBadge; // 업그레이드 버튼의 빨간 느낌표 - 조각으로 살 수 있는 노드가 있을 때만 보임
+    private VisualElement _crystalBadge; // 업그레이드 버튼의 노란 느낌표 - 결정으로 살 수 있는 노드가 있을 때만 보임 (빨간 느낌표 대신 같은 자리에)
     private VisualElement _weaponBadge; // 무기 버튼의 느낌표 - 지금 해금할 수 있는 무기가 있을 때만 보임
     private float _badgeTimer; // 느낌표를 다시 판단할 때까지 남은 시간(초)
     private const float BadgeRefreshInterval = 0.25f; // 느낌표 판단 주기(초) - 매 프레임 트리 전체를 훑지 않게
@@ -84,14 +85,17 @@ public class SidePanelUI : MonoBehaviour
         if (_badgeTimer > 0f || _buttonRow == null || _buttonRow.style.display == DisplayStyle.None) return;
         _badgeTimer = BadgeRefreshInterval;
 
-        bool upgrade = UpgradeManager.Instance != null && UpgradeManager.Instance.AnyUpgradeAvailable(); // 살 수 있는 노드가 있는지
+        bool upgrade = UpgradeManager.Instance != null && UpgradeManager.Instance.AnyUpgradeAvailable(false); // 조각으로 살 수 있는 노드가 있는지
+        bool crystal = UpgradeManager.Instance != null && UpgradeManager.Instance.AnyUpgradeAvailable(true); // 결정으로 살 수 있는 노드가 있는지
         bool weapon = WeaponManager.Instance != null && WeaponManager.Instance.AnyUnlockAffordable(); // 해금할 수 있는 무기가 있는지
-        _upgradeBadge.style.display = upgrade ? DisplayStyle.Flex : DisplayStyle.None;
+        // 느낌표는 하나만: 결정으로 살 수 있으면 노란 느낌표가 빨간 느낌표 대신 뜸
+        _upgradeBadge.style.display = upgrade && !crystal ? DisplayStyle.Flex : DisplayStyle.None;
+        _crystalBadge.style.display = crystal ? DisplayStyle.Flex : DisplayStyle.None;
         _weaponBadge.style.display = weapon ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
-    // 버튼 오른쪽 위에 붙는 느낌표 (처음엔 숨김) - 트리 노드의 느낌표와 같은 그림
-    private static VisualElement CreateBadge()
+    // 버튼 오른쪽 위에 붙는 느낌표 (처음엔 숨김) - 트리 노드의 느낌표와 같은 그림. crystal이면 노란 느낌표
+    private static VisualElement CreateBadge(bool crystal = false)
     {
         var badge = new VisualElement();
         badge.pickingMode = PickingMode.Ignore; // 버튼 클릭을 가로채지 않게
@@ -100,7 +104,7 @@ public class SidePanelUI : MonoBehaviour
         badge.style.right = 4; // 옆 버튼에 가려지지 않게 버튼 안쪽에 둠
         badge.style.width = 48; // 16px 그림의 3배
         badge.style.height = 48;
-        badge.style.backgroundImage = new StyleBackground(NoticeBadge.Sprite);
+        badge.style.backgroundImage = new StyleBackground(crystal ? NoticeBadge.CrystalSprite : NoticeBadge.Sprite);
         badge.style.display = DisplayStyle.None;
         return badge;
     }
@@ -219,6 +223,8 @@ public class SidePanelUI : MonoBehaviour
 
         _upgradeBadge = CreateBadge();
         upgradeButton.Add(_upgradeBadge);
+        _crystalBadge = CreateBadge(crystal: true);
+        upgradeButton.Add(_crystalBadge);
         _weaponBadge = CreateBadge();
         weaponButton.Add(_weaponBadge);
 

@@ -55,19 +55,19 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(1, 2, "유리컵", new Color(0.93f, 0.95f, 0.96f)),
         new ObjectData(1, 3, "화분", new Color(0.80f, 0.42f, 0.25f)),
         new ObjectData(2, 1, "계산기", new Color(0.01f, 0.18f, 0.23f)),
-        new ObjectData(2, 2, "책상", new Color(0.55f, 0.38f, 0.22f)) { hpMultiplier = 7f }, // ★ -> 존2
+        new ObjectData(2, 2, "책상", new Color(0.55f, 0.38f, 0.22f)) { hpMultiplier = 9f }, // ★ -> 존2 (체력 720 = 계산기의 10배)
         // --- 존2: 길거리 (곡괭이 t3 / 전동드릴 t4) ---
         new ObjectData(3, 1, "가로등", new Color(0.23f, 0.24f, 0.35f)),
         new ObjectData(3, 2, "자전거", new Color(0.23f, 0.24f, 0.30f)),
         new ObjectData(3, 3, "가로수", new Color(0.24f, 0.59f, 0.32f)),
         new ObjectData(4, 1, "자동차", new Color(0.70f, 0.69f, 0.71f)),
-        new ObjectData(4, 2, "도로", new Color(0.62f, 0.60f, 0.58f)) { hpMultiplier = 2f }, // ★ -> 존3
+        new ObjectData(4, 2, "도로", new Color(0.62f, 0.60f, 0.58f)) { hpMultiplier = 17600f / 1800f }, // ★ -> 존3 (체력 17,600 = 자동차의 10배)
         // --- 존3: 공사장 / 건물 (유압 브레이커 t5 / 다이너마이트 t6) ---
         new ObjectData(5, 1, "컨테이너 박스", new Color(0.72f, 0.22f, 0.16f)),
         new ObjectData(5, 2, "포크레인", new Color(0.85f, 0.70f, 0.20f)),
         new ObjectData(5, 3, "타워 크레인", new Color(0.92f, 0.58f, 0.10f)),
         new ObjectData(6, 1, "철구 크레인", new Color(0.90f, 0.68f, 0.15f)),
-        new ObjectData(6, 2, "아파트", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 2f }, // ★ 데모 마지막 (아파트 이후 우주 맵은 데모에서 뺌)
+        new ObjectData(6, 2, "아파트", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 163500f / 37000f }, // ★ 데모 마지막 (체력 163,500 = 다이너마이트 풀업 + 전역 강화 + 치명타 풀업 한 방)
     };
 
     private int equippedIndex; // 실제로 선택된 오브젝트의 objects 리스트 인덱스 (0부터 시작)
@@ -83,10 +83,11 @@ public class ObjectManager : MonoBehaviour
     // ---- 오브젝트 해금 시스템 ----
     // 오브젝트는 앞 오브젝트부터 순서대로 조각으로 해금해야 장착 가능. 0번(Plate)은 처음부터 해금된 상태로 시작
     private bool[] _unlocked;
-    // 해금 비용 = 직전 오브젝트를 몇 번 부숴야 하는지로 맞춤. 보상이 4.5배씩 늘 때 비용은 4.88배씩 늘어서
-    // 필요한 부수기 횟수가 유리컵 15번부터 오브젝트마다 조금씩 늘어남 (무기 해금 비용도 이 곡선을 따라감)
-    public const long UnlockCostBase = 15;
-    public const float UnlockCostGrowth = 4.88f;
+    // 해금 비용 = 직전 오브젝트의 기본 파편(강화 전) x 부숴야 하는 횟수 (무기 해금 비용도 이걸 따라감)
+    // 횟수는 방치형 게임 흔한 방식처럼 오브젝트마다 일정 배율로 곱해져 올라감 (Start x Growth^(index-1))
+    private const double UnlockBreaksStart = 25; // 유리컵을 열려면 접시(강화 전 파편 기준)를 이만큼 부숴야 함
+    private const double UnlockBreaksGrowth = 1.15; // 뒤 오브젝트로 갈 때마다 부숴야 하는 횟수에 곱해지는 배율 (아파트는 철구 크레인 약 154번)
+    public const long UnlockCostBase = 15; // 획득량 증가(Gain) 비용 계산의 기준 횟수
 
     // 오브젝트가 새로 해금될 때 (objectIndex) 전달 - Object 선택 UI 등이 구독
     public event Action<int> OnUnlockChanged;
@@ -229,9 +230,9 @@ public class ObjectManager : MonoBehaviour
     // 기본 보상이 고정값(예: 1개)이면 콤보/업그레이드 배율을 아무리 곱해도(배율은 곱셈일 뿐 밑변이 1이면 그대로
     // 작은 수) 후반 티어 가격을 절대 못 따라잡음. 그래서 기본 보상도 오브젝트 티어마다 기하급수적으로 커지게 함.
     private const long BaseRewardStart = 1; // 0번 오브젝트 기본 보상
-    private const float BaseRewardGrowth = 4.5f; // 같은 맵 안에서 오브젝트 하나 넘어갈 때마다 곱해지는 배율
+    private const float BaseRewardGrowth = 4.5f; // 맵1(접시~책상)에서 오브젝트 하나 넘어갈 때마다 곱해지는 배율
     private const int ObjectsPerMap = 5; // 맵 하나에 들어있는 오브젝트 수 (접시~책상 / 가로등~도로 / 컨테이너 박스~아파트)
-    private const float MapRewardJump = 5.42f; // 다음 맵으로 넘어가는 순간 추가로 곱해지는 배율 - 새 맵을 열면 확 많이 들어오는 느낌용 (가로등 기본 보상 = 1845 x 5.42 = 약 10,000)
+    private const float LaterRewardGrowth = 2f; // 맵2부터 오브젝트 하나 넘어갈 때마다 곱해지는 배율 - 맵 넘어갈 때 파편이 확 뛰지 않게 (가로등 820)
 
     public long GetBaseReward(int index) => Math.Max(1L, (long)RawBaseReward(index));
 
@@ -239,17 +240,17 @@ public class ObjectManager : MonoBehaviour
     private static double RawBaseReward(int index)
     {
         int safeIndex = Mathf.Max(0, index); // 음수 방지
-        return BaseRewardStart * Math.Pow(BaseRewardGrowth, safeIndex) * Math.Pow(MapRewardJump, safeIndex / ObjectsPerMap);
+        int map1Steps = Math.Min(safeIndex, ObjectsPerMap - 1); // 맵1 안에서 넘어간 횟수 (책상까지 최대 4)
+        return BaseRewardStart * Math.Pow(BaseRewardGrowth, map1Steps) * Math.Pow(LaterRewardGrowth, safeIndex - map1Steps);
     }
 
     // index번째 오브젝트를 해금하는 데 필요한 조각 개수 (0번은 비용 없음 - 처음부터 해금)
     public long GetUnlockCost(int index)
     {
         if (index <= 0) return 0;
-        // 바로 앞 오브젝트를 몇 번 부숴야 살 수 있는지(15번에서 시작해 오브젝트마다 약 8%씩 늘어남) x 앞 오브젝트의 기본 보상.
-        // 보상이 맵 경계에서 확 뛰어도 "부숴야 하는 횟수"는 일정하게 유지됨
-        double breaksNeeded = UnlockCostBase * Math.Pow(UnlockCostGrowth / BaseRewardGrowth, index - 1); // 앞 오브젝트를 부숴야 하는 횟수
-        return (long)(breaksNeeded * RawBaseReward(index - 1));
+        // 가격은 강화와 상관없이 고정. 드랍량/획득량/데미지/자동 클릭을 강화할수록 같은 가격을 더 빨리 모음
+        double breaksNeeded = UnlockBreaksStart * Math.Pow(UnlockBreaksGrowth, index - 1); // 앞 오브젝트를 (강화 전 기준) 부숴야 하는 횟수
+        return NumberFormatUtil.RoundPrice((long)(breaksNeeded * RawBaseReward(index - 1))); // 딱 떨어지는 가격으로
     }
 
     // 조각으로 index번째 오브젝트를 해금 시도.
@@ -289,7 +290,7 @@ public class ObjectManager : MonoBehaviour
         if (level >= MaxGainLevel) return -1;
 
         double levelFactor = Math.Pow(GainCostGrowthPerLevel, level); // 레벨이 오를수록 비싸지는 배율
-        return (long)(GetUnlockCost(index) * (GainCostBase / (double)UnlockCostBase) * levelFactor); // 그 오브젝트 해금 비용의 약 절반에서 시작
+        return NumberFormatUtil.RoundPrice((long)(GetUnlockCost(index) * (GainCostBase / (double)UnlockCostBase) * levelFactor)); // 그 오브젝트 해금 비용의 약 절반에서 시작 (딱 떨어지는 가격으로)
     }
 
     // index번째 오브젝트가 파괴될 때마다 추가로 더 얻는 조각 개수 (획득량 증가 업그레이드 보너스)
