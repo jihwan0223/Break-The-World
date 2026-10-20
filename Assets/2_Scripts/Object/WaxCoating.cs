@@ -22,6 +22,7 @@ public class WaxCoating : MonoBehaviour
     private const float OpenCracksAt = 0.45f; // 체력이 이만큼 깎인 뒤에 생기는 금은 시작 부분이 벌어진 틈으로 보임
     private const int ChunkCount = 9; // 왁스를 나누는 조각 수 (떨어져 나가는 단위)
     private const int ShatterPieces = 16; // 부서질 때 튀는 왁스 파편 수
+    private const int MaxChunkPlans = 4; // 그림마다 미리 만들어 두는 조각 나눔 수 (이 수만큼 만든 뒤로는 그중 하나를 골라 씀)
 
     // 오브젝트 그림 하나에서 뽑아낸 왁스 모양 (같은 그림을 쓰는 오브젝트끼리 공유)
     private class Shape
@@ -32,11 +33,15 @@ public class WaxCoating : MonoBehaviour
         public float[] diffuse; // 칸별 빛 받는 정도 (볼록한 면의 방향으로 계산)
         public float[] specular; // 칸별 반짝이는 정도 (매끈한 왁스 표면의 하이라이트)
         public Color[] inside; // 칸별로 왁스 너머 흐릿하게 비치는 안쪽 오브젝트 색 (a = 비치는 양)
+        public bool[] solid; // 오브젝트 그림이 있는 칸 (오브젝트 금은 여기에만)
+        public Color[] objectColor; // 칸별 오브젝트 그림 색 (번지기 전) - 오브젝트 금 색을 정할 때 씀
         public float pixelsPerUnit; // 왁스 그림의 Pixels Per Unit (칸 하나 = 오브젝트 그림 몇 픽셀)
         public Vector2 pivot; // 오브젝트 그림과 같은 자리에 겹치도록 맞춘 기준점 (0~1)
+        public readonly List<(float[] chunkAt, float[] crackAt, float[] fallAt)> plans = new List<(float[] chunkAt, float[] crackAt, float[] fallAt)>(); // 미리 만들어 둔 조각 나눔 (다시 덮을 때마다 새로 계산하면 느려서 몇 개만 만들고 돌려 씀)
+        public float scaleY; // 왁스 그림의 세로 배율 - 칸이 가로세로 다른 픽셀 수일 때(오브젝트를 한쪽으로만 늘린 경우) 칸이 화면에서 정사각형이 되게
     }
 
-    private static readonly Dictionary<(Sprite, int), Shape> _shapes = new Dictionary<(Sprite, int), Shape>(); // 그림+칸 크기별 왁스 모양 캐시
+    private static readonly Dictionary<(Sprite, Vector2Int), Shape> _shapes = new Dictionary<(Sprite, Vector2Int), Shape>(); // 그림+칸 크기별 왁스 모양 캐시
     private static ParticleSystem _shatter; // 부서질 때 왁스 파편을 뿌리는 공용 파티클
 
     private SpriteRenderer _object; // 안쪽 오브젝트 그림
@@ -46,28 +51,49 @@ public class WaxCoating : MonoBehaviour
     private SpriteRenderer _wax; // 왁스 그림 (자식 오브젝트)
     private Texture2D _texture; // 왁스 그림 픽셀
     private Color32[] _pixels; // 왁스 그림 픽셀 작업 공간
+    private SpriteRenderer _objectCracks; // 오브젝트 위(왁스 아래)에 그리는 오브젝트 금 (자식 오브젝트) - 왁스가 떨어져 나간 자리로 보임
+    private Texture2D _crackTexture; // 오브젝트 금 그림 픽셀
+    private Color32[] _crackPixels; // 오브젝트 금 그림 픽셀 작업 공간
     private Shape _shape; // 지금 오브젝트 그림에 맞춘 왁스 모양
     private Sprite _shapeSprite; // 왁스 모양을 만든 오브젝트 그림 - 그림이 바뀌면(가운데 오브젝트 교체 등) 다시 만듦
     private float[] _crackAt; // 조각 경계 칸이 미리 금으로 보이기 시작하는 깎인 비율 (경계가 아니면 2)
     private byte[] _crack; // 칸별 금 상태 - 0 없음, 1 실금, 2 벌어진 틈 (맞은 자리에서 뻗어나가며 쌓임)
-    private bool _dirty; // 새 금이 생겨서 다시 그려야 하는지
+    private bool _dirty; // 왁스 그림 전체를 다시 그려야 하는지 (새로 덮었거나 금이 다 지워졌을 때)
+    private bool _cracksDirty; // 오브젝트 금 그림 전체를 다시 그려야 하는지
+    private RectInt _hitRect; // 새 금이 생긴 범위(칸) - 맞을 때는 그 둘레만 다시 그림 (책상처럼 큰 그림을 통째로 다시 그리면 렉)
+    private bool _hasHitRect; // _hitRect에 다시 그릴 곳이 있는지
+    private float[] _fallAt; // 지금 조각 나눔의 조각별 떨어지는 깎인 비율 - 체력이 이 값을 지날 때만 그림이 바뀜
+    private bool _noCracks = true; // 아직 금이 하나도 없는지 (금 없고 체력이 꽉 찬 왁스는 늘 같은 그림이라 저장해 둔 걸 씀)
+    private Color32[] _pristine; // 금 없는 온전한 왁스 그림 (존을 오갈 때/다시 덮을 때 큰 그림을 매번 계산하지 않게)
+    private Color[] _baseColors; // 칸별 왁스 기본 색 (음영/결/비침까지 - 금/가장자리 처리 전). 모양/색이 같으면 계속 씀
+    private float[] _baseAlphas; // 칸별 왁스 기본 불투명도
+    private Shape _baseShape; // _baseColors를 만든 모양
+    private Color _baseColor; // _baseColors를 만든 왁스 색
     private int[] _rayStamp; // 칸별로 마지막에 칠한 금 줄기 번호 - 두껍게 칠한 자기 줄기를 다른 금으로 착각해 멈추지 않게
     private int _rayId; // 지금 그리는 금 줄기 번호
     private float[] _chunkAt; // 칸별로 떨어져 나가는 깎인 비율 (안 떨어지면 2)
     private float _shownDamage = -1f; // 마지막으로 그린 깎인 비율 - 같으면 다시 안 그림
     private bool _broken; // 부서져서 왁스가 사라진 상태인지
     private Color _color = Color.white; // 이 오브젝트의 왁스 색
-    private float _baseScale; // 시작할 때의 월드 크기 배율 - 도트 크기 계산 기준
+    private Vector2 _baseScale; // 시작할 때의 월드 크기 배율(가로, 세로) - 도트 크기 계산 기준
 
     // 플레이를 새로 시작할 때 모양 캐시를 비움 (플레이 시작 때 스크립트를 다시 불러오지 않는 설정이라, 그 사이 그림을 다시 불러왔으면 옛 모양이 남음)
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetCache() => _shapes.Clear();
 
     // 지금 왁스가 오브젝트를 덮고 있는지 (HealthSpriteSwitcher가 깨진 단계 그림을 안 쓰는 데 씀)
-    public bool Covers => enabled && (!_isTerrain || TerrainUnlocked);
+    public bool Covers => enabled && !NoWax && (!_isTerrain || TerrainUnlocked);
+
+    // 왁스를 안 덮는 오브젝트(ObjectManager noWax)인지 - 왁스는 없어도 맞으면 오브젝트에 금은 감
+    private bool NoWax => ObjectManager.Instance != null && ObjectManager.Instance.NoWaxOf(ObjectIndex);
+    // 맞으면 금이 가는지 (왁스가 덮고 있거나, 왁스 없는 오브젝트)
+    private bool Cracks => enabled && (NoWax || Covers);
 
     private int ObjectIndex => _click != null ? _click.ObjectIndex : -1;
-    private bool TerrainUnlocked => UpgradeManager.Instance != null && UpgradeManager.Instance.WaxIsUnlockedFor(ObjectIndex);
+    private static readonly int[] WaxOnUnlockTerrain = { 4, 9 }; // 해금 노드를 사면 바로 왁스가 덮이는 지형 (책상, 도로)
+    private bool TerrainUnlocked =>
+        (UpgradeManager.Instance != null && UpgradeManager.Instance.WaxIsUnlockedFor(ObjectIndex))
+        || (System.Array.IndexOf(WaxOnUnlockTerrain, ObjectIndex) >= 0 && ObjectManager.Instance != null && ObjectManager.Instance.IsUnlocked(ObjectIndex));
 
     // 맞을 때 튀는 파편 색 - 왁스가 덮고 있으면 왁스 색 (Click이 씀)
     public bool TryGetChipColor(out Color color)
@@ -82,13 +108,19 @@ public class WaxCoating : MonoBehaviour
         _health = GetComponent<Health>();
         _click = GetComponent<Click>();
         _isTerrain = GetComponent<ZoneBreaker>() != null;
-        _baseScale = Mathf.Abs(transform.lossyScale.y);
+        _baseScale = new Vector2(Mathf.Abs(transform.lossyScale.x), Mathf.Abs(transform.lossyScale.y));
 
         var waxObject = new GameObject("Wax"); // 왁스 그림을 그릴 자식
         waxObject.transform.SetParent(transform, false);
         _wax = waxObject.AddComponent<SpriteRenderer>();
         _wax.sharedMaterial = _object.sharedMaterial;
         _wax.enabled = false;
+
+        var cracksObject = new GameObject("ObjectCracks"); // 오브젝트 금을 그릴 자식
+        cracksObject.transform.SetParent(transform, false);
+        _objectCracks = cracksObject.AddComponent<SpriteRenderer>();
+        _objectCracks.sharedMaterial = _object.sharedMaterial;
+        _objectCracks.enabled = false;
     }
 
     void OnEnable()
@@ -102,19 +134,22 @@ public class WaxCoating : MonoBehaviour
         _health.OnDamaged -= HandleDamaged;
         _health.OnDied -= HandleDied;
         if (_wax != null) _wax.enabled = false;
+        if (_objectCracks != null) _objectCracks.enabled = false;
     }
 
     void OnDestroy()
     {
         if (_texture != null) Destroy(_texture);
         if (_wax != null && _wax.sprite != null) Destroy(_wax.sprite);
+        if (_crackTexture != null) Destroy(_crackTexture);
+        if (_objectCracks != null && _objectCracks.sprite != null) Destroy(_objectCracks.sprite);
     }
 
     private void HandleDamaged(int current, int max)
     {
         if (max <= 0) return;
         if (current >= max && _broken) Recoat(); // 다시 살아나 체력이 꽉 찼으면 새 왁스로 덮음
-        else if (current >= max && _crack != null) { System.Array.Clear(_crack, 0, _crack.Length); _dirty = true; } // 체력이 다시 꽉 차면(존을 다시 볼 때) 금도 없어짐
+        else if (current >= max && _crack != null) { System.Array.Clear(_crack, 0, _crack.Length); _dirty = _cracksDirty = _noCracks = true; } // 체력이 다시 꽉 차면(존을 다시 볼 때) 금도 없어짐
         Redraw(1f - (float)current / max);
     }
 
@@ -129,31 +164,47 @@ public class WaxCoating : MonoBehaviour
 
     void LateUpdate()
     {
-        bool show = Covers && !_broken && _object.enabled; // 지금 왁스를 보여줄지
-        if (show && (_shape == null || _object.sprite != _shapeSprite)) // 클릭 펀치로 크기가 잠깐 바뀌는 건 무시 (다시 만들면 금 배치가 매번 바뀜)
+        bool track = Cracks && !_broken && _object.enabled; // 금/왁스 모양을 지금 그림에 맞춰 둘지
+        if (track && (_shape == null || _object.sprite != _shapeSprite)) // 클릭 펀치로 크기가 잠깐 바뀌는 건 무시 (다시 만들면 금 배치가 매번 바뀜)
             Recoat();
-        if (show && _shape == null) show = false;
+        bool show = Covers && track && _shape != null; // 지금 왁스를 보여줄지
+
+        // 오브젝트 금은 왁스가 부서진 뒤에도 오브젝트가 사라질 때까지 남음
+        bool showCracks = Cracks && _object.enabled && _shape != null && _objectCracks.sprite != null; // 오브젝트 금을 보여줄지
+        _objectCracks.enabled = showCracks;
+        if (showCracks)
+        {
+            _objectCracks.sortingLayerID = _object.sortingLayerID;
+            _objectCracks.sortingOrder = _object.sortingOrder + 1;
+            _objectCracks.forceRenderingOff = _object.forceRenderingOff;
+            _objectCracks.flipX = _object.flipX;
+            _objectCracks.flipY = _object.flipY;
+            _objectCracks.color = new Color(1f, 1f, 1f, _object.color.a);
+        }
+
+        // 금/왁스 그림을 지금 체력에 맞게 그림 (왁스 없는 오브젝트도 금 그림이 비어 있게 처음에 한 번은 그려야 함)
+        if (track && _shape != null && _health.MaxHP > 0) Redraw(1f - (float)_health.CurrentHP / _health.MaxHP);
 
         _wax.enabled = show;
         if (!show) return;
 
-        // 오브젝트 그림을 그대로 따라감: 정렬 순서는 바로 위, 투명도(죽을 때/살아날 때 흐려짐)와 존 숨김도 같이
+        // 오브젝트 그림을 그대로 따라감: 정렬 순서는 오브젝트 금 위, 투명도(죽을 때/살아날 때 흐려짐)와 존 숨김도 같이
         _wax.sortingLayerID = _object.sortingLayerID;
-        _wax.sortingOrder = _object.sortingOrder + 1;
+        _wax.sortingOrder = _object.sortingOrder + 2;
         _wax.forceRenderingOff = _object.forceRenderingOff;
         _wax.flipX = _object.flipX;
         _wax.flipY = _object.flipY;
         _wax.color = new Color(1f, 1f, 1f, _object.color.a);
-
-        if (_health.MaxHP > 0) Redraw(1f - (float)_health.CurrentHP / _health.MaxHP);
     }
 
-    // 오브젝트 그림 픽셀 몇 개를 왁스 한 칸으로 묶을지 - 화면에서 도트 크기가 오브젝트마다 같게
-    private int CellPixels()
+    // 오브젝트 그림 픽셀 몇 개를 왁스 한 칸으로 묶을지(가로, 세로) - 화면에서 도트 크기가 오브젝트마다 같고 정사각형이게.
+    // 컨베이어 벨트처럼 한쪽으로만 늘린 오브젝트는 가로/세로 픽셀 수가 달라짐
+    private Vector2Int CellPixels()
     {
         Sprite sprite = _object.sprite; // 안쪽 오브젝트 그림
-        float scale = Mathf.Max(0.0001f, _baseScale); // 월드에서 커진 배율 (등장/타격 연출로 잠깐 바뀐 크기 말고 원래 크기)
-        return Mathf.Max(1, Mathf.RoundToInt(PixelWorldSize / scale * sprite.pixelsPerUnit));
+        Vector2 scale = Vector2.Max(_baseScale, new Vector2(0.0001f, 0.0001f)); // 월드에서 커진 배율 (등장/타격 연출로 잠깐 바뀐 크기 말고 원래 크기)
+        return new Vector2Int(Mathf.Max(1, Mathf.RoundToInt(PixelWorldSize / scale.x * sprite.pixelsPerUnit)),
+                              Mathf.Max(1, Mathf.RoundToInt(PixelWorldSize / scale.y * sprite.pixelsPerUnit)));
     }
 
     // 새 왁스로 덮음 - 모양을 맞추고, 금/조각 배치를 새로 정함
@@ -166,8 +217,18 @@ public class WaxCoating : MonoBehaviour
         Sprite sprite = _object.sprite; // 안쪽 오브젝트 그림
         _shapeSprite = sprite;
         if (sprite == null) { _shape = null; return; }
-        _shape = GetShape(sprite, CellPixels());
+        Shape shape = GetShape(sprite, CellPixels()); // 지금 그림에 맞는 왁스 모양
+        bool sameShape = shape == _shape && _wax.sprite != null && _crack != null; // 다시 살아난 것처럼 모양이 그대로면 그림/배열을 그대로 씀
+        _shape = shape;
         if (_shape == null) return;
+        _dirty = _cracksDirty = _noCracks = true;
+        if (sameShape)
+        {
+            System.Array.Clear(_crack, 0, _crack.Length);
+            System.Array.Clear(_rayStamp, 0, _rayStamp.Length);
+            PlanChunks();
+            return;
+        }
 
         int count = _shape.width * _shape.height; // 칸 수
         if (_texture == null || _texture.width != _shape.width || _texture.height != _shape.height)
@@ -175,13 +236,19 @@ public class WaxCoating : MonoBehaviour
             if (_texture != null) Destroy(_texture);
             _texture = new Texture2D(_shape.width, _shape.height, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
             _pixels = new Color32[count];
+            if (_crackTexture != null) Destroy(_crackTexture);
+            _crackTexture = new Texture2D(_shape.width, _shape.height, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
+            _crackPixels = new Color32[count];
         }
         if (_wax.sprite != null) Destroy(_wax.sprite);
         _wax.sprite = Sprite.Create(_texture, new Rect(0, 0, _shape.width, _shape.height), _shape.pivot, _shape.pixelsPerUnit, 0, SpriteMeshType.FullRect); // 그림이 계속 바뀌므로 투명 부분을 잘라내는 Tight 모양을 쓰면 안 됨
+        if (_objectCracks.sprite != null) Destroy(_objectCracks.sprite);
+        _objectCracks.sprite = Sprite.Create(_crackTexture, new Rect(0, 0, _shape.width, _shape.height), _shape.pivot, _shape.pixelsPerUnit, 0, SpriteMeshType.FullRect); // 왁스와 같은 칸/자리
+        _wax.transform.localScale = _objectCracks.transform.localScale = new Vector3(1f, _shape.scaleY, 1f); // 칸이 가로세로 다른 픽셀 수면 세로를 맞춰 늘림
 
         _crack = new byte[count];
         _rayStamp = new int[count];
-        _dirty = true;
+        _pristine = null;
         PlanChunks();
     }
 
@@ -189,7 +256,7 @@ public class WaxCoating : MonoBehaviour
     // 세게 맞을수록, 많이 깎였을수록 길게 뻗고, 뻗다가 다른 금을 만나면 대부분 거기서 멈춰 금끼리 이어짐
     public void Hit(Vector2 worldPoint, float hitFraction)
     {
-        if (!Covers || _broken || _shape == null || _crack == null || _health.MaxHP <= 0) return;
+        if (!Cracks || _broken || _shape == null || _crack == null || _health.MaxHP <= 0) return;
 
         Vector3 local = _wax.transform.InverseTransformPoint(worldPoint); // 왁스 그림 기준 위치(월드 단위)
         if (_wax.flipX) local.x = -local.x;
@@ -218,7 +285,16 @@ public class WaxCoating : MonoBehaviour
                 if (nx >= 0 && ny >= 0 && nx < w && ny < _shape.height && _shape.mask[ny * w + nx])
                     _crack[ny * w + nx] = (byte)Mathf.Max(_crack[ny * w + nx], open ? 2 : 1);
             }
-        _dirty = true;
+        int radius = Mathf.CeilToInt(reach * 1.1f) + 3; // 이번 금이 닿을 수 있는 최대 거리(칸) - 가지/굵기 포함
+        var rect = new RectInt(sx - radius, sy - radius, radius * 2 + 1, radius * 2 + 1); // 이번 금 범위
+        if (_hasHitRect)
+        {
+            int xMin = Mathf.Min(_hitRect.xMin, rect.xMin), yMin = Mathf.Min(_hitRect.yMin, rect.yMin); // 합친 범위
+            rect = new RectInt(xMin, yMin, Mathf.Max(_hitRect.xMax, rect.xMax) - xMin, Mathf.Max(_hitRect.yMax, rect.yMax) - yMin);
+        }
+        _hitRect = rect;
+        _hasHitRect = true;
+        _noCracks = false;
     }
 
     // 금 한 줄기를 (x, y)에서 angle 방향으로 length칸 그림. 조금씩 휘고 가끔 가지를 치며, 다른 금을 만나면 대부분 멈춤
@@ -274,6 +350,12 @@ public class WaxCoating : MonoBehaviour
     // 조각 경계는 떨어지기 조금 전에 금으로 먼저 보여서, 금이 간 자리대로 깨져 나가는 것처럼 보임
     private void PlanChunks()
     {
+        if (_shape.plans.Count >= MaxChunkPlans) // 이미 충분히 만들어 뒀으면 그중 하나를 골라 씀
+        {
+            (_chunkAt, _crackAt, _fallAt) = _shape.plans[Random.Range(0, _shape.plans.Count)];
+            return;
+        }
+
         int w = _shape.width, h = _shape.height; // 칸 수
         var seeds = new Vector2[ChunkCount]; // 조각 기준점
         var fallAt = new float[ChunkCount]; // 조각별 떨어지는 깎인 비율
@@ -313,6 +395,8 @@ public class WaxCoating : MonoBehaviour
                 breakAt = Mathf.Min(breakAt, Mathf.Min(fallAt[owner[cell]], fallAt[owner[cell + w]]));
             if (breakAt < 2f) _crackAt[cell] = Mathf.Min(_crackAt[cell], breakAt - 0.15f);
         }
+        _fallAt = fallAt;
+        _shape.plans.Add((_chunkAt, _crackAt, _fallAt));
     }
 
     private int RandomMaskCell()
@@ -330,17 +414,51 @@ public class WaxCoating : MonoBehaviour
     private void Redraw(float damage)
     {
         if (_shape == null || _broken || _pixels == null) return;
-        damage = Mathf.Round(damage * 50f) / 50f; // 2% 단위로만 다시 그려서 연타 중 매 프레임 그리지 않게
-        if (Mathf.Approximately(damage, _shownDamage) && !_dirty) return;
+        damage = Mathf.Round(damage * 50f) / 50f; // 2% 단위
+        // 체력은 조각이 떨어지거나 경계 금이 보이기 시작하는 값을 지날 때만 그림을 바꿈 - 그 외엔 새 금 둘레만 다시 그림
+        bool full = _dirty || _shownDamage < 0f || ThresholdCrossed(_shownDamage, damage); // 전체를 다시 그릴지
         _shownDamage = damage;
-        _dirty = false;
+        if (!full && !_hasHitRect && !_cracksDirty) return;
 
         int w = _shape.width, h = _shape.height; // 칸 수
-        for (int cell = 0; cell < _pixels.Length; cell++)
+        var all = new RectInt(0, 0, w, h); // 그림 전체
+        RectInt region = all; // 다시 그릴 범위
+        if (!full)
         {
-            if (!Visible(cell, damage)) { _pixels[cell] = default; continue; }
-            int x = cell % w, y = cell / w; // 이 칸 위치
+            region = new RectInt(_hitRect.xMin - 2, _hitRect.yMin - 2, _hitRect.width + 4, _hitRect.height + 4); // 둘레 음영까지
+            region.ClampToBounds(all);
+        }
+        if (Covers && (full || _hasHitRect)) RedrawWax(damage, w, h, region); // 왁스 없는 오브젝트는 금만
+        if (_cracksDirty) RedrawCracks(w, h, all);
+        else if (_hasHitRect) RedrawCracks(w, h, region);
+        _dirty = _cracksDirty = _hasHitRect = false;
+    }
 
+    // 깎인 비율이 old에서 now로 바뀌는 사이에 조각이 떨어지거나 경계 금이 보이기 시작하는지
+    private bool ThresholdCrossed(float old, float now)
+    {
+        if (_fallAt == null) return true;
+        foreach (float fall in _fallAt)
+        {
+            if ((fall <= old) != (fall <= now)) return true;
+            float crack = fall - 0.15f; // 경계 금이 보이기 시작하는 값 (PlanChunks와 같은 계산)
+            if ((crack <= old) != (crack <= now)) return true;
+        }
+        return false;
+    }
+
+    // 칸별 왁스 기본 색/불투명도를 미리 계산 (모양이나 색이 바뀔 때만) - 매번 노이즈/음영을 다시 계산하지 않게
+    private void BuildBase()
+    {
+        _baseShape = _shape;
+        _baseColor = _color;
+        int count = _shape.width * _shape.height; // 칸 수
+        _baseColors = new Color[count];
+        _baseAlphas = new float[count];
+        for (int cell = 0; cell < count; cell++)
+        {
+            if (!_shape.mask[cell]) continue;
+            int x = cell % _shape.width, y = cell / _shape.width; // 이 칸 위치
             float t = _shape.thickness[cell]; // 두께
             float mottle = 1f + (Mathf.PerlinNoise(x * 0.1f, y * 0.1f) - 0.5f) * 0.05f; // 왁스 표면의 아주 옅은 결
             Color color = _color * Mathf.Lerp(0.65f, 1.12f, _shape.diffuse[cell]) * mottle; // 빛 받는 면은 밝게, 반대쪽은 부드럽게 어둡게
@@ -348,7 +466,29 @@ public class WaxCoating : MonoBehaviour
             Color inside = _shape.inside[cell]; // 왁스 너머로 흐릿하게 비치는 안쪽 오브젝트
             color = Color.Lerp(color, (Color)inside * _color * 1.1f, inside.a * ShowThrough); // 안쪽 색이 왁스 색에 물들어 흐릿하게 보임
             color.a = 1f;
-            float alpha = Mathf.Lerp(ThinAlpha, ThickAlpha, t); // 두꺼울수록 덜 비침
+            _baseColors[cell] = color;
+            _baseAlphas[cell] = Mathf.Lerp(ThinAlpha, ThickAlpha, t); // 두꺼울수록 덜 비침
+        }
+    }
+
+    private void RedrawWax(float damage, int w, int h, RectInt region)
+    {
+        if (_baseColors == null || _baseShape != _shape || _baseColor != _color) { BuildBase(); _pristine = null; }
+        bool pristine = _noCracks && damage <= 0f && region.width == w && region.height == h; // 금 없는 온전한 왁스 전체
+        if (pristine && _pristine != null)
+        {
+            System.Array.Copy(_pristine, _pixels, _pixels.Length);
+            _texture.SetPixels32(_pixels);
+            _texture.Apply();
+            return;
+        }
+        for (int y = region.yMin; y < region.yMax; y++)
+        for (int x = region.xMin; x < region.xMax; x++)
+        {
+            int cell = y * w + x; // 이 칸
+            if (!Visible(cell, damage)) { _pixels[cell] = default; continue; }
+            Color color = _baseColors[cell]; // 기본 색
+            float alpha = _baseAlphas[cell]; // 기본 불투명도
 
             bool edge = x == 0 || y == 0 || x == w - 1 || y == h - 1
                      || !Visible(cell - 1, damage) || !Visible(cell + 1, damage) || !Visible(cell - w, damage) || !Visible(cell + w, damage); // 바깥/떨어진 자리와 맞닿은 칸
@@ -374,8 +514,39 @@ public class WaxCoating : MonoBehaviour
             color.a = alpha;
             _pixels[cell] = color;
         }
+        if (pristine) _pristine = (Color32[])_pixels.Clone();
         _texture.SetPixels32(_pixels);
         _texture.Apply();
+    }
+
+    private void RedrawCracks(int w, int h, RectInt region)
+    {
+        if (_noCracks) // 금이 없으면 다 투명
+        {
+            System.Array.Clear(_crackPixels, 0, _crackPixels.Length);
+            _crackTexture.SetPixels32(_crackPixels);
+            _crackTexture.Apply();
+            return;
+        }
+        // 오브젝트 금: 왁스 금과 같은 자리, 같은 방식 - 오브젝트 색이 하얗게 질린 선 + 아래/오른쪽 그림자 + 위/왼쪽 빛 받는 턱
+        for (int y = region.yMin; y < region.yMax; y++)
+        for (int x = region.xMin; x < region.xMax; x++)
+        {
+            int cell = y * w + x; // 이 칸
+            if (!_shape.solid[cell]) { _crackPixels[cell] = default; continue; }
+            Color baseColor = _shape.objectColor[cell]; // 이 칸의 오브젝트 색
+            Color color; // 칠할 색 (금이 아니고 턱도 아니면 투명)
+            byte crack = _crack[cell]; // 맞아서 생긴 금 (조각 경계에 미리 보이는 금은 왁스에만)
+            if (crack == 2) color = Color.Lerp(baseColor, Color.white, 0.55f); // 벌어진 틈
+            else if (crack == 1) color = Color.Lerp(baseColor, Color.white, 0.68f); // 실금
+            else if ((x > 0 && _crack[cell - 1] > 0) || (y < h - 1 && _crack[cell + w] > 0)) color = baseColor * 0.8f; // 금의 오른쪽/아래 - 그늘진 턱
+            else if ((x < w - 1 && _crack[cell + 1] > 0) || (y > 0 && _crack[cell - w] > 0)) color = Color.Lerp(baseColor, Color.white, 0.22f); // 금의 왼쪽/위 - 빛 받는 턱
+            else { _crackPixels[cell] = default; continue; }
+            color.a = 1f;
+            _crackPixels[cell] = color;
+        }
+        _crackTexture.SetPixels32(_crackPixels);
+        _crackTexture.Apply();
     }
 
     // 이 칸의 금 상태 - 맞아서 생긴 금, 또는 곧 떨어질 조각 경계에 미리 보이는 금
@@ -447,13 +618,12 @@ public class WaxCoating : MonoBehaviour
         ObjectManager.Instance != null && ObjectIndex >= 0 ? ObjectManager.Instance.WaxColorOf(ObjectIndex) : new Color(1f, 0.75f, 0.8f);
 
     // 오브젝트 그림을 cell픽셀 칸으로 줄여 왁스 모양을 만듦: 그림에서 Bulge칸까지 둥글게 부풀린 범위 + 볼록한 두께에 따른 음영/반짝임
-    private static Shape GetShape(Sprite sprite, int cell)
+    private static Shape GetShape(Sprite sprite, Vector2Int cell)
     {
         if (_shapes.TryGetValue((sprite, cell), out Shape cached)) return cached;
 
         Rect rect = sprite.rect; // 그림 전체 범위(픽셀) - textureRect는 투명 테두리를 잘라낸 범위라 기준점(pivot)과 안 맞음
-        int inner = Mathf.CeilToInt(rect.width / cell), innerH = Mathf.CeilToInt(rect.height / cell); // 그림이 차지하는 칸 수
-        int w = inner + Bulge * 2, h = innerH + Bulge * 2; // 부풀림 여유까지 포함한 칸 수
+        int inner = Mathf.CeilToInt(rect.width / cell.x), innerH = Mathf.CeilToInt(rect.height / cell.y); // 그림이 차지하는 칸 수
 
         // 읽기 허용이 꺼진 그림도 읽을 수 있게 작은 렌더 텍스처에 줄여 그린 뒤 픽셀을 읽음
         var rt = RenderTexture.GetTemporary(inner, innerH, 0, RenderTextureFormat.ARGB32);
@@ -471,20 +641,31 @@ public class WaxCoating : MonoBehaviour
         Color32[] small = read.GetPixels32(); // 줄인 그림 픽셀
         Destroy(read);
 
-        var solid = new bool[w * h]; // 오브젝트 그림이 있는 칸
+        // 그림이 실제로 그려진 범위만 씀 (투명한 여백까지 칸으로 만들면 칸 수가 몇 배로 늘어 금/조각/그리기가 다 느려짐)
+        int minX = inner, minY = innerH, maxX = -1, maxY = -1; // 그려진 범위 (줄인 그림 기준)
         for (int y = 0; y < innerH; y++)
             for (int x = 0; x < inner; x++)
-                solid[(y + Bulge) * w + x + Bulge] = small[y * inner + x].a > 100;
+                if (small[y * inner + x].a > 100)
+                {
+                    minX = Mathf.Min(minX, x); maxX = Mathf.Max(maxX, x);
+                    minY = Mathf.Min(minY, y); maxY = Mathf.Max(maxY, y);
+                }
+        if (maxX < 0) { minX = minY = 0; maxX = inner - 1; maxY = innerH - 1; } // 다 투명하면 전체
+        int w = maxX - minX + 1 + Bulge * 2, h = maxY - minY + 1 + Bulge * 2; // 부풀림 여유까지 포함한 칸 수
 
-        var shape = new Shape { width = w, height = h, mask = new bool[w * h], thickness = new float[w * h], diffuse = new float[w * h], specular = new float[w * h], inside = new Color[w * h] };
-
+        var solid = new bool[w * h]; // 오브젝트 그림이 있는 칸
+        var shape = new Shape { width = w, height = h, mask = new bool[w * h], thickness = new float[w * h], diffuse = new float[w * h], specular = new float[w * h], inside = new Color[w * h], solid = solid, objectColor = new Color[w * h] };
         // 안쪽 오브젝트 색을 칸 그림에 옮긴 뒤 여러 번 번지게 해서, 왁스 너머로 흐릿하게 비치는 모습을 만듦
         var tint = new Color[w * h]; // 번지기 전 안쪽 색 (rgb는 투명도를 곱한 값)
-        for (int y = 0; y < innerH; y++)
-            for (int x = 0; x < inner; x++)
+        for (int y = minY; y <= maxY; y++)
+            for (int x = minX; x <= maxX; x++)
             {
-                Color c = small[y * inner + x]; // 오브젝트 그림 한 칸
-                tint[(y + Bulge) * w + x + Bulge] = new Color(c.r * c.a, c.g * c.a, c.b * c.a, c.a);
+                Color32 c32 = small[y * inner + x]; // 오브젝트 그림 한 칸
+                int i = (y - minY + Bulge) * w + x - minX + Bulge; // 왁스 칸 번호
+                solid[i] = c32.a > 100;
+                shape.objectColor[i] = c32;
+                Color c = c32; // 계산용
+                tint[i] = new Color(c.r * c.a, c.g * c.a, c.b * c.a, c.a);
             }
         for (int pass = 0; pass < BlurCells; pass++) tint = Blur(tint, w, h);
         for (int i = 0; i < tint.Length; i++)
@@ -492,7 +673,8 @@ public class WaxCoating : MonoBehaviour
 
         // 그림에서 Bulge칸까지 둥글게 부풀린 범위가 왁스
         float[] fromSolid = Distance(solid, w, h); // 칸별로 가장 가까운 그림 칸까지 거리
-        for (int i = 0; i < shape.mask.Length; i++) shape.mask[i] = fromSolid[i] <= Bulge + 0.01f;
+        for (int i = 0; i < shape.mask.Length; i++)
+            shape.mask[i] = fromSolid[i] <= Bulge + 0.01f;
 
         // 가장자리에서 멀수록 두꺼움(둥근 돔 모양) - 그 기울기로 면 방향을 구해 빛과 반짝임을 계산
         var outside = new bool[w * h]; // 왁스 밖 칸
@@ -524,7 +706,8 @@ public class WaxCoating : MonoBehaviour
 
         float perPixelX = inner / rect.width, perPixelY = innerH / rect.height; // 그림 픽셀 하나가 왁스 몇 칸인지 (칸 수를 올림해서 1/cell보다 살짝 큼)
         shape.pixelsPerUnit = sprite.pixelsPerUnit * perPixelX;
-        shape.pivot = new Vector2((sprite.pivot.x * perPixelX + Bulge) / w, (sprite.pivot.y * perPixelY + Bulge) / h);
+        shape.pivot = new Vector2((sprite.pivot.x * perPixelX - minX + Bulge) / w, (sprite.pivot.y * perPixelY - minY + Bulge) / h);
+        shape.scaleY = perPixelX / perPixelY; // 그림은 가로 기준 PPU로 만들어서 세로는 이만큼 늘려야 원래 크기
         _shapes[(sprite, cell)] = shape;
         return shape;
     }

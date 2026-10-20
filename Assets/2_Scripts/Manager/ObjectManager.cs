@@ -24,6 +24,7 @@ public class ObjectManager : MonoBehaviour
         public Sprite[] healthStages; // 체력 100% -> 0% 순서 (예: Object1, Object1-1, Object1-2, Object1-3)
         // 크기는 코드에서 계산하지 않음 - 각 이미지의 Pixels Per Unit(Import Settings)으로 직접 맞출 것
         public Color waxColor; // 이 오브젝트를 덮는 왁스 색 (투명도는 무시됨). 비워두면(완전 투명) 기본 파스텔 색
+        public bool noWax; // 켜면 이 오브젝트는 왁스를 안 덮음 (맵3 벨트/간판/트럭처럼 왁뿌볼 말고는 맨몸)
     }
 
     // 왁스 색을 안 정한 오브젝트에 쓰는 기본 파스텔 색 (오브젝트 순서대로 돌아가며)
@@ -42,32 +43,36 @@ public class ObjectManager : MonoBehaviour
         return color;
     }
 
+    // index번째 오브젝트가 왁스를 안 덮는지 - 쓸 때마다 인스펙터 값을 읽음
+    public bool NoWaxOf(int index) =>
+        objectVisuals != null && index >= 0 && index < objectVisuals.Length && objectVisuals[index].noWax;
+
     [SerializeField] private ObjectVisualSet[] objectVisuals; // objects 리스트와 같은 순서/개수로 채워야 함 (15개)
 
     [SerializeField] private bool debugUnlockAll = false; // 테스트용 - 켜면 모든 오브젝트가 처음부터 해금됨 (업그레이드 무관)
 
-    // 파괴 대상 오브젝트 15종(데모) - 책상 위 소품에서 시작해 지형(책상/길바닥)을 거쳐 공사장 아파트까지. ★=마일스톤(체력 x2)
+    // 파괴 대상 오브젝트 15종(데모) - 책상 위 소품에서 시작해 지형(책상/길바닥)을 거쳐 왁스 공장 회사까지. ★=마일스톤(체력 x2)
     // 티어 구성은 ObjectHealthCalculator.tierSizes = {3,2,3,2,3,2} 와 순서/개수가 정확히 일치해야 함
     private static readonly List<ObjectData> objects = new List<ObjectData>
     {
         // --- 존1: 책상 위 (맨손 t1 / 망치 t2) ---
-        new ObjectData(1, 1, "접시", new Color(0.95f, 0.95f, 0.92f)),
-        new ObjectData(1, 2, "유리컵", new Color(0.93f, 0.95f, 0.96f)),
-        new ObjectData(1, 3, "화분", new Color(0.80f, 0.42f, 0.25f)),
-        new ObjectData(2, 1, "계산기", new Color(0.01f, 0.18f, 0.23f)),
-        new ObjectData(2, 2, "책상", new Color(0.55f, 0.38f, 0.22f)) { hpMultiplier = 9f }, // ★ -> 존2 (체력 720 = 계산기의 10배)
+        new ObjectData(1, 1, "달걀", new Color(0.98f, 0.94f, 0.84f)),
+        new ObjectData(1, 2, "사과", new Color(0.86f, 0.16f, 0.16f)),
+        new ObjectData(1, 3, "버터", new Color(1.00f, 0.86f, 0.42f)),
+        new ObjectData(2, 1, "식빵", new Color(0.86f, 0.62f, 0.34f)),
+        new ObjectData(2, 2, "책상", new Color(0.55f, 0.38f, 0.22f)) { hpMultiplier = 9f }, // ★ -> 존2 (체력 = 식빵의 10배)
         // --- 존2: 길거리 (곡괭이 t3 / 전동드릴 t4) ---
         new ObjectData(3, 1, "가로등", new Color(0.23f, 0.24f, 0.35f)),
         new ObjectData(3, 2, "자전거", new Color(0.23f, 0.24f, 0.30f)),
         new ObjectData(3, 3, "가로수", new Color(0.24f, 0.59f, 0.32f)),
         new ObjectData(4, 1, "자동차", new Color(0.70f, 0.69f, 0.71f)),
         new ObjectData(4, 2, "도로", new Color(0.62f, 0.60f, 0.58f)) { hpMultiplier = 17600f / 1800f }, // ★ -> 존3 (체력 17,600 = 자동차의 10배)
-        // --- 존3: 공사장 / 건물 (유압 브레이커 t5 / 다이너마이트 t6) ---
-        new ObjectData(5, 1, "컨테이너 박스", new Color(0.72f, 0.22f, 0.16f)),
-        new ObjectData(5, 2, "포크레인", new Color(0.85f, 0.70f, 0.20f)),
-        new ObjectData(5, 3, "타워 크레인", new Color(0.92f, 0.58f, 0.10f)),
-        new ObjectData(6, 1, "철구 크레인", new Color(0.90f, 0.68f, 0.15f)),
-        new ObjectData(6, 2, "아파트", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 163500f / 37000f }, // ★ 데모 마지막 (체력 163,500 = 다이너마이트 풀업 + 전역 강화 + 치명타 풀업 한 방)
+        // --- 존3: 왁스 공장 (유압 브레이커 t5 / 다이너마이트 t6) ---
+        new ObjectData(5, 1, "컨베이어 벨트", new Color(0.35f, 0.38f, 0.45f)),
+        new ObjectData(5, 2, "왁뿌볼", new Color(0.45f, 0.75f, 0.25f)),
+        new ObjectData(5, 3, "간판", new Color(0.92f, 0.92f, 0.90f)),
+        new ObjectData(6, 1, "트럭", new Color(0.95f, 0.95f, 0.95f)),
+        new ObjectData(6, 2, "회사", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 163500f / 37000f }, // ★ 데모 마지막 (체력 163,500 = 다이너마이트 풀업 + 전역 강화 + 치명타 풀업 한 방)
     };
 
     private int equippedIndex; // 실제로 선택된 오브젝트의 objects 리스트 인덱스 (0부터 시작)
@@ -85,8 +90,8 @@ public class ObjectManager : MonoBehaviour
     private bool[] _unlocked;
     // 해금 비용 = 직전 오브젝트의 기본 파편(강화 전) x 부숴야 하는 횟수 (무기 해금 비용도 이걸 따라감)
     // 횟수는 방치형 게임 흔한 방식처럼 오브젝트마다 일정 배율로 곱해져 올라감 (Start x Growth^(index-1))
-    private const double UnlockBreaksStart = 25; // 유리컵을 열려면 접시(강화 전 파편 기준)를 이만큼 부숴야 함
-    private const double UnlockBreaksGrowth = 1.15; // 뒤 오브젝트로 갈 때마다 부숴야 하는 횟수에 곱해지는 배율 (아파트는 철구 크레인 약 154번)
+    private const double UnlockBreaksStart = 25; // 사과를 열려면 달걀(강화 전 파편 기준)을 이만큼 부숴야 함
+    private const double UnlockBreaksGrowth = 1.15; // 뒤 오브젝트로 갈 때마다 부숴야 하는 횟수에 곱해지는 배율 (회사는 트럭 약 154번)
     public const long UnlockCostBase = 15; // 획득량 증가(Gain) 비용 계산의 기준 횟수
 
     // 오브젝트가 새로 해금될 때 (objectIndex) 전달 - Object 선택 UI 등이 구독
@@ -230,8 +235,8 @@ public class ObjectManager : MonoBehaviour
     // 기본 보상이 고정값(예: 1개)이면 콤보/업그레이드 배율을 아무리 곱해도(배율은 곱셈일 뿐 밑변이 1이면 그대로
     // 작은 수) 후반 티어 가격을 절대 못 따라잡음. 그래서 기본 보상도 오브젝트 티어마다 기하급수적으로 커지게 함.
     private const long BaseRewardStart = 1; // 0번 오브젝트 기본 보상
-    private const float BaseRewardGrowth = 4.5f; // 맵1(접시~책상)에서 오브젝트 하나 넘어갈 때마다 곱해지는 배율
-    private const int ObjectsPerMap = 5; // 맵 하나에 들어있는 오브젝트 수 (접시~책상 / 가로등~도로 / 컨테이너 박스~아파트)
+    private const float BaseRewardGrowth = 4.5f; // 맵1(달걀~책상)에서 오브젝트 하나 넘어갈 때마다 곱해지는 배율
+    private const int ObjectsPerMap = 5; // 맵 하나에 들어있는 오브젝트 수 (달걀~책상 / 가로등~도로 / 컨베이어 벨트~회사)
     private const float LaterRewardGrowth = 2f; // 맵2부터 오브젝트 하나 넘어갈 때마다 곱해지는 배율 - 맵 넘어갈 때 파편이 확 뛰지 않게 (가로등 820)
 
     public long GetBaseReward(int index) => Math.Max(1L, (long)RawBaseReward(index));

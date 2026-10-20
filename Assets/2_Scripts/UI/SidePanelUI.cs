@@ -394,7 +394,7 @@ public class SidePanelUI : MonoBehaviour
             if (PieceTutorial.Instance != null) PieceTutorial.Instance.Done = false;
             UpgradeManager.Instance?.ResetAll();
             ObjectManager.Instance?.ResetAll();
-            ObjectManager.Instance?.Equip(0); // 잠긴 오브젝트를 들고 있지 않게 접시로
+            ObjectManager.Instance?.Equip(0); // 잠긴 오브젝트를 들고 있지 않게 달걀로
             WeaponManager.Instance?.ResetUnlocks();
             _weaponBrowse.index = 0;
             ZoneManager.Instance?.ResetAll();
@@ -755,6 +755,7 @@ public class SidePanelUI : MonoBehaviour
             slot.style.marginRight = 6;
             slot.style.backgroundColor = WeaponPreviewColor;
             slot.RegisterCallback<ClickEvent>(_ => { _weaponBrowse.index = index; redraw(); });
+            slot.AddToClassList(DebrisPool.ClickSoundClass); // 누르면 버튼 클릭 소리
             slots.Add(slot);
             slotRow.Add(slot);
         }

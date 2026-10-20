@@ -198,9 +198,12 @@ public class Click : MonoBehaviour
         if (isLucky)
             damage = Mathf.Max(damage, _health.CurrentHP);
 
-        // 이번 타격으로 죽는 게 아닐 때만 클릭 사운드 재생 (죽을 땐 파괴 사운드만 나오게)
+        // 이번 타격으로 죽는 게 아닐 때만 클릭 사운드 재생 (죽을 땐 파괴 사운드만 나오게).
+        // 파괴 사운드가 없는 오브젝트(버터 등)는 한 방에 부서져도 클릭 사운드는 나게
         bool willDie = damage >= _health.CurrentHP;
-        if (!willDie && !IsZoneHidden)
+        bool hasBreakSound = ObjectManager.Instance != null && ObjIndex >= 0 && ObjIndex < ObjectManager.StaticObjectCount
+            && ObjectManager.Instance.GetObjectAt(ObjIndex).breakSound != null; // 부서질 때 따로 나는 소리가 있는지
+        if ((!willDie || !hasBreakSound) && !IsZoneHidden)
             PlayRandomClickSound();
 
         bool wasAlive = _health.CurrentHP > 0; // 이미 부서져 있던 걸 때린 게 아닌지

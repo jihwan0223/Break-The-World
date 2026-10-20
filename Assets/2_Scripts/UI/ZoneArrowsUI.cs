@@ -103,6 +103,7 @@ public class ZoneArrowsUI : MonoBehaviour
         arrow.style.backgroundImage = new StyleBackground(texture);
         arrow.style.unityBackgroundImageTintColor = Color.white;
 
+        arrow.AddToClassList(DebrisPool.ClickSoundClass); // 누르면 버튼 클릭 소리
         arrow.RegisterCallback<ClickEvent>(_ =>
         {
             if (ZoneManager.Instance == null) return;

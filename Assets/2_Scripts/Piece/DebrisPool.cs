@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 // 오브젝트를 부수면 얻은 조각만큼 파편이 부서진 지점에서 떨어져 바닥(spawnArea)에 쌓이고, 파편을 클릭해서 주워야 조각(돈)이 들어오는 시스템.
 // 파편 하나가 여러 조각 값을 들고 있을 수 있음 (한 번에 떨어뜨리는 개수에 상한이 있어서 총액을 나눠 담음).
@@ -29,6 +32,8 @@ public class DebrisPool : MonoBehaviour
     [SerializeField] private int maxCarriedPieces = 80; // 빗자루가 앞에 모아서 밀고 갈 수 있는 파편 수 - 넘치는 건 주운 자리에서 바로 사라짐
     [SerializeField] private float carryPileWidth = 1.2f; // 빗자루 앞 더미가 꽉 찼을 때의 가로 길이(월드 유닛) - 쓸어 담을수록 이 길이까지 앞으로 길어짐
     [SerializeField] private float carryGatherSpeed = 12f; // 쓸린 파편이 더미 안 제자리로 끌려가는 속도 (클수록 빨리 붙음)
+    [SerializeField] private AudioClip pickupSound; // 지금 보는 존에서 파편/결정을 주울 때 소리
+    [SerializeField] private AudioClip mouseClickSound; // 버튼을 누를 때 소리
 
     // 바닥에 떨어져 있는(또는 떨어지는 중인) 파편 하나
     private class Piece
@@ -58,6 +63,7 @@ public class DebrisPool : MonoBehaviour
     [System.NonSerialized] private ParticleSystem[] _shardSystems;
     private readonly List<Piece> _mergeTargets = new List<Piece>(); // 바닥이 꽉 찼을 때 값을 나눠 받을 파편들 (매번 재사용)
     private readonly List<Piece> _carried = new List<Piece>(); // 빗자루가 쓸어서 앞에 모아 밀고 가는 파편들 - 값은 이미 지급됐고 그림만 남은 것
+    private AudioSource _audioSource; // 줍기/마우스 클릭 소리를 내는 소스 (없으면 자동으로 붙임)
 
     // 오브젝트를 부숴 파편을 새로 떨어뜨릴 때마다 그 파편들을 전달 (결정 제외) - 첫 파편 튜토리얼 등이 구독
     public event System.Action<IReadOnlyList<Transform>> OnPiecesDropped;
@@ -82,6 +88,9 @@ public class DebrisPool : MonoBehaviour
         _fallbackSprite = CreateDotSprite();
         _popup = GetComponent<PickupPopup>();
         if (_popup == null) _popup = gameObject.AddComponent<PickupPopup>();
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
+        _audioSource.playOnAwake = false;
         if (GetComponent<CursorRangeIndicator>() == null) gameObject.AddComponent<CursorRangeIndicator>(); // 커서 범위 표시도 같은 식으로 자동으로 붙임
     }
 
@@ -116,6 +125,10 @@ public class DebrisPool : MonoBehaviour
 
         Vector2 screenPos = Mouse.current.position.ReadValue(); // 마우스 화면 위치
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
+
+        // 버튼(업그레이드 노드, 메뉴/무기/존 화살표 등)을 누를 때만 클릭 소리
+        if (Mouse.current.leftButton.wasPressedThisFrame && IsOverButton(screenPos))
+            SfxPlayer.Play(_audioSource, mouseClickSound, priority: true);
         UpdateHoverPickup(worldPos, screenPos != _lastMouseScreenPos);
         _lastMouseScreenPos = screenPos;
 
@@ -411,12 +424,46 @@ public class DebrisPool : MonoBehaviour
         }
     }
 
+    // 버튼처럼 쓰는 UI 툴킷 요소(Button이 아닌데 클릭을 받는 것)에 붙이면 누를 때 클릭 소리가 남
+    public const string ClickSoundClass = "click-sound";
+
+    private static readonly List<RaycastResult> _uiHits = new List<RaycastResult>(); // 캔버스 UI 레이캐스트 결과 (매번 재사용)
+
+    // 화면 좌표 아래에 누를 수 있는 버튼이 있는지 - 캔버스 UI(업그레이드 트리 노드 등)와 UI 툴킷(우측 패널, 메뉴 등) 둘 다 봄
+    private static bool IsOverButton(Vector2 screenPos)
+    {
+        if (EventSystem.current != null)
+        {
+            _uiHits.Clear();
+            EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current) { position = screenPos }, _uiHits);
+            if (_uiHits.Count > 0)
+            {
+                Selectable selectable = _uiHits[0].gameObject.GetComponentInParent<Selectable>(); // 맨 위에 맞은 UI의 버튼
+                // 업그레이드 트리 판(ScrollRect)에도 Button이 붙어 있어서, 스크롤 판에 붙은 버튼은 배경으로 봄
+                if (selectable != null && selectable.IsInteractable() && selectable.GetComponent<ScrollRect>() == null) return true;
+            }
+        }
+
+        foreach (UIDocument document in FindObjectsByType<UIDocument>(FindObjectsSortMode.None))
+        {
+            IPanel panel = document.rootVisualElement?.panel; // 이 문서의 패널
+            if (panel == null) continue;
+            Vector2 panelPos = RuntimePanelUtils.ScreenToPanel(panel, new Vector2(screenPos.x, Screen.height - screenPos.y)); // 패널 좌표 (위가 0)
+            for (VisualElement element = panel.Pick(panelPos); element != null; element = element.parent)
+                if ((element is UnityEngine.UIElements.Button || element.ClassListContains(ClickSoundClass)) && element.enabledInHierarchy) return true;
+        }
+        return false;
+    }
+
     // mergePopup이면 "+N"을 근처 것끼리 합쳐서 띄움 (빗자루/호버 줍기처럼 연달아 줍는 경우. 안 보이는 존에서 주운 건 안 띄움).
     // carry는 빗자루가 주울 때만 켬 - 그림을 바로 지우지 않고 빗자루 앞 더미에 넣음
     private void Collect(Piece piece, bool mergePopup, bool carry = false)
     {
         if (piece.zone == CurrentZone)
+        {
             _popup.Show(piece.renderer.transform.position, piece.value, piece.isCrystal, mergePopup);
+            SfxPlayer.Play(_audioSource, pickupSound); // 같은 소리 최소 간격이 있어서 한꺼번에 주워도 겹쳐 쌓이지 않음
+        }
         if (piece.isCrystal)
             CurrencyManager.Instance?.AddCrystals(piece.value);
         else
@@ -495,11 +542,11 @@ public class DebrisPool : MonoBehaviour
         return count;
     }
 
-    // objectIndex 오브젝트의 pileColor - 인덱스가 이상하면 마지막으로 알던 색으로 폴백
+    // objectIndex 오브젝트의 파편 색 = 그 오브젝트 왁스 색 - 인덱스가 이상하면 마지막으로 알던 색으로 폴백
     private Color PileColorFor(int objectIndex)
     {
         if (ObjectManager.Instance != null && objectIndex >= 0 && objectIndex < ObjectManager.StaticObjectCount)
-            return ObjectManager.Instance.GetObjectAt(objectIndex).pileColor;
+            return ObjectManager.Instance.WaxColorOf(objectIndex);
 
         return _currentColor;
     }
