@@ -27,6 +27,8 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     private Image _icon;
     private Sprite _baseSprite; // 원래(미해금/0레벨) 스프라이트 - Awake 시점에 저장해둠
     private RectTransform _rect;
+    private Coroutine _denyRoutine; // 지금 재생 중인 "못 삼" 흔들림 (중첩 방지)
+    private Vector2 _denyBasePivot; // "못 삼" 흔들림 전 원래 pivot
     private Coroutine _shakeRoutine; // 지금 재생 중인 흔들림 (중첩 방지)
     private bool _wasRevealed; // 직전 Refresh 때 이 노드가 공개 상태였는지 - hidden→revealed로 바뀌는 "등장 순간"을 한 번만 잡으려고 추적
     private bool _refreshedOnce; // Refresh가 최소 한 번 돌았는지 - 첫 호출 때는 등장 흔들림을 재생 안 함(이미 열려있던 노드로 취급)
@@ -106,8 +108,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         _rect = (RectTransform)transform;
         _button = GetComponent<Button>();
         _button.onClick.AddListener(HandleClicked);
-        _icon = GetComponent<Image>();
-        if (_icon != null) _baseSprite = _icon.sprite;
+        CacheIcon();
 
         // 미사용 오버레이 - 클릭을 가로채지 않도록만 처리
         if (doneOverlay != null)
@@ -117,9 +118,19 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         }
     }
 
+    // 아이콘과 원래(미해금) 스프라이트를 처음 한 번만 잡아둠. 트리를 처음 열 때는 패널 OnEnable의 RefreshAll이
+    // 이 노드의 Awake보다 먼저 불려서, UpdateIcon에서도 불러야 저장된 상태의 그림이 바로 반영됨
+    private void CacheIcon()
+    {
+        if (_icon != null) return;
+        _icon = GetComponent<Image>();
+        if (_icon != null) _baseSprite = _icon.sprite;
+    }
+
     // 해금 완료(또는 획득량 1레벨 이상)면 upgradedSprite로, 아니면 원래 스프라이트로
     private void UpdateIcon()
     {
+        CacheIcon();
         if (_icon == null || upgradedSprite == null) return;
         _icon.sprite = IsLeveled() ? upgradedSprite : _baseSprite;
     }
@@ -128,8 +139,14 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     {
         if (ObjectManager.Instance == null) return;
 
-        bool success = isGain ? ObjectManager.Instance.TryUpgradeGain(objectIndex) : ObjectManager.Instance.TryUnlock(objectIndex);
-        if (!success) return; // 실패(조각 부족 등) 시 아무 반응 없음 - 일반 업그레이드 노드와 동일
+        // 이미 해금된 노드는 TryUnlock이 true를 돌려줘서 따로 막음 - 안 그러면 누를 때마다 구매 이펙트가 터짐
+        bool alreadyDone = !isGain && ObjectManager.Instance.IsUnlocked(objectIndex);
+        bool success = !alreadyDone && (isGain ? ObjectManager.Instance.TryUpgradeGain(objectIndex) : ObjectManager.Instance.TryUnlock(objectIndex));
+        if (!success)
+        {
+            PlayDenyShake(); // 못 살 때(이미 해금/최대/조각 부족)는 좌우로 짧게만 흔들림
+            return;
+        }
 
         PlayShake();
         NodePurchaseEffect.Play(_rect, NodePurchaseEffect.NormalColor, !isGain); // 해금은 크게 터짐
@@ -243,12 +260,12 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
 
         int level = ObjectManager.Instance.GetGainLevel(objectIndex);
         bool maxed = level >= 5;
-        string nextGain = maxed ? null : $"+{NumberFormatUtil.Format(ObjectManager.Instance.GainBonusPerLevel(objectIndex))}개"; // 레벨당 이 오브젝트 처치 시 더 주는 조각 개수
+        string gain = NumberFormatUtil.Format(ObjectManager.Instance.GainBonusPerLevel(objectIndex)); // 레벨당 이 오브젝트 처치 시 더 주는 조각 개수
         return new UpgradeTooltip.Content
         {
             title = $"{objectName} 획득량",
-            description = "부술 때 얻는 조각이 늘어납니다.",
-            level = nextGain != null ? $"{level} / 5  (다음 {nextGain})" : $"{level} / 5",
+            description = $"{KoreanJosa.EulReul(objectName)} 부술 때 얻는 조각이 +{gain}개 증가합니다.",
+            level = $"{level} / 5",
             price = maxed ? "최대" : $"{NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))} 조각",
         };
     }
@@ -281,5 +298,42 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
 
         _rect.localRotation = Quaternion.identity;
         _shakeRoutine = null;
+    }
+
+    // 흔드는 도중 트리를 닫으면 코루틴이 멈추니 원래 자리로 되돌림
+    void OnDisable()
+    {
+        if (_denyRoutine == null) return;
+        _rect.pivot = _denyBasePivot;
+        _denyRoutine = null;
+    }
+
+    // 못 살 때 흔들림 - 터지는 이펙트 없이 좌우로 짧게 (일반 업그레이드 노드와 동일)
+    private void PlayDenyShake()
+    {
+        if (_denyRoutine != null) StopCoroutine(_denyRoutine);
+        else _denyBasePivot = _rect.pivot; // 흔드는 중이 아닐 때만 원래 pivot 기억 (연타해도 자리가 안 밀리게)
+        _denyRoutine = StartCoroutine(DenyShakeRoutine());
+    }
+
+    private IEnumerator DenyShakeRoutine()
+    {
+        const float duration = 0.18f;      // 흔들림 총 시간(초)
+        const float amplitudeRatio = 0.06f; // 최대 이동 거리 (노드 폭 기준 비율)
+        // anchoredPosition은 선(UpgradeTreeLink)이 읽는 값이라 건드리지 않고 pivot만 밀어서 그림만 흔듦 - 선은 제자리
+        const float oscillations = 2f;     // 좌우 왕복 횟수
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime; // 업그레이드 화면이 timeScale 0이라 unscaled
+            float progress = Mathf.Clamp01(elapsed / duration);
+            float offset = amplitudeRatio * Mathf.Sin(progress * oscillations * Mathf.PI * 2f) * (1f - progress); // 이번 프레임 이동 (폭 비율)
+            _rect.pivot = _denyBasePivot - new Vector2(offset, 0f); // pivot을 줄이면 그림이 오른쪽으로 감
+            yield return null;
+        }
+
+        _rect.pivot = _denyBasePivot;
+        _denyRoutine = null;
     }
 }

@@ -56,7 +56,7 @@ public class ObjectManager : MonoBehaviour
     private static readonly List<ObjectData> objects = new List<ObjectData>
     {
         // --- 존1: 책상 위 (맨손 t1 / 망치 t2) ---
-        new ObjectData(1, 1, "달걀", new Color(0.98f, 0.94f, 0.84f)),
+        new ObjectData(1, 1, "달걀", new Color(0.98f, 0.94f, 0.84f)) { hpMultiplier = 1f / 3f }, // 첫 오브젝트라 체력 10 (맨손 10클릭) - 전체 배율 3배로 30이면 초반이 너무 지루함
         new ObjectData(1, 2, "사과", new Color(0.86f, 0.16f, 0.16f)),
         new ObjectData(1, 3, "버터", new Color(1.00f, 0.86f, 0.42f)),
         new ObjectData(2, 1, "식빵", new Color(0.86f, 0.62f, 0.34f)),
@@ -67,11 +67,11 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(3, 3, "가로수", new Color(0.24f, 0.59f, 0.32f)),
         new ObjectData(4, 1, "자동차", new Color(0.70f, 0.69f, 0.71f)),
         new ObjectData(4, 2, "도로", new Color(0.62f, 0.60f, 0.58f)) { hpMultiplier = 17600f / 1800f }, // ★ -> 존3 (체력 17,600 = 자동차의 10배)
-        // --- 존3: 왁스 공장 (유압 브레이커 t5 / 다이너마이트 t6) ---
-        new ObjectData(5, 1, "컨베이어 벨트", new Color(0.35f, 0.38f, 0.45f)),
-        new ObjectData(5, 2, "왁뿌볼", new Color(0.45f, 0.75f, 0.25f)),
-        new ObjectData(5, 3, "간판", new Color(0.92f, 0.92f, 0.90f)),
-        new ObjectData(6, 1, "트럭", new Color(0.95f, 0.95f, 0.95f)),
+        // --- 존3: 왁스 회사 (유압 브레이커 t5 / 다이너마이트 t6) - 왁뿌볼은 존3이 열릴 때 공짜 해금(ZoneManager), 나머지는 이 순서로 해금 ---
+        new ObjectData(5, 1, "왁뿌볼", new Color(0.45f, 0.75f, 0.25f)),
+        new ObjectData(5, 2, "간판", new Color(0.92f, 0.92f, 0.90f)),
+        new ObjectData(5, 3, "트럭", new Color(0.95f, 0.95f, 0.95f)),
+        new ObjectData(6, 1, "컨베이어 벨트", new Color(0.35f, 0.38f, 0.45f)),
         new ObjectData(6, 2, "회사", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 163500f / 37000f }, // ★ 데모 마지막 (체력 163,500 = 다이너마이트 풀업 + 전역 강화 + 치명타 풀업 한 방)
     };
 

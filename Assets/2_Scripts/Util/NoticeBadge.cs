@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public static class NoticeBadge
 {
     private const int Size = 16; // 그림 한 변(px)
-    private const float NodeSizeRatio = 0.4f; // 노드에 붙일 때 크기 (노드 한 변 기준 비율)
+    private const float NodeSizeRatio = 0.28f; // 노드에 붙일 때 크기 (노드 한 변 기준 비율) - 노드 그림을 덜 가리게 작게
 
     private static Sprite _sprite; // 한 번 만들어 캐시해두는 빨간 느낌표 그림 (조각)
     private static Sprite _crystalSprite; // 한 번 만들어 캐시해두는 노란 느낌표 그림 (결정)
@@ -34,7 +34,7 @@ public static class NoticeBadge
         return Sprite.Create(texture, new Rect(0, 0, Size, Size), new Vector2(0.5f, 0.5f), Size);
     }
 
-    // 트리 노드의 느낌표를 켜고 끔. 오른쪽 위 모서리에 붙이고, 처음 켤 때 한 번만 만듦 (badge는 노드가 들고 있는 필드).
+    // 트리 노드의 느낌표를 켜고 끔. 오른쪽 위 모서리 바깥에 걸치게 붙이고, 처음 켤 때 한 번만 만듦 (badge는 노드가 들고 있는 필드).
     // crystal이면 노란 느낌표 (결정으로 사는 노드)
     public static void Set(ref GameObject badge, RectTransform node, bool on, bool crystal = false)
     {
@@ -52,7 +52,7 @@ public static class NoticeBadge
             var rect = (RectTransform)badge.transform; // 위치/크기를 정할 RectTransform
             rect.anchorMin = rect.anchorMax = Vector2.one; // 노드 오른쪽 위 모서리 기준
             rect.sizeDelta = new Vector2(size, size);
-            rect.anchoredPosition = new Vector2(-size * 0.25f, -size * 0.25f); // 모서리에 걸치되 살짝 안쪽으로
+            rect.anchoredPosition = new Vector2(size * 0.15f, size * 0.15f); // 모서리 바깥으로 살짝 빼서 노드 그림/효과 배지를 안 가림
         }
         if (on) badge.GetComponent<Image>().sprite = crystal ? CrystalSprite : Sprite;
         badge.SetActive(on);

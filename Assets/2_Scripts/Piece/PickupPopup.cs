@@ -13,7 +13,7 @@ public class PickupPopup : MonoBehaviour
     [SerializeField] private float mergeRadius = 1.5f; // 빗자루가 주운 파편끼리 이 거리 안이면 한 숫자로 합침
     [SerializeField] private float mergeWindow = 0.3f; // 뜬 지 이 시간(초) 안의 숫자에만 합침 - 지나면 새 숫자를 띄움
     [SerializeField] private int maxActive = 40; // 동시에 떠 있을 수 있는 최대 개수 - 넘으면 가장 오래된 것부터 재사용
-    [SerializeField] private int sortingOrder = 30; // 파편/결정보다 위에 그려지도록
+    [SerializeField] private int sortingOrder = 35; // 파편/결정/오브젝트(맵3 트럭 30 + 금 31 + 왁스 32)보다 위, 커서 범위 표시(40)보다 아래
     [SerializeField] private Color pieceColor = Color.white; // 조각 숫자 색
     [SerializeField] private Color crystalColor = new Color(0.55f, 0.9f, 1f); // 결정 숫자 색 (좌상단 결정 라벨과 같은 하늘색)
     [SerializeField] private float popDuration = 0.16f; // 데미지 숫자가 튀어나오며 커지는 시간(초)

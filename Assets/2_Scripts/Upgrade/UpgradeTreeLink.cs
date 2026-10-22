@@ -17,7 +17,7 @@ public class UpgradeTreeLink : MonoBehaviour
     [SerializeField] private RectTransform[] extraFromNodes = System.Array.Empty<RectTransform>(); // 추가 선행 노드(2번째부터) - fromNode와 합쳐 하나라도(OR) 충족되면 toNode가 열림
     [SerializeField] private RectTransform toNode;   // 이 링크가 가리키는 자식 노드
     [SerializeField] private UpgradeManager.LinkRouting routing = UpgradeManager.LinkRouting.Straight; // 선 모양 (모든 선행 노드에 공통 적용)
-    [SerializeField] private float thickness = 40f;  // 선 두께(px)
+    [SerializeField] private float thickness = 24f;  // 선 두께(px)
     [SerializeField, Range(0f, 1f)] private float bendRatio = 0.5f; // 계단형에서 꺾이는 지점 (from→to 사이 비율)
     [SerializeField] private Color color = new Color(1f, 1f, 1f, 0.5f); // 선 색
     [SerializeField] private Color crystalColor = new Color(0.45f, 0.9f, 1f, 0.7f); // toNode가 결정으로 사는 노드일 때의 선 색 (선행 노드가 일반 노드여도 이 색)

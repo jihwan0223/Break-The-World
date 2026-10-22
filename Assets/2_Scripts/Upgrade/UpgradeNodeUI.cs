@@ -45,6 +45,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     private Sprite _baseSprite; // 원래(0레벨) 스프라이트 - Awake 시점에 저장해둠
     private RectTransform _rect;
     private Coroutine _shakeRoutine; // 지금 재생 중인 흔들림 (중첩 방지)
+    private Coroutine _denyRoutine; // 지금 재생 중인 "못 삼" 흔들림 (중첩 방지)
+    private Vector2 _denyBasePivot; // "못 삼" 흔들림 전 원래 pivot
     private bool _wasRevealed;   // 직전 Refresh 때 공개 상태였는지 - 등장 순간 1회 감지용
     private bool _refreshedOnce; // Refresh가 최소 한 번 돌았는지 - 첫 호출 땐 등장 흔들림 안 함
     private GameObject _badge;   // 지금 재화로 살 수 있을 때 오른쪽 위에 뜨는 느낌표 (처음 필요할 때 만듦)
@@ -68,6 +70,14 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         _rect = (RectTransform)transform;
         _button = GetComponent<Button>();
         _button.onClick.AddListener(HandleClicked);
+        CacheIcon();
+    }
+
+    // 아이콘과 원래(0레벨) 스프라이트를 처음 한 번만 잡아둠. 트리를 처음 열 때는 패널 OnEnable의 RefreshAll이
+    // 이 노드의 Awake보다 먼저 불려서, UpdateIcon에서도 불러야 저장된 레벨의 그림이 바로 반영됨
+    private void CacheIcon()
+    {
+        if (_icon != null) return;
         _icon = GetComponent<Image>();
         if (_icon != null) _baseSprite = _icon.sprite;
     }
@@ -75,6 +85,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     // 1레벨 이상이면 upgradedSprite로, 0레벨이면 원래 스프라이트로
     private void UpdateIcon(int level)
     {
+        CacheIcon();
         if (_icon == null || upgradedSprite == null) return;
         _icon.sprite = level >= 1 ? upgradedSprite : _baseSprite;
     }
@@ -84,30 +95,33 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     private void HandleClicked()
     {
-        // 성공하면 대각선 흔들림만. 실패(최대레벨/조각부족/미공개)면 아무 반응 없음 (툴팁은 호버로 이미 떠있음)
-        if (UpgradeManager.Instance != null && UpgradeManager.Instance.TryUpgrade(Id))
+        // 성공하면 대각선 흔들림 + 구매 이펙트. 실패(최대레벨/조각부족)면 좌우로 짧게만 흔들림 (툴팁은 호버로 이미 떠있음)
+        if (UpgradeManager.Instance == null) return;
+        if (!UpgradeManager.Instance.TryUpgrade(Id))
         {
-            UpgradeTooltip.Instance?.UpdateContent(BuildTooltipContent()); // 마우스 계속 대고 있어도 레벨 숫자 즉시 갱신
-            PlayShake();
-            bool crystal = Array.Exists(costs, cost => cost.useCrystals); // 결정으로 사는 노드면 연출 색이 다름
-            bool maxed = UpgradeManager.Instance.GetLevel(Id) >= maxLevel; // 방금 최대 레벨을 찍었으면 크게 터짐
-            NodePurchaseEffect.Play(_rect, crystal ? NodePurchaseEffect.CrystalColor : NodePurchaseEffect.NormalColor, maxed);
-            UpgradeTooltip.Instance?.PlayShake(); // 호버로 떠있는 툴팁도 같이 흔들림
-            UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true);
+            PlayDenyShake();
+            return;
         }
+        UpgradeTooltip.Instance?.UpdateContent(BuildTooltipContent()); // 마우스 계속 대고 있어도 레벨 숫자 즉시 갱신
+        PlayShake();
+        bool crystal = Array.Exists(costs, cost => cost.useCrystals); // 결정으로 사는 노드면 연출 색이 다름
+        bool maxed = UpgradeManager.Instance.GetLevel(Id) >= maxLevel; // 방금 최대 레벨을 찍었으면 크게 터짐
+        NodePurchaseEffect.Play(_rect, crystal ? NodePurchaseEffect.CrystalColor : NodePurchaseEffect.NormalColor, maxed);
+        UpgradeTooltip.Instance?.PlayShake(); // 호버로 떠있는 툴팁도 같이 흔들림
+        UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true);
     }
 
     // 툴팁에 보여줄 내용 - 제목/설명/레벨/가격 4줄
     private UpgradeTooltip.Content BuildTooltipContent()
     {
         int level = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetLevel(Id) : 0;
-        string nextEffect = IsMasked() ? null : NextLevelEffectText(level); // 다음 레벨에서 늘어나는 수치 문구 ("+3", "+15%" 등) - 해금류/최대레벨이면 null, 가려진 노드는 효과 종류가 드러나지 않게 null
 
         return new UpgradeTooltip.Content
         {
             title = IsMasked() ? "???" : displayName,
-            description = IsMasked() ? UpgradeManager.Instance.LockedTargetHintText(Id) : description.Replace("{n}", CurrentSecondsText()),
-            level = nextEffect != null ? $"{level} / {maxLevel}  (다음 {nextEffect})" : $"{level} / {maxLevel}",
+            // 수치가 늘어나는 효과는 "무엇이 +n 증가합니다"로 자동 작성, 해금류는 인스펙터 설명 그대로
+            description = IsMasked() ? UpgradeManager.Instance.LockedTargetHintText(Id) : AutoDescription(level) ?? description.Replace("{n}", CurrentSecondsText()),
+            level = $"{level} / {maxLevel}",
             price = IsMasked() ? "" : NextCostText(level), // 가려진 노드는 가격도 숨김
         };
     }
@@ -136,77 +150,69 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         return seconds < 0f ? "?" : seconds.ToString("0.#");
     }
 
-    // 다음 레벨을 올렸을 때 실제로 늘어나는 수치를 사람이 읽는 문구로("+3", "+15%", "-0.5초" 등).
-    // 해금류(on/off라 수치 의미 없음) 이거나 이미 최대 레벨이면 null.
-    private string NextLevelEffectText(int level)
+    // 수치가 늘어나는 효과의 설명을 "무엇이 +n 증가합니다" 형태로 만듦. n은 다음 레벨에서 늘어나는 값
+    // (최대 레벨이면 마지막 레벨 값). 해금류(on/off라 수치 의미 없음)는 null -> 인스펙터 설명을 그대로 씀
+    private string AutoDescription(int level)
     {
-        if (level >= maxLevel) return null; // 최대면 다음 값 자체가 없음
-        if (valuePerLevel == null || valuePerLevel.Length == 0) return null; // 값 배열 없으면 표시할 게 없음
-
-        int idx = Mathf.Clamp(level, 0, valuePerLevel.Length - 1); // UpgradeManager.ValueAtLevel(level+1)과 동일한 인덱싱
-        float value = valuePerLevel[idx]; // 다음 레벨에서 추가되는 원값
+        if (valuePerLevel == null || valuePerLevel.Length == 0) return null; // 값 배열 없으면 수치를 모름
+        float value = valuePerLevel[Mathf.Clamp(level, 0, valuePerLevel.Length - 1)]; // 다음 레벨에서 추가되는 원값 (UpgradeManager.ValueAtLevel(level+1)과 같은 인덱싱)
+        string n = Round(value); // 반올림한 수치 문구
+        string obj = KoreanJosa.EulReul(targetObjectName); // "사과를" - 대상 오브젝트 효과용
+        string weapon = targetWeaponName; // 대상 무기 이름 (비면 전역)
 
         switch (effect)
         {
-            case UpgradeManager.UpgradeEffect.AutoClickUnlock:
-            case UpgradeManager.UpgradeEffect.ComboUnlock:
-            case UpgradeManager.UpgradeEffect.LuckyClick:
-            case UpgradeManager.UpgradeEffect.DoubleClick:
-            case UpgradeManager.UpgradeEffect.AutoMineUnlock:
-            case UpgradeManager.UpgradeEffect.AutoSweepUnlock:
-            case UpgradeManager.UpgradeEffect.HoverPickupUnlock:
-            case UpgradeManager.UpgradeEffect.ZoneAutoBreakUnlock:
-            case UpgradeManager.UpgradeEffect.HoverClickUnlock:
-            case UpgradeManager.UpgradeEffect.PieceMergeDecoy:
-            case UpgradeManager.UpgradeEffect.WaxCoatUnlock:
-                return null; // 해금류는 숫자가 아니라 on/off라 표시 안 함
-
-            case UpgradeManager.UpgradeEffect.CritChance:
-            case UpgradeManager.UpgradeEffect.CritDamage:
-            case UpgradeManager.UpgradeEffect.LuckyClickChanceUp:
-            case UpgradeManager.UpgradeEffect.DoubleClickChanceUp:
-            case UpgradeManager.UpgradeEffect.PieceGainGlobal:
-            case UpgradeManager.UpgradeEffect.PieceGainObject:
-            {
-                // 드랍량 강화는 %가 아니라 실제로 늘어나는 조각 수로 보여줌 (기본 보상의 value%, 최소 1개)
-                int objectIndex = ObjectManager.StaticIndexOfName(targetObjectName); // 이 노드가 강화하는 오브젝트
-                if (objectIndex < 0 || ObjectManager.Instance == null) return $"+{value:0.##}%";
-                double pieces = UpgradeManager.ObjectPieceBonusPerLevel(ObjectManager.Instance.GetBaseReward(objectIndex), value); // 다음 레벨에서 더 얻는 조각 수
-                return pieces < 100 ? $"+{pieces:0.#}개" : $"+{NumberFormatUtil.Format((long)Math.Round(pieces))}개";
-            }
-
-            case UpgradeManager.UpgradeEffect.ObjectDoubleDrop:
-            case UpgradeManager.UpgradeEffect.CrystalChance:
-                return $"+{value:0.##}%"; // 확률/비율계 효과
-
-            case UpgradeManager.UpgradeEffect.AutoClickSpeed:
-            case UpgradeManager.UpgradeEffect.ComboCooldown:
-            case UpgradeManager.UpgradeEffect.AutoMineSpeed:
-            case UpgradeManager.UpgradeEffect.AutoSweepSpeed:
-                return $"-{value:0.##}초"; // 주기가 줄어드는 효과
-
-            case UpgradeManager.UpgradeEffect.ComboDuration:
-                return $"+{value:0.##}초"; // 지속시간이 늘어나는 효과
-
-            case UpgradeManager.UpgradeEffect.ObjectExtraCopies:
-                return $"+{value:0.##}개"; // 더 놓이는 개수
-
-            case UpgradeManager.UpgradeEffect.AutoSweepLayers:
-            case UpgradeManager.UpgradeEffect.HoverPickupLayers:
-                return $"+{value:0.##}층"; // 쓸어 담는 층이 늘어나는 효과
-
             case UpgradeManager.UpgradeEffect.ClickDamage:
             {
-                int weaponIndex = WeaponManager.StaticIndexOfWeaponName(targetWeaponName); // 이 노드가 강화하는 무기 (전역이면 -1)
+                int weaponIndex = WeaponManager.StaticIndexOfWeaponName(weapon); // 이 노드가 강화하는 무기 (전역이면 -1)
                 if (weaponIndex < 0 && WeaponManager.Instance != null)
                     weaponIndex = WeaponManager.Instance.EquippedIndex; // 전역 강화는 지금 장착한 무기 기준으로 보여줌
                 int scale = ObjectHealthCalculator.ScaleOfTier(weaponIndex + 1); // 그 무기 티어의 데미지 배율
-                return $"+{NumberFormatUtil.Format(Mathf.RoundToInt(value * scale))}"; // 실제로 붙는 데미지(배율 적용 후)로 표시
+                string amount = NumberFormatUtil.Format(Mathf.RoundToInt(value * scale)); // 실제로 붙는 데미지(배율 적용 후)
+                return string.IsNullOrEmpty(weapon) ? $"모든 무기의 데미지가 +{amount} 증가합니다." : $"{weapon}의 데미지가 +{amount} 증가합니다.";
             }
-
-            default: // AutoClickCount, AutoMineYield, ComboMultiplier, WeaponKillBonus 등 순수 수치형
-                return $"+{value:0.##}";
+            case UpgradeManager.UpgradeEffect.CritChance: return $"치명타 확률이 +{n}% 증가합니다.";
+            case UpgradeManager.UpgradeEffect.CritDamage: return $"치명타 데미지가 +{n}% 증가합니다.";
+            case UpgradeManager.UpgradeEffect.LuckyClickChanceUp: return $"럭키 클릭 확률이 +{n}% 증가합니다.";
+            case UpgradeManager.UpgradeEffect.DoubleClickChanceUp: return $"더블 클릭 확률이 +{n}% 증가합니다.";
+            case UpgradeManager.UpgradeEffect.PieceGainGlobal: return $"모든 오브젝트를 부술 때 얻는 조각이 +{n}% 증가합니다.";
+            case UpgradeManager.UpgradeEffect.PieceGainObject:
+            {
+                // %가 아니라 실제로 늘어나는 조각 수로 (기본 보상의 value%, 최소 1개)
+                int objectIndex = ObjectManager.StaticIndexOfName(targetObjectName); // 이 노드가 강화하는 오브젝트
+                if (objectIndex < 0 || ObjectManager.Instance == null) return $"{obj} 부술 때 얻는 조각이 +{n}% 증가합니다.";
+                double pieces = UpgradeManager.ObjectPieceBonusPerLevel(ObjectManager.Instance.GetBaseReward(objectIndex), value); // 늘어나는 조각 수
+                return $"{obj} 부술 때 얻는 조각이 +{NumberFormatUtil.Format((long)Math.Round(pieces))}개 증가합니다.";
+            }
+            case UpgradeManager.UpgradeEffect.ObjectDoubleDrop: return $"{obj} 부술 때 조각이 2배로 나올 확률이 +{n}% 증가합니다.";
+            case UpgradeManager.UpgradeEffect.WeaponKillBonus: return $"{KoreanJosa.EuroRo(weapon)} 부술 때 조각을 +{n}개 더 얻습니다.";
+            case UpgradeManager.UpgradeEffect.CrystalChance: return $"오브젝트를 부술 때 결정이 나올 확률이 +{n}% 증가합니다.";
+            case UpgradeManager.UpgradeEffect.CrystalAmount: return $"결정이 나올 때 개수가 +{n}개 증가합니다.";
+            case UpgradeManager.UpgradeEffect.GroundPieceCap: return $"바닥에 쌓일 수 있는 조각 개수가 +{n}개 증가합니다.";
+            case UpgradeManager.UpgradeEffect.AutoClickSpeed: return $"{targetObjectName} 자동 클릭 간격이 {n}초 줄어듭니다.";
+            case UpgradeManager.UpgradeEffect.AutoClickCount: return $"{targetObjectName} 자동 클릭 한 번에 때리는 횟수가 +{n}회 증가합니다.";
+            case UpgradeManager.UpgradeEffect.ComboCooldown: return $"콤보 쿨타임이 {n}초 줄어듭니다.";
+            case UpgradeManager.UpgradeEffect.ComboDuration: return $"콤보 지속시간이 +{n}초 늘어납니다.";
+            case UpgradeManager.UpgradeEffect.ComboMultiplier: return $"콤보 중 얻는 조각 배율이 +{n}배 증가합니다.";
+            case UpgradeManager.UpgradeEffect.AutoMineSpeed: return $"자동 채굴 간격이 {n}초 줄어듭니다.";
+            case UpgradeManager.UpgradeEffect.AutoMineYield: return $"자동 채굴 한 번에 얻는 조각이 +{n}배 증가합니다.";
+            case UpgradeManager.UpgradeEffect.AutoSweepSpeed: return $"자동 줍기 간격이 {n}초 줄어듭니다.";
+            case UpgradeManager.UpgradeEffect.AutoSweepLayers: return $"자동 줍기가 한 번에 쓸어 담는 조각 층이 +{n}층 증가합니다.";
+            case UpgradeManager.UpgradeEffect.HoverPickupLayers: return $"커서 줍기가 한 번에 줍는 조각 층이 +{n}층 증가합니다.";
+            case UpgradeManager.UpgradeEffect.CursorRange: return $"커서 범위가 +{n} 넓어집니다.";
+            case UpgradeManager.UpgradeEffect.ObjectExtraCopies:
+                return $"맵에 {KoreanJosa.IGa(targetObjectName)} +{n}개 더 놓입니다. 동시에 여러 개를 부술 수 있어 조각을 더 빨리 모읍니다.";
+            default: return null; // 해금류
         }
+    }
+
+    // 툴팁 수치 반올림 - 1 이상은 정수, 1 미만은 소수 첫째 자리 (0.09 -> 0.1). 그래도 0이 되면 둘째 자리까지
+    private static string Round(float value)
+    {
+        float abs = Mathf.Abs(value); // 크기
+        if (abs >= 1f) return Mathf.RoundToInt(abs).ToString();
+        string oneDecimal = abs.ToString("0.#"); // 소수 첫째 자리
+        return oneDecimal != "0" ? oneDecimal : abs.ToString("0.##");
     }
 
     // 다음 레벨 비용을 "123K 조각 + 5 결정" 형태 문구로. 최대 레벨이면 "최대"
@@ -296,5 +302,42 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         _rect.localRotation = Quaternion.identity;
         _shakeRoutine = null;
+    }
+
+    // 흔드는 도중 트리를 닫으면 코루틴이 멈추니 원래 자리로 되돌림
+    void OnDisable()
+    {
+        if (_denyRoutine == null) return;
+        _rect.pivot = _denyBasePivot;
+        _denyRoutine = null;
+    }
+
+    // 못 살 때 흔들림 - 터지는 이펙트 없이 좌우로 짧게 (해금/획득량 노드와 동일)
+    private void PlayDenyShake()
+    {
+        if (_denyRoutine != null) StopCoroutine(_denyRoutine);
+        else _denyBasePivot = _rect.pivot; // 흔드는 중이 아닐 때만 원래 pivot 기억 (연타해도 자리가 안 밀리게)
+        _denyRoutine = StartCoroutine(DenyShakeRoutine());
+    }
+
+    private IEnumerator DenyShakeRoutine()
+    {
+        const float duration = 0.18f;      // 흔들림 총 시간(초)
+        const float amplitudeRatio = 0.06f; // 최대 이동 거리 (노드 폭 기준 비율)
+        // anchoredPosition은 선(UpgradeTreeLink)이 읽는 값이라 건드리지 않고 pivot만 밀어서 그림만 흔듦 - 선은 제자리
+        const float oscillations = 2f;     // 좌우 왕복 횟수
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime; // 업그레이드 화면이 timeScale 0이라 unscaled
+            float progress = Mathf.Clamp01(elapsed / duration);
+            float offset = amplitudeRatio * Mathf.Sin(progress * oscillations * Mathf.PI * 2f) * (1f - progress); // 이번 프레임 이동 (폭 비율)
+            _rect.pivot = _denyBasePivot - new Vector2(offset, 0f); // pivot을 줄이면 그림이 오른쪽으로 감
+            yield return null;
+        }
+
+        _rect.pivot = _denyBasePivot;
+        _denyRoutine = null;
     }
 }
