@@ -4524,9 +4524,10 @@ MonoBehaviour:
   zoneRoot: {fileID: 1610872450}
   unlockZone: 2
   unlockEffect: {fileID: 1797684722}
-  shockwaveSpeed: 12
-  shockwaveWidth: 0.15
-  shockwaveColor: {r: 1, g: 1, b: 1, a: 0.8}
+  shockwaveSpeed: 20
+  crackColor: {r: 1, g: 1, b: 1, a: 0.9}
+  crackWidth: 0.08
+  crackBranches: 7
   shakeAmount: 0.15
   shakeDuration: 0.3
   autoBreakInterval: 5
@@ -29845,9 +29846,10 @@ MonoBehaviour:
   zoneRoot: {fileID: 558599200}
   unlockZone: 3
   unlockEffect: {fileID: 1797684722}
-  shockwaveSpeed: 12
-  shockwaveWidth: 0.15
-  shockwaveColor: {r: 1, g: 1, b: 1, a: 0.8}
+  shockwaveSpeed: 20
+  crackColor: {r: 1, g: 1, b: 1, a: 0.9}
+  crackWidth: 0.08
+  crackBranches: 7
   shakeAmount: 0.15
   shakeDuration: 0.3
   autoBreakInterval: 5
@@ -33162,9 +33164,10 @@ MonoBehaviour:
   zoneRoot: {fileID: 1630271656}
   unlockZone: 1
   unlockEffect: {fileID: 1797684722}
-  shockwaveSpeed: 12
-  shockwaveWidth: 0.15
-  shockwaveColor: {r: 1, g: 1, b: 1, a: 0.8}
+  shockwaveSpeed: 20
+  crackColor: {r: 1, g: 1, b: 1, a: 0.9}
+  crackWidth: 0.08
+  crackBranches: 7
   shakeAmount: 0.15
   shakeDuration: 0.3
   autoBreakInterval: 5
