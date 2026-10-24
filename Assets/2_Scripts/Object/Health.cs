@@ -206,6 +206,16 @@ public class Health : MonoBehaviour
         OnRespawned?.Invoke();
     }
 
+    // 투명한 상태에서 duration초 동안 서서히 나타남 (보스전 보호막 오브젝트 등장용)
+    public void FadeIn(float duration)
+    {
+        if (_spriteRenderer == null || !isActiveAndEnabled) return;
+        Color color = _originalColor; // 처음엔 완전히 투명하게
+        color.a = 0f;
+        _spriteRenderer.color = color;
+        StartCoroutine(Fade(0f, _originalColor.a, duration));
+    }
+
     // 지정한 시간 동안 스프라이트 알파값을 from -> to로 보간 (흐려지며 사라지고/나타나는 연출)
     private IEnumerator Fade(float fromAlpha, float toAlpha, float duration)
     {

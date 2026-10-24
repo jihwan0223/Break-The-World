@@ -38,14 +38,23 @@ public class Click : MonoBehaviour
     private float _autoMineTimer; // 자동채굴 업그레이드의 다음 발동까지 누적된 시간(초)
     private float _hoverHitCooldown; // 커서 타격을 다시 넣을 수 있을 때까지 남은 시간(초) - 0 이하면 바로 때릴 수 있음
     private bool _isTerrain; // 존 전체를 부수는 지형(책상/도로/아파트)인지 - 커서 타격 대상에서 뺌
+    private ZoneBreaker _boss; // 이 오브젝트가 지형(보스)이면 그 ZoneBreaker - 잡기 전엔 보스전 중에만 맞고, 보스전 중엔 보호막만큼 데미지가 줄어듦
     private WaxCoating _wax; // 이 오브젝트를 덮은 왁스 (맞을 때 튀는 부스러기 색을 왁스 색으로)
+
+    private const float StreakWindow = 0.45f; // 이 시간(초) 안에 다시 직접 클릭하면 연타가 이어짐
+    private const float StreakPitchStep = 0.025f; // 연타 한 번마다 타격음 피치가 올라가는 양
+    private const int StreakMaxSteps = 12; // 이 연타 수부터는 피치가 더 안 올라감 (최대 +0.3)
+    private static int _streak; // 지금 이어지는 연타 수 (모든 오브젝트 공용 - 여러 개를 번갈아 때려도 이어짐)
+    private static float _lastStreakTime = -1f; // 마지막으로 직접 클릭한 시각 (unscaled)
+    private static int _lastStreakFrame = -1; // 마지막으로 연타 수를 올린 프레임 - 커서 범위로 한 번에 여러 개를 때려도 한 번만 셈
 
     void Start()
     {
         _health = GetComponent<Health>();
         _audioSource = GetComponent<AudioSource>();
         _collider = GetComponent<Collider2D>();
-        _isTerrain = GetComponent<ZoneBreaker>() != null;
+        _boss = GetComponent<ZoneBreaker>();
+        _isTerrain = _boss != null;
         _wax = GetComponent<WaxCoating>(); // HealthSpriteSwitcher가 붙여둠 - 없으면(그림 단계가 없는 오브젝트) 여기서 붙임
         if (_wax == null && GetComponent<SpriteRenderer>() != null) _wax = gameObject.AddComponent<WaxCoating>();
         _health.OnDied += HandleDied;
@@ -85,6 +94,8 @@ public class Click : MonoBehaviour
         // 바로 아래에서 ObjectManager.Instance도 참조하니 둘 다 확인해야 함 (CurrencyManager만 확인하면 널 참조 위험)
         if (CurrencyManager.Instance == null || ObjectManager.Instance == null)
             return;
+
+        if (ZoneBreaker.IsShieldObject(_health)) return; // 보스전 보호막 오브젝트는 부숴도 조각/결정이 안 나옴
 
         int objectIndex = ObjIndex; // 방금 파괴된 오브젝트 (가운데 스왑 오브젝트면 장착 중인 것, 고정이면 그 인덱스)
         if (objectIndex < 0) return;
@@ -144,9 +155,23 @@ public class Click : MonoBehaviour
         }
     }
 
+    // 직접 클릭 연타 수를 올리고 그만큼 높인 타격음 피치를 돌려줌. 잠깐 쉬면 처음부터
+    private static float NextStreakPitch()
+    {
+        float now = Time.unscaledTime; // 지금 시각
+        if (Time.frameCount != _lastStreakFrame)
+        {
+            bool continued = now >= _lastStreakTime && now - _lastStreakTime <= StreakWindow; // 앞 클릭과 이어지는지 (플레이를 다시 시작하면 시각이 0부터라 now가 더 작을 수 있음)
+            _streak = continued ? Mathf.Min(_streak + 1, StreakMaxSteps) : 0;
+            _lastStreakFrame = Time.frameCount;
+        }
+        _lastStreakTime = now;
+        return 1f + _streak * StreakPitchStep;
+    }
+
     // 현재 선택된 오브젝트(ObjectManager)의 clickSounds 중 하나를 랜덤 재생하되,
-    // 바로 직전에 재생한 것과는 겹치지 않게 고름
-    private void PlayRandomClickSound()
+    // 바로 직전에 재생한 것과는 겹치지 않게 고름. pitch: 연타로 높아진 피치
+    private void PlayRandomClickSound(float pitch)
     {
         if (ObjectManager.Instance == null)
             return;
@@ -165,13 +190,16 @@ public class Click : MonoBehaviour
             index = (index + 1) % clickSounds.Length;
 
         _lastClickSoundIndex = index;
-        SfxPlayer.Play(_audioSource, clickSounds[index]);
+        SfxPlayer.Play(_audioSource, clickSounds[index], pitch: pitch);
     }
 
     // 클릭 한 번(플레이어 클릭/자동클릭/더블클릭 추가 타격 공용)의 데미지 계산 + 적용 + 연출.
     // 이미 죽어서 리스폰을 기다리는 중이면 아무것도 하지 않음 (더블클릭/자동클릭이 중복으로 때리는 걸 방지)
-    private void PerformClickHit(bool playWeaponSwing = true, Vector2? swingPoint = null)
+    // playerClick: 마우스로 직접 누른 클릭인지 (연타 피치 상승은 직접 클릭만)
+    private void PerformClickHit(bool playWeaponSwing = true, Vector2? swingPoint = null, bool playerClick = false)
     {
+        if (_boss != null && !_boss.BossAllowsDamage) return; // 아직 안 잡은 보스는 보스 도전 버튼을 눌러야 맞음
+
         // 바로 부활형 오브젝트가 페이드아웃/부활 대기 중이면, 이 클릭이 씹히지 않게 즉시 되살림
         if (_health.IsDead)
         {
@@ -194,7 +222,9 @@ public class Click : MonoBehaviour
 
         // 럭키 클릭 - 당첨되면 데미지가 모자라도 즉시 파괴. 원래 데미지가 남은 체력보다 크면 그대로 둠
         // (남은 체력으로 깎아버리면 뜨는 숫자가 무기 데미지가 아니라 체력만큼만 나옴)
-        bool isLucky = UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.LuckyClickChance;
+        bool bossFight = _boss != null && _boss.BossActive; // 보스전 중인 보스를 때리는지
+        if (bossFight) damage = Mathf.Max(1, Mathf.RoundToInt(damage * _boss.BossDamageMultiplier)); // 왁스 보호막만큼 덜 깎임
+        bool isLucky = !bossFight && UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.LuckyClickChance; // 보스전엔 한 방에 부수는 럭키 클릭 없음
         if (isLucky)
             damage = Mathf.Max(damage, _health.CurrentHP);
 
@@ -203,8 +233,9 @@ public class Click : MonoBehaviour
         bool willDie = damage >= _health.CurrentHP;
         bool hasBreakSound = ObjectManager.Instance != null && ObjIndex >= 0 && ObjIndex < ObjectManager.StaticObjectCount
             && ObjectManager.Instance.GetObjectAt(ObjIndex).breakSound != null; // 부서질 때 따로 나는 소리가 있는지
+        float pitch = playerClick ? NextStreakPitch() : 1f; // 직접 연타할수록 타격음이 조금씩 높아짐 (부수는 타격도 연타 수는 셈)
         if ((!willDie || !hasBreakSound) && !IsZoneHidden)
-            PlayRandomClickSound();
+            PlayRandomClickSound(pitch);
 
         bool wasAlive = _health.CurrentHP > 0; // 이미 부서져 있던 걸 때린 게 아닌지
         _health.TakeDamage(damage);
@@ -402,7 +433,7 @@ public class Click : MonoBehaviour
                 _hoverHitCooldown = UpgradeManager.Instance.HoverClickIntervalSeconds;
             else
                 Debug.Log("Click");
-            PerformClickHit(true, _collider.ClosestPoint(worldPos)); // 타격 연출은 커서 위치에서, 커서 범위 가장자리에 걸쳐 맞았으면 커서에 가장 가까운 자리에서 나옴
+            PerformClickHit(true, _collider.ClosestPoint(worldPos), !hover); // 타격 연출은 커서 위치에서, 커서 범위 가장자리에 걸쳐 맞았으면 커서에 가장 가까운 자리에서 나옴
 
             // 더블클릭 업그레이드 - 확률 판정 성공 시 살짝 늦게 두 번째 타격을 처리
             // (첫 타격에 죽었으면 지연된 PerformClickHit이 알아서 무시함 - IsDead 체크가 있음)

@@ -76,13 +76,34 @@ public class WaxCoating : MonoBehaviour
     private bool _broken; // 부서져서 왁스가 사라진 상태인지
     private Color _color = Color.white; // 이 오브젝트의 왁스 색
     private Vector2 _baseScale; // 시작할 때의 월드 크기 배율(가로, 세로) - 도트 크기 계산 기준
+    private bool _forceCover; // 보스전처럼 조건과 상관없이 왁스를 덮을지
+    private SpriteRenderer _shield; // 보스전 보호막 덧칠 - 연결된 오브젝트 색 왁스를 모서리/끝부분에 덧바름 (자식 오브젝트)
+    private Texture2D _shieldTexture; // 보호막 덧칠 그림 픽셀
+    private Color32[] _shieldPixels; // 보호막 덧칠 그림 픽셀 작업 공간
+    private Vector2Int[] _shieldAnchors; // 연결별 덧칠 중심 칸 (모서리 → 변 가운데 → 나머지 가장자리 순)
+    private Shape _shieldShape; // 덧칠 중심/그림을 만든 왁스 모양 - 모양이 바뀌면 다시 만듦
+    private bool[] _shieldShown; // 마지막으로 그린 연결별 켜짐 상태 - 같으면 다시 안 그림
+    private bool _shieldOn; // 보호막 덧칠을 보여줄지
+    private const float ShieldRadius = 0.12f; // 덧칠 한 덩이 반지름 (왁스 그림 짧은 변 대비)
 
     // 플레이를 새로 시작할 때 모양 캐시를 비움 (플레이 시작 때 스크립트를 다시 불러오지 않는 설정이라, 그 사이 그림을 다시 불러왔으면 옛 모양이 남음)
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetCache() => _shapes.Clear();
 
     // 지금 왁스가 오브젝트를 덮고 있는지 (HealthSpriteSwitcher가 깨진 단계 그림을 안 쓰는 데 씀)
-    public bool Covers => enabled && !NoWax && (!_isTerrain || TerrainUnlocked);
+    public bool Covers => enabled && (_forceCover || (!NoWax && (!_isTerrain || TerrainUnlocked)));
+
+    // 보스전 동안 켜서 지형/왁스 없는 오브젝트도 왁스를 입은 모습으로 만듦
+    public bool ForceCover
+    {
+        get => _forceCover;
+        set
+        {
+            if (_forceCover == value) return;
+            _forceCover = value;
+            _dirty = true; // 덮개가 바뀌었으니 왁스 그림을 처음부터 다시
+        }
+    }
 
     // 왁스를 안 덮는 오브젝트(ObjectManager noWax)인지 - 왁스는 없어도 맞으면 오브젝트에 금은 감
     private bool NoWax => ObjectManager.Instance != null && ObjectManager.Instance.NoWaxOf(ObjectIndex);
@@ -121,6 +142,12 @@ public class WaxCoating : MonoBehaviour
         _objectCracks = cracksObject.AddComponent<SpriteRenderer>();
         _objectCracks.sharedMaterial = _object.sharedMaterial;
         _objectCracks.enabled = false;
+
+        var shieldObject = new GameObject("WaxShield"); // 보호막 덧칠을 그릴 자식
+        shieldObject.transform.SetParent(transform, false);
+        _shield = shieldObject.AddComponent<SpriteRenderer>();
+        _shield.sharedMaterial = _object.sharedMaterial;
+        _shield.enabled = false;
     }
 
     void OnEnable()
@@ -135,10 +162,13 @@ public class WaxCoating : MonoBehaviour
         _health.OnDied -= HandleDied;
         if (_wax != null) _wax.enabled = false;
         if (_objectCracks != null) _objectCracks.enabled = false;
+        if (_shield != null) _shield.enabled = false;
     }
 
     void OnDestroy()
     {
+        if (_shieldTexture != null) Destroy(_shieldTexture);
+        if (_shield != null && _shield.sprite != null) Destroy(_shield.sprite);
         if (_texture != null) Destroy(_texture);
         if (_wax != null && _wax.sprite != null) Destroy(_wax.sprite);
         if (_crackTexture != null) Destroy(_crackTexture);
@@ -186,6 +216,7 @@ public class WaxCoating : MonoBehaviour
         if (track && _shape != null && _health.MaxHP > 0) Redraw(1f - (float)_health.CurrentHP / _health.MaxHP);
 
         _wax.enabled = show;
+        _shield.enabled = show && _shieldOn && _shield.sprite != null;
         if (!show) return;
 
         // 오브젝트 그림을 그대로 따라감: 정렬 순서는 오브젝트 금 위, 투명도(죽을 때/살아날 때 흐려짐)와 존 숨김도 같이
@@ -195,6 +226,98 @@ public class WaxCoating : MonoBehaviour
         _wax.flipX = _object.flipX;
         _wax.flipY = _object.flipY;
         _wax.color = new Color(1f, 1f, 1f, _object.color.a);
+
+        if (!_shield.enabled) return;
+        _shield.sortingLayerID = _object.sortingLayerID;
+        _shield.sortingOrder = _object.sortingOrder + 3; // 왁스 위에 덧바름
+        _shield.forceRenderingOff = _object.forceRenderingOff;
+        _shield.flipX = _object.flipX;
+        _shield.flipY = _object.flipY;
+        _shield.color = _wax.color;
+    }
+
+    // 보스전 보호막: 연결별 색(colors)과 지금 이어져 있는지(on). 이어진 연결마다 보스 왁스 모서리/끝부분에 그 색 왁스가 조금 덧발림. null이면 다 지움
+    public void SetShield(Color[] colors, bool[] on)
+    {
+        _shieldOn = colors != null && colors.Length > 0 && _shape != null && _pixels != null;
+        if (!_shieldOn) { _shieldShown = null; return; }
+
+        bool rebuild = _shieldShape != _shape || _shieldAnchors == null || _shieldAnchors.Length != colors.Length; // 덧칠 자리를 새로 정할지
+        if (!rebuild && _shieldShown != null && System.Linq.Enumerable.SequenceEqual(_shieldShown, on)) return; // 그대로면 다시 안 그림
+
+        int w = _shape.width, h = _shape.height; // 칸 수
+        if (rebuild)
+        {
+            _shieldShape = _shape;
+            _shieldAnchors = PickShieldAnchors(colors.Length);
+            if (_shieldTexture == null || _shieldTexture.width != w || _shieldTexture.height != h)
+            {
+                if (_shieldTexture != null) Destroy(_shieldTexture);
+                _shieldTexture = new Texture2D(w, h, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
+                _shieldPixels = new Color32[w * h];
+            }
+            if (_shield.sprite != null) Destroy(_shield.sprite);
+            _shield.sprite = Sprite.Create(_shieldTexture, new Rect(0, 0, w, h), _shape.pivot, _shape.pixelsPerUnit, 0, SpriteMeshType.FullRect); // 왁스와 같은 칸/자리
+            _shield.transform.localScale = _wax.transform.localScale;
+        }
+        _shieldShown = (bool[])on.Clone();
+
+        System.Array.Clear(_shieldPixels, 0, _shieldPixels.Length);
+        float radius = Mathf.Max(4f, Mathf.Min(w, h) * ShieldRadius); // 덧칠 한 덩이 반지름(칸)
+        Vector3 half = (LightDir + Vector3.forward).normalized; // 반짝임 계산용
+        for (int i = 0; i < colors.Length; i++)
+        {
+            if (!on[i]) continue;
+            Vector2Int anchor = _shieldAnchors[i]; // 이 덩이 중심
+            int reach = Mathf.CeilToInt(radius * 1.25f); // 울퉁불퉁한 테두리까지 포함한 최대 거리
+            for (int y = Mathf.Max(0, anchor.y - reach); y <= Mathf.Min(h - 1, anchor.y + reach); y++)
+                for (int x = Mathf.Max(0, anchor.x - reach); x <= Mathf.Min(w - 1, anchor.x + reach); x++)
+                {
+                    int cell = y * w + x; // 이 칸
+                    if (!_shape.mask[cell]) continue; // 보스 왁스 위에만
+                    float dx = x - anchor.x, dy = y - anchor.y; // 중심에서 떨어진 칸 수
+                    float r = radius * (0.75f + 0.5f * Mathf.PerlinNoise(x * 0.15f + i * 13.7f, y * 0.15f + i * 7.3f)); // 울퉁불퉁한 덩이 테두리
+                    float t = Mathf.Sqrt(dx * dx + dy * dy) / r; // 0 가운데 ~ 1 테두리
+                    if (t > 1f) continue;
+                    // 일반 오브젝트 왁스와 같은 방식으로 칠함 - 보스 왁스 면의 음영/광을 그대로 따라가서 왁스 위에 다른 색 왁스를 한 겹 더 바른 느낌.
+                    // 덧바른 덩이의 둥근 두께도 살짝 섞어 도톰하게
+                    Vector3 normal = new Vector3(dx / r, dy / r, Mathf.Sqrt(1f - t * t)).normalized; // 덧바른 덩이 면 방향
+                    float patchLight = Mathf.Clamp01(Vector3.Dot(normal, LightDir) * 0.5f + 0.5f); // 덩이 자체가 빛 받는 정도
+                    float diffuse = Mathf.Lerp(_shape.diffuse[cell], patchLight, 0.3f); // 아래 왁스 면 음영 위주 + 덩이 두께 조금
+                    float thickness = _shape.thickness[cell]; // 아래 왁스 두께
+                    float mottle = 1f + (Mathf.PerlinNoise(x * 0.1f + 50f, y * 0.1f) - 0.5f) * 0.05f; // 왁스 표면의 옅은 결
+                    Color color = colors[i] * Mathf.Lerp(0.65f, 1.12f, diffuse) * mottle; // 빛 받는 면은 밝게, 반대쪽은 어둡게
+                    color = Color.Lerp(color, Color.white, thickness * 0.12f); // 볼록한 가운데는 살짝 밝게
+                    if (t > 0.85f) color *= 0.9f; // 덧바른 가장자리는 아주 살짝 진하게
+                    float spec = Mathf.Max(_shape.specular[cell], Mathf.Pow(Mathf.Max(0f, Vector3.Dot(normal, half)), 12f) * 0.25f); // 은은한 광
+                    color = Color.Lerp(color, Color.white, spec * 0.6f);
+                    color.a = Mathf.Max(Mathf.Lerp(ThinAlpha, ThickAlpha, thickness), spec); // 일반 왁스처럼 아주 살짝 비침
+                    _shieldPixels[cell] = color;
+                }
+        }
+        _shieldTexture.SetPixels32(_shieldPixels);
+        _shieldTexture.Apply();
+    }
+
+    // 덧칠 중심을 왁스 가장자리에서 고름: 네 모서리 → 네 변 가운데 → 그 뒤는 아무 방향 끝
+    private Vector2Int[] PickShieldAnchors(int count)
+    {
+        var directions = new[] { new Vector2(-1, 1), new Vector2(1, 1), new Vector2(1, -1), new Vector2(-1, -1),
+                                 new Vector2(0, 1), new Vector2(1, 0), new Vector2(0, -1), new Vector2(-1, 0) }; // 앞쪽부터 쓰는 방향
+        int w = _shape.width, h = _shape.height; // 칸 수
+        var anchors = new Vector2Int[count];
+        for (int i = 0; i < count; i++)
+        {
+            Vector2 direction = i < directions.Length ? directions[i] : Random.insideUnitCircle.normalized; // 이 덩이를 놓을 방향
+            float best = float.MinValue; // 그 방향으로 가장 멀리 나간 정도
+            for (int cell = 0; cell < _shape.mask.Length; cell++)
+            {
+                if (!_shape.mask[cell]) continue;
+                float score = ((float)(cell % w) / w - 0.5f) * direction.x + ((float)(cell / w) / h - 0.5f) * direction.y; // 가로세로 비율을 맞춘 방향 거리
+                if (score > best) { best = score; anchors[i] = new Vector2Int(cell % w, cell / w); }
+            }
+        }
+        return anchors;
     }
 
     // 오브젝트 그림 픽셀 몇 개를 왁스 한 칸으로 묶을지(가로, 세로) - 화면에서 도트 크기가 오브젝트마다 같고 정사각형이게.

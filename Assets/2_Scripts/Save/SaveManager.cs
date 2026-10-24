@@ -131,6 +131,7 @@ public class SaveManager : MonoBehaviour
             objectIndex = ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : 0,
             unlockedMaxZone = ZoneManager.Instance != null ? ZoneManager.Instance.UnlockedMaxZone : 0,
             currentZone = ZoneManager.Instance != null ? ZoneManager.Instance.CurrentZone : 0,
+            finalBossCleared = ZoneBreaker.FinalBossCleared,
             upgrades = upgrades.ToArray(),
         };
 
@@ -168,6 +169,7 @@ public class SaveManager : MonoBehaviour
         }
 
         ZoneManager.Instance?.SetState(data.unlockedMaxZone, data.currentZone);
+        ZoneBreaker.FinalBossCleared = data.finalBossCleared;
 
         // 해금 상태를 먼저 복원해야 장착이 막히지 않음
         if (WeaponManager.Instance != null && data.unlockedWeapons != null)

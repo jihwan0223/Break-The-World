@@ -11,7 +11,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
     [SerializeField] private RectTransform content;
 
     [Header("줌")]
-    [SerializeField] private float minZoom = 0.07f; // 최소 축소 배율
+    [SerializeField] private float minZoom = 0.15f; // 최소 축소 배율
     [SerializeField] private float maxZoom = 1.5f; // 최대 확대 배율
     [SerializeField] private float zoomStep = 0.1f; // 휠 한 틱당 목표 배율이 곱해지는 비율 (0.1 = 틱당 ±10%, 곱셈이라 어느 배율에서든 체감이 균일함)
     [SerializeField] private float zoomSmoothSpeed = 8f; // 목표 배율을 따라잡는 속도 (클수록 빠르게/뚝뚝 끊기게, 작을수록 부드럽게)

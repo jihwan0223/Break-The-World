@@ -7,7 +7,7 @@ using UnityEngine;
 // 결정 업그레이드(존 자동 파괴 해금)를 사면 이 오브젝트가 갈라진 상태가 되어, 직접 부수지 않아도 autoBreakInterval마다 존 전체가 계속 부서진다.
 // shockwaveSpeed를 넣으면 이 오브젝트 중심에서 균열이 뻗어나가며 가까운 오브젝트부터 차례로 부서짐 (0이면 전부 동시에)
 [RequireComponent(typeof(Health))]
-public class ZoneBreaker : MonoBehaviour
+public partial class ZoneBreaker : MonoBehaviour
 {
     [SerializeField] private Transform zoneRoot; // 이 존의 루트 - 이 아래에 있는 오브젝트를 전부 같이 부숨
     [SerializeField] private int unlockZone = 1; // 처음 부술 때 해금할 존 번호 (ZoneManager에 그 존이 없으면 해금/연출 안 함)
@@ -57,10 +57,13 @@ public class ZoneBreaker : MonoBehaviour
         _health = GetComponent<Health>();
         _health.OnDied += HandleDied;
         _click = GetComponent<Click>();
+        BossChallengeUI.Ensure();
     }
 
     void Update()
     {
+        UpdateBoss();
+
         // 존 자동 파괴(결정 업그레이드)를 해금했으면 갈라진 연출을 켜고, 주기마다 존 전체를 부숨. 안 보는 존에서도 계속 돎
         bool unlocked = _click != null && UpgradeManager.Instance != null
             && UpgradeManager.Instance.ZoneAutoBreakIsUnlockedFor(_click.ObjectIndex); // 이 오브젝트의 자동 파괴를 해금했는지
@@ -87,6 +90,8 @@ public class ZoneBreaker : MonoBehaviour
 
     private void HandleDied()
     {
+        if (BossActive) WinBoss(); // 보스전 중에 부쉈으면 성공 - 보상 + 슬로우 모션 (해금/균열 연출은 아래에서 그대로)
+
         bool unlocking = ZoneManager.Instance != null
             && ZoneManager.Instance.UnlockedMaxZone < unlockZone
             && unlockZone < ZoneManager.Instance.ZoneCount; // 이번 파괴로 다음 존을 새로 여는지

@@ -384,6 +384,7 @@ public class SidePanelUI : MonoBehaviour
         AddDebugButton(list, "맵 해금 초기화", () =>
         {
             ZoneManager.Instance?.ResetAll();
+            ZoneBreaker.ResetBosses();
             return "존1만 열린 상태로 되돌렸습니다. 책상을 부수면 해금 연출이 나옵니다";
         });
         AddDebugButton(list, "전체 초기화", () =>
@@ -398,6 +399,7 @@ public class SidePanelUI : MonoBehaviour
             WeaponManager.Instance?.ResetUnlocks();
             _weaponBrowse.index = 0;
             ZoneManager.Instance?.ResetAll();
+            ZoneBreaker.ResetBosses();
             UpgradeTreeUI.Instance?.RefreshAll();
             SaveManager.Instance?.SaveNow();
             return "모든 데이터를 처음 상태로 되돌렸습니다";

@@ -83,7 +83,8 @@ public static class SfxPlayer
     }
 
     // priority: 파괴 소리처럼 꼭 들려야 하는 소리 - 동시 재생 수 제한을 무시함 (최소 간격은 그대로)
-    public static void Play(AudioSource source, AudioClip clip, bool priority = false)
+    // pitch: 기본 피치 (연타할수록 타격음을 높일 때 씀) - 여기에 랜덤 흔들림이 더해짐
+    public static void Play(AudioSource source, AudioClip clip, bool priority = false, float pitch = 1f)
     {
         if (source == null || clip == null) return;
 
@@ -97,7 +98,7 @@ public static class SfxPlayer
             _recentPlayTimes.Dequeue();
 
         float busy = Mathf.InverseLerp(QuietStart, QuietFull, _recentPlayTimes.Count); // 0(한가) ~ 1(엄청 연타 중)
-        source.pitch = 1f + Random.Range(-PitchJitter, PitchJitter);
+        source.pitch = pitch + Random.Range(-PitchJitter, PitchJitter);
         source.PlayOneShot(Trimmed(clip), BaseVolume * Volume * Mathf.Lerp(1f, MinBusyVolume, busy));
 
         _lastPlayTime[clip] = now;
