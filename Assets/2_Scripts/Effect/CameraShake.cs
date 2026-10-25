@@ -17,7 +17,7 @@ public class CameraShake : MonoBehaviour
     public static void Shake(float amount, float duration)
     {
         Camera cam = Camera.main; // 흔들 카메라
-        if (cam == null || amount <= 0f || duration <= 0f) return;
+        if (cam == null || amount <= 0f || duration <= 0f || !GameSettings.ScreenShake) return; // 설정에서 화면 흔들림을 끄면 안 흔듦
 
         CameraShake shake = cam.GetComponent<CameraShake>(); // 카메라에 붙은 흔들기
         if (shake == null) shake = cam.gameObject.AddComponent<CameraShake>();

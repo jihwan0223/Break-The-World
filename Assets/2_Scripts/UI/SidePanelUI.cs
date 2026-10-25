@@ -282,7 +282,7 @@ public class SidePanelUI : MonoBehaviour
         closeButton.style.right = 16;
         closeButton.style.width = 60;
         closeButton.style.height = 60;
-        closeButton.style.fontSize = 28;
+        closeButton.style.fontSize = 36;
         closeButton.style.unityFontStyleAndWeight = FontStyle.Bold;
         PixelStyle.Button(closeButton, PixelStyle.Pink); // 픽셀 입체 버튼
         panel.Add(closeButton);
@@ -376,7 +376,7 @@ public class SidePanelUI : MonoBehaviour
         _debugStatus.style.left = 0;
         _debugStatus.style.right = 0;
         _debugStatus.style.bottom = 40;
-        _debugStatus.style.fontSize = 26;
+        _debugStatus.style.fontSize = 36;
         _debugStatus.style.color = PixelStyle.Text.linear;
         _debugStatus.style.unityTextAlign = TextAnchor.MiddleCenter;
         _debugPanel.Add(_debugStatus);
@@ -438,7 +438,7 @@ public class SidePanelUI : MonoBehaviour
 
         // 가운데: < [이름 / 큰 미리보기 / 선택 버튼] > , 오른쪽: 정보 카드 (Keep on Mining처럼 그림이 화면 가운데, 설명은 오른쪽)
         var nameLabel = new Label();
-        nameLabel.style.fontSize = 40;
+        nameLabel.style.fontSize = 36;
         nameLabel.style.color = PixelStyle.Text.linear;
         nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
         nameLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -462,7 +462,7 @@ public class SidePanelUI : MonoBehaviour
         var equippedLabel = new Label("장착됨");
         equippedLabel.style.height = 64;
         equippedLabel.style.marginTop = 24;
-        equippedLabel.style.fontSize = 24;
+        equippedLabel.style.fontSize = 36;
         equippedLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
         equippedLabel.style.color = PixelStyle.Good.linear;
         equippedLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -548,7 +548,7 @@ public class SidePanelUI : MonoBehaviour
         card.style.right = 60;
         card.style.top = Length.Percent(50);
         card.style.translate = new Translate(0, Length.Percent(-50)); // 세로 가운데
-        card.style.width = 380; // 가로는 좁게
+        card.style.width = 440; // 가로는 좁게 (36px 글씨 한 줄이 들어가는 만큼)
         card.style.paddingTop = 28; // 내용만큼만 높아지되 위아래 여백을 넉넉히
         card.style.paddingBottom = 16;
         card.style.paddingLeft = 24;
@@ -596,7 +596,7 @@ public class SidePanelUI : MonoBehaviour
         var nextButton = new Button(() => { _weaponBrowse.index = Mathf.Min(WeaponCount() - 1, _weaponBrowse.index + 1); redraw(); }) { text = ">" };
 
         var nameLabel = new Label();
-        nameLabel.style.fontSize = 40;
+        nameLabel.style.fontSize = 36;
         nameLabel.style.color = PixelStyle.Text.linear;
         nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
         nameLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -740,12 +740,12 @@ public class SidePanelUI : MonoBehaviour
         row.style.marginBottom = 26; // 줄 사이를 넓혀 세로로 길쭉한 카드
 
         var labelText = new Label(label);
-        labelText.style.fontSize = 22;
+        labelText.style.fontSize = 36;
         labelText.style.color = PixelStyle.MutedText.linear;
         row.Add(labelText);
 
         var valueText = new Label(value);
-        valueText.style.fontSize = 24;
+        valueText.style.fontSize = 36;
         valueText.style.unityFontStyleAndWeight = FontStyle.Bold;
         valueText.style.color = (valueColor == GoodColor ? PixelStyle.Good : valueColor == BadColor ? PixelStyle.Bad
             : valueColor == HiddenColor ? PixelStyle.Hidden : PixelStyle.Text).linear; // 크림 바탕에서 보이는 진한 색으로
@@ -834,7 +834,7 @@ public class SidePanelUI : MonoBehaviour
         button.clicked += () => StartCoroutine(PunchThenInvoke(button, NavButtonPunchDuration, NavButtonPunchAmount, onClick));
         button.style.width = 300;
         button.style.height = 110;
-        button.style.fontSize = 34;
+        button.style.fontSize = 36;
         button.style.unityFontStyleAndWeight = FontStyle.Bold;
         PixelStyle.Button(button, tone); // 픽셀 입체 버튼
         return button;

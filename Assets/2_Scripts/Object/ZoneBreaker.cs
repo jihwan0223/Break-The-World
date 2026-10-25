@@ -129,7 +129,9 @@ public partial class ZoneBreaker : MonoBehaviour
     {
         if (zoneRoot == null) yield break;
 
-        Vector3 center = transform.position; // 균열 시작점
+        Renderer ownRenderer = GetComponent<Renderer>(); // 이 오브젝트 그림
+        Vector3 center = ownRenderer != null ? ownRenderer.bounds.center : transform.position; // 균열 시작점 - 그림 한가운데 (회사처럼 기준점이 아래쪽인 그림도 가운데서 퍼지게)
+        center.z = transform.position.z;
         Health[] targets = zoneRoot.GetComponentsInChildren<Health>(); // 부술 대상들
         bool[] done = new bool[targets.Length]; // 이미 균열이 닿은 대상인지
         float maxRadius = 0f; // 가장 먼 대상까지의 거리 - 균열이 여기까지 퍼지면 끝

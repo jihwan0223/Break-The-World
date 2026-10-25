@@ -83,7 +83,8 @@ public class HitEffects : MonoBehaviour
         }
 
         Vector3 numberPosition = new Vector3(point.x + Random.Range(-NumberJitter, NumberJitter), point.y, 0f); // 숫자가 뜰 자리
-        _numbers.ShowDamage(numberPosition, damage, strong ? StrongDamageColor : DamageColor, strong ? StrongNumberScale : NumberScale);
+        if (GameSettings.DamageNumbers) // 설정에서 데미지 숫자를 끄면 부스러기만
+            _numbers.ShowDamage(numberPosition, damage, strong ? StrongDamageColor : DamageColor, strong ? StrongNumberScale : NumberScale);
     }
 
     void Update()

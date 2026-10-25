@@ -30,7 +30,7 @@ public static class PixelStyle
 
     private static readonly Color Outline = Hex("#8B6B4A"); // 공통 외곽선 (부드러운 갈색)
     public static readonly Color Text = Hex("#5A3E2B"); // 크림 위 기본 글씨 (진한 갈색)
-    public static readonly Color MutedText = Hex("#9A7A5A"); // 항목 이름 같은 옅은 글씨
+    public static readonly Color MutedText = Hex("#7E5E40"); // 항목 이름 같은 옅은 글씨
     public static readonly Color Good = Hex("#3E7A60"); // 장착 중/해금 완료 (진한 민트)
     public static readonly Color Bad = Hex("#B8524A"); // 잠김 (벽돌색)
     public static readonly Color Hidden = Hex("#B8A48C"); // ???로 가린 값
@@ -79,7 +79,7 @@ public static class PixelStyle
     {
         var header = new Label($"— {title} —"); // 양옆 줄이 달린 작은 제목
         header.pickingMode = PickingMode.Ignore;
-        header.style.fontSize = 20;
+        header.style.fontSize = 36;
         header.style.color = MutedText.linear;
         header.style.unityTextAlign = TextAnchor.MiddleCenter;
         header.style.marginBottom = 12;

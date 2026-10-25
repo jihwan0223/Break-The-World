@@ -15,15 +15,14 @@ public class MainMenuUI : MonoBehaviour
     private const string MainSceneName = "MainScene"; // 새 게임/불러오기가 이동할 씬 이름
     private const string SaveFileName = "savedata.json"; // SaveManager의 기본 저장 파일명과 반드시 같아야 "새 게임"이 실제로 지워짐
     private const string MasterVolumeKey = "MasterVolume"; // 마스터 음량을 저장할 PlayerPrefs 키
-    private const float ShatterDuration = 0.6f; // 버튼이 깨진 뒤 게임 씬으로 넘어가기까지 시간(초) - 조각이 사라지는 시간과 같음
+    private const float ShatterDuration = 0.6f; // 깨진 조각이 사라지는 시간(초)
+    private const float StartDelay = 0.3f; // 버튼이 깨진 뒤 게임 씬으로 넘어가기까지 시간(초) - 조각이 다 사라지기 전에 넘어감
     private const int ShardRows = 3; // 버튼을 가로로 자르는 줄 수
     private const int ShardColumns = 6; // 한 줄을 세로로 자르는 조각 수
     private const float ShardGravity = 2600f; // 조각이 아래로 떨어지는 가속도(px/초²)
 
-    private static readonly Color ButtonColor = new Color(0.15f, 0.15f, 0.15f, 0.85f); // 버튼 기본 배경 (SidePanelUI와 동일 톤)
-    private static readonly Color SelectedColor = new Color(1f, 0.85f, 0.35f, 1f); // 키보드/마우스로 선택된 항목 테두리색 (ZoneArrowsUI의 HoverTint와 통일)
-    private static readonly Color PanelBg = new Color(0.08f, 0.08f, 0.1f, 1f); // 확인창/설정 패널 배경 (SidePanelUI 팝업과 동일 톤)
-    private static readonly Color BorderColor = new Color(0.32f, 0.38f, 0.55f); // 패널 테두리색 (SidePanelUI InfoBorderColor와 동일)
+    private const float SelectedScale = 1.08f; // 선택된 버튼을 이만큼 키워서 표시
+    private readonly Dictionary<Button, PixelStyle.Tone> _buttonTones = new Dictionary<Button, PixelStyle.Tone>(); // 버튼별 색 - 깨질 때 조각 색으로 씀
 
     // 메인 메뉴에서 방향키로 옮겨다닐 버튼들 (저장 파일이 없으면 "불러오기"는 목록에서 빠짐)
     private readonly List<Button> _menuButtons = new List<Button>();
@@ -38,10 +37,9 @@ public class MainMenuUI : MonoBehaviour
     private System.Action _confirmPendingAction; // "예"를 눌렀을 때 실행할 동작 (새 게임 시작 / 게임 종료)
 
     private VisualElement _settingsPanel; // 설정 창 (평소엔 숨김)
-    private readonly List<VisualElement> _cylinderWraps = new List<VisualElement>(); // 유리 원통마다 감싼 테두리용 컨테이너 (선택 강조 표시용) - 마스터, 효과음 순
-    private readonly List<GlassCylinderSlider> _cylinders = new List<GlassCylinderSlider>(); // _cylinderWraps와 같은 순서의 유리 원통
-    private Button _settingsBackButton; // 설정에서 메인 메뉴로 돌아가는 버튼
-    private int _settingsSelectedIndex; // 0..원통 수-1 = 원통, 원통 수 = 뒤로가기 버튼
+    private readonly List<SettingItem> _settingItems = new List<SettingItem>(); // 설정창 항목들 (위아래 이동 순서)
+    private int _settingsSelectedIndex; // 지금 선택된 설정 항목 번호
+    private AudioSource _clickSource; // 버튼 클릭 소리 재생기
 
     // 날아가는 조각 하나 (깨진 버튼 조각 / 유리 원통에서 떨어진 조각 공용)
     private class Shard
@@ -112,22 +110,28 @@ public class MainMenuUI : MonoBehaviour
         _menuButtons.Clear();
         _menuActions.Clear();
         _shards.Clear();
-        _cylinderWraps.Clear();
-        _cylinders.Clear();
+        _buttonTones.Clear();
+        _settingItems.Clear();
         root.RegisterCallback<PointerMoveEvent>(evt => _pointer = evt.position, TrickleDown.TrickleDown);
         GameFonts.Apply(root);
+        if (GameFonts.UiColored != null)
+            root.style.unityFontDefinition = FontDefinition.FromSDFFont(GameFonts.UiColored); // 글자색이 먹는 도트 글꼴
         root.style.flexGrow = 1;
-        root.style.backgroundColor = PanelBg;
+        PixelStyle.Frame(root, PixelStyle.Window, 8f); // 게임 화면 창과 같은 크림 바탕 + 갈색 테두리
 
-        var title = new Label("BREAK THE WORLD"); // 대충 만든 타이틀 - 나중에 로고 이미지로 교체 가능
+        var title = new Label("BREAK THE WORLD"); // 타이틀 - 나중에 로고 이미지로 교체 가능
         title.style.position = Position.Absolute;
-        title.style.top = Length.Percent(18);
-        title.style.left = 0;
-        title.style.right = 0;
-        title.style.fontSize = 56;
-        title.style.unityFontStyleAndWeight = FontStyle.Bold;
-        title.style.color = Color.white;
+        title.style.top = Length.Percent(16);
+        title.style.left = Length.Percent(50);
+        title.style.translate = new Translate(Length.Percent(-50), 0); // 글자 길이만큼만 리본
+        title.style.paddingLeft = 64;
+        title.style.paddingRight = 64;
+        title.style.paddingTop = 14;
+        title.style.paddingBottom = 22;
+        title.style.fontSize = 72;
         title.style.unityTextAlign = TextAnchor.MiddleCenter;
+        PixelStyle.Frame(title, PixelStyle.Ribbon, 8f); // 분홍 리본
+        PixelStyle.OutlinedText(title, PixelStyle.Ribbon.text, 0.3f);
         root.Add(title);
 
         var menuColumn = new VisualElement(); // 버튼 4개가 세로로 쌓이는 가운데 정렬 칸
@@ -155,10 +159,14 @@ public class MainMenuUI : MonoBehaviour
         System.Action quitAction = () =>
             RequestConfirm("게임을 종료하시겠습니까?", QuitGame);
 
-        newGameButton = CreateMenuButton("새 게임", newGameAction);
-        loadButton = CreateMenuButton("불러오기", loadAction);
-        Button settingsButton = CreateMenuButton("설정", settingsAction);
-        Button quitButton = CreateMenuButton("나가기", quitAction);
+        newGameAction = WithClick(newGameAction);
+        loadAction = WithClick(loadAction);
+        settingsAction = WithClick(settingsAction);
+        quitAction = WithClick(quitAction);
+        newGameButton = CreateMenuButton("새 게임", PixelStyle.Mint, newGameAction);
+        loadButton = CreateMenuButton("불러오기", PixelStyle.Sky, loadAction);
+        Button settingsButton = CreateMenuButton("설정", PixelStyle.Butter, settingsAction);
+        Button quitButton = CreateMenuButton("나가기", PixelStyle.Pink, quitAction);
 
         if (!hasSave)
         {
@@ -209,20 +217,16 @@ public class MainMenuUI : MonoBehaviour
     }
 
     // 메인 메뉴용 큼직한 버튼 하나. 마우스 오버 시 키보드 선택 인덱스도 같이 옮겨서 둘이 어긋나지 않게 함
-    private Button CreateMenuButton(string text, System.Action onClick)
+    private Button CreateMenuButton(string text, PixelStyle.Tone tone, System.Action onClick)
     {
         var button = new Button(onClick) { text = text };
         button.focusable = false; // UI 툴킷 기본 키보드 포커스/내비게이션을 꺼둠 - 켜져있으면 Enter/방향키가 여기(네이티브 포커스)와 밑의 수동 폴링(_selectedIndex) 두 군데서 따로 처리돼 서로 다른 버튼이 눌리는 사고가 남
-        button.style.width = 320;
-        button.style.height = 80;
-        button.style.marginBottom = 16;
-        button.style.fontSize = 30;
-        button.style.unityFontStyleAndWeight = FontStyle.Bold;
-        button.style.backgroundColor = ButtonColor;
-        button.style.color = Color.white;
-        SetBorderWidth(button, 3);
-        SetBorderColor(button, Color.clear);
-        SetBorderRadius(button, 8);
+        button.style.width = 360;
+        button.style.height = 88;
+        button.style.marginBottom = 18;
+        button.style.fontSize = 36;
+        PixelStyle.Button(button, tone); // 게임 화면과 같은 도트 입체 버튼
+        _buttonTones[button] = tone;
 
         button.RegisterCallback<PointerEnterEvent>(_ =>
         {
@@ -238,7 +242,7 @@ public class MainMenuUI : MonoBehaviour
     private void UpdateMenuSelectionVisual()
     {
         for (int i = 0; i < _menuButtons.Count; i++)
-            SetBorderColor(_menuButtons[i], i == _selectedIndex ? SelectedColor : Color.clear);
+            SetSelected(_menuButtons[i], i == _selectedIndex);
     }
 
     private void HandleMenuKeyboard(Keyboard kb)
@@ -270,7 +274,7 @@ public class MainMenuUI : MonoBehaviour
         _mode = InputMode.Starting;
         _shardLayer.pickingMode = PickingMode.Position; // 깨지는 동안 다른 버튼이 눌리지 않게 맨 위 층이 클릭을 받아냄
         _afterShatter = onBroken;
-        _shatterTimer = ShatterDuration;
+        _shatterTimer = StartDelay;
 
         Rect bounds = _shardLayer.WorldToLocal(button.worldBound); // 조각 층 기준 버튼 자리
         // 조각이 퍼져 나가는 중심: 마우스로 눌렀으면 누른 자리, 키보드로 눌렀으면 버튼 가운데
@@ -287,7 +291,7 @@ public class MainMenuUI : MonoBehaviour
                 var piece = new Rect(bounds.x + x, bounds.y + row * rowHeight, width, rowHeight); // 이 조각 자리
                 Vector2 direction = (piece.center - origin).normalized; // 누른 자리에서 바깥으로
                 Vector2 velocity = direction * Random.Range(250f, 700f) + new Vector2(0f, -300f); // 살짝 위로 튀었다가 떨어짐
-                VisualElement element = SpawnShard(piece, ButtonColor, velocity);
+                VisualElement element = SpawnShard(piece, _buttonTones.TryGetValue(button, out PixelStyle.Tone tone) ? tone.face.linear : Color.white, velocity); // 버튼 색 조각
 
                 // 조각 안에 버튼 글자를 통째로 넣고 조각 밖은 잘라내서, 글자도 같이 쪼개진 것처럼 보이게 함
                 var face = new Label(button.text);
@@ -410,15 +414,12 @@ public class MainMenuUI : MonoBehaviour
         box.style.paddingBottom = 32;
         box.style.paddingLeft = 32;
         box.style.paddingRight = 32;
-        box.style.backgroundColor = PanelBg;
         box.style.alignItems = Align.Center;
-        SetBorderWidth(box, 2);
-        SetBorderColor(box, BorderColor);
-        SetBorderRadius(box, 10);
+        PixelStyle.Frame(box, PixelStyle.Window, 6f); // 크림 픽셀 창
 
         _confirmMessage = new Label();
-        _confirmMessage.style.fontSize = 26;
-        _confirmMessage.style.color = Color.white;
+        _confirmMessage.style.fontSize = 36;
+        _confirmMessage.style.color = PixelStyle.Text.linear;
         _confirmMessage.style.unityTextAlign = TextAnchor.MiddleCenter;
         _confirmMessage.style.whiteSpace = WhiteSpace.Normal;
         _confirmMessage.style.marginBottom = 28;
@@ -427,10 +428,10 @@ public class MainMenuUI : MonoBehaviour
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
 
-        _confirmYes = new Button(() => { CloseConfirm(); _confirmPendingAction?.Invoke(); }) { text = "예" };
-        _confirmNo = new Button(CloseConfirm) { text = "아니오" };
-        StyleDialogButton(_confirmYes);
-        StyleDialogButton(_confirmNo);
+        _confirmYes = new Button(() => { PlayClick(); CloseConfirm(); _confirmPendingAction?.Invoke(); }) { text = "예" };
+        _confirmNo = new Button(() => { PlayClick(); CloseConfirm(); }) { text = "아니오" };
+        StyleDialogButton(_confirmYes, PixelStyle.Mint);
+        StyleDialogButton(_confirmNo, PixelStyle.Pink);
         _confirmYes.style.marginRight = 20;
 
         _confirmYes.RegisterCallback<PointerEnterEvent>(_ => { _confirmSelectedIndex = 0; UpdateConfirmSelectionVisual(); });
@@ -462,8 +463,8 @@ public class MainMenuUI : MonoBehaviour
 
     private void UpdateConfirmSelectionVisual()
     {
-        SetBorderColor(_confirmYes, _confirmSelectedIndex == 0 ? SelectedColor : Color.clear);
-        SetBorderColor(_confirmNo, _confirmSelectedIndex == 1 ? SelectedColor : Color.clear);
+        SetSelected(_confirmYes, _confirmSelectedIndex == 0);
+        SetSelected(_confirmNo, _confirmSelectedIndex == 1);
     }
 
     private void HandleConfirmKeyboard(Keyboard kb)
@@ -477,12 +478,24 @@ public class MainMenuUI : MonoBehaviour
         }
         else if (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
         {
+            PlayClick();
             if (_confirmSelectedIndex == 0) { CloseConfirm(); _confirmPendingAction?.Invoke(); }
             else CloseConfirm();
         }
     }
 
     // ---- 설정 패널 ----
+
+    // 설정창에서 위아래로 옮겨 다니는 항목 하나 (유리관 / 선택 줄 / 뒤로가기)
+    private class SettingItem
+    {
+        public VisualElement element; // 선택됐을 때 커지는 대상
+        public System.Action<int> onStep; // 좌우 방향키 (-1/+1)
+        public System.Action onEnter; // 엔터/스페이스
+    }
+
+    private static readonly PixelStyle.Tone SlotTone = new PixelStyle.Tone(
+        new Color(0.42f, 0.32f, 0.25f), new Color(0.55f, 0.43f, 0.34f), new Color(0.3f, 0.22f, 0.17f), new Color(0.24f, 0.17f, 0.12f), Color.white); // 유리관 뒤 어두운 홈 - 밝은 크림 창에서 유리가 보이게
 
     private VisualElement BuildSettingsPanel()
     {
@@ -499,48 +512,92 @@ public class MainMenuUI : MonoBehaviour
         panel.style.display = DisplayStyle.None;
         panel.RegisterCallback<ClickEvent>(evt => { if (evt.target == panel) CloseSettings(); });
 
-        var column = new VisualElement(); // 설정 창 본체
-        column.style.paddingTop = 36;
-        column.style.paddingBottom = 20;
-        column.style.paddingLeft = 48;
-        column.style.paddingRight = 48;
-        column.style.backgroundColor = PanelBg;
-        column.style.alignItems = Align.Center;
-        SetBorderWidth(column, 2);
-        SetBorderColor(column, BorderColor);
-        SetBorderRadius(column, 10);
-        panel.Add(column);
+        var window = new VisualElement(); // 설정 창 본체
+        window.style.paddingTop = 30;
+        window.style.paddingBottom = 26;
+        window.style.paddingLeft = 48;
+        window.style.paddingRight = 48;
+        window.style.alignItems = Align.Center;
+        PixelStyle.Frame(window, PixelStyle.Window, 6f); // 크림 픽셀 창
+        panel.Add(window);
 
-        var title = new Label("설정");
-        title.style.fontSize = 44;
-        title.style.unityFontStyleAndWeight = FontStyle.Bold;
-        title.style.color = Color.white;
-        title.style.marginBottom = 30;
-        column.Add(title);
+        var title = new Label("설정"); // 분홍 리본 제목
+        title.style.fontSize = 36;
+        title.style.paddingLeft = 48;
+        title.style.paddingRight = 48;
+        title.style.paddingTop = 10;
+        title.style.paddingBottom = 14;
+        title.style.marginBottom = 24;
+        PixelStyle.Frame(title, PixelStyle.Ribbon);
+        PixelStyle.OutlinedText(title, PixelStyle.Ribbon.text);
+        window.Add(title);
 
-        float masterVolume = PlayerPrefs.GetFloat(MasterVolumeKey, 1f); // 저장된 마스터 음량
+        var columns = new VisualElement(); // 왼쪽 소리 / 오른쪽 화면·게임
+        columns.style.flexDirection = FlexDirection.Row;
+        columns.style.alignItems = Align.FlexStart;
+        window.Add(columns);
+
+        var sound = new VisualElement(); // 소리 칸
+        sound.style.alignItems = Align.Center;
+        sound.style.marginRight = 56;
+        sound.Add(PixelStyle.CardHeader("소리"));
+        columns.Add(sound);
+
+        float masterVolume = GameSettings.MasterVolume; // 저장된 마스터 음량
         AudioListener.volume = masterVolume; // 시작할 때 저장된 값으로 실제 음량도 맞춤
-        AddVolumeCylinder(column, "마스터 음량", masterVolume, value =>
+        AddVolumeCylinder(sound, "전체 음량", masterVolume, value =>
         {
             AudioListener.volume = value;
             PlayerPrefs.SetFloat(MasterVolumeKey, value);
         });
-        AddVolumeCylinder(column, "효과음", SfxPlayer.Volume, value => SfxPlayer.Volume = value);
+        AddVolumeCylinder(sound, "효과음", SfxPlayer.Volume, value => SfxPlayer.Volume = value);
+        AddVolumeCylinder(sound, "배경음악", GameSettings.BgmVolume, value => GameSettings.BgmVolume = value);
 
-        _settingsBackButton = CreateMenuButton("뒤로가기", CloseSettings);
-        column.Add(_settingsBackButton);
-        _settingsBackButton.RegisterCallback<PointerEnterEvent>(_ => { _settingsSelectedIndex = _cylinders.Count; UpdateSettingsSelectionVisual(); });
+        var options = new VisualElement(); // 화면/게임 칸
+        options.style.alignItems = Align.Center;
+        columns.Add(options);
+
+        options.Add(PixelStyle.CardHeader("화면"));
+        AddOptionRow(options, "화면 모드", () => GameSettings.Fullscreen ? "전체화면" : "창 모드",
+            _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
+        AddOptionRow(options, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
+        {
+            List<Vector2Int> list = GameSettings.Resolutions; // 고를 수 있는 해상도
+            if (list.Count == 0) return;
+            int index = Mathf.Max(0, list.IndexOf(GameSettings.Resolution)); // 지금 해상도 번호
+            GameSettings.Resolution = list[(index + step + list.Count) % list.Count];
+        });
+        AddOptionRow(options, "프레임 제한", () =>
+        {
+            int fps = GameSettings.FpsOptions[GameSettings.FpsIndex]; // 제한 값
+            return fps < 0 ? "모니터 맞춤" : $"{fps} FPS";
+        }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length);
+
+        var gameHeader = PixelStyle.CardHeader("게임"); // 게임 항목 머리글
+        gameHeader.style.marginTop = 10;
+        options.Add(gameHeader);
+        AddOptionRow(options, "화면 흔들림", () => GameSettings.ScreenShake ? "켜기" : "끄기",
+            _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
+        AddOptionRow(options, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기",
+            _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
+
+        Button back = CreateMenuButton("뒤로가기", PixelStyle.Pink, WithClick(CloseSettings)); // 메인 메뉴로
+        back.style.marginTop = 16;
+        back.style.marginBottom = 0;
+        window.Add(back);
+        _settingItems.Add(new SettingItem { element = back, onEnter = () => { PlayClick(); CloseSettings(); } });
+        back.RegisterCallback<PointerEnterEvent>(_ => SelectSetting(_settingItems.Count - 1));
 
         return panel;
     }
 
-    // "이름 퍼센트" 한 줄 + 그 밑에 가로로 누운 유리관(선택 강조 테두리용 컨테이너로 감쌈)
+    // "이름 퍼센트" 한 줄 + 그 밑에 어두운 홈 안의 가로 유리관
     private void AddVolumeCylinder(VisualElement column, string label, float value, System.Action<float> onChanged)
     {
         var caption = new Label(); // 유리관 위 "이름 퍼센트" 글자
-        caption.style.fontSize = 24;
-        caption.style.color = Color.white;
-        caption.style.marginBottom = 8;
+        caption.style.fontSize = 36;
+        caption.style.color = PixelStyle.Text.linear;
+        caption.style.marginBottom = 6;
         column.Add(caption);
 
         var cylinder = new GlassCylinderSlider(value, newValue =>
@@ -550,28 +607,77 @@ public class MainMenuUI : MonoBehaviour
         }, SpawnGlassChips);
         caption.text = label + "  " + Mathf.RoundToInt(cylinder.Value * 100f) + "%";
 
-        var wrap = new VisualElement(); // 유리관 자체엔 테두리가 안 어울려서, 감싸서 선택 강조 테두리를 줌
-        wrap.style.paddingTop = 10;
-        wrap.style.paddingBottom = 10;
-        wrap.style.paddingLeft = 16;
-        wrap.style.paddingRight = 16;
-        wrap.style.marginBottom = 30;
-        SetBorderWidth(wrap, 3);
-        SetBorderColor(wrap, Color.clear);
-        SetBorderRadius(wrap, 8);
+        var wrap = new VisualElement(); // 유리관이 놓이는 어두운 홈
+        wrap.style.paddingTop = 14;
+        wrap.style.paddingBottom = 18;
+        wrap.style.paddingLeft = 18;
+        wrap.style.paddingRight = 18;
+        wrap.style.marginBottom = 22;
+        PixelStyle.Frame(wrap, SlotTone);
         wrap.Add(cylinder);
         column.Add(wrap);
 
-        int index = _cylinders.Count; // 이 유리관의 선택 인덱스
-        wrap.RegisterCallback<PointerEnterEvent>(_ => { _settingsSelectedIndex = index; UpdateSettingsSelectionVisual(); });
-        _cylinderWraps.Add(wrap);
-        _cylinders.Add(cylinder);
+        int index = _settingItems.Count; // 이 유리관의 선택 번호
+        wrap.RegisterCallback<PointerEnterEvent>(_ => SelectSetting(index));
+        _settingItems.Add(new SettingItem
+        {
+            element = wrap,
+            onStep = step => cylinder.SetValue(cylinder.Value + step * GlassCylinderSlider.Step), // 오른쪽 = 올리기, 왼쪽 = 내리기(유리가 깨져 나감)
+        });
+    }
+
+    // "이름  < 값 >" 한 줄 - 화살표나 좌우 방향키로 값을 바꿈 (바로 저장/적용)
+    private void AddOptionRow(VisualElement column, string label, System.Func<string> getValue, System.Action<int> step)
+    {
+        var row = new VisualElement(); // 한 줄
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.alignItems = Align.Center;
+        row.style.width = 680;
+        row.style.paddingLeft = 20;
+        row.style.paddingRight = 12;
+        row.style.paddingTop = 8;
+        row.style.paddingBottom = 12;
+        row.style.marginBottom = 12;
+        PixelStyle.Frame(row, PixelStyle.Card);
+
+        var name = new Label(label); // 항목 이름
+        name.style.flexGrow = 1;
+        name.style.fontSize = 36;
+        name.style.color = PixelStyle.Text.linear;
+        row.Add(name);
+
+        var value = new Label(getValue()); // 지금 값
+        System.Action<int> change = delta => { step(delta); value.text = getValue(); }; // 값 바꾸고 다시 표시
+        Button left = CreateArrowButton("<", () => { PlayClick(); change(-1); }); // 이전 값
+        Button right = CreateArrowButton(">", () => { PlayClick(); change(1); }); // 다음 값
+        value.style.width = 230;
+        value.style.fontSize = 36;
+        value.style.color = PixelStyle.Text.linear;
+        value.style.unityTextAlign = TextAnchor.MiddleCenter;
+        row.Add(left);
+        row.Add(value);
+        row.Add(right);
+        column.Add(row);
+
+        int index = _settingItems.Count; // 이 줄의 선택 번호
+        row.RegisterCallback<PointerEnterEvent>(_ => SelectSetting(index));
+        _settingItems.Add(new SettingItem { element = row, onStep = d => { PlayClick(); change(d); }, onEnter = () => { PlayClick(); change(1); } });
+    }
+
+    private Button CreateArrowButton(string text, System.Action onClick)
+    {
+        var button = new Button(onClick) { text = text };
+        button.focusable = false;
+        button.style.width = 60;
+        button.style.height = 60;
+        button.style.fontSize = 36;
+        PixelStyle.Button(button, PixelStyle.Mint);
+        return button;
     }
 
     private void OpenSettings()
     {
-        _settingsSelectedIndex = 0;
-        UpdateSettingsSelectionVisual();
+        SelectSetting(0);
         _settingsPanel.style.display = DisplayStyle.Flex;
         _mode = InputMode.Settings;
     }
@@ -580,58 +686,60 @@ public class MainMenuUI : MonoBehaviour
     {
         _settingsPanel.style.display = DisplayStyle.None;
         _mode = InputMode.Menu;
+        PlayerPrefs.Save(); // 바꾼 설정을 바로 디스크에
     }
 
-    private void UpdateSettingsSelectionVisual()
+    private void SelectSetting(int index)
     {
-        for (int i = 0; i < _cylinderWraps.Count; i++)
-            SetBorderColor(_cylinderWraps[i], _settingsSelectedIndex == i ? SelectedColor : Color.clear);
-        SetBorderColor(_settingsBackButton, _settingsSelectedIndex == _cylinders.Count ? SelectedColor : Color.clear);
+        _settingsSelectedIndex = index;
+        for (int i = 0; i < _settingItems.Count; i++)
+            SetSelected(_settingItems[i].element, i == _settingsSelectedIndex);
     }
 
-    // 위아래 = 항목 이동(유리관들 -> 뒤로가기), 좌우 = 선택된 유리관의 음량 조절
+    // 위아래 = 항목 이동, 좌우 = 선택된 항목 값 바꾸기, 엔터 = 선택(뒤로가기/값 넘기기)
     private void HandleSettingsKeyboard(Keyboard kb)
     {
-        int itemCount = _cylinders.Count + 1; // 원통들 + 뒤로가기 버튼
-        bool onCylinder = _settingsSelectedIndex < _cylinders.Count; // 지금 원통이 선택돼 있는지
+        int count = _settingItems.Count; // 항목 수
+        if (count == 0) return;
+        SettingItem item = _settingItems[_settingsSelectedIndex]; // 지금 선택된 항목
 
         if (kb.escapeKey.wasPressedThisFrame)
-        {
             CloseSettings();
-        }
         else if (kb.upArrowKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame)
-        {
-            int step = kb.downArrowKey.wasPressedThisFrame ? 1 : -1; // 위/아래 이동 방향
-            _settingsSelectedIndex = (_settingsSelectedIndex + step + itemCount) % itemCount;
-            UpdateSettingsSelectionVisual();
-        }
-        else if (onCylinder && (kb.leftArrowKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame))
-        {
-            float delta = kb.rightArrowKey.wasPressedThisFrame ? GlassCylinderSlider.Step : -GlassCylinderSlider.Step; // 오른쪽 = 올리기, 왼쪽 = 내리기(유리가 깨져 나감)
-            GlassCylinderSlider cylinder = _cylinders[_settingsSelectedIndex]; // 지금 선택된 원통
-            cylinder.SetValue(cylinder.Value + delta); // 값이 바뀌면 원통이 알아서 저장 콜백까지 부름
-        }
+            SelectSetting((_settingsSelectedIndex + (kb.downArrowKey.wasPressedThisFrame ? 1 : -1) + count) % count);
+        else if (kb.leftArrowKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame)
+            item.onStep?.Invoke(kb.rightArrowKey.wasPressedThisFrame ? 1 : -1);
         else if (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
-        {
-            if (!onCylinder)
-                CloseSettings();
-        }
+            item.onEnter?.Invoke();
     }
 
     // ---- 공용 스타일 헬퍼 ----
 
-    private void StyleDialogButton(Button button)
+    // 버튼 클릭 소리 (효과음 음량 따름)
+    private void PlayClick()
+    {
+        if (_clickSource == null) _clickSource = gameObject.AddComponent<AudioSource>();
+        AudioClip clip = GameAudio.Instance != null ? GameAudio.Instance.click : null; // 클릭 소리
+        SfxPlayer.Play(_clickSource, clip, priority: true);
+    }
+
+    private System.Action WithClick(System.Action action) => () => { PlayClick(); action?.Invoke(); };
+
+    private void StyleDialogButton(Button button, PixelStyle.Tone tone)
     {
         button.focusable = false; // 메인 메뉴 버튼과 같은 이유로 네이티브 포커스/내비게이션 꺼둠
-        button.style.width = 140;
-        button.style.height = 56;
-        button.style.fontSize = 22;
-        button.style.unityFontStyleAndWeight = FontStyle.Bold;
-        button.style.backgroundColor = ButtonColor;
-        button.style.color = Color.white;
-        SetBorderWidth(button, 3);
-        SetBorderColor(button, Color.clear);
-        SetBorderRadius(button, 6);
+        button.style.width = 180;
+        button.style.height = 72;
+        button.style.fontSize = 36;
+        PixelStyle.Button(button, tone); // 도트 입체 버튼
+        _buttonTones[button] = tone;
+    }
+
+    // 키보드/마우스로 선택된 버튼은 살짝 크게
+    private static void SetSelected(VisualElement button, bool selected)
+    {
+        float scale = selected ? SelectedScale : 1f; // 크기 배율
+        button.style.scale = new Scale(new Vector3(scale, scale, 1f));
     }
 
     private void SetBorderWidth(VisualElement el, float width)

@@ -78,7 +78,7 @@ public class BossChallengeUI : MonoBehaviour
         Place(_challengeButton);
         _challengeButton.style.width = 300;
         _challengeButton.style.height = 80;
-        _challengeButton.style.fontSize = 34;
+        _challengeButton.style.fontSize = 36;
         PixelStyle.Button(_challengeButton, PixelStyle.Pink);
         _challengeButton.style.display = DisplayStyle.None;
         GuardPointer(_challengeButton);
@@ -134,8 +134,8 @@ public class BossChallengeUI : MonoBehaviour
         _timeFill.style.backgroundColor = TimeColor.linear; // 버터색 타이머
         timeBack.Add(_timeFill);
         timeRow.Add(timeBack);
-        _timeLabel = MakeLabel(24, PixelStyle.Text.linear);
-        _timeLabel.style.width = 64; // 숫자 자리수가 바뀌어도 바 길이가 안 흔들리게
+        _timeLabel = MakeLabel(36, PixelStyle.Text.linear);
+        _timeLabel.style.width = 100; // 숫자 자리수가 바뀌어도 바 길이가 안 흔들리게
         _timeLabel.style.unityTextAlign = TextAnchor.MiddleRight;
         timeRow.Add(_timeLabel);
         bars.Add(timeRow);
@@ -146,7 +146,7 @@ public class BossChallengeUI : MonoBehaviour
         _giveUpButton.style.width = 110;
         _giveUpButton.style.height = 64;
         _giveUpButton.style.marginLeft = 18;
-        _giveUpButton.style.fontSize = 26;
+        _giveUpButton.style.fontSize = 24;
         PixelStyle.Button(_giveUpButton, PixelStyle.Pink);
         _fightPanel.Add(_giveUpButton);
         root.Add(_fightPanel);
@@ -185,7 +185,7 @@ public class BossChallengeUI : MonoBehaviour
         PixelStyle.Frame(window, PixelStyle.Window, 6f);
 
         var title = new Label("보스전 실패"); // 제목 리본
-        title.style.fontSize = 40;
+        title.style.fontSize = 36;
         title.style.paddingLeft = 40;
         title.style.paddingRight = 40;
         title.style.paddingTop = 8;
@@ -195,7 +195,7 @@ public class BossChallengeUI : MonoBehaviour
         PixelStyle.OutlinedText(title, PixelStyle.Ribbon.text);
         window.Add(title);
 
-        var message = MakeLabel(28, PixelStyle.Text.linear); // 안내 문구
+        var message = MakeLabel(36, PixelStyle.Text.linear); // 안내 문구
         message.text = "시간 안에 부수지 못했어요";
         message.style.marginTop = 24;
         message.style.marginBottom = 28;
@@ -209,7 +209,7 @@ public class BossChallengeUI : MonoBehaviour
         {
             button.style.width = 220;
             button.style.height = 76;
-            button.style.fontSize = 30;
+            button.style.fontSize = 36;
             button.style.marginLeft = 12;
             button.style.marginRight = 12;
         }
