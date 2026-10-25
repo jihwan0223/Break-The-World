@@ -144,6 +144,8 @@ public class SidePanelUI : MonoBehaviour
     {
         root.Clear();
         GameFonts.Apply(root);
+        if (GameFonts.UiColored != null)
+            root.style.unityFontDefinition = FontDefinition.FromSDFFont(GameFonts.UiColored); // 기본 글꼴은 글자색이 안 먹어서(늘 흰색) 크림 바탕 위 갈색 글씨를 쓰려면 색이 먹는 글꼴이어야 함
 
         // 투명한 루트가 화면 전체 클릭을 먹어서 뒤쪽 Canvas(업그레이드 트리)의 노드 클릭이 안 되는 문제 방지 -
         // 실제 버튼/팝업 패널은 각자 picking 모드를 그대로 유지하므로 그 위 클릭은 정상 동작함
@@ -151,9 +153,6 @@ public class SidePanelUI : MonoBehaviour
 
         // 화면 전체를 꽉 채우는 팝업 패널 - 업그레이드 화면과 동일하게 전체화면으로 덮고 X 버튼으로 닫음
         _panel = CreatePopupFrame(ClosePanel, out _panelTitle);
-        // 무기/도감 팝업은 무늬 없는 단색 배경 (색은 OpenPanel에서 팝업마다 지정)
-        _panel.style.backgroundImage = new StyleBackground(StyleKeyword.None);
-        _panel.Q("pattern").RemoveFromHierarchy();
 
         _weaponContent = BuildWeaponSection(out _refreshWeaponSelector);
         _panel.Add(_weaponContent);
@@ -195,7 +194,7 @@ public class SidePanelUI : MonoBehaviour
         buttonRow.RegisterCallback<PointerEnterEvent>(_ => UIPointerGuard.IsPointerOverUI = true);
         buttonRow.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
 
-        var upgradeButton = CreateButton("업그레이드", () =>
+        var upgradeButton = CreateButton("업그레이드", PixelStyle.Mint, () =>
         {
             Debug.Log("업그레이드 버튼 눌림");
             // Canvas로 만든 업그레이드 화면을 직접 켬 (닫기는 그 화면 안의 X 버튼 -> UpgradeTreeUI.Close()가 담당)
@@ -203,19 +202,19 @@ public class SidePanelUI : MonoBehaviour
             else Debug.LogWarning("SidePanelUI: Upgrade Tree Panel이 인스펙터에 비어있어서 업그레이드 화면을 못 엶");
         });
 
-        var weaponButton = CreateButton("무기", () =>
+        var weaponButton = CreateButton("무기", PixelStyle.Pink, () =>
         {
             Debug.Log("무기 버튼 눌림");
             OpenPanel("무기", _weaponContent);
         });
 
-        var objectButton = CreateButton("도감", () =>
+        var objectButton = CreateButton("도감", PixelStyle.Sky, () =>
         {
             Debug.Log("도감 버튼 눌림");
             OpenPanel("도감", _objectContent);
         });
 
-        var debugButton = CreateButton("디버그", () =>
+        var debugButton = CreateButton("디버그", PixelStyle.Butter, () =>
         {
             Debug.Log("디버그 버튼 눌림");
             OpenDebugPanel();
@@ -250,27 +249,8 @@ public class SidePanelUI : MonoBehaviour
         panel.style.right = 0;
         panel.style.top = 0;
         panel.style.bottom = 0;
-        panel.style.backgroundColor = new Color(0.08f, 0.08f, 0.1f, 1f); // 업그레이드 화면처럼 불투명 단색(검정 대신 짙은 남색조)
+        PixelStyle.Frame(panel, PixelStyle.Window, 6f); // 픽셀 창: 크림 바탕 + 갈색 외곽선 (무기/도감/디버그 공통)
 
-        // 밋밋한 단색 대신 위쪽이 살짝 밝은 남색 그라데이션을 깔고, 그 위에 은은한 십자 점 무늬를 반복해서 깔아 꾸밈 (이미지 파일 없이 코드로 그림)
-        panel.style.backgroundImage = GradientBackground(new Color(0.03f, 0.04f, 0.08f), new Color(0.13f, 0.16f, 0.26f));
-
-        var pattern = new VisualElement { name = "pattern" }; // 무늬 층 - 클릭은 통과시킴 (무기 팝업에서는 숨김)
-        pattern.pickingMode = PickingMode.Ignore;
-        pattern.style.position = Position.Absolute;
-        pattern.style.left = 0;
-        pattern.style.right = 0;
-        pattern.style.top = 0;
-        pattern.style.bottom = 0;
-        Color dot = new Color(0.7f, 0.8f, 1f, 0.025f); // 무늬 색 - 어두운 배경 위에 섞이면 알파가 조금만 커도 꽤 밝아 보여서 아주 낮게 잡음
-        Color corner = new Color(0.7f, 0.8f, 1f, 0.012f); // 모서리 점은 십자보다 더 옅게
-        pattern.style.backgroundImage = new StyleBackground(MakeTexture(16, 16, (x, y) =>
-            (x == 8 && y >= 6 && y <= 10) || (y == 8 && x >= 6 && x <= 10) ? dot // 칸 가운데 십자
-            : (x <= 1 && y <= 1) ? corner // 칸 모서리 점
-            : Color.clear, FilterMode.Point, TextureWrapMode.Repeat));
-        pattern.style.backgroundRepeat = new BackgroundRepeat(Repeat.Repeat, Repeat.Repeat);
-        pattern.style.backgroundSize = new BackgroundSize(96, 96); // 16px 무늬를 6배로 키워 픽셀 느낌 유지
-        panel.Add(pattern);
         panel.style.display = DisplayStyle.None;
 
         // 이 패널 위에 포인터가 있는 동안은 뒤쪽 월드 오브젝트가 클릭되지 않도록 플래그를 켜고 끔
@@ -281,12 +261,17 @@ public class SidePanelUI : MonoBehaviour
         titleLabel = new Label();
         titleLabel.pickingMode = PickingMode.Ignore;
         titleLabel.style.position = Position.Absolute;
-        titleLabel.style.top = 16;
-        titleLabel.style.left = 0;
-        titleLabel.style.right = 0;
-        titleLabel.style.unityTextAlign = TextAnchor.UpperCenter;
-        titleLabel.style.fontSize = 22;
-        titleLabel.style.color = Color.white;
+        titleLabel.style.top = 22; // 창 외곽선 안쪽
+        titleLabel.style.left = Length.Percent(50);
+        titleLabel.style.translate = new Translate(Length.Percent(-50), 0); // 글자 길이만큼만 리본이 생기게 가운데 정렬
+        titleLabel.style.paddingLeft = 48;
+        titleLabel.style.paddingRight = 48;
+        titleLabel.style.paddingTop = 10;
+        titleLabel.style.paddingBottom = 14; // 리본 아래 그늘 줄만큼 더
+        titleLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+        titleLabel.style.fontSize = 36;
+        PixelStyle.Frame(titleLabel, PixelStyle.Ribbon); // 분홍 리본
+        PixelStyle.OutlinedText(titleLabel, PixelStyle.Ribbon.text); // 흰 글씨 + 진한 그림자
         titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
         panel.Add(titleLabel);
 
@@ -295,34 +280,14 @@ public class SidePanelUI : MonoBehaviour
         closeButton.style.position = Position.Absolute;
         closeButton.style.top = 16;
         closeButton.style.right = 16;
-        closeButton.style.width = 44;
-        closeButton.style.height = 44;
+        closeButton.style.width = 60;
+        closeButton.style.height = 60;
         closeButton.style.fontSize = 28;
         closeButton.style.unityFontStyleAndWeight = FontStyle.Bold;
-        closeButton.style.backgroundColor = Color.clear;
-        closeButton.style.borderTopWidth = 0;
-        closeButton.style.borderBottomWidth = 0;
-        closeButton.style.borderLeftWidth = 0;
-        closeButton.style.borderRightWidth = 0;
-        closeButton.style.color = Color.white;
+        PixelStyle.Button(closeButton, PixelStyle.Pink); // 픽셀 입체 버튼
         panel.Add(closeButton);
 
         return panel;
-    }
-
-    // 아래(bottom) -> 위(top)로 이어지는 세로 그라데이션 배경. .linear: 텍스처 색은 감마 보정 없이 그려져서 그냥 쓰면 훨씬 밝게 보임
-    private static StyleBackground GradientBackground(Color bottom, Color top) =>
-        new StyleBackground(MakeTexture(1, 64, (x, y) => Color.Lerp(bottom, top, y / 63f).linear, FilterMode.Bilinear, TextureWrapMode.Clamp));
-
-    // 픽셀마다 색을 계산해 작은 텍스처를 만듦 - 팝업 배경 장식용. 어두운 색에서 8비트 단계가 띠로 보이지 않도록 Half 포맷 사용
-    private static Texture2D MakeTexture(int width, int height, System.Func<int, int, Color> pixel, FilterMode filter, TextureWrapMode wrap)
-    {
-        var texture = new Texture2D(width, height, TextureFormat.RGBAHalf, false) { filterMode = filter, wrapMode = wrap };
-        for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++)
-                texture.SetPixel(x, y, pixel(x, y));
-        texture.Apply();
-        return texture;
     }
 
     // 디버그 팝업 - 다른 팝업과 같은 전체 화면 모양. 테스트용 버튼을 세로로 모아둠 (원래 업그레이드 화면 아래쪽에 있던 것들)
@@ -335,7 +300,7 @@ public class SidePanelUI : MonoBehaviour
         list.style.position = Position.Absolute;
         list.style.left = 0;
         list.style.right = 0;
-        list.style.top = 90;
+        list.style.top = 110; // 제목 리본 아래부터
         list.style.alignItems = Align.Center;
 
         // 각 동작은 눌린 결과를 한 줄 문구로 돌려줌 - 화면이 팝업에 가려져서 눌렀는지 알 수 없기 때문
@@ -412,7 +377,7 @@ public class SidePanelUI : MonoBehaviour
         _debugStatus.style.right = 0;
         _debugStatus.style.bottom = 40;
         _debugStatus.style.fontSize = 26;
-        _debugStatus.style.color = Color.white;
+        _debugStatus.style.color = PixelStyle.Text.linear;
         _debugStatus.style.unityTextAlign = TextAnchor.MiddleCenter;
         _debugPanel.Add(_debugStatus);
 
@@ -422,8 +387,9 @@ public class SidePanelUI : MonoBehaviour
     // 디버그 목록에 버튼 하나 추가 - 누르면 action을 실행하고 돌려받은 문구를 아래 줄에 표시
     private void AddDebugButton(VisualElement list, string text, System.Func<string> action)
     {
-        Button button = CreateButton(text, () => _debugStatus.text = action());
+        Button button = CreateButton(text, PixelStyle.Butter, () => _debugStatus.text = action());
         button.style.width = 460; // "업그레이드 초기화"처럼 긴 글자도 들어가도록 기본 폭보다 넓게
+        button.style.height = 90; // 8개가 화면 안에 다 들어가게 기본보다 낮게
         button.style.marginBottom = 14;
         list.Add(button);
     }
@@ -447,7 +413,7 @@ public class SidePanelUI : MonoBehaviour
         OnSelectorPanelToggled?.Invoke(false);
     }
 
-    // 팝업 안에 들어갈 전체 영역: 화살표 사이에 이름, 그 아래 왼쪽엔 이미지 자리 / 오른쪽엔 설명 + Select 버튼.
+    // 팝업 안에 들어갈 전체 영역: 화면 가운데에 < 이름/큰 이미지/선택 버튼 >, 오른쪽에 설명 카드.
     // 무기/오브젝트 팝업이 완전히 같은 모양을 공유하도록 콜백만 받아서 공용으로 구성함.
     private VisualElement BuildSelectorSection(
         BrowseState browse,
@@ -464,100 +430,44 @@ public class SidePanelUI : MonoBehaviour
         content.style.position = Position.Absolute;
         content.style.left = 16;
         content.style.right = 16;
-        content.style.top = 60;
+        content.style.top = 96; // 제목 리본 아래부터
         content.style.bottom = 16;
         content.style.display = DisplayStyle.None;
 
         System.Action redraw = null; // 이름/이미지/버튼/정보 카드를 현재 browse.index 기준으로 다시 그리는 함수 (아래 끝에서 채움)
 
-        // 위쪽 줄: < 이름 >
-        var arrowRow = new VisualElement();
-        arrowRow.style.flexDirection = FlexDirection.Row;
-        arrowRow.style.justifyContent = Justify.Center;
-        arrowRow.style.alignItems = Align.Center;
-        arrowRow.style.height = 60;
-
+        // 가운데: < [이름 / 큰 미리보기 / 선택 버튼] > , 오른쪽: 정보 카드 (Keep on Mining처럼 그림이 화면 가운데, 설명은 오른쪽)
         var nameLabel = new Label();
-        nameLabel.style.width = 260;
-        nameLabel.style.fontSize = 24;
-        nameLabel.style.color = Color.white;
+        nameLabel.style.fontSize = 40;
+        nameLabel.style.color = PixelStyle.Text.linear;
         nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
         nameLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+        nameLabel.style.marginBottom = 16;
 
-        // Select 버튼 / Equipped 표시 - 중간보다 약간 아래, 오른쪽에 위치. 장착 여부에 따라 둘 중 하나만 보임
-        var selectButton = new Button() { text = "선택" };
-        selectButton.style.position = Position.Absolute;
-        selectButton.style.top = Length.Percent(55);
-        selectButton.style.right = 350; // 오른쪽 기준 30px 왼쪽으로 이동
-        selectButton.style.width = 140;
-        selectButton.style.height = 44;
-        selectButton.style.fontSize = 18;
-        selectButton.style.unityFontStyleAndWeight = FontStyle.Bold;
-        selectButton.style.backgroundColor = new Color(0.2f, 0.45f, 0.2f, 0.9f);
-        selectButton.style.color = Color.white;
-
-        var equippedLabel = new Label("장착됨");
-        equippedLabel.style.position = Position.Absolute;
-        equippedLabel.style.top = Length.Percent(55);
-        equippedLabel.style.right = 350; // Select 버튼과 같은 위치를 공유해야 하므로 동일하게 이동
-        equippedLabel.style.width = 140;
-        equippedLabel.style.height = 44;
-        equippedLabel.style.fontSize = 18;
-        equippedLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        equippedLabel.style.color = new Color(0.5f, 0.9f, 0.5f);
-        equippedLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
-
-        // 미리보기 이미지 - 맨 처음 크기(100)에서 7배인 700. 세로는 화면 중앙 정렬,
-        // 가로는 왼쪽 화살표의 실제 위치를 기준으로 그보다 살짝 왼쪽에 중심이 오도록 계산함 (아래 GeometryChangedEvent에서)
-        const float previewImageSize = 700f;
-        const float previewImageLeftOffsetFromArrow = 40f; // 화살표 중심에서 이만큼 더 왼쪽으로
-
-        var previewImage = new Image();
-        previewImage.style.position = Position.Absolute;
-        previewImage.style.top = Length.Percent(50);
-        previewImage.style.marginTop = -previewImageSize / 2f; // 이미지 높이의 절반만큼 올려서 세로 중앙 정렬
+        const float previewImageSize = 600f; // 미리보기 액자 한 변
+        var previewImage = new Image(); // 오브젝트 그림만 (뒤 액자 없음)
         previewImage.style.width = previewImageSize;
         previewImage.style.height = previewImageSize;
         previewImage.scaleMode = ScaleMode.ScaleToFit;
 
-        // 미리보기 액자 - 반투명 어두운 판에 테두리를 둘러 도감 진열칸처럼 보이게 함
-        previewImage.style.backgroundColor = CollectionPreviewColor;
-        previewImage.style.borderTopWidth = 3;
-        previewImage.style.borderBottomWidth = 3;
-        previewImage.style.borderLeftWidth = 3;
-        previewImage.style.borderRightWidth = 3;
-        previewImage.style.borderTopColor = InfoBorderColor;
-        previewImage.style.borderBottomColor = InfoBorderColor;
-        previewImage.style.borderLeftColor = InfoBorderColor;
-        previewImage.style.borderRightColor = InfoBorderColor;
-        previewImage.style.borderTopLeftRadius = 14;
-        previewImage.style.borderTopRightRadius = 14;
-        previewImage.style.borderBottomLeftRadius = 14;
-        previewImage.style.borderBottomRightRadius = 14;
+        // 선택 버튼 / 장착됨 표시 - 미리보기 아래. 장착 여부에 따라 둘 중 하나만 보임 (도감 모드에선 둘 다 숨김)
+        var selectButton = new Button() { text = "선택" };
+        selectButton.style.width = 360;
+        selectButton.style.height = 64;
+        selectButton.style.marginTop = 24;
+        selectButton.style.fontSize = 24;
+        selectButton.style.unityFontStyleAndWeight = FontStyle.Bold;
+        PixelStyle.Button(selectButton, PixelStyle.Mint); // 픽셀 입체 버튼
 
-        // 도감 정보 카드 - 항목 이름은 왼쪽, 값은 오른쪽에 한 줄씩. 선택 버튼(right 350, 폭 140) 위쪽에 가운데가 맞도록 둠
-        var infoCard = new VisualElement();
-        infoCard.style.position = Position.Absolute;
-        infoCard.style.top = 110;
-        infoCard.style.right = 200;
-        infoCard.style.width = 440;
-        infoCard.style.paddingTop = 24;
-        infoCard.style.paddingBottom = 10;
-        infoCard.style.paddingLeft = 24;
-        infoCard.style.paddingRight = 24;
-        infoCard.style.backgroundColor = CollectionPanelColor;
-        infoCard.style.borderTopWidth = 3;
-        infoCard.style.borderBottomWidth = 3;
-        infoCard.style.borderLeftWidth = 3;
-        infoCard.style.borderRightWidth = 3;
-        infoCard.style.borderTopColor = InfoBorderColor;
-        infoCard.style.borderBottomColor = InfoBorderColor;
-        infoCard.style.borderLeftColor = InfoBorderColor;
-        infoCard.style.borderRightColor = InfoBorderColor;
-        infoCard.style.borderTopLeftRadius = 8;
-        infoCard.style.borderTopRightRadius = 8;
-        infoCard.style.borderBottomLeftRadius = 8;
-        infoCard.style.borderBottomRightRadius = 8;
+        var equippedLabel = new Label("장착됨");
+        equippedLabel.style.height = 64;
+        equippedLabel.style.marginTop = 24;
+        equippedLabel.style.fontSize = 24;
+        equippedLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+        equippedLabel.style.color = PixelStyle.Good.linear;
+        equippedLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+
+        var infoCard = CreateSideCard(); // 오른쪽 정보 카드
         infoCard.style.display = DisplayStyle.None;
 
         selectButton.clicked += () =>
@@ -569,11 +479,6 @@ public class SidePanelUI : MonoBehaviour
             redraw();
         };
 
-        content.Add(selectButton);
-        content.Add(equippedLabel);
-        content.Add(previewImage);
-        content.Add(infoCard);
-
         var prevButton = new Button(() =>
         {
             int count = getCount();
@@ -582,14 +487,6 @@ public class SidePanelUI : MonoBehaviour
             redraw();
         })
         { text = "<" };
-        SetArrowButtonStyle(prevButton);
-
-        // 왼쪽 화살표의 실제 레이아웃이 계산된 뒤, 그 중심보다 살짝 왼쪽에 미리보기 이미지 중심이 오도록 위치 계산
-        prevButton.RegisterCallback<GeometryChangedEvent>(_ =>
-        {
-            Vector2 arrowCenterInContent = content.WorldToLocal(prevButton.worldBound.center);
-            previewImage.style.left = arrowCenterInContent.x - previewImageLeftOffsetFromArrow - previewImageSize / 2f;
-        });
 
         var nextButton = new Button(() =>
         {
@@ -599,13 +496,15 @@ public class SidePanelUI : MonoBehaviour
             redraw();
         })
         { text = ">" };
-        SetArrowButtonStyle(nextButton);
 
-        arrowRow.Add(prevButton);
-        arrowRow.Add(nameLabel);
-        arrowRow.Add(nextButton);
-
-        content.Add(arrowRow);
+        var center = new VisualElement(); // 이름 / 미리보기 / 버튼 세로 묶음
+        center.style.alignItems = Align.Center;
+        center.Add(nameLabel);
+        center.Add(previewImage);
+        center.Add(selectButton);
+        center.Add(equippedLabel);
+        content.Add(CreateCenterRow(prevButton, center, nextButton));
+        content.Add(infoCard);
 
         // 외부(Start, OpenPanel)에서 필요할 때마다 최신 상태로 다시 그릴 수 있도록 넘겨줌
         redraw = () => RefreshSelectorState(nameLabel, selectButton, equippedLabel, previewImage, infoCard, getName, getIcon, getEquippedIndex, getInfoRows, browse.index, isLocked);
@@ -614,17 +513,50 @@ public class SidePanelUI : MonoBehaviour
         return content;
     }
 
-    // 도감 팝업 색 - 짙은 청록 단색 배경에 청록 테두리
-    private static readonly Color CollectionBackgroundColor = new Color(0.05f, 0.12f, 0.13f);
-    private static readonly Color InfoBorderColor = new Color(0.28f, 0.6f, 0.58f); // 도감 카드/미리보기 액자 테두리색
-    private static readonly Color CollectionPanelColor = new Color(0.02f, 0.06f, 0.07f, 0.85f); // 도감 정보 카드 판
-    private static readonly Color CollectionPreviewColor = new Color(0.5f, 0.9f, 0.85f, 0.08f); // 도감 미리보기 판 - 검은 실루엣이 보이도록 살짝 밝게
-    private static readonly Color EquippedBorderColor = new Color(1f, 0.8f, 0.3f); // 무기 슬롯 - 장착 중인 무기 테두리색
-    // 무기 팝업 색 - 짙은 차콜 단색 배경에 강철색 테두리
-    private static readonly Color WeaponBackgroundColor = new Color(0.1f, 0.11f, 0.13f);
-    private static readonly Color WeaponBorderColor = new Color(0.62f, 0.67f, 0.74f);
-    private static readonly Color WeaponPanelColor = new Color(0.05f, 0.06f, 0.07f, 0.85f); // 정보 카드 판
-    private static readonly Color WeaponPreviewColor = new Color(0.8f, 0.85f, 0.95f, 0.08f); // 미리보기/슬롯 판 - 검은 실루엣이 보이도록 살짝 밝게
+    // 팝업 가운데 줄: 화면 가운데에 < [내용] > (화살표는 배경 없이 큰 갈색 글자)
+    private static VisualElement CreateCenterRow(Button prevButton, VisualElement center, Button nextButton)
+    {
+        var row = new VisualElement(); // 가운데 정렬 줄
+        row.style.flexGrow = 1;
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.alignItems = Align.Center;
+        row.style.justifyContent = Justify.Center;
+        row.style.paddingRight = 220; // 오른쪽 설명 카드에 화살표가 붙지 않게 가운데 묶음을 살짝 왼쪽으로
+        foreach (Button arrow in new[] { prevButton, nextButton })
+        {
+            arrow.style.width = 140;
+            arrow.style.height = 220;
+            arrow.style.fontSize = 140;
+            arrow.style.unityFontStyleAndWeight = FontStyle.Bold;
+            arrow.style.color = PixelStyle.Text.linear;
+            arrow.style.backgroundColor = Color.clear;
+            SetFrame(arrow, Color.clear, 0, 0);
+        }
+        prevButton.style.marginRight = 30;
+        nextButton.style.marginLeft = 30;
+        row.Add(prevButton);
+        row.Add(center);
+        row.Add(nextButton);
+        return row;
+    }
+
+    // 팝업 오른쪽 설명 카드 - 화면 오른쪽, 세로 가운데
+    private static VisualElement CreateSideCard()
+    {
+        var card = new VisualElement(); // 설명 카드
+        card.style.position = Position.Absolute;
+        card.style.right = 60;
+        card.style.top = Length.Percent(50);
+        card.style.translate = new Translate(0, Length.Percent(-50)); // 세로 가운데
+        card.style.width = 380; // 가로는 좁게
+        card.style.paddingTop = 28; // 내용만큼만 높아지되 위아래 여백을 넉넉히
+        card.style.paddingBottom = 16;
+        card.style.paddingLeft = 24;
+        card.style.paddingRight = 24;
+        PixelStyle.Frame(card, PixelStyle.Card); // 픽셀 카드
+        return card;
+    }
+
     private static readonly Color GoodColor = new Color(0.5f, 0.9f, 0.5f); // 장착 중/해금 완료 표시색
     private static readonly Color BadColor = new Color(0.95f, 0.45f, 0.4f); // 잠김 표시색
     private static readonly Color HiddenColor = new Color(0.5f, 0.52f, 0.6f); // ???로 가린 값의 색
@@ -646,78 +578,44 @@ public class SidePanelUI : MonoBehaviour
         element.style.borderBottomRightRadius = radius;
     }
 
-    // 무기 팝업: 좌우 화살표 사이에 [큰 미리보기 | 이름 + 정보 카드 + 장착/해금 버튼], 아래에 무기 10칸 슬롯 줄
+    // 무기 팝업: 화면 가운데에 < 이름/큰 미리보기/장착·해금 버튼 >, 오른쪽에 능력치 카드, 아래에 무기 슬롯 줄
     private VisualElement BuildWeaponSection(out System.Action refresh)
     {
         var content = new VisualElement();
         content.style.position = Position.Absolute;
         content.style.left = 16;
         content.style.right = 16;
-        content.style.top = 60;
+        content.style.top = 96; // 제목 리본 아래부터
         content.style.bottom = 16;
         content.style.display = DisplayStyle.None;
 
         System.Action redraw = null; // 현재 _weaponBrowse.index 기준으로 전체를 다시 그림 (아래 끝에서 채움)
 
-        // 가운데 줄: < [미리보기] [이름/카드/버튼] >
-        var mainRow = new VisualElement();
-        mainRow.style.flexGrow = 1;
-        mainRow.style.flexDirection = FlexDirection.Row;
-        mainRow.style.alignItems = Align.Center;
-        mainRow.style.justifyContent = Justify.SpaceBetween;
-
+        // 가운데: < [이름 / 큰 미리보기 / 장착·해금 버튼] > , 오른쪽: 능력치 카드 (Keep on Mining처럼 그림이 화면 가운데, 설명은 오른쪽)
         var prevButton = new Button(() => { _weaponBrowse.index = Mathf.Max(0, _weaponBrowse.index - 1); redraw(); }) { text = "<" };
         var nextButton = new Button(() => { _weaponBrowse.index = Mathf.Min(WeaponCount() - 1, _weaponBrowse.index + 1); redraw(); }) { text = ">" };
-        // 화살표는 배경/테두리 없이 큰 글자만 (닫기 X 버튼과 같은 방식)
-        foreach (Button arrow in new[] { prevButton, nextButton })
-        {
-            arrow.style.width = 140;
-            arrow.style.height = 220;
-            arrow.style.fontSize = 140;
-            arrow.style.unityFontStyleAndWeight = FontStyle.Bold;
-            arrow.style.color = Color.white;
-            arrow.style.backgroundColor = Color.clear;
-            SetFrame(arrow, Color.clear, 0, 0);
-        }
-
-        var center = new VisualElement();
-        center.style.flexDirection = FlexDirection.Row;
-        center.style.alignItems = Align.Center;
-
-        const float previewSize = 560f; // 미리보기 액자 한 변
-        var preview = new Image { scaleMode = ScaleMode.ScaleToFit };
-        preview.style.width = previewSize;
-        preview.style.height = previewSize;
-        preview.style.marginRight = 60;
-        preview.style.backgroundColor = WeaponPreviewColor;
-        SetFrame(preview, WeaponBorderColor, 3, 14);
-
-        var side = new VisualElement();
-        side.style.width = 480;
 
         var nameLabel = new Label();
         nameLabel.style.fontSize = 40;
-        nameLabel.style.color = Color.white;
+        nameLabel.style.color = PixelStyle.Text.linear;
         nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        nameLabel.style.marginBottom = 20;
+        nameLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+        nameLabel.style.marginBottom = 16;
 
-        var card = new VisualElement();
-        card.style.paddingTop = 24;
-        card.style.paddingBottom = 10;
-        card.style.paddingLeft = 24;
-        card.style.paddingRight = 24;
-        card.style.marginBottom = 24;
-        card.style.backgroundColor = WeaponPanelColor;
-        SetFrame(card, WeaponBorderColor, 3, 8);
+        const float previewSize = 520f; // 미리보기 액자 한 변 (아래 슬롯 줄 자리를 남김)
+        var preview = new Image { scaleMode = ScaleMode.ScaleToFit }; // 무기 그림만 (뒤 액자 없음)
+        preview.style.width = previewSize;
+        preview.style.height = previewSize;
+
+        var card = CreateSideCard(); // 오른쪽 능력치 카드
 
         var actionButton = new Button();
+        actionButton.style.width = 400;
         actionButton.style.height = 64;
+        actionButton.style.marginTop = 24;
         actionButton.style.fontSize = 24;
         actionButton.style.unityFontStyleAndWeight = FontStyle.Bold;
-        actionButton.style.color = Color.white;
-        actionButton.style.marginLeft = 0;
-        actionButton.style.marginRight = 0;
-        SetFrame(actionButton, WeaponBorderColor, 2, 8);
+        PixelStyle.Button(actionButton, PixelStyle.Mint); // 픽셀 입체 버튼 (조각이 모자라 못 누르면 흐려짐)
         actionButton.clicked += () =>
         {
             WeaponManager weapons = WeaponManager.Instance; // 장착/해금 처리
@@ -729,16 +627,13 @@ public class SidePanelUI : MonoBehaviour
             redraw();
         };
 
-        side.Add(nameLabel);
-        side.Add(card);
-        side.Add(actionButton);
+        var center = new VisualElement(); // 이름 / 미리보기 / 버튼 세로 묶음
+        center.style.alignItems = Align.Center;
+        center.Add(nameLabel);
         center.Add(preview);
-        center.Add(side);
-
-        mainRow.Add(prevButton);
-        mainRow.Add(center);
-        mainRow.Add(nextButton);
-        content.Add(mainRow);
+        center.Add(actionButton);
+        content.Add(CreateCenterRow(prevButton, center, nextButton));
+        content.Add(card);
 
         // 아래 줄: 무기 슬롯 10칸 - 누르면 그 무기로 바로 이동
         var slotRow = new VisualElement();
@@ -755,7 +650,7 @@ public class SidePanelUI : MonoBehaviour
             slot.style.height = 96;
             slot.style.marginLeft = 6;
             slot.style.marginRight = 6;
-            slot.style.backgroundColor = WeaponPreviewColor;
+            slot.style.backgroundColor = PixelStyle.Card.face.linear; // 픽셀 칸 안쪽
             slot.RegisterCallback<ClickEvent>(_ => { _weaponBrowse.index = index; redraw(); });
             slot.AddToClassList(DebrisPool.ClickSoundClass); // 누르면 버튼 클릭 소리
             slots.Add(slot);
@@ -796,6 +691,7 @@ public class SidePanelUI : MonoBehaviour
         long cost = buyable ? weapons.GetUnlockCost(index) : 0; // 해금 가격
 
         card.Clear();
+        card.Add(PixelStyle.CardHeader("능력치")); // 카드 머리글
         card.Add(CreateInfoRow("공격력", hidden ? "???" : NumberFormatUtil.Format(data.clickDamage), hidden ? HiddenColor : Color.white));
         card.Add(CreateInfoRow("강화 보너스", hidden ? "???" : $"+{NumberFormatUtil.Format(bonus)}", hidden ? HiddenColor : Color.white));
         card.Add(CreateInfoRow("클릭당 합계", hidden ? "???" : NumberFormatUtil.Format(data.clickDamage + bonus), hidden ? HiddenColor : Color.white));
@@ -809,20 +705,20 @@ public class SidePanelUI : MonoBehaviour
         {
             actionButton.text = "장착 중";
             actionButton.SetEnabled(false);
-            actionButton.style.backgroundColor = WeaponPanelColor;
+            actionButton.style.opacity = 1f; // 장착 중은 흐리게 하지 않음 (글자로 충분히 구분됨)
         }
         else if (unlocked)
         {
             actionButton.text = "장착하기";
             actionButton.SetEnabled(true);
-            actionButton.style.backgroundColor = new Color(0.2f, 0.45f, 0.2f, 0.9f);
+            actionButton.style.opacity = StyleKeyword.Null;
         }
         else
         {
             long have = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetPieces() : 0; // 보유 조각
             actionButton.text = $"해금 ({NumberFormatUtil.Format(cost)} 조각)";
             actionButton.SetEnabled(have >= cost);
-            actionButton.style.backgroundColor = new Color(0.3f, 0.42f, 0.58f, 0.9f); // 강철 청색 - 배경과 어울리게
+            actionButton.style.opacity = StyleKeyword.Null; // 조각이 모자라면 흐리게
         }
 
         for (int i = 0; i < slots.Count; i++)
@@ -830,8 +726,8 @@ public class SidePanelUI : MonoBehaviour
             slots[i].sprite = weapons.GetWeaponAt(i).icon;
             slots[i].tintColor = weapons.IsUnlocked(i) ? Color.white : Color.black;
             // 장착 중 = 금색, 지금 보고 있는 칸 = 흰색, 나머지 = 기본 테두리
-            Color border = i == weapons.EquippedIndex ? EquippedBorderColor : i == index ? Color.white : WeaponBorderColor;
-            SetFrame(slots[i], border, i == index || i == weapons.EquippedIndex ? 3 : 2, 10);
+            Color border = (i == weapons.EquippedIndex ? PixelStyle.Highlight : i == index ? PixelStyle.Text : PixelStyle.Card.outline).linear; // 장착 중 주황 / 보는 중 진갈색 / 나머지 연갈색
+            SetFrame(slots[i], border, i == index || i == weapons.EquippedIndex ? 4 : 2, 0); // 각진 픽셀 칸
         }
     }
 
@@ -841,17 +737,18 @@ public class SidePanelUI : MonoBehaviour
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
         row.style.justifyContent = Justify.SpaceBetween;
-        row.style.marginBottom = 14;
+        row.style.marginBottom = 26; // 줄 사이를 넓혀 세로로 길쭉한 카드
 
         var labelText = new Label(label);
         labelText.style.fontSize = 22;
-        labelText.style.color = new Color(0.65f, 0.7f, 0.8f);
+        labelText.style.color = PixelStyle.MutedText.linear;
         row.Add(labelText);
 
         var valueText = new Label(value);
         valueText.style.fontSize = 24;
         valueText.style.unityFontStyleAndWeight = FontStyle.Bold;
-        valueText.style.color = valueColor;
+        valueText.style.color = (valueColor == GoodColor ? PixelStyle.Good : valueColor == BadColor ? PixelStyle.Bad
+            : valueColor == HiddenColor ? PixelStyle.Hidden : PixelStyle.Text).linear; // 크림 바탕에서 보이는 진한 색으로
         row.Add(valueText);
 
         return row;
@@ -902,6 +799,7 @@ public class SidePanelUI : MonoBehaviour
         // 도감 정보 카드를 현재 오브젝트 기준으로 새로 채움
         var rows = getInfoRows?.Invoke(index);
         infoCard.Clear();
+        infoCard.Add(PixelStyle.CardHeader("도감 정보")); // 카드 머리글
         infoCard.style.display = rows == null ? DisplayStyle.None : DisplayStyle.Flex;
         if (rows != null)
             foreach (var row in rows)
@@ -922,21 +820,11 @@ public class SidePanelUI : MonoBehaviour
         equippedLabel.style.display = isEquipped ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
-    private void SetArrowButtonStyle(Button button)
-    {
-        button.style.width = 48;
-        button.style.height = 48;
-        button.style.fontSize = 22;
-        button.style.unityFontStyleAndWeight = FontStyle.Bold;
-        button.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.85f);
-        button.style.color = Color.white;
-    }
-
     private const float NavButtonPunchAmount = 0.15f; // 업글/무기/오브젝트 버튼 클릭시 커지는 비율
     private const float NavButtonPunchDuration = 0.12f; // 펀치 애니메이션 길이(초)
 
     // 좌상단 가로줄에 나란히 놓이는 버튼 (고정 폭/높이) - 3개 합쳐서 화면(1920 기준) 절반 가까이 오도록 키움
-    private Button CreateButton(string text, System.Action onClick)
+    private Button CreateButton(string text, PixelStyle.Tone tone, System.Action onClick)
     {
         // onClick이 패널을 열거나 버튼 줄 자체를 숨겨버리므로, 펀치가 다 보인 뒤에 실제 동작을 실행해야 함
         // (먼저 실행하면 버튼이 그 즉시 사라져서 펀치가 눈에 안 보임)
@@ -948,12 +836,7 @@ public class SidePanelUI : MonoBehaviour
         button.style.height = 110;
         button.style.fontSize = 34;
         button.style.unityFontStyleAndWeight = FontStyle.Bold;
-        button.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.85f);
-        button.style.color = Color.white;
-        button.style.borderTopLeftRadius = 6;
-        button.style.borderTopRightRadius = 6;
-        button.style.borderBottomLeftRadius = 6;
-        button.style.borderBottomRightRadius = 6;
+        PixelStyle.Button(button, tone); // 픽셀 입체 버튼
         return button;
     }
 
@@ -979,7 +862,6 @@ public class SidePanelUI : MonoBehaviour
         _currentlyOpenContent = contentToShow;
         _weaponContent.style.display = contentToShow == _weaponContent ? DisplayStyle.Flex : DisplayStyle.None;
         _objectContent.style.display = contentToShow == _objectContent ? DisplayStyle.Flex : DisplayStyle.None;
-        _panel.style.backgroundColor = contentToShow == _weaponContent ? WeaponBackgroundColor : CollectionBackgroundColor;
         _panel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility(); // 팝업이 열렸으니 버튼 줄 숨김
 

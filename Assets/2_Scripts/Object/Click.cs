@@ -223,7 +223,7 @@ public class Click : MonoBehaviour
         // 럭키 클릭 - 당첨되면 데미지가 모자라도 즉시 파괴. 원래 데미지가 남은 체력보다 크면 그대로 둠
         // (남은 체력으로 깎아버리면 뜨는 숫자가 무기 데미지가 아니라 체력만큼만 나옴)
         bool bossFight = _boss != null && _boss.BossActive; // 보스전 중인 보스를 때리는지
-        if (bossFight) damage = Mathf.Max(1, Mathf.RoundToInt(damage * _boss.BossDamageMultiplier)); // 왁스 보호막만큼 덜 깎임
+        if (bossFight && _boss.ShieldRatio > 0f) damage = Mathf.Max(1, Mathf.FloorToInt(damage * _boss.BossDamageMultiplier)); // 왁스 보호막만큼 덜 깎임 - 내림이라 작은 데미지도 보호막이 있으면 숫자가 줄어든 게 보임
         bool isLucky = !bossFight && UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.LuckyClickChance; // 보스전엔 한 방에 부수는 럭키 클릭 없음
         if (isLucky)
             damage = Mathf.Max(damage, _health.CurrentHP);

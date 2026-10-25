@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// 보스전 UI (화면 왼쪽 위, 조각 표시 바로 아래): 평소엔 지금 맵 보스의 "보스 도전" 버튼, 보스전 중엔 남은 시간/보스 체력/보호막/포기하기.
+// 보스전 UI: 평소엔 조각 표시 아래에 지금 맵 보스의 "보스 도전" 버튼, 보스전 중엔 화면 위에 보스 체력/보호막/남은 시간 + 포기 버튼,
+// 시간 초과로 실패하면 재도전/나가기 창.
 // 보스전 동안은 다른 UI(조각 표시 포함)를 전부 숨김. 성공 순간 슬로우 모션도 여기서 돌림.
 // 씬에 따로 놓을 필요 없이 ZoneBreaker가 처음 켜질 때 만들어짐
 public class BossChallengeUI : MonoBehaviour
@@ -16,8 +17,14 @@ public class BossChallengeUI : MonoBehaviour
 
     private UIDocument _document; // 이 UI를 그리는 문서
     private Button _challengeButton; // 보스 도전 버튼
-    private VisualElement _fightPanel; // 보스전 중 상자 (시간/체력/보호막) - 화면 위, 조각 표시 오른쪽
-    private Button _giveUpButton; // 포기하기 버튼 - 조각 표시 아래 (도전 버튼 자리)
+    private VisualElement _fightPanel; // 보스전 중 상자 (체력/보호막/시간/포기) - 화면 위 가운데
+    private Button _giveUpButton; // 포기 버튼 - 보스전 상자 안, 체력바 오른쪽
+    private VisualElement _failPopup; // 실패 창 (재도전/나가기)
+    private ZoneBreaker _failedBoss; // 방금 실패한 보스 - 재도전 대상
+
+    private static readonly Color HpColor = new Color(0.91f, 0.38f, 0.35f); // 보스 체력 (산호빛 빨강)
+    private static readonly Color HpBack = new Color(0.45f, 0.32f, 0.24f); // 체력/타이머 바 빈 곳 (갈색)
+    private static readonly Color TimeColor = new Color(0.96f, 0.84f, 0.55f); // 타이머 (버터색)
     private Label _timeLabel; // 남은 시간 숫자 (타이머 바 오른쪽)
     private VisualElement _timeFill; // 타이머 바 채움 - 시간이 갈수록 줄어듦
     private VisualElement _hpFill; // 보스 체력바 채움 (빨강)
@@ -62,84 +69,177 @@ public class BossChallengeUI : MonoBehaviour
         VisualElement root = _document.rootVisualElement; // 이 문서의 최상위
         root.Clear();
         GameFonts.Apply(root);
+        if (GameFonts.UiColored != null)
+            root.style.unityFontDefinition = FontDefinition.FromSDFFont(GameFonts.UiColored); // 글자색이 먹는 글꼴
+        root.pickingMode = PickingMode.Ignore; // 빈 곳 클릭은 게임으로
 
+        // 보스 도전 버튼 - 조각 표시 아래 (분홍 픽셀 버튼)
         _challengeButton = new Button(() => { if (_ready != null) _ready.StartBoss(); }) { text = "보스 도전!" };
         Place(_challengeButton);
+        _challengeButton.style.width = 300;
         _challengeButton.style.height = 80;
-        _challengeButton.style.minWidth = 300;
         _challengeButton.style.fontSize = 34;
-        _challengeButton.style.color = Color.white;
-        _challengeButton.style.backgroundColor = new Color(0.75f, 0.15f, 0.15f, 0.95f); // 눈에 띄는 빨강
+        PixelStyle.Button(_challengeButton, PixelStyle.Pink);
         _challengeButton.style.display = DisplayStyle.None;
         GuardPointer(_challengeButton);
         root.Add(_challengeButton);
 
+        // 보스전 상자 - 화면 위 가운데: [체력바 + 타이머] [포기]
         _fightPanel = new VisualElement();
         _fightPanel.style.position = Position.Absolute;
-        _fightPanel.style.top = 28; // 화면 위 가운데, 가로 50% - 보스 게임들의 상단 체력바처럼 (보스전 중엔 다른 UI는 숨김)
-        _fightPanel.style.left = Length.Percent(25);
-        _fightPanel.style.right = Length.Percent(25);
-        _fightPanel.style.paddingLeft = 14;
-        _fightPanel.style.paddingRight = 14;
-        _fightPanel.style.paddingTop = 10;
-        _fightPanel.style.paddingBottom = 8;
-        _fightPanel.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.85f); // 다른 UI와 같은 반투명 어두운 배경
-        SetRadius(_fightPanel, 6);
+        _fightPanel.style.top = 24;
+        _fightPanel.style.left = Length.Percent(17);
+        _fightPanel.style.right = Length.Percent(17); // 가로 66%
+        _fightPanel.style.flexDirection = FlexDirection.Row;
+        _fightPanel.style.alignItems = Align.Center;
+        _fightPanel.style.paddingLeft = 20;
+        _fightPanel.style.paddingRight = 16;
+        _fightPanel.style.paddingTop = 14;
+        _fightPanel.style.paddingBottom = 16;
+        PixelStyle.Frame(_fightPanel, PixelStyle.Box); // 크림 픽셀 틀
         _fightPanel.style.display = DisplayStyle.None;
         GuardPointer(_fightPanel);
 
+        var bars = new VisualElement(); // 체력바 + 타이머 줄
+        bars.style.flexGrow = 1;
+
         var hpBack = new VisualElement(); // 체력바 바탕
-        hpBack.style.height = 16;
-        hpBack.style.backgroundColor = new Color(0.08f, 0.08f, 0.08f, 0.85f);
-        SetBorder(hpBack, 2, new Color(0.05f, 0.05f, 0.05f)); // 진한 테두리
-        SetRadius(hpBack, 4);
+        hpBack.style.height = 24;
+        hpBack.style.backgroundColor = HpBack.linear;
+        SetBorder(hpBack, 3, PixelStyle.Text.linear); // 진갈색 테두리
         _hpFill = new VisualElement();
         _hpFill.style.height = Length.Percent(100);
-        _hpFill.style.backgroundColor = new Color(0.85f, 0.2f, 0.2f);
-        SetRadius(_hpFill, 2);
+        _hpFill.style.backgroundColor = HpColor.linear;
         hpBack.Add(_hpFill);
         _shieldFill = new VisualElement();
         _shieldFill.style.position = Position.Absolute; // 빨간 체력 위에 겹침
         _shieldFill.style.left = 0;
         _shieldFill.style.top = 0;
         _shieldFill.style.height = Length.Percent(100);
-        _shieldFill.style.backgroundColor = new Color(1f, 1f, 1f, 0.6f); // 반투명 흰색 - 체력 위에 씌운 보호막
-        SetRadius(_shieldFill, 2);
+        _shieldFill.style.backgroundColor = new Color(1f, 1f, 1f, 0.65f); // 반투명 흰색 - 체력 위에 씌운 보호막
         hpBack.Add(_shieldFill);
-        _fightPanel.Add(hpBack);
+        bars.Add(hpBack);
 
         var timeRow = new VisualElement(); // 타이머 바 + 남은 초
         timeRow.style.flexDirection = FlexDirection.Row;
         timeRow.style.alignItems = Align.Center;
-        timeRow.style.marginTop = 4;
+        timeRow.style.marginTop = 8;
         var timeBack = new VisualElement(); // 타이머 바 바탕
         timeBack.style.flexGrow = 1;
-        timeBack.style.height = 6;
-        timeBack.style.backgroundColor = new Color(0.08f, 0.08f, 0.08f, 0.85f);
-        SetBorder(timeBack, 1, new Color(0.05f, 0.05f, 0.05f));
-        SetRadius(timeBack, 3);
+        timeBack.style.height = 12;
+        timeBack.style.backgroundColor = HpBack.linear;
+        SetBorder(timeBack, 2, PixelStyle.Text.linear);
         _timeFill = new VisualElement();
         _timeFill.style.height = Length.Percent(100);
-        _timeFill.style.backgroundColor = new Color(1f, 0.8f, 0.25f); // 노란 타이머
-        SetRadius(_timeFill, 1);
+        _timeFill.style.backgroundColor = TimeColor.linear; // 버터색 타이머
         timeBack.Add(_timeFill);
         timeRow.Add(timeBack);
-        _timeLabel = MakeLabel(20, Color.white);
-        _timeLabel.style.width = 54; // 숫자 자리수가 바뀌어도 바 길이가 안 흔들리게
+        _timeLabel = MakeLabel(24, PixelStyle.Text.linear);
+        _timeLabel.style.width = 64; // 숫자 자리수가 바뀌어도 바 길이가 안 흔들리게
         _timeLabel.style.unityTextAlign = TextAnchor.MiddleRight;
         timeRow.Add(_timeLabel);
-        _fightPanel.Add(timeRow);
+        bars.Add(timeRow);
+        _fightPanel.Add(bars);
+
+        // 포기 - 체력바 바로 오른쪽 (작은 분홍 버튼)
+        _giveUpButton = new Button(() => ZoneBreaker.ActiveBoss?.GiveUpBoss()) { text = "포기" };
+        _giveUpButton.style.width = 110;
+        _giveUpButton.style.height = 64;
+        _giveUpButton.style.marginLeft = 18;
+        _giveUpButton.style.fontSize = 26;
+        PixelStyle.Button(_giveUpButton, PixelStyle.Pink);
+        _fightPanel.Add(_giveUpButton);
         root.Add(_fightPanel);
 
-        _giveUpButton = new Button(() => ZoneBreaker.ActiveBoss?.GiveUpBoss()) { text = "포기하기" };
-        Place(_giveUpButton);
-        _giveUpButton.style.height = 70;
-        _giveUpButton.style.minWidth = 300;
-        _giveUpButton.style.fontSize = 30;
-        _giveUpButton.style.display = DisplayStyle.None;
-        GuardPointer(_giveUpButton);
-        root.Add(_giveUpButton);
+        BuildFailPopup(root);
+        ZoneBreaker.BossFailed += ShowFailPopup;
+    }
 
+    void OnDisable()
+    {
+        ZoneBreaker.BossFailed -= ShowFailPopup;
+    }
+
+    // 실패 창: 어둡게 덮은 화면 가운데 크림 창 - "보스전 실패" + [재도전] [나가기]
+    private void BuildFailPopup(VisualElement root)
+    {
+        _failPopup = new VisualElement();
+        _failPopup.style.position = Position.Absolute;
+        _failPopup.style.left = 0;
+        _failPopup.style.right = 0;
+        _failPopup.style.top = 0;
+        _failPopup.style.bottom = 0;
+        _failPopup.style.backgroundColor = new Color(0f, 0f, 0f, 0.45f); // 뒤 게임을 어둡게
+        _failPopup.style.alignItems = Align.Center;
+        _failPopup.style.justifyContent = Justify.Center;
+        _failPopup.style.display = DisplayStyle.None;
+        GuardPointer(_failPopup);
+
+        var window = new VisualElement(); // 가운데 창
+        window.style.width = 620;
+        window.style.alignItems = Align.Center;
+        window.style.paddingTop = 36;
+        window.style.paddingBottom = 40;
+        window.style.paddingLeft = 32;
+        window.style.paddingRight = 32;
+        PixelStyle.Frame(window, PixelStyle.Window, 6f);
+
+        var title = new Label("보스전 실패"); // 제목 리본
+        title.style.fontSize = 40;
+        title.style.paddingLeft = 40;
+        title.style.paddingRight = 40;
+        title.style.paddingTop = 8;
+        title.style.paddingBottom = 14;
+        title.style.unityTextAlign = TextAnchor.MiddleCenter;
+        PixelStyle.Frame(title, PixelStyle.Ribbon);
+        PixelStyle.OutlinedText(title, PixelStyle.Ribbon.text);
+        window.Add(title);
+
+        var message = MakeLabel(28, PixelStyle.Text.linear); // 안내 문구
+        message.text = "시간 안에 부수지 못했어요";
+        message.style.marginTop = 24;
+        message.style.marginBottom = 28;
+        window.Add(message);
+
+        var buttons = new VisualElement(); // [재도전] [나가기]
+        buttons.style.flexDirection = FlexDirection.Row;
+        var retry = new Button(() => CloseFailPopup(true)) { text = "재도전" };
+        var exit = new Button(() => CloseFailPopup(false)) { text = "나가기" };
+        foreach (Button button in new[] { retry, exit })
+        {
+            button.style.width = 220;
+            button.style.height = 76;
+            button.style.fontSize = 30;
+            button.style.marginLeft = 12;
+            button.style.marginRight = 12;
+        }
+        PixelStyle.Button(retry, PixelStyle.Mint);
+        PixelStyle.Button(exit, PixelStyle.Pink);
+        buttons.Add(retry);
+        buttons.Add(exit);
+        window.Add(buttons);
+
+        _failPopup.Add(window);
+        root.Add(_failPopup);
+    }
+
+    // 실패했을 때 - 게임을 멈추고 실패 창을 띄움
+    private void ShowFailPopup(ZoneBreaker boss)
+    {
+        _failedBoss = boss;
+        _failPopup.style.display = DisplayStyle.Flex;
+        if (_slowElapsed >= 0f) StopSlow();
+        Time.timeScale = 0f; // 창이 떠 있는 동안 게임 정지 (다른 창들과 같음)
+    }
+
+    // retry면 같은 보스에 바로 다시 도전, 아니면 그냥 게임으로 돌아감
+    private void CloseFailPopup(bool retry)
+    {
+        _failPopup.style.display = DisplayStyle.None;
+        UIPointerGuard.IsPointerOverUI = false;
+        Time.timeScale = 1f;
+        if (retry && _failedBoss != null) _failedBoss.StartBoss();
+        _failedBoss = null;
     }
 
     void Update()
@@ -147,7 +247,7 @@ public class BossChallengeUI : MonoBehaviour
         if (_challengeButton == null) return;
 
         ZoneBreaker active = ZoneBreaker.ActiveBoss; // 보스전 중인 보스
-        _ready = active == null && Time.timeScale > 0f ? ZoneBreaker.ChallengeableBoss() : null; // 업그레이드 창 등이 열려 게임이 멈춰 있으면 안 띄움 - 해금하고 창을 닫아야 뜸
+        _ready = active == null && Time.timeScale > 0f ? ZoneBreaker.ChallengeableBoss() : null; // 업그레이드 창/실패 창 등으로 게임이 멈춰 있으면 안 띄움
 
         SetShown(_challengeButton, _ready != null);
         if (_ready != null)
@@ -158,7 +258,6 @@ public class BossChallengeUI : MonoBehaviour
 
         bool fighting = active != null; // 보스전 중인지
         SetShown(_fightPanel, fighting);
-        SetShown(_giveUpButton, fighting);
         if (fighting != _wasFighting) HideOtherUI(fighting);
         _wasFighting = fighting;
         if (fighting)
@@ -274,13 +373,5 @@ public class BossChallengeUI : MonoBehaviour
         element.style.borderBottomColor = color;
         element.style.borderLeftColor = color;
         element.style.borderRightColor = color;
-    }
-
-    private static void SetRadius(VisualElement element, float radius)
-    {
-        element.style.borderTopLeftRadius = radius;
-        element.style.borderTopRightRadius = radius;
-        element.style.borderBottomLeftRadius = radius;
-        element.style.borderBottomRightRadius = radius;
     }
 }

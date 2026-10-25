@@ -98,16 +98,12 @@ public class PieceUI : MonoBehaviour
         background.style.paddingRight = 18;
         background.style.justifyContent = Justify.Center; // 두 줄을 상자 세로 가운데에
         background.style.alignItems = Align.FlexStart;
-        background.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.85f);
-        background.style.borderTopLeftRadius = 6;
-        background.style.borderTopRightRadius = 6;
-        background.style.borderBottomLeftRadius = 6;
-        background.style.borderBottomRightRadius = 6;
+        PixelStyle.Frame(background, PixelStyle.Box); // 오른쪽 위 버튼과 같은 픽셀 틀 (크림)
 
-        _pieceLabel = CreateLabel(Color.white);
+        _pieceLabel = CreateLabel(PixelStyle.Text.linear); // 크림 상자 위 진한 갈색
         background.Add(_pieceLabel);
 
-        _crystalLabel = CreateLabel(new Color(0.35f, 0.85f, 1f)); // 결정은 하늘색으로 구분
+        _crystalLabel = CreateLabel(new Color(0.23f, 0.53f, 0.66f).linear); // 결정은 진한 하늘색으로 구분 (크림 위에서 보이게)
         background.Add(_crystalLabel);
 
         root.Add(background);

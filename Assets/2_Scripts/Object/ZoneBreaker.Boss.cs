@@ -19,6 +19,7 @@ public partial class ZoneBreaker
 
     public static bool FinalBossCleared; // 다음 맵이 없는 마지막 보스(회사)를 잡았는지 - 저장됨
     public static ZoneBreaker ActiveBoss { get; private set; } // 지금 보스전 중인 보스 (없으면 null)
+    public static event System.Action<ZoneBreaker> BossFailed; // 시간 안에 못 부숴서 실패했을 때 - UI가 재도전/나가기 창을 띄움
     private static readonly List<ZoneBreaker> _bosses = new List<ZoneBreaker>(); // 켜져 있는 보스들 (UI가 도전 버튼을 띄울 보스를 찾을 때)
 
     private readonly List<Health> _links = new List<Health>(); // 보호막으로 연결된 기본 오브젝트들 (보스전 시작 때 정함)
@@ -127,7 +128,7 @@ public partial class ZoneBreaker
         if (ZoneManager.Instance != null && ZoneManager.Instance.IsHidden(transform)) { LoseBoss(); return; }
 
         _bossTimeLeft -= Time.deltaTime; // 업그레이드 창 등으로 시간이 멈추면 같이 멈춤
-        if (_bossTimeLeft <= 0f) { LoseBoss(); return; }
+        if (_bossTimeLeft <= 0f) { LoseBoss(); BossFailed?.Invoke(this); return; } // 시간 초과만 실패 창을 띄움 (포기/맵 이동은 바로 끝)
 
         while (shieldSpawnTimes != null && _nextSpawn < shieldSpawnTimes.Length && _bossTimeLeft <= shieldSpawnTimes[_nextSpawn])
         {

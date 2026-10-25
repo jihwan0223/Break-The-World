@@ -36,6 +36,21 @@ public static class GameFonts
         }
     }
 
+    private static UnityEngine.TextCore.Text.FontAsset _uiOutlined; // UI 툴킷용 테두리가 되는 폰트 (처음 쓸 때 한 번 만들어 캐시)
+
+    // UI 툴킷에서 글자 테두리(-unity-text-outline)가 먹는 폰트. UiColored는 도트 그대로인 비트맵이라 테두리/그림자가 안 그려져서,
+    // 테두리가 필요한 버튼/제목 글자만 SDF로 찍은 이걸 씀 (여백을 넉넉히 둬야 테두리가 잘리지 않음)
+    public static UnityEngine.TextCore.Text.FontAsset UiOutlined
+    {
+        get
+        {
+            if (_uiOutlined == null && Ui != null)
+                _uiOutlined = UnityEngine.TextCore.Text.FontAsset.CreateFontAsset(Ui, UiColoredPixelSize, 8,
+                    UnityEngine.TextCore.LowLevel.GlyphRenderMode.SDFAA, 1024, 1024);
+            return _uiOutlined;
+        }
+    }
+
     private const string TmpOutlineName = "MonaS12 SDF Outline"; // 검은 테두리를 켠 TMP 재질 이름 (Resources 안)
     private static Material _tmpOutline; // 처음 쓸 때 한 번 불러와 캐시
 
