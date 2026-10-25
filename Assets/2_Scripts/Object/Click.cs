@@ -101,10 +101,9 @@ public class Click : MonoBehaviour
         if (objectIndex < 0) return;
         int weaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : -1;
 
-        // 오브젝트 티어에 따라 기하급수적으로 커지는 기본 보상 + "획득량 증가"(ObjectManager) 보너스 + 콤보 배율
+        // 오브젝트 티어에 따라 기하급수적으로 커지는 기본 보상 + "획득량 증가"(ObjectManager) 보너스
         long baseReward = ObjectManager.Instance.GetBaseReward(objectIndex) * pieceReward;
         long gainBonus = ObjectManager.Instance.GetGainBonus(objectIndex);
-        float comboMultiplier = ComboManager.Instance != null ? ComboManager.Instance.ShardMultiplier : 1f;
 
         // 업그레이드: 파편 획득 배율(전역), 오브젝트 드랍량 강화(개수), 무기별 처치 보너스 파편
         float upgradeMultiplier = 1f;
@@ -119,7 +118,7 @@ public class Click : MonoBehaviour
 
         // 후반 티어는 값이 int 범위를 넘어설 수 있어서 double로 계산함 (Mathf.RoundToInt는 int라 오버플로됨).
         // 드랍량 강화는 전역 배율과 서로 곱해지지 않고 더해짐 (예전에 둘 다 %였을 때와 같은 결과)
-        double rawTotal = ((baseReward + gainBonus + weaponKillBonus) * (double)upgradeMultiplier + objectBonus) * comboMultiplier;
+        double rawTotal = ((baseReward + gainBonus + weaponKillBonus) * (double)upgradeMultiplier + objectBonus);
         // 소수 부분은 반올림으로 버리지 않고 그만큼의 확률로 1개를 더 줌 - 평균은 계산값과 정확히 같음
         long finalPieces = (long)System.Math.Floor(rawTotal);
         if (Random.value < rawTotal - finalPieces)
@@ -263,6 +262,8 @@ public class Click : MonoBehaviour
     // 자동클릭은 오브젝트별로 따로 설정하는 거라, 지금 장착 중인 오브젝트를 대상으로 하는 노드가 있을 때만 작동함
     private void UpdateAutoClick()
     {
+        if (ZoneBreaker.ActiveBoss != null) return; // 보스전 중엔 자동클릭 쉼 (타이머도 멈춤)
+
         int objectIndex = ObjIndex;
         if (UpgradeManager.Instance == null || objectIndex < 0 || !UpgradeManager.Instance.AutoClickIsUnlockedFor(objectIndex))
             return;
@@ -339,7 +340,7 @@ public class Click : MonoBehaviour
 
         _flyingProjectiles.Remove(projectile);
         Destroy(projectile);
-        PerformClickHit(false);
+        if (ZoneBreaker.ActiveBoss == null) PerformClickHit(false); // 날아오는 사이 보스전이 시작됐으면 안 때림
     }
 
     // 투사체가 착지할 자리를 오브젝트 안쪽에서 몇 번 뽑아보고, 자기 자신 말고 다른 오브젝트(책상 위 접시 등)가 없는 자리를 고름.

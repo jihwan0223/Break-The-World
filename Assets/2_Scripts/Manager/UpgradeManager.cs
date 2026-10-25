@@ -19,16 +19,16 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("자동클릭 해금")] AutoClickUnlock,          // 자동 클릭 기능 해금 (레벨 1이면 켜짐)
         [InspectorName("자동클릭 주기 단축")] AutoClickSpeed,      // 자동 클릭 주기 -값 초
         [InspectorName("자동클릭 횟수 증가")] AutoClickCount,      // 자동 클릭 1회당 +값 번
-        [InspectorName("콤보 해금")] ComboUnlock,                  // 콤보 기능 해금
-        [InspectorName("콤보 쿨타임 감소")] ComboCooldown,         // 콤보 쿨타임 -값 초
-        [InspectorName("콤보 지속시간 증가")] ComboDuration,       // 콤보 지속시간 +값 초
+        [InspectorName("(사용 안 함) 콤보 해금")] ComboUnlock,           // 콤보 기능은 지웠음 - 뒤 번호가 밀리지 않게 자리만 남김
+        [InspectorName("(사용 안 함) 콤보 쿨타임")] ComboCooldown,       // 콤보 기능은 지웠음 - 자리만 남김
+        [InspectorName("(사용 안 함) 콤보 지속시간")] ComboDuration,     // 콤보 기능은 지웠음 - 자리만 남김
         [InspectorName("럭키 클릭 해금")] LuckyClick,              // 럭키 클릭 해금
         [InspectorName("더블 클릭 해금")] DoubleClick,             // 더블 클릭 해금
         [InspectorName("자동 채굴 해금")] AutoMineUnlock,          // 자동 채굴 해금
         [InspectorName("자동 채굴 주기 단축")] AutoMineSpeed,      // 자동 채굴 주기 -값 초
         // 아래는 나중에 추가된 것들 - enum은 int로 직렬화되니 새 값은 항상 맨 뒤에만 붙일 것
         [InspectorName("자동 채굴 획득량 증가")] AutoMineYield,    // 자동 채굴 1틱당 획득량 +값 배 (대상 오브젝트 기본 보상 기준)
-        [InspectorName("콤보 배율 증가")] ComboMultiplier,        // 콤보 활성 중 파편 배율 +값
+        [InspectorName("(사용 안 함) 콤보 배율")] ComboMultiplier,       // 콤보 기능은 지웠음 - 자리만 남김
         [InspectorName("럭키클릭 확률 증가")] LuckyClickChanceUp,  // 럭키클릭 확률 +값 %
         [InspectorName("더블클릭 확률 증가")] DoubleClickChanceUp, // 더블클릭 발동 확률 +값 %
         [InspectorName("전역 조각 획득 증가")] PieceGainGlobal,    // 모든 오브젝트 조각 획득 +값 %
@@ -68,11 +68,7 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private float minAutoClickInterval = 1.5f;  // 자동 클릭 주기 하한
     [SerializeField] private float autoClickIntervalGrowthPerObject = 1.05f; // 오브젝트 번호가 1 늘 때마다 자동 클릭 주기에 곱해지는 배율 (1이면 모두 같은 주기, 클수록 뒤쪽 오브젝트가 늦게 깨짐)
     [SerializeField] private int baseAutoClickCount = 1;         // 자동 클릭 1회당 기본 클릭 수
-    [SerializeField] private float baseComboCooldown = 30f;      // 콤보 기본 쿨타임(초)
-    [SerializeField] private float minComboCooldown = 10f;       // 콤보 쿨타임 하한
-    [SerializeField] private float baseComboDuration = 5f;       // 콤보 기본 지속시간(초)
     [SerializeField] private float luckyClickChanceValue = 0.001f; // 럭키 클릭 기본 확률 (0.1%) - LuckyClickChanceUp이 위에 더함
-    [SerializeField] private float baseComboMultiplier = 2f;     // 콤보 활성 중 기본 파편 배율 - ComboMultiplier가 위에 더함
     [SerializeField] private float baseDoubleClickChance = 0.25f;// 더블클릭 해금 직후 발동 확률 - DoubleClickChanceUp이 위에 더함
     [SerializeField] private float baseAutoMineInterval = 8f;    // 자동 채굴 기본 주기(초)
     [SerializeField] private float minAutoMineInterval = 2f;     // 자동 채굴 주기 하한
@@ -401,7 +397,7 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    // ---- 효과 값 (Click.cs, ComboManager 등에서 사용) ----
+    // ---- 효과 값 (Click.cs 등에서 사용) ----
 
     // 특정 효과의 "구매한 레벨들의 값 총합" (선택적으로 대상 오브젝트가 일치하는 노드만)
     private float SumEffect(UpgradeEffect effect, int objectIndexFilter = int.MinValue)
@@ -487,17 +483,6 @@ public class UpgradeManager : MonoBehaviour
 
     public int AutoClickClicksPerTriggerFor(int objectIndex) =>
         baseAutoClickCount + Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoClickCount, objectIndex));
-
-    public bool ComboIsUnlocked => AnyUnlocked(UpgradeEffect.ComboUnlock);
-
-    public float ComboCooldownSeconds =>
-        Mathf.Max(minComboCooldown, baseComboCooldown - SumEffect(UpgradeEffect.ComboCooldown));
-
-    public float ComboDurationSeconds =>
-        baseComboDuration + SumEffect(UpgradeEffect.ComboDuration);
-
-    // 콤보 활성 중 파편 배율 (ComboManager가 콤보 켜져있을 때 이 값을 씀)
-    public float ComboShardMultiplierValue => baseComboMultiplier + SumEffect(UpgradeEffect.ComboMultiplier);
 
     public bool LuckyClickIsUnlocked => AnyUnlocked(UpgradeEffect.LuckyClick);
     public float LuckyClickChance =>

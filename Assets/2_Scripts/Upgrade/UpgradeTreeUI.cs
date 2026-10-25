@@ -43,6 +43,27 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
 
         Instance = this;
         CacheNodes();
+        StyleButton("CloseButton", PixelStyle.Pink, "X", new Vector2(64f, 64f));
+        StyleButton("CameraResetButton", PixelStyle.Mint, "카메라 리셋", new Vector2(300f, 64f));
+    }
+
+    // 닫기/카메라 리셋 버튼을 무기·도감 창과 같은 픽셀 버튼으로 입힘
+    private void StyleButton(string buttonName, PixelStyle.Tone tone, string label, Vector2 size)
+    {
+        foreach (UnityEngine.UI.Button button in GetComponentsInChildren<UnityEngine.UI.Button>(true))
+        {
+            if (button.name != buttonName) continue;
+            ((RectTransform)button.transform).sizeDelta = size;
+            PixelStyle.UguiButton(button, tone);
+            var text = button.GetComponentInChildren<TMPro.TMP_Text>(true); // 버튼 글씨
+            if (text != null)
+            {
+                text.text = label;
+                text.fontSize = 28;
+                text.alignment = TMPro.TextAlignmentOptions.Center;
+            }
+            return;
+        }
     }
 
     // content 아래의 모든 업그레이드/이코노미 노드를 찾아 캐시 (손으로 배치한 노드도 여기서 잡힘)

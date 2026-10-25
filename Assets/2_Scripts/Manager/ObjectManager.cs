@@ -214,7 +214,7 @@ public class ObjectManager : MonoBehaviour
         Health.ComputeMaxHP(objects[index].tier, objects[index].indexInTier, objects[index].hpMultiplier);
 
     // 지금 업그레이드 기준으로 index번째 오브젝트를 한 번 부술 때 받는 파편 수.
-    // Click.HandleDied 계산에서 콤보 배율과 2배 드랍 확률(둘 다 상황마다 달라짐)만 뺀 값
+    // Click.HandleDied 계산에서 2배 드랍 확률(상황마다 달라짐)만 뺀 값
     public long ExpectedPieces(int index)
     {
         float upgradeMultiplier = 1f; // 파편 획득 배율 업그레이드
@@ -232,7 +232,7 @@ public class ObjectManager : MonoBehaviour
 
     // ---- 클릭 시 기본 파편 보상 ----
     // 오브젝트를 부술 때마다 받는 기본 파편 수. 업그레이드/해금 비용이 티어마다 6배씩 기하급수적으로 커지는데
-    // 기본 보상이 고정값(예: 1개)이면 콤보/업그레이드 배율을 아무리 곱해도(배율은 곱셈일 뿐 밑변이 1이면 그대로
+    // 기본 보상이 고정값(예: 1개)이면 업그레이드 배율을 아무리 곱해도(배율은 곱셈일 뿐 밑변이 1이면 그대로
     // 작은 수) 후반 티어 가격을 절대 못 따라잡음. 그래서 기본 보상도 오브젝트 티어마다 기하급수적으로 커지게 함.
     private const long BaseRewardStart = 1; // 0번 오브젝트 기본 보상
     private const float BaseRewardGrowth = 4.5f; // 맵1(달걀~책상)에서 오브젝트 하나 넘어갈 때마다 곱해지는 배율

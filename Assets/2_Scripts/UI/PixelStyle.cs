@@ -97,6 +97,48 @@ public static class PixelStyle
         button.RegisterCallback<PointerUpEvent>(_ => Paint(button, Kind.Hover, tone, dot), TrickleDown.TrickleDown);
     }
 
+    private static readonly Dictionary<(Kind, Color, Color, Color, Color), Sprite> _sprites = new Dictionary<(Kind, Color, Color, Color, Color), Sprite>(); // uGUI용 틀 스프라이트 (9칸 테두리 포함)
+
+    // uGUI(Canvas) 버튼에도 같은 픽셀 버튼 모양 - 평소/마우스 올림/누름 그림을 바꿔 끼움. 글씨는 흰색 + 버튼 색의 진한 테두리
+    public static void UguiButton(UnityEngine.UI.Button button, Tone tone, float dot = Dot)
+    {
+        var image = button.targetGraphic as UnityEngine.UI.Image; // 버튼 그림
+        if (image == null) image = button.GetComponent<UnityEngine.UI.Image>();
+        if (image != null)
+        {
+            image.sprite = SpriteOf(Kind.Button, tone);
+            image.type = UnityEngine.UI.Image.Type.Sliced;
+            image.color = Color.white;
+            image.pixelsPerUnitMultiplier = 1f / dot; // 도트 한 칸 = dot px
+        }
+        button.transition = UnityEngine.UI.Selectable.Transition.SpriteSwap;
+        button.spriteState = new UnityEngine.UI.SpriteState
+        {
+            highlightedSprite = SpriteOf(Kind.Hover, tone),
+            selectedSprite = SpriteOf(Kind.Button, tone),
+            pressedSprite = SpriteOf(Kind.Pressed, tone),
+        };
+
+        var text = button.GetComponentInChildren<TMPro.TMP_Text>(true); // 버튼 글씨
+        if (text == null) return;
+        text.color = Color.white;
+        text.fontStyle = TMPro.FontStyles.Bold;
+        text.outlineColor = tone.text;
+        text.outlineWidth = 0.3f;
+        text.margin = new Vector4(0f, 0f, 0f, Depth * dot); // 아래 두께 위 면 가운데에
+    }
+
+    private static Sprite SpriteOf(Kind kind, Tone tone)
+    {
+        var key = (kind, tone.face, tone.light, tone.dark, tone.outline); // 캐시 키
+        if (_sprites.TryGetValue(key, out Sprite cached) && cached != null) return cached;
+        Texture2D texture = Texture(kind, tone); // UI 툴킷과 같은 틀 그림
+        var sprite = Sprite.Create(texture, new Rect(0, 0, Size, Size), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect,
+            new Vector4(Slice, Slice, Slice, Slice)); // 9칸 늘리기 테두리
+        _sprites[key] = sprite;
+        return sprite;
+    }
+
     private static void Paint(VisualElement element, Kind kind, Tone tone, float dot)
     {
         element.style.backgroundColor = Color.clear;

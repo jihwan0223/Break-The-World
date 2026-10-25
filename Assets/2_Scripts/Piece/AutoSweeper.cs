@@ -31,6 +31,7 @@ public class AutoSweeper : MonoBehaviour
     {
         if (_sweeping || UpgradeManager.Instance == null || !UpgradeManager.Instance.AutoSweepIsUnlocked || DebrisPool.Instance == null)
             return;
+        if (ZoneBreaker.ActiveBoss != null) return; // 보스전 중엔 빗자루 안 나옴 (타이머도 멈춤)
 
         _timer += Time.deltaTime; // 업그레이드/무기 화면이 열려 timeScale이 0이면 같이 멈춤
         if (_timer < UpgradeManager.Instance.AutoSweepIntervalSeconds) return;

@@ -126,7 +126,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         };
     }
 
-    // 설명 문구의 {n} 자리에 넣을 지금 시간(초) - 자동클릭/자동 줍기/콤보처럼 시간이 있는 효과만. 업그레이드로 줄어든 현재 값
+    // 설명 문구의 {n} 자리에 넣을 지금 시간(초) - 자동클릭/자동 줍기처럼 시간이 있는 효과만. 업그레이드로 줄어든 현재 값
     private string CurrentSecondsText()
     {
         UpgradeManager upgrades = UpgradeManager.Instance; // 현재 수치 조회
@@ -138,9 +138,6 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.AutoClickSpeed: seconds = upgrades.AutoClickIntervalSecondsFor(objectIndex); break;
             case UpgradeManager.UpgradeEffect.AutoSweepUnlock:
             case UpgradeManager.UpgradeEffect.AutoSweepSpeed: seconds = upgrades.AutoSweepIntervalSeconds; break;
-            case UpgradeManager.UpgradeEffect.ComboUnlock:
-            case UpgradeManager.UpgradeEffect.ComboCooldown: seconds = upgrades.ComboCooldownSeconds; break;
-            case UpgradeManager.UpgradeEffect.ComboDuration: seconds = upgrades.ComboDurationSeconds; break;
             case UpgradeManager.UpgradeEffect.AutoMineUnlock:
             case UpgradeManager.UpgradeEffect.AutoMineSpeed: seconds = upgrades.AutoMineIntervalSeconds; break;
             case UpgradeManager.UpgradeEffect.HoverClickUnlock: seconds = upgrades.HoverClickIntervalSeconds; break;
@@ -191,9 +188,6 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.GroundPieceCap: return $"바닥에 쌓일 수 있는 조각 개수가 +{n}개 증가합니다.";
             case UpgradeManager.UpgradeEffect.AutoClickSpeed: return $"{targetObjectName} 자동 클릭 간격이 {n}초 줄어듭니다.";
             case UpgradeManager.UpgradeEffect.AutoClickCount: return $"{targetObjectName} 자동 클릭 한 번에 때리는 횟수가 +{n}회 증가합니다.";
-            case UpgradeManager.UpgradeEffect.ComboCooldown: return $"콤보 쿨타임이 {n}초 줄어듭니다.";
-            case UpgradeManager.UpgradeEffect.ComboDuration: return $"콤보 지속시간이 +{n}초 늘어납니다.";
-            case UpgradeManager.UpgradeEffect.ComboMultiplier: return $"콤보 중 얻는 조각 배율이 +{n}배 증가합니다.";
             case UpgradeManager.UpgradeEffect.AutoMineSpeed: return $"자동 채굴 간격이 {n}초 줄어듭니다.";
             case UpgradeManager.UpgradeEffect.AutoMineYield: return $"자동 채굴 한 번에 얻는 조각이 +{n}배 증가합니다.";
             case UpgradeManager.UpgradeEffect.AutoSweepSpeed: return $"자동 줍기 간격이 {n}초 줄어듭니다.";
