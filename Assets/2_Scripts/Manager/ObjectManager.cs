@@ -239,7 +239,11 @@ public class ObjectManager : MonoBehaviour
     private const int ObjectsPerMap = 5; // 맵 하나에 들어있는 오브젝트 수 (달걀~책상 / 가로등~도로 / 컨베이어 벨트~회사)
     private const float LaterRewardGrowth = 2f; // 맵2부터 오브젝트 하나 넘어갈 때마다 곱해지는 배율 - 맵 넘어갈 때 파편이 확 뛰지 않게 (가로등 820)
 
-    public long GetBaseReward(int index) => Math.Max(1L, (long)RawBaseReward(index));
+    public long GetBaseReward(int index) => Math.Max(1L, (long)(RawBaseReward(index) * (index >= ObjectsPerMap * 2 ? Map3DropMultiplier : 1.0)));
+
+    // 맵3(왁뿌볼~회사)에서 얻는 조각만 이만큼 곱함 - 후반 업그레이드(수억~수십억)를 살 수 있게 후반 인플레를 키움.
+    // 해금/획득량 가격은 RawBaseReward 기준이라 그대로 (그만큼 더 빨리 모임)
+    private const double Map3DropMultiplier = 10;
 
     // 소수점을 버리기 전의 기본 보상 - 해금 비용이 이 값을 기준으로 계산됨
     private static double RawBaseReward(int index)

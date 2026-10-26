@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-// 설정창에서 바꾸는 값들 (PlayerPrefs에 저장). 게임을 켜면 저장된 화면/음량 설정을 바로 적용하고 배경음악을 틀어 둠.
+// 설정창에서 바꾸는 값들 (PlayerPrefs에 저장). 게임을 켜면 저장된 화면/음량 설정을 바로 적용함. 배경음악은 메뉴 씬에서만 나옴.
 // 마스터 음량은 MainMenuUI, 효과음 음량은 SfxPlayer가 따로 저장함 (예전부터 쓰던 키 그대로)
 public static class GameSettings
 {
@@ -16,7 +17,8 @@ public static class GameSettings
 
     public static readonly int[] FpsOptions = { 30, 60, 120, -1 }; // 프레임 제한 선택지 (-1 = 화면 주사율에 맞춤)
 
-    private static AudioSource _bgm; // 배경음악 재생기 (씬이 바뀌어도 계속)
+    private const string MenuSceneName = "MenuScene"; // 배경음악이 나오는 씬
+    private static AudioSource _bgm; // 배경음악 재생기 (씬이 바뀌어도 남아 있음)
 
     public static float MasterVolume => PlayerPrefs.GetFloat(MasterVolumeKey, 1f);
 
@@ -70,7 +72,7 @@ public static class GameSettings
         set { PlayerPrefs.SetString(ResolutionKey, $"{value.x}x{value.y}"); ApplyDisplay(); }
     }
 
-    // 게임이 켜질 때 저장된 설정을 적용하고 배경음악을 틈
+    // 게임이 켜질 때 저장된 설정을 적용하고, 씬이 바뀔 때마다 배경음악을 켜거나 끔
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Startup()
     {
@@ -79,7 +81,8 @@ public static class GameSettings
 #if !UNITY_EDITOR
         ApplyDisplay(); // 에디터 게임 화면 크기는 건드리지 않음
 #endif
-        StartBgm();
+        UpdateBgm();
+        SceneManager.sceneLoaded += (_, __) => UpdateBgm();
     }
 
     private static void ApplyDisplay()
@@ -97,9 +100,20 @@ public static class GameSettings
         Application.targetFrameRate = fps < 0 ? -1 : fps;
     }
 
-    private static void StartBgm()
+    // 메뉴 씬이면 틀고(이미 나오는 중이면 그대로), 게임 씬이면 멈춤
+    private static void UpdateBgm()
     {
-        if (_bgm != null || GameAudio.Instance == null || GameAudio.Instance.bgm == null) return;
+        if (SceneManager.GetActiveScene().name != MenuSceneName)
+        {
+            if (_bgm != null) _bgm.Stop();
+            return;
+        }
+        if (_bgm != null)
+        {
+            if (!_bgm.isPlaying) _bgm.Play();
+            return;
+        }
+        if (GameAudio.Instance == null || GameAudio.Instance.bgm == null) return;
         var go = new GameObject("BGM"); // 배경음악 재생기
         Object.DontDestroyOnLoad(go);
         _bgm = go.AddComponent<AudioSource>();

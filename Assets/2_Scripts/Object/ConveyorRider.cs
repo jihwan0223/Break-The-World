@@ -51,6 +51,7 @@ public class ConveyorRider : MonoBehaviour
     void LateUpdate()
     {
         if (belt == null || belt.sprite == null) return;
+        if (!belt.gameObject.activeInHierarchy) return; // 벨트가 숨겨져 있으면(보스전 등) 놓인 자리에 가만히 있음
         bool dead = _health != null && _health.IsDead; // 부서져서 재생성 대기 중인지
         if (_restartPending && !dead)
         {

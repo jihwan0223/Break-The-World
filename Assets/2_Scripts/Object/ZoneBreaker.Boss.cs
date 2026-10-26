@@ -167,7 +167,7 @@ public partial class ZoneBreaker
     {
         var candidates = new List<Health>(); // 나타날 수 있는 오브젝트
         foreach (Health h in _hiddenObjects)
-            if (h != null && h.enabled && !h.gameObject.activeSelf) candidates.Add(h);
+            if (h != null && h.enabled && !h.gameObject.activeSelf && h.GetComponent<ConveyorBelt>() == null) candidates.Add(h); // 벨트는 보호막으로 안 나옴
 
         while (candidates.Count > 0)
         {
@@ -176,10 +176,42 @@ public partial class ZoneBreaker
             candidates.RemoveAt(pick);
             chosen.gameObject.SetActive(true);
             if (!chosen.gameObject.activeInHierarchy) { chosen.gameObject.SetActive(false); continue; } // 부모가 숨겨져 있어서 안 보이면 다른 걸로
+            if (chosen.GetComponent<ConveyorRider>() != null) PlaceAtRandomSpot(chosen); // 벨트 없이 나온 왁뿌볼은 맵 아무 데나
             Reveal(chosen);
             ShieldGlow.Attach(chosen); // 누가 봐도 부숴야 할 것처럼 깜빡이며 빛남
             _links.Add(chosen);
             RebuildLinkColors();
+            return;
+        }
+    }
+
+    // 화면 안 빈자리 아무 곳에 놓음 - 보스나 이미 나온 보호막 오브젝트와 안 겹치게 (못 찾으면 원래 자리)
+    private void PlaceAtRandomSpot(Health h)
+    {
+        const float Margin = 0.5f; // 화면 가장자리 여백(유닛)
+        const float TopReserve = 1.5f; // 위쪽 체력바 UI 자리(유닛)
+        Camera cam = Camera.main; // 화면 범위 기준
+        var sr = h.GetComponent<SpriteRenderer>(); // 오브젝트 크기
+        if (cam == null || sr == null) return;
+
+        var taken = new List<Bounds>(); // 피해야 할 자리
+        if (TryGetComponent(out Renderer bossRenderer)) taken.Add(bossRenderer.bounds);
+        foreach (Health link in _links)
+            if (link != null && link.gameObject.activeInHierarchy && link.TryGetComponent(out Renderer r)) taken.Add(r.bounds);
+
+        Vector3 offset = sr.bounds.center - h.transform.position; // 위치 -> 그림 중심 차이
+        Vector3 extents = sr.bounds.extents; // 그림 반 크기
+        float halfH = cam.orthographicSize, halfW = halfH * cam.aspect; // 화면 반 크기
+        Vector3 c = cam.transform.position; // 화면 중심
+        for (int i = 0; i < 40; i++)
+        {
+            var center = new Vector3( // 그림 중심 후보
+                Random.Range(c.x - halfW + extents.x + Margin, c.x + halfW - extents.x - Margin),
+                Random.Range(c.y - halfH + extents.y + Margin, c.y + halfH - extents.y - TopReserve),
+                sr.bounds.center.z);
+            var spot = new Bounds(center, sr.bounds.size); // 놓였을 때 차지할 범위
+            if (taken.Exists(t => t.Intersects(spot))) continue;
+            h.transform.position = center - offset;
             return;
         }
     }

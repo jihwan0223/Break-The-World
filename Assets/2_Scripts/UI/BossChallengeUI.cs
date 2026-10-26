@@ -25,10 +25,13 @@ public class BossChallengeUI : MonoBehaviour
     private static readonly Color HpColor = new Color(0.91f, 0.38f, 0.35f); // 보스 체력 (산호빛 빨강)
     private static readonly Color HpBack = new Color(0.45f, 0.32f, 0.24f); // 체력/타이머 바 빈 곳 (갈색)
     private static readonly Color TimeColor = new Color(0.96f, 0.84f, 0.55f); // 타이머 (버터색)
+    private const float PanelAlpha = 0.7f; // 보스전 상자 바탕 불투명도 (1 = 꽉 참)
+    private static readonly Color ShieldTextColor = new Color(0.25f, 0.47f, 0.72f); // 보호막 감소율 글자 (크림 바탕에서 잘 보이는 파랑)
     private Label _timeLabel; // 남은 시간 숫자 (타이머 바 오른쪽)
     private VisualElement _timeFill; // 타이머 바 채움 - 시간이 갈수록 줄어듦
     private VisualElement _hpFill; // 보스 체력바 채움 (빨강)
     private VisualElement _shieldFill; // 체력바 위에 겹치는 보호막 (흰색) - 보호막 오브젝트가 깎일수록 줄어듦
+    private Label _shieldLabel; // 체력바 오른쪽 "보호막 -N%" - 지금 줄어드는 데미지 비율 (보호막 없으면 안 보임)
     private ZoneBreaker _ready; // 지금 도전 버튼이 가리키는 보스
     private bool _wasFighting; // 지난 프레임에 보스전 중이었는지 - 바뀔 때만 다른 UI를 숨기고/되돌림
     private readonly List<(VisualElement root, DisplayStyle display)> _hidden = new List<(VisualElement, DisplayStyle)>(); // 보스전 동안 숨긴 다른 UI와 원래 표시 상태
@@ -97,6 +100,7 @@ public class BossChallengeUI : MonoBehaviour
         _fightPanel.style.paddingTop = 14;
         _fightPanel.style.paddingBottom = 16;
         PixelStyle.Frame(_fightPanel, PixelStyle.Box); // 크림 픽셀 틀
+        _fightPanel.style.unityBackgroundImageTintColor = new Color(1f, 1f, 1f, PanelAlpha); // 틀만 살짝 투명하게 (바/글자는 그대로) - 맵 배경과 어울리게
         _fightPanel.style.display = DisplayStyle.None;
         GuardPointer(_fightPanel);
 
@@ -118,7 +122,17 @@ public class BossChallengeUI : MonoBehaviour
         _shieldFill.style.height = Length.Percent(100);
         _shieldFill.style.backgroundColor = new Color(1f, 1f, 1f, 0.65f); // 반투명 흰색 - 체력 위에 씌운 보호막
         hpBack.Add(_shieldFill);
-        bars.Add(hpBack);
+        hpBack.style.flexGrow = 1;
+        var hpRow = new VisualElement(); // 체력바 + 보호막 감소율
+        hpRow.style.flexDirection = FlexDirection.Row;
+        hpRow.style.alignItems = Align.Center;
+        hpRow.Add(hpBack);
+        _shieldLabel = MakeLabel(36, ShieldTextColor.linear);
+        _shieldLabel.style.width = 230; // 숫자가 바뀌어도 바 길이가 안 흔들리게 (보호막 없을 땐 투명하게 자리만 차지)
+        _shieldLabel.style.marginLeft = 12;
+        _shieldLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+        hpRow.Add(_shieldLabel);
+        bars.Add(hpRow);
 
         var timeRow = new VisualElement(); // 타이머 바 + 남은 초
         timeRow.style.flexDirection = FlexDirection.Row;
@@ -135,7 +149,7 @@ public class BossChallengeUI : MonoBehaviour
         timeBack.Add(_timeFill);
         timeRow.Add(timeBack);
         _timeLabel = MakeLabel(36, PixelStyle.Text.linear);
-        _timeLabel.style.width = 100; // 숫자 자리수가 바뀌어도 바 길이가 안 흔들리게
+        _timeLabel.style.width = 242; // 위 보호막 글자 자리와 같은 폭 - 체력바/타이머 바 오른쪽 끝을 맞춤
         _timeLabel.style.unityTextAlign = TextAnchor.MiddleRight;
         timeRow.Add(_timeLabel);
         bars.Add(timeRow);
@@ -266,6 +280,9 @@ public class BossChallengeUI : MonoBehaviour
             _timeFill.style.width = Length.Percent(active.BossTimeRatio * 100f);
             _hpFill.style.width = Length.Percent(active.BossHpRatio * 100f);
             _shieldFill.style.width = Length.Percent(active.BossHpRatio * active.ShieldFill * 100f); // 빨간 체력 중 보호막이 덮은 만큼
+            int shieldPercent = Mathf.RoundToInt(active.ShieldRatio * 100f); // 지금 줄어드는 데미지 %
+            _shieldLabel.text = $"보호막 -{shieldPercent}%";
+            _shieldLabel.style.visibility = shieldPercent > 0 ? Visibility.Visible : Visibility.Hidden;
         }
 
         UpdateSlow();

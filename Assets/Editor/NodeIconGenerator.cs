@@ -18,9 +18,9 @@ public static class NodeIconGenerator
     static readonly RectInt WideBox = new RectInt(2, 16, 28, 14); // 띠 오브젝트(도로/벨트)를 넣을 영역 - 배지 아래 가로 전체
     static readonly RectInt RiderBox = new RectInt(4, 6, 10, 10); // 벨트 위에 올릴 왁뿌볼 영역 (벨트 바로 위)
     const float StripAspect = 2f; // 띠 오브젝트는 왼쪽에서 높이의 이 배수만큼만 잘라 크게 보여줌
-    static readonly string[] KeepOriginal = { "간판", "트럭", "회사" }; // 자동 그림이 잘리거나 안 어울려서 원래 손그림 유지
+    static readonly string[] KeepOriginal = { }; // 자동 그림이 잘리거나 안 어울려서 원래 손그림 유지할 오브젝트 (간판/트럭/회사는 정면 그림으로 바뀌어 다시 자동 그림)
     // 이 배지 노드만 자동 그림, 나머지 노드는 원래 손그림 유지 (오브젝트 이름 -> 자동으로 만들 배지)
-    static readonly Dictionary<string, string[]> OnlyBadges = new Dictionary<string, string[]> { { "자동차", new[] { "AutoClick" } } };
+    static readonly Dictionary<string, string[]> OnlyBadges = new Dictionary<string, string[]> { { "자동차", new[] { "AutoClick", "AutoSpeed", "AutoCount" } } };
     // 오브젝트 그림 대신 기존 노드 손그림 속 오브젝트를 그대로 씀 (오브젝트 이름 -> 손그림 경로)
     static readonly Dictionary<string, string> ArtFromNode = new Dictionary<string, string>
     {
@@ -37,14 +37,16 @@ public static class NodeIconGenerator
     static readonly Color32 BorderO = new Color32(0, 255, 0, 255); // 구매 후 테두리 색
     static readonly Color32 Inside = new Color32(0, 0, 0, 255); // 안쪽 바탕 색
 
-    // 배지 종류 -> 잘라올 기존 그림
+    // 배지 종류 -> 잘라올 기존 그림 (옛 손그림 노드 그림을 Editor 폴더에 따로 보관 - 빌드엔 안 들어감)
+    const string BadgeDir = "Assets/Editor/NodeIconBadges"; // 배지 원본 폴더
     static readonly Dictionary<string, string> BadgeSources = new Dictionary<string, string>
     {
-        { "DropRate", "Assets/3_Image/NodeImage/Object/Object1_DropRate_X.png" },
-        { "DoubleDrop", "Assets/3_Image/NodeImage/Object/Object11_DoubleDropRate_X.png" },
-        { "AutoClick", "Assets/3_Image/NodeImage/Object/Object11_AutoClick_X.png" },
-        { "UnLock", "Assets/3_Image/NodeImage/UnLock/Object11_UnLock_X.png" },
+        { "DropRate", BadgeDir + "/DropRate.png" },
+        { "DoubleDrop", BadgeDir + "/DoubleDrop.png" },
+        { "AutoClick", BadgeDir + "/AutoClick.png" },
+        { "UnLock", BadgeDir + "/UnLock.png" },
     };
+    const float BasePixelsPerUnit = 100f; // 32px 노드 그림의 PPU (기존 노드 그림과 같음)
 
     [MenuItem("Tools/Upgrade Tree/Node Icons - Generate and Apply")]
     static void Apply()
@@ -58,6 +60,8 @@ public static class NodeIconGenerator
         var badges = new Dictionary<string, Color32[]>(); // 배지 종류 -> 잘라낸 픽셀 (BadgeArea 크기, 위에서부터)
         foreach (var pair in BadgeSources) badges[pair.Key] = CutBadge(pair.Value);
         badges["PlusOne"] = PlusOneBadge();
+        badges["AutoSpeed"] = BoltBadge();
+        badges["AutoCount"] = DoubleCursorBadge();
 
         var targets = new List<(Component node, int objectIndex, string badge)>(); // 아이콘을 바꿀 노드
         foreach (var node in Object.FindObjectsByType<UpgradeNodeUI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
@@ -225,9 +229,9 @@ public static class NodeIconGenerator
         {
             case UpgradeManager.UpgradeEffect.PieceGainObject: return "DropRate";
             case UpgradeManager.UpgradeEffect.ObjectDoubleDrop: return "DoubleDrop";
-            case UpgradeManager.UpgradeEffect.AutoClickUnlock:
-            case UpgradeManager.UpgradeEffect.AutoClickSpeed:
-            case UpgradeManager.UpgradeEffect.AutoClickCount: return "AutoClick";
+            case UpgradeManager.UpgradeEffect.AutoClickUnlock: return "AutoClick";
+            case UpgradeManager.UpgradeEffect.AutoClickSpeed: return "AutoSpeed"; // 노란 번개
+            case UpgradeManager.UpgradeEffect.AutoClickCount: return "AutoCount"; // 겹친 커서 2개
             case UpgradeManager.UpgradeEffect.ObjectExtraCopies: return "PlusOne";
             default: handled = false; return null;
         }
@@ -332,6 +336,61 @@ public static class NodeIconGenerator
             }
     }
 
+    // 자동클릭 속도 강화용 노란 번개 배지
+    static Color32[] BoltBadge() => DrawBadge((new[]
+    {
+        "....yyyy",
+        "...yyyy.",
+        "...yyy..",
+        "..yyy...",
+        ".yyyyyyy",
+        "yyyyyyy.",
+        "...yyy..",
+        "..yyy...",
+        "..yy....",
+        ".yy.....",
+        ".y......",
+    }, 3, 1));
+
+    // 자동클릭 횟수 강화용 겹친 커서 2개 배지 (뒤 파랑, 앞 흰색)
+    static Color32[] DoubleCursorBadge()
+    {
+        string[] cursor = // 'w' = 칠할 칸
+        {
+            "w......",
+            "ww.....",
+            "www....",
+            "wwww...",
+            "wwwww..",
+            "wwwwww.",
+            "wwwwwww",
+            "wwwww..",
+            "ww.ww..",
+            "w...ww.",
+            ".....w.",
+        };
+        string[] back = System.Array.ConvertAll(cursor, row => row.Replace('w', 'b')); // 뒤 커서는 파랑
+        return DrawBadge((back, 1, 0), (cursor, 5, 3));
+    }
+
+    // 글자 그림 여러 장을 BadgeArea 크기 배지로 (나중 것이 위). w=흰색, b=파랑, y=노랑, '.'=투명
+    static Color32[] DrawBadge(params (string[] rows, int x, int y)[] layers)
+    {
+        var palette = new Dictionary<char, Color32> // 글자 -> 색 (기존 배지 색과 맞춤)
+        {
+            { 'w', new Color32(255, 255, 255, 255) },
+            { 'b', new Color32(0, 137, 251, 255) },
+            { 'y', new Color32(255, 214, 64, 255) },
+        };
+        var result = new Color32[BadgeArea.width * BadgeArea.height]; // 배지 픽셀 (위에서부터)
+        foreach (var layer in layers)
+            for (int y = 0; y < layer.rows.Length; y++)
+                for (int x = 0; x < layer.rows[y].Length; x++)
+                    if (palette.TryGetValue(layer.rows[y][x], out Color32 c))
+                        result[(layer.y + y) * BadgeArea.width + layer.x + x] = c;
+        return result;
+    }
+
     // 오브젝트 추가 배치용 노란 "+1" 배지 (BadgeArea 크기, 위에서부터) - 기존 배지 그림이 없어서 코드로 그림
     static Color32[] PlusOneBadge()
     {
@@ -381,7 +440,6 @@ public static class NodeIconGenerator
     static void SetupImporter(string path)
     {
         var importer = (TextureImporter)AssetImporter.GetAtPath(path); // 새 그림 임포터
-        var template = (TextureImporter)AssetImporter.GetAtPath(BadgeSources["DropRate"]); // 기존 노드 그림 임포터
         if (importer == null) return;
         importer.textureType = TextureImporterType.Sprite;
         importer.spriteImportMode = SpriteImportMode.Single;
@@ -390,7 +448,7 @@ public static class NodeIconGenerator
         importer.mipmapEnabled = false;
         importer.alphaIsTransparency = true;
         importer.GetSourceTextureWidthAndHeight(out int width, out _); // 2배 해상도 그림이면 PPU도 2배 (실제 크기는 같게)
-        if (template != null) importer.spritePixelsPerUnit = template.spritePixelsPerUnit * width / Size;
+        importer.spritePixelsPerUnit = BasePixelsPerUnit * width / Size;
         importer.SaveAndReimport();
     }
 }

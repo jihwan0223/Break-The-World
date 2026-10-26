@@ -222,7 +222,8 @@ public class Click : MonoBehaviour
         // 럭키 클릭 - 당첨되면 데미지가 모자라도 즉시 파괴. 원래 데미지가 남은 체력보다 크면 그대로 둠
         // (남은 체력으로 깎아버리면 뜨는 숫자가 무기 데미지가 아니라 체력만큼만 나옴)
         bool bossFight = _boss != null && _boss.BossActive; // 보스전 중인 보스를 때리는지
-        if (bossFight && _boss.ShieldRatio > 0f) damage = Mathf.Max(1, Mathf.FloorToInt(damage * _boss.BossDamageMultiplier)); // 왁스 보호막만큼 덜 깎임 - 내림이라 작은 데미지도 보호막이 있으면 숫자가 줄어든 게 보임
+        bool shielded = bossFight && _boss.ShieldRatio > 0f; // 보호막에 막혀 데미지가 줄어드는 타격인지
+        if (shielded) damage = Mathf.Max(1, Mathf.FloorToInt(damage * _boss.BossDamageMultiplier)); // 왁스 보호막만큼 덜 깎임 - 내림이라 작은 데미지도 보호막이 있으면 숫자가 줄어든 게 보임
         bool isLucky = !bossFight && UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.LuckyClickChance; // 보스전엔 한 방에 부수는 럭키 클릭 없음
         if (isLucky)
             damage = Mathf.Max(damage, _health.CurrentHP);
@@ -249,7 +250,7 @@ public class Click : MonoBehaviour
             Color chipColor = ObjectManager.Instance != null && objectIndex >= 0 && objectIndex < ObjectManager.StaticObjectCount
                 ? ObjectManager.Instance.GetObjectAt(objectIndex).pileColor : Color.white; // 그 오브젝트의 파편 색과 같은 색
             if (_wax != null && _wax.TryGetChipColor(out Color waxColor)) chipColor = waxColor; // 왁스로 덮여 있으면 왁스 부스러기가 튐
-            HitEffects.Play(hitPoint, damage, isCrit || isLucky, chipColor);
+            HitEffects.Play(hitPoint, damage, isCrit || isLucky, chipColor, shielded, isLucky);
             if (_wax != null) _wax.Hit(hitPoint, (float)damage / Mathf.Max(1, _health.MaxHP)); // 맞은 자리에서 왁스에 금이 뻗어나감
         }
 
@@ -417,6 +418,7 @@ public class Click : MonoBehaviour
         // 지형(책상/도로/아파트)은 화면 전체라 직접 눌러야만 맞음
         _hoverHitCooldown -= Time.deltaTime;
         bool hover = !pressed && _hoverHitCooldown <= 0f && !_isTerrain && !IsZoneHidden
+            && ZoneBreaker.ActiveBoss == null // 보스전 중엔 커서 타격 없음 (직접 눌러야 맞음)
             && UpgradeManager.Instance != null && UpgradeManager.Instance.HoverClickIsUnlocked; // 이번 프레임에 커서 타격을 시도할지
         if (!pressed && !hover)
             return;
