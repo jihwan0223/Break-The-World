@@ -24,8 +24,9 @@ public class Click : MonoBehaviour
     private int ObjIndex => fixedObjectIndex >= 0 ? fixedObjectIndex
         : (ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : -1);
 
-    [SerializeField] private Sprite autoClickProjectile; // 채워두면 자동클릭이 즉시 때리는 대신 이 그림이 날아와서 맞는 순간에 타격이 들어감 (유리컵의 야구공처럼)
-    [SerializeField] private float projectileScale = 2.5f; // 투사체 그림 크기 배율 (스프라이트 원래 크기 기준)
+    [SerializeField] private float projectileWorldSize = 0.9f; // 자동클릭 때 날아오는 무기 그림의 크기(월드 유닛, 긴 변 기준)
+    private const float SuperCritMultiplier = 2f; // 슈퍼 크리티컬 데미지 = 일반 치명타 데미지의 이 배수
+    private const float AutoClickDamageRatio = 0.5f; // 자동클릭 한 번이 주는 데미지 = 직접 클릭 데미지의 이 비율
     [SerializeField] private float projectileFlightSeconds = 2f; // 타격 몇 초 전부터 날아오기 시작할지(초) - 자동클릭 주기보다 길면 주기만큼만 날아옴
     [SerializeField] private float projectileSpinDegreesPerSecond = 720f; // 날아오는 동안 도는 속도
     [SerializeField] private float projectileStaggerSeconds = 0.1f; // 한 번에 여러 번 때릴 때 투사체 사이의 간격(초)
@@ -194,8 +195,8 @@ public class Click : MonoBehaviour
 
     // 클릭 한 번(플레이어 클릭/자동클릭/더블클릭 추가 타격 공용)의 데미지 계산 + 적용 + 연출.
     // 이미 죽어서 리스폰을 기다리는 중이면 아무것도 하지 않음 (더블클릭/자동클릭이 중복으로 때리는 걸 방지)
-    // playerClick: 마우스로 직접 누른 클릭인지 (연타 피치 상승은 직접 클릭만)
-    private void PerformClickHit(bool playWeaponSwing = true, Vector2? swingPoint = null, bool playerClick = false)
+    // playerClick: 마우스로 직접 누른 클릭인지 (연타 피치 상승은 직접 클릭만). autoClick: 자동클릭 타격 - 데미지가 AutoClickDamageRatio만큼
+    private void PerformClickHit(bool playWeaponSwing = true, Vector2? swingPoint = null, bool playerClick = false, bool autoClick = false)
     {
         if (_boss != null && !_boss.BossAllowsDamage) return; // 아직 안 잡은 보스는 보스 도전 버튼을 눌러야 맞음
 
@@ -214,19 +215,19 @@ public class Click : MonoBehaviour
         int clickDamageBonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetClickDamageBonus(equippedWeaponIndex) : 0;
         int damage = baseDamage + clickDamageBonus;
 
-        // 크리티컬 확률 판정 - 성공하면 크리티컬 배율을 곱함
-        bool isCrit = UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.CritChanceValue;
-        if (isCrit)
+        // 슈퍼 크리티컬(럭키 클릭 노드로 해금) - 터지면 치명타 데미지의 SuperCritMultiplier배. 안 터지면 일반 크리티컬 판정
+        bool isSuper = UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.LuckyClickChance; // 슈퍼 크리티컬인지
+        bool isCrit = !isSuper && UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.CritChanceValue;
+        if (isSuper)
+            damage = Mathf.RoundToInt(damage * UpgradeManager.Instance.CritMultiplierValue * SuperCritMultiplier);
+        else if (isCrit)
             damage = Mathf.RoundToInt(damage * UpgradeManager.Instance.CritMultiplierValue);
+        if (autoClick)
+            damage = Mathf.Max(1, Mathf.RoundToInt(damage * AutoClickDamageRatio));
 
-        // 럭키 클릭 - 당첨되면 데미지가 모자라도 즉시 파괴. 원래 데미지가 남은 체력보다 크면 그대로 둠
-        // (남은 체력으로 깎아버리면 뜨는 숫자가 무기 데미지가 아니라 체력만큼만 나옴)
         bool bossFight = _boss != null && _boss.BossActive; // 보스전 중인 보스를 때리는지
         bool shielded = bossFight && _boss.ShieldRatio > 0f; // 보호막에 막혀 데미지가 줄어드는 타격인지
         if (shielded) damage = Mathf.Max(1, Mathf.FloorToInt(damage * _boss.BossDamageMultiplier)); // 왁스 보호막만큼 덜 깎임 - 내림이라 작은 데미지도 보호막이 있으면 숫자가 줄어든 게 보임
-        bool isLucky = !bossFight && UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.LuckyClickChance; // 보스전엔 한 방에 부수는 럭키 클릭 없음
-        if (isLucky)
-            damage = Mathf.Max(damage, _health.CurrentHP);
 
         // 이번 타격으로 죽는 게 아닐 때만 클릭 사운드 재생 (죽을 땐 파괴 사운드만 나오게).
         // 파괴 사운드가 없는 오브젝트(버터 등)는 한 방에 부서져도 클릭 사운드는 나게
@@ -250,7 +251,7 @@ public class Click : MonoBehaviour
             Color chipColor = ObjectManager.Instance != null && objectIndex >= 0 && objectIndex < ObjectManager.StaticObjectCount
                 ? ObjectManager.Instance.GetObjectAt(objectIndex).pileColor : Color.white; // 그 오브젝트의 파편 색과 같은 색
             if (_wax != null && _wax.TryGetChipColor(out Color waxColor)) chipColor = waxColor; // 왁스로 덮여 있으면 왁스 부스러기가 튐
-            HitEffects.Play(hitPoint, damage, isCrit || isLucky, chipColor, shielded, isLucky);
+            HitEffects.Play(hitPoint, damage, isCrit || isSuper, chipColor, shielded, isSuper);
             if (_wax != null) _wax.Hit(hitPoint, (float)damage / Mathf.Max(1, _health.MaxHP)); // 맞은 자리에서 왁스에 금이 뻗어나감
         }
 
@@ -274,7 +275,7 @@ public class Click : MonoBehaviour
         int clicks = UpgradeManager.Instance.AutoClickClicksPerTriggerFor(objectIndex);
 
         // 투사체는 타격 시각보다 flight초 먼저 날려서, 남은 시간 동안 날아와 타격 순간에 딱 맞게 도착시킴
-        if (autoClickProjectile != null && !_projectilesLaunched && !IsZoneHidden && _autoClickTimer >= interval - Mathf.Min(projectileFlightSeconds, interval))
+        if (ProjectileSprite != null && !_projectilesLaunched && !IsZoneHidden && _autoClickTimer >= interval - Mathf.Min(projectileFlightSeconds, interval))
         {
             _projectilesLaunched = true;
             float remaining = Mathf.Max(interval - _autoClickTimer, 0.05f); // 타격까지 남은 시간 = 이번 비행 시간
@@ -294,8 +295,11 @@ public class Click : MonoBehaviour
             return;
 
         for (int i = 0; i < clicks; i++)
-            PerformClickHit();
+            PerformClickHit(autoClick: true);
     }
+
+    // 자동클릭 때 날아오는 그림 = 지금 장착한 무기 그림
+    private static Sprite ProjectileSprite => WeaponManager.Instance != null ? WeaponManager.Instance.CurrentWeapon.icon : null;
 
     // 화면 옆 밖에서 투사체가 날아와 오브젝트에 맞는 순간 타격을 넣음. 무기 타격 이미지는 대신 투사체라 안 나옴
     private IEnumerator FlyProjectileThenHit(float startDelaySeconds, float flightSeconds)
@@ -304,9 +308,10 @@ public class Click : MonoBehaviour
             yield return new WaitForSeconds(startDelaySeconds);
 
         Camera cam = Camera.main; // 화면 밖 시작점을 구하려고 필요
-        if (cam == null || _collider == null)
+        Sprite sprite = ProjectileSprite; // 날아갈 무기 그림
+        if (cam == null || _collider == null || sprite == null)
         {
-            PerformClickHit();
+            PerformClickHit(autoClick: true);
             yield break;
         }
 
@@ -319,10 +324,10 @@ public class Click : MonoBehaviour
 
         var projectile = new GameObject("AutoClickProjectile"); // 날아가는 그림 하나
         var projectileRenderer = projectile.AddComponent<SpriteRenderer>(); // 투사체 그림을 그리는 렌더러
-        projectileRenderer.sprite = autoClickProjectile;
+        projectileRenderer.sprite = sprite;
         SpriteRenderer ownRenderer = GetComponent<SpriteRenderer>(); // 오브젝트 자신의 렌더러 - 그 위에 그리려고 정렬 순서를 참고
         projectileRenderer.sortingOrder = (ownRenderer != null ? ownRenderer.sortingOrder : 0) + 5;
-        projectile.transform.localScale = Vector3.one * projectileScale;
+        projectile.transform.localScale = Vector3.one * (projectileWorldSize / Mathf.Max(0.01f, Mathf.Max(sprite.bounds.size.x, sprite.bounds.size.y))); // 무기마다 그림 크기가 달라도 같은 크기로
         projectile.transform.position = start;
         _flyingProjectiles.Add(projectile);
 
@@ -341,7 +346,7 @@ public class Click : MonoBehaviour
 
         _flyingProjectiles.Remove(projectile);
         Destroy(projectile);
-        if (ZoneBreaker.ActiveBoss == null) PerformClickHit(false); // 날아오는 사이 보스전이 시작됐으면 안 때림
+        if (ZoneBreaker.ActiveBoss == null) PerformClickHit(false, autoClick: true); // 날아오는 사이 보스전이 시작됐으면 안 때림
     }
 
     // 투사체가 착지할 자리를 오브젝트 안쪽에서 몇 번 뽑아보고, 자기 자신 말고 다른 오브젝트(책상 위 접시 등)가 없는 자리를 고름.

@@ -20,8 +20,8 @@ public class HitEffects : MonoBehaviour
     private const float ShieldedNumberScale = 1.1f; // 보스 보호막에 막혀 줄어든 숫자 크기 배율 (보통보다 작게)
 
     private static readonly Color DamageColor = Color.white;                        // 보통 데미지 숫자 색 (치명타/럭키클릭이 아닐 때)
-    private static readonly Color StrongDamageColor = new Color(1f, 0.85f, 0.2f); // 치명타/럭키클릭 숫자 색
-    private const string LuckyLabel = "LUCKY!"; // 럭키클릭 숫자 위에 붙는 글자
+    private static readonly Color StrongDamageColor = new Color(1f, 0.55f, 0.55f, 0.95f); // 치명타 숫자 색 (연한 빨강, 살짝 투명)
+    private static readonly Color SuperDamageColor = new Color(1f, 0.9f, 0.45f, 0.95f); // 슈퍼 크리티컬 숫자 색 (연한 노랑, 살짝 투명)
     private static readonly Color ShieldedDamageColor = new Color(0.62f, 0.78f, 0.92f); // 보스 보호막에 막혀 줄어든 숫자 색 (흐린 하늘색)
 
     // 날아가는 부스러기 하나
@@ -41,9 +41,9 @@ public class HitEffects : MonoBehaviour
     private Sprite _square;        // 부스러기용 단색 사각형
     private PickupPopup _numbers;  // 데미지 숫자 표시 (줍기 숫자와 섞이지 않게 따로 둔 인스턴스)
 
-    // point에서 부스러기가 튀고 데미지 숫자가 뜸. strong이면 치명타/럭키클릭 - 더 많이 튀고 숫자가 크고 노랗게 나옴.
+    // point에서 부스러기가 튀고 데미지 숫자가 뜸. strong이면 치명타/슈퍼 크리티컬 - 더 많이 튀고 숫자가 큼 (치명타 연한 빨강).
     // shielded면 보스 보호막에 막혀 줄어든 데미지 - 숫자가 작고 흐린 하늘색 (치명타여도 이쪽이 우선)
-    // lucky면 럭키클릭 - 숫자 위에 "LUCKY!"가 붙음 (숫자는 한 방에 깎은 남은 체력)
+    // lucky면 슈퍼 크리티컬 - 숫자가 연한 보라
     public static void Play(Vector2 point, long damage, bool strong, Color chipColor, bool shielded = false, bool lucky = false)
     {
         if (_instance == null)
@@ -90,9 +90,8 @@ public class HitEffects : MonoBehaviour
         Vector3 numberPosition = new Vector3(point.x + Random.Range(-NumberJitter, NumberJitter), point.y, 0f); // 숫자가 뜰 자리
         if (GameSettings.DamageNumbers) // 설정에서 데미지 숫자를 끄면 부스러기만
             _numbers.ShowDamage(numberPosition, damage,
-                shielded ? ShieldedDamageColor : strong ? StrongDamageColor : DamageColor,
-                shielded ? ShieldedNumberScale : strong ? StrongNumberScale : NumberScale,
-                lucky ? LuckyLabel : null);
+                shielded ? ShieldedDamageColor : lucky ? SuperDamageColor : strong ? StrongDamageColor : DamageColor,
+                shielded ? ShieldedNumberScale : strong ? StrongNumberScale : NumberScale);
     }
 
     void Update()

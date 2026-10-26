@@ -82,12 +82,12 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (_icon != null) _baseSprite = _icon.sprite;
     }
 
-    // 1레벨 이상이면 upgradedSprite로, 0레벨이면 원래 스프라이트로
+    // 최대 레벨(만렙)이면 upgradedSprite(테두리 색 바뀐 그림)로, 아니면 원래 스프라이트로
     private void UpdateIcon(int level)
     {
         CacheIcon();
         if (_icon == null || upgradedSprite == null) return;
-        _icon.sprite = level >= 1 ? upgradedSprite : _baseSprite;
+        _icon.sprite = level >= maxLevel ? upgradedSprite : _baseSprite;
     }
 
     // 이 노드가 아직 해금 안 된 오브젝트/무기 대상이라 툴팁을 "???"로 가려야 하는지 - 그걸 해금하면 원래 설명으로 돌아옴
@@ -170,7 +170,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             }
             case UpgradeManager.UpgradeEffect.CritChance: return $"치명타 확률이 +{n}% 증가합니다.";
             case UpgradeManager.UpgradeEffect.CritDamage: return $"치명타 데미지가 +{n}% 증가합니다.";
-            case UpgradeManager.UpgradeEffect.LuckyClickChanceUp: return $"럭키 클릭 확률이 +{n}% 증가합니다.";
+            case UpgradeManager.UpgradeEffect.LuckyClickChanceUp: return $"슈퍼 크리티컬 확률이 +{n}% 증가합니다.";
             case UpgradeManager.UpgradeEffect.DoubleClickChanceUp: return $"더블 클릭 확률이 +{n}% 증가합니다.";
             case UpgradeManager.UpgradeEffect.PieceGainGlobal: return $"모든 오브젝트를 부술 때 얻는 조각이 +{n}% 증가합니다.";
             case UpgradeManager.UpgradeEffect.PieceGainObject:
@@ -193,7 +193,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.AutoSweepSpeed: return $"자동 줍기 간격이 {n}초 줄어듭니다.";
             case UpgradeManager.UpgradeEffect.AutoSweepLayers: return $"자동 줍기가 한 번에 쓸어 담는 조각 층이 +{n}층 증가합니다.";
             case UpgradeManager.UpgradeEffect.HoverPickupLayers: return $"커서 줍기가 한 번에 줍는 조각 층이 +{n}층 증가합니다.";
-            case UpgradeManager.UpgradeEffect.CursorRange: return $"커서 범위가 +{n} 넓어집니다.";
+            case UpgradeManager.UpgradeEffect.CursorRange: return "커서 범위가 더 증가합니다."; // 월드 단위 숫자는 감이 안 와서 수치 없이
             case UpgradeManager.UpgradeEffect.ObjectExtraCopies:
                 return $"맵에 {KoreanJosa.IGa(targetObjectName)} +{n}개 더 놓입니다. 동시에 여러 개를 부술 수 있어 조각을 더 빨리 모읍니다.";
             default: return null; // 해금류

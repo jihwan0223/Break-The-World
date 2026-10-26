@@ -30,21 +30,26 @@ public class CurrencyManager : MonoBehaviour
 
     [SerializeField] private int crystalPityKills = 200; // 결정 천장 - 오브젝트를 이만큼 부수는 동안 결정이 한 번도 안 나오면 이번 처치에 확정으로 나옴
     private int _killsSinceCrystal; // 마지막으로 결정이 나온 뒤 부순 오브젝트 수 (천장 계산용, 저장됨)
+    [SerializeField] private long pityStopCrystals = 5; // 결정을 누적 이만큼 얻으면 천장(확정 드랍)을 끔 - 그 뒤로는 확률로만 나옴
+    private long _totalCrystals; // 지금까지 얻은 결정 누적 (써도 줄지 않음, 저장됨)
 
     public long TotalPieces => _totalPieces;
     public bool EverHadCrystal => _everHadCrystal;
     public int KillsSinceCrystal => _killsSinceCrystal;
+    public long TotalCrystals => _totalCrystals;
 
     // 저장 파일을 불러올 때 누적 조각 / 결정 획득 여부 / 천장 카운트를 복원
-    public void SetProgress(long totalPieces, bool everHadCrystal, int killsSinceCrystal)
+    public void SetProgress(long totalPieces, bool everHadCrystal, int killsSinceCrystal, long totalCrystals)
     {
+        _totalCrystals = totalCrystals;
         _totalPieces = totalPieces;
         _everHadCrystal = everHadCrystal;
         _killsSinceCrystal = killsSinceCrystal;
     }
 
     // 오브젝트를 하나 부술 때마다 호출 - 결정 없이 천장 횟수를 채웠으면 true (이번에 확정으로 나와야 함)
-    public bool CountKillForPity() => ++_killsSinceCrystal >= crystalPityKills;
+    // 결정을 pityStopCrystals개 이상 얻은 뒤로는 천장 없음
+    public bool CountKillForPity() => ++_killsSinceCrystal >= crystalPityKills && _totalCrystals < pityStopCrystals;
 
     // 결정이 나왔을 때 호출 - 천장 카운트를 처음부터
     public void ResetCrystalPity() => _killsSinceCrystal = 0;
@@ -62,7 +67,7 @@ public class CurrencyManager : MonoBehaviour
 
     public void AddCrystals(long amount)
     {
-        if (amount > 0) _everHadCrystal = true; // 불러오기(SetCrystals)가 아니라 실제로 얻었을 때만
+        if (amount > 0) { _everHadCrystal = true; _totalCrystals += amount; } // 불러오기(SetCrystals)가 아니라 실제로 얻었을 때만
         SetCrystals(_crystals + amount);
     }
 

@@ -13,11 +13,11 @@ public class WeaponManager : MonoBehaviour
     private static readonly List<WeaponData> weapons = new List<WeaponData>
     {
         new WeaponData(1, "맨손", 1),
-        new WeaponData(2, "망치", 6),
-        new WeaponData(3, "곡괭이", 16),
-        new WeaponData(4, "전동 드릴", 36),
-        new WeaponData(5, "유압 브레이커", 76),
-        new WeaponData(6, "다이너마이트", 156),
+        new WeaponData(2, "프라이팬", 6),
+        new WeaponData(3, "망치", 16),
+        new WeaponData(4, "야구 방망이", 36),
+        new WeaponData(5, "곡괭이", 76),
+        new WeaponData(6, "철퇴", 156),
     };
 
     [SerializeField] private Sprite[] weaponIcons; // 무기별 이미지 (weapons 리스트와 같은 순서로 채워야 함, 아직 없는 무기는 비워둬도 됨)

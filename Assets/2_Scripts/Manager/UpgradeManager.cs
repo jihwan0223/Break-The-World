@@ -22,14 +22,14 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("(사용 안 함) 콤보 해금")] ComboUnlock,           // 콤보 기능은 지웠음 - 뒤 번호가 밀리지 않게 자리만 남김
         [InspectorName("(사용 안 함) 콤보 쿨타임")] ComboCooldown,       // 콤보 기능은 지웠음 - 자리만 남김
         [InspectorName("(사용 안 함) 콤보 지속시간")] ComboDuration,     // 콤보 기능은 지웠음 - 자리만 남김
-        [InspectorName("럭키 클릭 해금")] LuckyClick,              // 럭키 클릭 해금
+        [InspectorName("슈퍼 크리티컬 해금")] LuckyClick,          // 슈퍼 크리티컬 해금 (예전 럭키 클릭 자리) - 터지면 치명타 데미지의 2배
         [InspectorName("더블 클릭 해금")] DoubleClick,             // 더블 클릭 해금
         [InspectorName("자동 채굴 해금")] AutoMineUnlock,          // 자동 채굴 해금
         [InspectorName("자동 채굴 주기 단축")] AutoMineSpeed,      // 자동 채굴 주기 -값 초
         // 아래는 나중에 추가된 것들 - enum은 int로 직렬화되니 새 값은 항상 맨 뒤에만 붙일 것
         [InspectorName("자동 채굴 획득량 증가")] AutoMineYield,    // 자동 채굴 1틱당 획득량 +값 배 (대상 오브젝트 기본 보상 기준)
         [InspectorName("(사용 안 함) 콤보 배율")] ComboMultiplier,       // 콤보 기능은 지웠음 - 자리만 남김
-        [InspectorName("럭키클릭 확률 증가")] LuckyClickChanceUp,  // 럭키클릭 확률 +값 %
+        [InspectorName("슈퍼 크리티컬 확률 증가")] LuckyClickChanceUp, // 슈퍼 크리티컬 확률 +값 %
         [InspectorName("더블클릭 확률 증가")] DoubleClickChanceUp, // 더블클릭 발동 확률 +값 %
         [InspectorName("전역 조각 획득 증가")] PieceGainGlobal,    // 모든 오브젝트 조각 획득 +값 %
         [InspectorName("오브젝트 조각 획득 증가")] PieceGainObject, // Target Object Name 오브젝트 처치 시 조각 +(기본 보상의 값 %, 최소 1개)
@@ -64,11 +64,11 @@ public class UpgradeManager : MonoBehaviour
     [Header("기준값")]
     [SerializeField] private float baseCritChance = 0.1f;        // 크리티컬 기본 확률 (CritDamage 노드가 1레벨 이상일 때만 적용)
     [SerializeField] private float baseCritMultiplier = 1.5f;    // 크리티컬 기본 배율
-    [SerializeField] private float baseAutoClickInterval = 5f;   // 자동 클릭 기본 주기(초)
-    [SerializeField] private float minAutoClickInterval = 1.5f;  // 자동 클릭 주기 하한
+    [SerializeField] private float baseAutoClickInterval = 7f;   // 자동 클릭 기본 주기(초)
+    [SerializeField] private float minAutoClickInterval = 2.5f;  // 자동 클릭 주기 하한
     [SerializeField] private float autoClickIntervalGrowthPerObject = 1.05f; // 오브젝트 번호가 1 늘 때마다 자동 클릭 주기에 곱해지는 배율 (1이면 모두 같은 주기, 클수록 뒤쪽 오브젝트가 늦게 깨짐)
     [SerializeField] private int baseAutoClickCount = 1;         // 자동 클릭 1회당 기본 클릭 수
-    [SerializeField] private float luckyClickChanceValue = 0.001f; // 럭키 클릭 기본 확률 (0.1%) - LuckyClickChanceUp이 위에 더함
+    [SerializeField] private float luckyClickChanceValue = 0.001f; // 슈퍼 크리티컬 기본 확률 (0.1%) - LuckyClickChanceUp이 위에 더함
     [SerializeField] private float baseDoubleClickChance = 0.25f;// 더블클릭 해금 직후 발동 확률 - DoubleClickChanceUp이 위에 더함
     [SerializeField] private float baseAutoMineInterval = 8f;    // 자동 채굴 기본 주기(초)
     [SerializeField] private float minAutoMineInterval = 2f;     // 자동 채굴 주기 하한

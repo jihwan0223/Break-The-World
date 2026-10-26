@@ -12,7 +12,7 @@ public class PieceTutorial : MonoBehaviour
     // 튜토리얼 진행 중인지 - 이 동안 Click은 오브젝트 클릭을 무시함
     public static bool Active { get; private set; }
 
-    [SerializeField] private float zoomDuration = 0.5f; // 줌인/복귀에 걸리는 시간(초)
+    [SerializeField] private float zoomDuration = 0.8f; // 줌인/복귀에 걸리는 시간(초)
     [SerializeField] private float padding = 0.4f; // 파편들 둘레로 화면에 더 보여줄 여백 (월드 유닛)
     [SerializeField] private float minOrthoSize = 0.8f; // 파편이 하나뿐이어도 이 이상은 확대하지 않음 (카메라 세로 절반 크기)
     [SerializeField] private float blinkPerSecond = 1.5f; // 초당 깜빡임 횟수

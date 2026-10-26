@@ -20,7 +20,7 @@ public static class NodeIconGenerator
     const float StripAspect = 2f; // 띠 오브젝트는 왼쪽에서 높이의 이 배수만큼만 잘라 크게 보여줌
     static readonly string[] KeepOriginal = { }; // 자동 그림이 잘리거나 안 어울려서 원래 손그림 유지할 오브젝트 (간판/트럭/회사는 정면 그림으로 바뀌어 다시 자동 그림)
     // 이 배지 노드만 자동 그림, 나머지 노드는 원래 손그림 유지 (오브젝트 이름 -> 자동으로 만들 배지)
-    static readonly Dictionary<string, string[]> OnlyBadges = new Dictionary<string, string[]> { { "자동차", new[] { "AutoClick", "AutoSpeed", "AutoCount" } } };
+    static readonly Dictionary<string, string[]> OnlyBadges = new Dictionary<string, string[]> { { "자동차", new[] { "AutoClick", "AutoSpeed", "AutoCount", "PlusOne" } } };
     // 오브젝트 그림 대신 기존 노드 손그림 속 오브젝트를 그대로 씀 (오브젝트 이름 -> 손그림 경로)
     static readonly Dictionary<string, string> ArtFromNode = new Dictionary<string, string>
     {

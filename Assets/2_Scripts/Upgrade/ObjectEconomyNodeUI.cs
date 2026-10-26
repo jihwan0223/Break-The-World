@@ -127,12 +127,15 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         if (_icon != null) _baseSprite = _icon.sprite;
     }
 
-    // 해금 완료(또는 획득량 1레벨 이상)면 upgradedSprite로, 아니면 원래 스프라이트로
+    // 해금 완료(또는 획득량 최대 레벨)면 upgradedSprite로, 아니면 원래 스프라이트로
     private void UpdateIcon()
     {
         CacheIcon();
         if (_icon == null || upgradedSprite == null) return;
-        _icon.sprite = IsLeveled() ? upgradedSprite : _baseSprite;
+        bool maxed = ObjectManager.Instance != null && (isGain
+            ? ObjectManager.Instance.GetGainLevel(objectIndex) >= ObjectManager.MaxGainLevel
+            : ObjectManager.Instance.IsUnlocked(objectIndex)); // 더 올릴 게 없는지
+        _icon.sprite = maxed ? upgradedSprite : _baseSprite;
     }
 
     private void HandleClicked()

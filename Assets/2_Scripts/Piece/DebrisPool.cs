@@ -45,6 +45,7 @@ public class DebrisPool : MonoBehaviour
         public int zone; // 떨어진 존 번호 (그 존을 보고 있을 때만 보이고 주울 수 있음)
         public bool landed; // 착지를 마쳤는지
         public bool sweepMarked; // 이번 자동 줍기가 쓸어 담을 대상인지 (자동 줍기가 출발할 때 위층부터 정해짐)
+        public bool sweepOnLand; // 떨어지는 도중에 빗자루가 지나감 - 착지하자마자 바로 주움
         public Vector2 carryOffset; // 빗자루에 쓸려 밀려갈 때 더미 안에서 놓일 자리 (빗자루 x, 바닥 아래끝 기준)
         public Vector2 carryCurrent; // 지금 빗자루 기준으로 있는 자리 - 쓸린 자리에서 carryOffset으로 끌려감
     }
@@ -73,6 +74,7 @@ public class DebrisPool : MonoBehaviour
     public float FallDuration => fallDuration; // 부서진 지점에서 바닥까지 떨어지는 시간(초)
 
     private int CurrentZone => ZoneManager.Instance != null ? ZoneManager.Instance.CurrentZone : 0; // 지금 보고 있는 존
+    private bool _sweepAll; // 이번 자동 줍기가 전 층(전부)을 쓰는지 - 출발 뒤에 떨어진 파편도 대상
     private int MaxGroundPieces => UpgradeManager.Instance != null ? UpgradeManager.Instance.MaxGroundPieces : 400; // 한 존 바닥에 동시에 있을 수 있는 파편 수
 
     void Awake()
@@ -356,6 +358,7 @@ public class DebrisPool : MonoBehaviour
         piece.zone = zone;
         piece.landed = false;
         piece.sweepMarked = false;
+        piece.sweepOnLand = false;
         piece.renderer.sprite = GetRandomPieceSprite();
         piece.renderer.color = color;
         piece.renderer.sortingOrder = isCrystal ? 11 : 10; // 결정이 파편 더미에 묻히지 않게 위에 그림 (클릭도 우선)
@@ -392,6 +395,7 @@ public class DebrisPool : MonoBehaviour
     // 출발한 뒤에 떨어진 파편은 대상이 아니라서 다음 자동 줍기 때 쓸림
     public void MarkTopLayersForSweep(int layers)
     {
+        _sweepAll = layers >= LayerCount; // 전 층이면 출발 뒤에 떨어진 것도 지나가는 자리에 있으면 다 주움
         int layerSize = Mathf.Max(1, Mathf.CeilToInt(MaxGroundPieces / (float)LayerCount)); // 한 층에 들어가는 파편 수
         long quota = layers >= LayerCount ? long.MaxValue : (long)layers * layerSize; // 존 하나에서 쓸어 담을 파편 수 (전 층이면 전부)
         var taken = new Dictionary<int, long>(); // 존 번호 -> 지금까지 대상으로 표시한 파편 수
@@ -419,8 +423,9 @@ public class DebrisPool : MonoBehaviour
         {
             Piece piece = _groundPieces[i];
             float pieceX = piece.renderer.transform.position.x; // 이 파편의 가로 위치
-            if (piece.sweepMarked && piece.landed && pieceX > fromX && pieceX <= toX)
-                Collect(piece, true, carry: true);
+            if (!(piece.sweepMarked || _sweepAll) || pieceX <= fromX || pieceX > toX) continue;
+            if (piece.landed) Collect(piece, true, carry: true);
+            else piece.sweepOnLand = true; // 아직 떨어지는 중이면 놓치지 않게 착지하는 순간 주움
         }
     }
 
@@ -512,6 +517,7 @@ public class DebrisPool : MonoBehaviour
     // 자동 줍기가 끝나면(화면 밖으로 나가면) 호출 - 밀고 가던 파편을 전부 치움
     public void ReleaseCarried()
     {
+        _sweepAll = false;
         foreach (Piece piece in _carried)
             ReturnToPool(piece);
         _carried.Clear();
@@ -573,6 +579,7 @@ public class DebrisPool : MonoBehaviour
         pieceTransform.position = landingPoint;
         piece.landed = true;
         ApplyVisibility(piece);
+        if (piece.sweepOnLand) Collect(piece, true); // 떨어지는 사이 빗자루가 지나갔으면 바로 주움
     }
 
     // 존을 넘기면 그 존의 파편만 보이고 주울 수 있게 함 (다른 존 파편은 그대로 남아있음)

@@ -33,7 +33,7 @@ public class PickupPopup : MonoBehaviour
         public string sign; // 숫자 앞에 붙는 부호 - 줍기는 "+", 데미지는 "-"
         public bool pops; // 데미지 숫자인지 - 튀어나오듯 커졌다가 옆으로 흩어지며 떠오름
         public float drift; // 떠오르는 동안 옆으로 흘러가는 거리 (데미지 숫자만)
-        public string label; // 숫자 위에 작게 붙는 글자 (예: 럭키클릭 "LUCKY!") - 없으면 null
+        public float baseAlpha = 1f; // 색에 넣은 원래 불투명도 - 사라질 때 여기서부터 줄어듦
     }
 
     private readonly List<Popup> _active = new List<Popup>(); // 지금 떠 있는 숫자들 (오래된 순)
@@ -62,13 +62,10 @@ public class PickupPopup : MonoBehaviour
         popup.mergeable = merge;
     }
 
-    // 맞은 자리에 -amount를 띄움 (데미지 숫자). 줍기 숫자와 섞이지 않게 HitEffects가 따로 둔 인스턴스에서 씀.
-    // label이 있으면 숫자 위 줄에 작게 붙임
-    public void ShowDamage(Vector3 position, long amount, Color color, float sizeScale, string label = null)
+    // 맞은 자리에 -amount를 띄움 (데미지 숫자). 줍기 숫자와 섞이지 않게 HitEffects가 따로 둔 인스턴스에서 씀
+    public void ShowDamage(Vector3 position, long amount, Color color, float sizeScale)
     {
         Popup popup = Begin(position, amount, color, "-", sizeScale); // 새로 띄운 데미지 숫자
-        popup.label = label;
-        SetText(popup);
         popup.pops = true;
         popup.drift = Random.Range(-popDrift, popDrift);
         popup.text.transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(-popTilt, popTilt));
@@ -97,10 +94,10 @@ public class PickupPopup : MonoBehaviour
         popup.sign = sign;
         popup.pops = false;
         popup.drift = 0f;
-        popup.label = null;
         popup.text.transform.rotation = Quaternion.identity;
         popup.text.transform.localScale = Vector3.one;
         popup.text.color = color;
+        popup.baseAlpha = color.a;
         popup.text.fontSize = fontSize * sizeScale;
         popup.text.transform.position = popup.start;
         popup.text.gameObject.SetActive(true);
@@ -134,13 +131,13 @@ public class PickupPopup : MonoBehaviour
                 popup.text.transform.localScale = Vector3.one * Mathf.LerpUnclamped(popStartScale, 1f, pop);
             }
             Color color = popup.text.color; // 투명도만 바꿔 다시 넣을 색
-            color.a = progress < 0.5f ? 1f : 1f - (progress - 0.5f) / 0.5f;
+            color.a = popup.baseAlpha * (progress < 0.5f ? 1f : 1f - (progress - 0.5f) / 0.5f);
             popup.text.color = color;
         }
     }
 
     private void SetText(Popup popup) =>
-        popup.text.text = (popup.label != null ? $"<size=70%>{popup.label}</size>\n" : "") + $"{popup.sign}{NumberFormatUtil.Format(popup.amount)}";
+        popup.text.text = $"{popup.sign}{NumberFormatUtil.Format(popup.amount)}";
 
     private Popup CreatePopup()
     {
