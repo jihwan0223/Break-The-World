@@ -4013,7 +4013,7 @@ MonoBehaviour:
   shieldSpawnTimes:
   - 25
   - 10
-  repeatBossForTest: 1
+  repeatBossForTest: 0
   shieldFadeSeconds: 0.8
   zoneRoot: {fileID: 1610872450}
   unlockZone: 2
@@ -21353,14 +21353,14 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 1f6d0fbf18d876940b3954c07a56ceeb, type: 3}
   - {fileID: 21300000, guid: 9caec1790fdfdaf4896fffaf67c22a6a, type: 3}
   - {fileID: 21300000, guid: eda5a2a878979ee4a8178b252d614fad, type: 3}
-  - {fileID: 21300000, guid: 78bcd41b704830e4c868cd8e3dcc6497, type: 3}
+  - {fileID: 21300000, guid: 6475507d7f4245940ab9310bea5af271, type: 3}
   - {fileID: 21300000, guid: d5e40c56a55b11343bc8a264d05a19e8, type: 3}
   weaponSizeMultipliers:
   - 0
   - 0
   - 1.5
   - 0
-  - 1.5
+  - 0
   - 0
   weaponRotationOffsets:
   - 0
@@ -27558,7 +27558,7 @@ MonoBehaviour:
   shieldSpawnTimes:
   - 25
   - 10
-  repeatBossForTest: 1
+  repeatBossForTest: 0
   shieldFadeSeconds: 0.8
   zoneRoot: {fileID: 558599200}
   unlockZone: 3
@@ -30225,7 +30225,7 @@ MonoBehaviour:
   shieldSpawnTimes:
   - 25
   - 10
-  repeatBossForTest: 1
+  repeatBossForTest: 0
   shieldFadeSeconds: 0.8
   zoneRoot: {fileID: 1630271656}
   unlockZone: 1

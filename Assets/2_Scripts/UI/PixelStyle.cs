@@ -47,6 +47,8 @@ public static class PixelStyle
     public static readonly Tone Card = new Tone(Hex("#FDEBD0"), Hex("#FFF6E6"), Hex("#E8CFA8"), Hex("#C9A67E"), Text); // 정보 카드/액자
     public static readonly Tone Ribbon = new Tone(Hex("#F2A7A0"), Hex("#F9D0CB"), Hex("#C9776F"), Outline, Hex("#5A2E2A")); // 제목 리본
     public static readonly Tone Box = new Tone(Hex("#FFF6E6"), Hex("#FFFDF7"), Hex("#EAD9BE"), Outline, Text); // 조각 표시 상자
+    public static readonly Tone Slot = new Tone(
+        new Color(0.42f, 0.52f, 0.64f), new Color(0.54f, 0.64f, 0.76f), new Color(0.32f, 0.40f, 0.51f), new Color(0.22f, 0.28f, 0.37f), Color.white); // 유리관 음량 조절기 뒤 홈 (차분한 푸른 회색) - 메뉴/게임 설정 공용
 
     private const int Size = 12; // 틀 그림 한 변(도트)
     private const int Slice = 4; // 9칸 늘리기에서 테두리로 남길 도트 수

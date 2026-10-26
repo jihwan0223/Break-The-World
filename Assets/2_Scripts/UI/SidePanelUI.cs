@@ -72,6 +72,7 @@ public partial class SidePanelUI : MonoBehaviour
         if (_panel.style.display == DisplayStyle.Flex) ClosePanel();
         else if (_debugPanel.style.display == DisplayStyle.Flex) CloseDebugPanel();
         else if (_statsPanel.style.display == DisplayStyle.Flex) CloseStatsPanel();
+        else if (_confirmBox.style.display == DisplayStyle.Flex) _confirmBox.style.display = DisplayStyle.None; // 확인창만 닫기
         else if (_settingsPanel.style.display == DisplayStyle.Flex) CloseSettingsPanel();
         else if (_upgradeTreeOpen) UpgradeTreeUI.Instance?.Close();
         else OpenSettingsPanel(); // 아무 창도 없으면 ESC로 설정 열기

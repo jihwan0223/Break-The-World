@@ -14,7 +14,7 @@ public partial class ZoneBreaker
     [SerializeField] private float shieldPerLink = 0.15f; // 보호막 연결 하나당 줄어드는 데미지 비율
     [SerializeField] private float maxShield = 0.75f; // 보호막으로 줄어드는 데미지 최대 비율
     [SerializeField] private float[] shieldSpawnTimes = { 25f, 10f }; // 남은 시간이 이 값(초)이 될 때마다 같은 존 오브젝트가 하나씩(랜덤) 나타나 보호막으로 연결됨
-    [SerializeField] private bool repeatBossForTest = true; // 테스트용 - 켜두면 잡은 보스도 도전 버튼이 계속 뜸 (출시 전에 끌 것)
+    [SerializeField] private bool repeatBossForTest = false; // 테스트용 - 켜두면 잡은 보스도 도전 버튼이 계속 뜸 (출시 전에 끌 것)
     [SerializeField] private float shieldFadeSeconds = 0.8f; // 보호막 오브젝트가 투명한 상태에서 서서히 나타나는 시간(초)
 
     public static bool FinalBossCleared; // 다음 맵이 없는 마지막 보스(회사)를 잡았는지 - 저장됨

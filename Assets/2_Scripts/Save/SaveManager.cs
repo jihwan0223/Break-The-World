@@ -68,6 +68,14 @@ public class SaveManager : MonoBehaviour
             SaveNow();
     }
 
+    // "저장 안 하고 종료/나가기" - 자동 저장 대기 중인 변경을 버리고, 종료 직전 저장도 안 함
+    public void DiscardPending()
+    {
+        if (_saveRoutine != null) StopCoroutine(_saveRoutine);
+        _saveRoutine = null;
+        _isDirty = false;
+    }
+
     private void MarkDirty()
     {
         _isDirty = true;

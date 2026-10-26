@@ -9,6 +9,7 @@ public static class GameSettings
 {
     private const string MasterVolumeKey = "MasterVolume"; // 마스터 음량 (MainMenuUI와 같은 키)
     private const string BgmVolumeKey = "BgmVolume"; // 배경음악 음량
+    private const float BgmLoudness = 0.2f; // 배경음악 원래 소리 크기 배율 - 원본이 커서 크게 줄임 (음량 100%여도 원본의 20%)
     private const string FullscreenKey = "Fullscreen"; // 1 = 전체화면, 0 = 창 모드
     private const string ResolutionKey = "Resolution"; // "가로x세로"
     private const string FpsKey = "FpsLimit"; // FpsOptions 번호
@@ -36,7 +37,7 @@ public static class GameSettings
         set
         {
             PlayerPrefs.SetFloat(BgmVolumeKey, Mathf.Clamp01(value));
-            if (_bgm != null) _bgm.volume = BgmVolume;
+            if (_bgm != null) _bgm.volume = BgmVolume * BgmLoudness;
         }
     }
 
@@ -84,6 +85,9 @@ public static class GameSettings
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Startup()
     {
+#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
+        Debug.unityLogger.filterLogType = LogType.Warning; // 출시 빌드는 경고/에러만 기록 (클릭마다 찍히는 일반 로그 끔)
+#endif
         AudioListener.volume = MasterVolume;
         ApplyFrameRate();
 #if !UNITY_EDITOR
@@ -128,7 +132,7 @@ public static class GameSettings
         _bgm.clip = GameAudio.Instance.bgm;
         _bgm.loop = true;
         _bgm.playOnAwake = false;
-        _bgm.volume = BgmVolume;
+        _bgm.volume = BgmVolume * BgmLoudness;
         _bgm.ignoreListenerPause = true;
         _bgm.Play();
     }

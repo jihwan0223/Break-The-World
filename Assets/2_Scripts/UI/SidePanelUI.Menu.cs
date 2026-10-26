@@ -12,8 +12,11 @@ public partial class SidePanelUI
     private VisualElement _statsPanel; // 통계 창
     private readonly List<(Label value, System.Func<string> get)> _statRows = new List<(Label, System.Func<string>)>(); // 통계 값 줄 - 열 때마다 다시 채움
     private VisualElement _settingsPanel; // 설정 창
-    private Button _quitButton; // 게임 종료 버튼 - 한 번 누르면 확인 문구로 바뀌고 한 번 더 누르면 종료
-    private bool _quitArmed; // 게임 종료를 한 번 눌러 확인을 기다리는 중인지
+    private VisualElement _confirmBox; // 종료/메뉴로 나가기 확인창 (설정 창 위에 덮음)
+    private Label _confirmMessage; // 확인창 질문
+    private Button _confirmSave; // "저장하고 ~"
+    private Button _confirmNoSave; // "저장 안 하고 ~"
+    private System.Action _confirmLeave; // 확인창에서 고른 뒤 실제로 나가는 동작 (종료 또는 메뉴로)
 
     // ---- 설정 ----
 
@@ -22,12 +25,14 @@ public partial class SidePanelUI
         _settingsPanel = CreatePopupFrame(CloseSettingsPanel, out Label title);
         title.text = "설정";
 
-        var body = new VisualElement(); // 제목 아래 가운데: [소리+게임] [화면], 그 아래 버튼 줄
+        var body = new VisualElement(); // 화면 가운데: [소리] [화면+게임], 그 아래 버튼 줄 (메뉴 설정과 같은 배치)
         body.style.position = Position.Absolute;
         body.style.left = 0;
         body.style.right = 0;
-        body.style.top = 130;
+        body.style.top = 100; // 제목 리본 아래부터
+        body.style.bottom = 0;
         body.style.alignItems = Align.Center;
+        body.style.justifyContent = Justify.Center;
         _settingsPanel.Add(body);
 
         var columns = new VisualElement(); // 두 칸
@@ -35,24 +40,17 @@ public partial class SidePanelUI
         columns.style.alignItems = Align.FlexStart;
         body.Add(columns);
 
-        var left = new VisualElement(); // 소리 + 게임
-        left.style.marginRight = 48;
+        var left = new VisualElement(); // 소리
+        left.style.marginRight = 56;
         left.style.alignItems = Align.Center;
         columns.Add(left);
-        var right = new VisualElement(); // 화면
+        var right = new VisualElement(); // 화면 + 게임
         right.style.alignItems = Align.Center;
         columns.Add(right);
 
         left.Add(PixelStyle.CardHeader("소리"));
-        AddSettingRow(left, "전체 음량", () => Percent(GameSettings.MasterVolume),
-            step => GameSettings.MasterVolume = Mathf.Round(Mathf.Clamp01(GameSettings.MasterVolume + step * 0.1f) * 10f) / 10f);
-        AddSettingRow(left, "효과음", () => Percent(SfxPlayer.Volume),
-            step => SfxPlayer.Volume = Mathf.Round(Mathf.Clamp01(SfxPlayer.Volume + step * 0.1f) * 10f) / 10f);
-        var gameHeader = PixelStyle.CardHeader("게임"); // 게임 항목 머리글
-        gameHeader.style.marginTop = 10;
-        left.Add(gameHeader);
-        AddSettingRow(left, "화면 흔들림", () => GameSettings.ScreenShake ? "켜기" : "끄기", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
-        AddSettingRow(left, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
+        AddVolumeBar(left, "전체 음량", () => GameSettings.MasterVolume, v => GameSettings.MasterVolume = v);
+        AddVolumeBar(left, "효과음", () => SfxPlayer.Volume, v => SfxPlayer.Volume = v);
 
         right.Add(PixelStyle.CardHeader("화면"));
         AddSettingRow(right, "화면 모드", () => GameSettings.Fullscreen ? "전체화면" : "창 모드", _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
@@ -68,6 +66,11 @@ public partial class SidePanelUI
             int fps = GameSettings.FpsOptions[GameSettings.FpsIndex]; // 제한 값
             return fps < 0 ? "모니터 맞춤" : $"{fps} FPS";
         }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length);
+        var gameHeader = PixelStyle.CardHeader("게임"); // 게임 항목 머리글
+        gameHeader.style.marginTop = 10;
+        right.Add(gameHeader);
+        AddSettingRow(right, "화면 흔들림", () => GameSettings.ScreenShake ? "켜기" : "끄기", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
+        AddSettingRow(right, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
 
         var buttons = new VisualElement(); // 아래 버튼 줄
         buttons.style.flexDirection = FlexDirection.Row;
@@ -75,9 +78,9 @@ public partial class SidePanelUI
         body.Add(buttons);
 
         Button debug = CreateButton("디버그", PixelStyle.Butter, () => { CloseSettingsPanel(); OpenDebugPanel(); });
-        Button menu = CreateButton("메인 메뉴로", PixelStyle.Sky, GoToMainMenu);
-        _quitButton = CreateButton("게임 종료", PixelStyle.Pink, QuitGame);
-        foreach (Button b in new[] { debug, menu, _quitButton })
+        Button menu = CreateButton("메인 메뉴로", PixelStyle.Sky, () => ShowLeaveConfirm("메인 메뉴로 나갈까요?", "나가기", GoToMainMenu));
+        Button quit = CreateButton("게임 종료", PixelStyle.Pink, () => ShowLeaveConfirm("게임을 종료할까요?", "종료", QuitGame));
+        foreach (Button b in new[] { debug, menu, quit })
         {
             b.style.width = 340;
             b.style.height = 96;
@@ -86,7 +89,96 @@ public partial class SidePanelUI
             buttons.Add(b);
         }
 
+        BuildLeaveConfirm();
         root.Add(_settingsPanel);
+    }
+
+    // 설정 창 위에 덮는 확인창: 질문 + [저장하고 ~] [저장 안 하고 ~] [돌아가기]
+    private void BuildLeaveConfirm()
+    {
+        _confirmBox = new VisualElement(); // 반투명 검은 덮개 (뒤 설정 창 클릭 막음)
+        _confirmBox.style.position = Position.Absolute;
+        _confirmBox.style.left = 0;
+        _confirmBox.style.right = 0;
+        _confirmBox.style.top = 0;
+        _confirmBox.style.bottom = 0;
+        _confirmBox.style.backgroundColor = new Color(0f, 0f, 0f, 0.5f);
+        _confirmBox.style.alignItems = Align.Center;
+        _confirmBox.style.justifyContent = Justify.Center;
+        _confirmBox.style.display = DisplayStyle.None;
+        _settingsPanel.Add(_confirmBox);
+
+        var window = new VisualElement(); // 가운데 크림 창
+        window.style.alignItems = Align.Center;
+        window.style.paddingTop = 36;
+        window.style.paddingBottom = 36;
+        window.style.paddingLeft = 48;
+        window.style.paddingRight = 48;
+        PixelStyle.Frame(window, PixelStyle.Window, 6f);
+        _confirmBox.Add(window);
+
+        _confirmMessage = new Label(); // 질문
+        _confirmMessage.style.fontSize = 36;
+        _confirmMessage.style.color = PixelStyle.Text.linear;
+        _confirmMessage.style.marginBottom = 30;
+        window.Add(_confirmMessage);
+
+        var row = new VisualElement(); // 버튼 줄
+        row.style.flexDirection = FlexDirection.Row;
+        window.Add(row);
+        _confirmSave = CreateButton("", PixelStyle.Mint, () => Leave(true));
+        _confirmNoSave = CreateButton("", PixelStyle.Pink, () => Leave(false));
+        Button back = CreateButton("돌아가기", PixelStyle.Sky, () => _confirmBox.style.display = DisplayStyle.None);
+        foreach (Button b in new[] { _confirmSave, _confirmNoSave, back })
+        {
+            b.style.width = 380;
+            b.style.height = 96;
+            b.style.marginLeft = 8;
+            b.style.marginRight = 8;
+            row.Add(b);
+        }
+    }
+
+    // verb: "종료" / "나가기" - 버튼 글자에 붙음
+    private void ShowLeaveConfirm(string question, string verb, System.Action leave)
+    {
+        _confirmMessage.text = question;
+        _confirmSave.text = $"저장하고 {verb}";
+        _confirmNoSave.text = $"저장 안 하고 {verb}";
+        _confirmLeave = leave;
+        _confirmBox.style.display = DisplayStyle.Flex;
+    }
+
+    // 저장 여부를 정하고 나감. 저장 안 하면 아직 안 쓴 변경(자동 저장 대기분)을 버림
+    private void Leave(bool save)
+    {
+        if (save) SaveManager.Instance?.SaveNow();
+        else SaveManager.Instance?.DiscardPending();
+        PlayerPrefs.Save(); // 설정 값은 저장 여부와 상관없이 유지
+        _confirmLeave?.Invoke();
+    }
+
+    // 메뉴 설정과 같은 모양: "이름 퍼센트" 글자 + 그 밑 홈 안의 유리관 (누르거나 끌어서 조절)
+    private void AddVolumeBar(VisualElement column, string label, System.Func<float> get, System.Action<float> set)
+    {
+        var caption = new Label(); // 유리관 위 "이름 퍼센트"
+        caption.style.fontSize = 36;
+        caption.style.color = PixelStyle.Text.linear;
+        caption.style.marginBottom = 6;
+        column.Add(caption);
+
+        var cylinder = new GlassCylinderSlider(get(), v => { set(v); caption.text = $"{label}  {Percent(v)}"; }, _ => { }); // 유리관 조절기
+        var slot = new VisualElement(); // 유리관이 놓이는 홈
+        slot.style.paddingTop = 14;
+        slot.style.paddingBottom = 18;
+        slot.style.paddingLeft = 18;
+        slot.style.paddingRight = 18;
+        slot.style.marginBottom = 18;
+        PixelStyle.Frame(slot, PixelStyle.Slot);
+        slot.Add(cylinder);
+        column.Add(slot);
+
+        _settingRefreshers.Add(() => { cylinder.SetValue(get()); caption.text = $"{label}  {Percent(get())}"; }); // 창을 열 때 저장된 값으로
     }
 
     // "이름  < 값 >" 한 줄 - 화살표로 값을 바꾸고 바로 저장/적용
@@ -140,8 +232,7 @@ public partial class SidePanelUI
     private void OpenSettingsPanel()
     {
         foreach (System.Action refresh in _settingRefreshers) refresh();
-        _quitArmed = false;
-        _quitButton.text = "게임 종료";
+        _confirmBox.style.display = DisplayStyle.None;
         _settingsPanel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility();
         Time.timeScale = 0f; // 다른 창과 같이 열려 있는 동안 게임 정지
@@ -159,23 +250,12 @@ public partial class SidePanelUI
 
     private void GoToMainMenu()
     {
-        SaveManager.Instance?.SaveNow();
-        PlayerPrefs.Save();
         Time.timeScale = 1f; // 멈춘 채로 넘어가지 않게
         SceneManager.LoadScene(MenuSceneName);
     }
 
-    // 한 번 누르면 확인 문구, 한 번 더 누르면 저장하고 종료
     private void QuitGame()
     {
-        if (!_quitArmed)
-        {
-            _quitArmed = true;
-            _quitButton.text = "한 번 더 누르면 종료";
-            return;
-        }
-        SaveManager.Instance?.SaveNow();
-        PlayerPrefs.Save();
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else

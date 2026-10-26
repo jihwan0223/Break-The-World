@@ -494,9 +494,6 @@ public class MainMenuUI : MonoBehaviour
         public System.Action onEnter; // 엔터/스페이스
     }
 
-    private static readonly PixelStyle.Tone SlotTone = new PixelStyle.Tone(
-        new Color(0.42f, 0.32f, 0.25f), new Color(0.55f, 0.43f, 0.34f), new Color(0.3f, 0.22f, 0.17f), new Color(0.24f, 0.17f, 0.12f), Color.white); // 유리관 뒤 어두운 홈 - 밝은 크림 창에서 유리가 보이게
-
     private VisualElement BuildSettingsPanel()
     {
         // 확인창처럼 반투명 배경 위 가운데 창 - 창 밖(배경)을 누르면 닫힘
@@ -613,7 +610,7 @@ public class MainMenuUI : MonoBehaviour
         wrap.style.paddingLeft = 18;
         wrap.style.paddingRight = 18;
         wrap.style.marginBottom = 22;
-        PixelStyle.Frame(wrap, SlotTone);
+        PixelStyle.Frame(wrap, PixelStyle.Slot);
         wrap.Add(cylinder);
         column.Add(wrap);
 
