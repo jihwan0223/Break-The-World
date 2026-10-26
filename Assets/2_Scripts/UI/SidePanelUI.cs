@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 [RequireComponent(typeof(UIDocument))]
-public class SidePanelUI : MonoBehaviour
+public partial class SidePanelUI : MonoBehaviour
 {
     // 화살표로 둘러보는 중인 인덱스를 들고 있는 작은 상태 객체 (무기용/오브젝트용 각각 하나씩)
     private class BrowseState
@@ -65,12 +65,16 @@ public class SidePanelUI : MonoBehaviour
     void Update()
     {
         RefreshBadges();
+        GameStats.PlaySeconds += Time.deltaTime; // 창이 열려 멈춘 동안(timeScale 0)은 안 늘어남
 
         if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
 
         if (_panel.style.display == DisplayStyle.Flex) ClosePanel();
         else if (_debugPanel.style.display == DisplayStyle.Flex) CloseDebugPanel();
+        else if (_statsPanel.style.display == DisplayStyle.Flex) CloseStatsPanel();
+        else if (_settingsPanel.style.display == DisplayStyle.Flex) CloseSettingsPanel();
         else if (_upgradeTreeOpen) UpgradeTreeUI.Instance?.Close();
+        else OpenSettingsPanel(); // 아무 창도 없으면 ESC로 설정 열기
     }
 
     void OnDisable()
@@ -92,6 +96,9 @@ public class SidePanelUI : MonoBehaviour
         _upgradeBadge.style.display = upgrade && !crystal ? DisplayStyle.Flex : DisplayStyle.None;
         _crystalBadge.style.display = crystal ? DisplayStyle.Flex : DisplayStyle.None;
         _weaponBadge.style.display = weapon ? DisplayStyle.Flex : DisplayStyle.None;
+        // 통계 버튼은 결정 업그레이드로 해금해야 나타남
+        bool stats = UpgradeManager.Instance != null && UpgradeManager.Instance.StatsIsUnlocked; // 통계 창 해금 여부
+        _statsButton.style.display = stats ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     // 버튼 오른쪽 위에 붙는 느낌표 (처음엔 숨김) - 트리 노드의 느낌표와 같은 그림. crystal이면 노란 느낌표
@@ -123,6 +130,8 @@ public class SidePanelUI : MonoBehaviour
 
         bool hide = (_panel != null && _panel.style.display == DisplayStyle.Flex)
                     || (_debugPanel != null && _debugPanel.style.display == DisplayStyle.Flex)
+                    || (_statsPanel != null && _statsPanel.style.display == DisplayStyle.Flex)
+                    || (_settingsPanel != null && _settingsPanel.style.display == DisplayStyle.Flex)
                     || _upgradeTreeOpen;
         _buttonRow.style.display = hide ? DisplayStyle.None : DisplayStyle.Flex;
     }
@@ -180,6 +189,8 @@ public class SidePanelUI : MonoBehaviour
 
         root.Add(_panel);
         BuildDebugPanel(root);
+        BuildStatsPanel(root);
+        BuildSettingsPanel(root);
 
         // Upgrade/Weapon/Object 버튼 3개가 화면 우상단에 일렬로 나오는 가로줄
         // (업그레이드 페이지 자체는 유저가 Canvas로 새로 만든 UpgradeTreeUI가 담당 - 여기선 그걸 여는 버튼만 있음)
@@ -214,11 +225,9 @@ public class SidePanelUI : MonoBehaviour
             OpenPanel("도감", _objectContent);
         });
 
-        var debugButton = CreateButton("디버그", PixelStyle.Butter, () =>
-        {
-            Debug.Log("디버그 버튼 눌림");
-            OpenDebugPanel();
-        });
+        _statsButton = CreateButton("통계", PixelStyle.Butter, OpenStatsPanel); // 결정 업그레이드로 해금 (디버그는 설정 창 안으로 옮김)
+        _statsButton.style.display = DisplayStyle.None;
+        Button settingsButton = CreateGearButton(); // 맨 오른쪽 톱니 = 설정
 
         _upgradeBadge = CreateBadge();
         upgradeButton.Add(_upgradeBadge);
@@ -227,14 +236,16 @@ public class SidePanelUI : MonoBehaviour
         _weaponBadge = CreateBadge();
         weaponButton.Add(_weaponBadge);
 
-        debugButton.style.marginRight = 12; // 맨 왼쪽에 둠 - 줄이 오른쪽 기준 정렬이라 기존 3개 위치가 안 바뀜
+        _statsButton.style.marginRight = 12; // 맨 왼쪽
         upgradeButton.style.marginRight = 12;
         weaponButton.style.marginRight = 12;
+        objectButton.style.marginRight = 12;
 
-        buttonRow.Add(debugButton);
+        buttonRow.Add(_statsButton);
         buttonRow.Add(upgradeButton);
         buttonRow.Add(weaponButton);
         buttonRow.Add(objectButton);
+        buttonRow.Add(settingsButton);
         root.Add(buttonRow);
 
         _buttonRow = buttonRow; // OpenPanel/ClosePanel/업그레이드 화면 토글에서 보이기/숨기기 위해 저장해둠
@@ -365,6 +376,7 @@ public class SidePanelUI : MonoBehaviour
             _weaponBrowse.index = 0;
             ZoneManager.Instance?.ResetAll();
             ZoneBreaker.ResetBosses();
+            GameStats.Reset();
             UpgradeTreeUI.Instance?.RefreshAll();
             SaveManager.Instance?.SaveNow();
             return "모든 데이터를 처음 상태로 되돌렸습니다";

@@ -49,6 +49,7 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("조각 합치기 (표시용)")] PieceMergeDecoy, // 실제 효과 없음 - 바닥이 차면 조각이 합쳐지는 건 원래 기능인데, 업그레이드로 얻은 것처럼 보이게 하는 노드용
         [InspectorName("왁스 코팅 해금")] WaxCoatUnlock,          // Target Object Name 지형(책상/도로/아파트)에 왁스를 입힘 - 일반 오브젝트는 처음부터 왁스가 덮여 있음
         [InspectorName("커서 줍기 층 증가")] HoverPickupLayers,  // 커서 줍기가 한 번에 줍는 파편 층 +값 (0이면 맨 위 파편 1개만, 1 이상이면 커서 밑의 위쪽 그 층 수만큼 전부)
+        [InspectorName("통계 창 해금")] StatsUnlock,              // 화면 위 버튼 줄에 통계 버튼이 생김
     }
 
     // 선행 노드와 잇는 선의 모양 (UpgradeTreeLink가 이 값을 보고 세그먼트를 배치함)
@@ -550,6 +551,7 @@ public class UpgradeManager : MonoBehaviour
     // 커서 범위 반지름(월드 단위). 0이면 범위 없이 커서 한 점만. 커서 줍기를 해금하면 기본 범위가 생기고 범위 증가가 그 위에 더해짐
     public float CursorRadius => SumEffect(UpgradeEffect.CursorRange) + (HoverPickupIsUnlocked ? hoverPickupBaseRadius : 0f);
     public bool HoverClickIsUnlocked => AnyUnlocked(UpgradeEffect.HoverClickUnlock); // 커서 타격 해금 여부
+    public bool StatsIsUnlocked => AnyUnlocked(UpgradeEffect.StatsUnlock); // 통계 창 해금 여부
     public float HoverClickIntervalSeconds => Mathf.Max(0.02f, hoverClickInterval); // 커서 타격 간격(초) - 0 이하로 넣어도 매 프레임 때리지 않게 하한을 둠
 
     public float AutoSweepIntervalSeconds =>

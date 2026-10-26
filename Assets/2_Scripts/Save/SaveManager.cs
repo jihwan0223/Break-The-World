@@ -125,6 +125,13 @@ public class SaveManager : MonoBehaviour
             everHadCrystal = CurrencyManager.Instance != null && CurrencyManager.Instance.EverHadCrystal,
             killsSinceCrystal = CurrencyManager.Instance != null ? CurrencyManager.Instance.KillsSinceCrystal : 0,
             totalCrystals = CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalCrystals : 0,
+            statObjectsBroken = GameStats.ObjectsBroken,
+            statClicks = GameStats.Clicks,
+            statCrits = GameStats.Crits,
+            statSuperCrits = GameStats.SuperCrits,
+            statBossClears = GameStats.BossClears,
+            statPlaySeconds = GameStats.PlaySeconds,
+            statBrokenPerObject = GameStats.BrokenPerObject,
             pieceTutorialDone = PieceTutorial.Instance != null && PieceTutorial.Instance.Done,
             unlockedObjects = unlockedObjects,
             gainLevels = gainLevels,
@@ -144,11 +151,19 @@ public class SaveManager : MonoBehaviour
     // 저장 파일이 있으면 읽어서 각 매니저에 적용, 없으면 아무것도 안 함(기본값 그대로 시작)
     public void Load()
     {
+        GameStats.Reset(); // 세이브가 없으면(새 게임) 기록도 처음부터
         if (!File.Exists(SavePath))
             return;
 
         string json = File.ReadAllText(SavePath);
         SaveData data = JsonUtility.FromJson<SaveData>(json);
+        GameStats.ObjectsBroken = data.statObjectsBroken;
+        GameStats.Clicks = data.statClicks;
+        GameStats.Crits = data.statCrits;
+        GameStats.SuperCrits = data.statSuperCrits;
+        GameStats.BossClears = data.statBossClears;
+        GameStats.PlaySeconds = data.statPlaySeconds;
+        GameStats.BrokenPerObject = data.statBrokenPerObject ?? new long[0];
 
         if (CurrencyManager.Instance != null)
             CurrencyManager.Instance.SetPieces(data.pieces);

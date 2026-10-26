@@ -239,6 +239,7 @@ public partial class ZoneBreaker
     private void WinBoss()
     {
         _bossWon = true;
+        GameStats.BossClears++;
         if (IsFinalBoss) FinalBossCleared = true;
         EndBoss(true);
 

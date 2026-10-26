@@ -167,6 +167,7 @@ public class CurrencyManager : MonoBehaviour
         _everHadCrystal = false;
         _starterCrystalDropped = false;
         _killsSinceCrystal = 0;
+        _totalCrystals = 0;
         SetCrystals(0);
     }
 }

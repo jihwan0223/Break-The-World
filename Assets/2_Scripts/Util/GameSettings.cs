@@ -20,7 +20,15 @@ public static class GameSettings
     private const string MenuSceneName = "MenuScene"; // 배경음악이 나오는 씬
     private static AudioSource _bgm; // 배경음악 재생기 (씬이 바뀌어도 남아 있음)
 
-    public static float MasterVolume => PlayerPrefs.GetFloat(MasterVolumeKey, 1f);
+    public static float MasterVolume
+    {
+        get => PlayerPrefs.GetFloat(MasterVolumeKey, 1f);
+        set
+        {
+            PlayerPrefs.SetFloat(MasterVolumeKey, Mathf.Clamp01(value));
+            AudioListener.volume = MasterVolume;
+        }
+    }
 
     public static float BgmVolume
     {

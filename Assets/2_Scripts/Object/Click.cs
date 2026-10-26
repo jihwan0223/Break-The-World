@@ -96,6 +96,7 @@ public class Click : MonoBehaviour
         if (CurrencyManager.Instance == null || ObjectManager.Instance == null)
             return;
 
+        GameStats.CountBroken(ObjIndex);
         if (ZoneBreaker.IsShieldObject(_health)) return; // 보스전 보호막 오브젝트는 부숴도 조각/결정이 안 나옴
 
         int objectIndex = ObjIndex; // 방금 파괴된 오브젝트 (가운데 스왑 오브젝트면 장착 중인 것, 고정이면 그 인덱스)
@@ -222,6 +223,9 @@ public class Click : MonoBehaviour
             damage = Mathf.RoundToInt(damage * UpgradeManager.Instance.CritMultiplierValue * SuperCritMultiplier);
         else if (isCrit)
             damage = Mathf.RoundToInt(damage * UpgradeManager.Instance.CritMultiplierValue);
+        if (playerClick) GameStats.Clicks++;
+        if (isSuper) GameStats.SuperCrits++;
+        else if (isCrit) GameStats.Crits++;
         if (autoClick)
             damage = Mathf.Max(1, Mathf.RoundToInt(damage * AutoClickDamageRatio));
 

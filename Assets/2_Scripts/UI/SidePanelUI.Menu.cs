@@ -1,0 +1,414 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
+
+// 게임 화면의 설정 창(오른쪽 위 톱니)과 통계 창(결정 업그레이드로 해금). 디버그 창은 설정 창 안 버튼으로 엶
+public partial class SidePanelUI
+{
+    private const string MenuSceneName = "MenuScene"; // 설정 창의 "메인 메뉴로"가 이동할 씬
+
+    private Button _statsButton; // 버튼 줄의 통계 버튼 (해금 전엔 숨김)
+    private VisualElement _statsPanel; // 통계 창
+    private readonly List<(Label value, System.Func<string> get)> _statRows = new List<(Label, System.Func<string>)>(); // 통계 값 줄 - 열 때마다 다시 채움
+    private VisualElement _settingsPanel; // 설정 창
+    private Button _quitButton; // 게임 종료 버튼 - 한 번 누르면 확인 문구로 바뀌고 한 번 더 누르면 종료
+    private bool _quitArmed; // 게임 종료를 한 번 눌러 확인을 기다리는 중인지
+
+    // ---- 설정 ----
+
+    private void BuildSettingsPanel(VisualElement root)
+    {
+        _settingsPanel = CreatePopupFrame(CloseSettingsPanel, out Label title);
+        title.text = "설정";
+
+        var body = new VisualElement(); // 제목 아래 가운데: [소리+게임] [화면], 그 아래 버튼 줄
+        body.style.position = Position.Absolute;
+        body.style.left = 0;
+        body.style.right = 0;
+        body.style.top = 130;
+        body.style.alignItems = Align.Center;
+        _settingsPanel.Add(body);
+
+        var columns = new VisualElement(); // 두 칸
+        columns.style.flexDirection = FlexDirection.Row;
+        columns.style.alignItems = Align.FlexStart;
+        body.Add(columns);
+
+        var left = new VisualElement(); // 소리 + 게임
+        left.style.marginRight = 48;
+        left.style.alignItems = Align.Center;
+        columns.Add(left);
+        var right = new VisualElement(); // 화면
+        right.style.alignItems = Align.Center;
+        columns.Add(right);
+
+        left.Add(PixelStyle.CardHeader("소리"));
+        AddSettingRow(left, "전체 음량", () => Percent(GameSettings.MasterVolume),
+            step => GameSettings.MasterVolume = Mathf.Round(Mathf.Clamp01(GameSettings.MasterVolume + step * 0.1f) * 10f) / 10f);
+        AddSettingRow(left, "효과음", () => Percent(SfxPlayer.Volume),
+            step => SfxPlayer.Volume = Mathf.Round(Mathf.Clamp01(SfxPlayer.Volume + step * 0.1f) * 10f) / 10f);
+        var gameHeader = PixelStyle.CardHeader("게임"); // 게임 항목 머리글
+        gameHeader.style.marginTop = 10;
+        left.Add(gameHeader);
+        AddSettingRow(left, "화면 흔들림", () => GameSettings.ScreenShake ? "켜기" : "끄기", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
+        AddSettingRow(left, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
+
+        right.Add(PixelStyle.CardHeader("화면"));
+        AddSettingRow(right, "화면 모드", () => GameSettings.Fullscreen ? "전체화면" : "창 모드", _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
+        AddSettingRow(right, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
+        {
+            List<Vector2Int> list = GameSettings.Resolutions; // 고를 수 있는 해상도
+            if (list.Count == 0) return;
+            int index = Mathf.Max(0, list.IndexOf(GameSettings.Resolution)); // 지금 해상도 번호
+            GameSettings.Resolution = list[(index + step + list.Count) % list.Count];
+        });
+        AddSettingRow(right, "프레임 제한", () =>
+        {
+            int fps = GameSettings.FpsOptions[GameSettings.FpsIndex]; // 제한 값
+            return fps < 0 ? "모니터 맞춤" : $"{fps} FPS";
+        }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length);
+
+        var buttons = new VisualElement(); // 아래 버튼 줄
+        buttons.style.flexDirection = FlexDirection.Row;
+        buttons.style.marginTop = 36;
+        body.Add(buttons);
+
+        Button debug = CreateButton("디버그", PixelStyle.Butter, () => { CloseSettingsPanel(); OpenDebugPanel(); });
+        Button menu = CreateButton("메인 메뉴로", PixelStyle.Sky, GoToMainMenu);
+        _quitButton = CreateButton("게임 종료", PixelStyle.Pink, QuitGame);
+        foreach (Button b in new[] { debug, menu, _quitButton })
+        {
+            b.style.width = 340;
+            b.style.height = 96;
+            b.style.marginLeft = 10;
+            b.style.marginRight = 10;
+            buttons.Add(b);
+        }
+
+        root.Add(_settingsPanel);
+    }
+
+    // "이름  < 값 >" 한 줄 - 화살표로 값을 바꾸고 바로 저장/적용
+    private void AddSettingRow(VisualElement column, string label, System.Func<string> getValue, System.Action<int> step)
+    {
+        var row = new VisualElement(); // 한 줄
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.alignItems = Align.Center;
+        row.style.width = 640;
+        row.style.paddingLeft = 20;
+        row.style.paddingRight = 12;
+        row.style.paddingTop = 8;
+        row.style.paddingBottom = 12;
+        row.style.marginBottom = 12;
+        PixelStyle.Frame(row, PixelStyle.Card);
+
+        var name = new Label(label); // 항목 이름
+        name.style.flexGrow = 1;
+        name.style.fontSize = 36;
+        name.style.color = PixelStyle.Text.linear;
+        row.Add(name);
+
+        var value = new Label(); // 지금 값 (창을 열 때 다시 읽음)
+        value.style.width = 230;
+        value.style.fontSize = 36;
+        value.style.color = PixelStyle.Text.linear;
+        value.style.unityTextAlign = TextAnchor.MiddleCenter;
+        System.Action<int> change = d => { step(d); value.text = getValue(); }; // 바꾸고 다시 표시
+        row.Add(ArrowButton("<", () => change(-1)));
+        row.Add(value);
+        row.Add(ArrowButton(">", () => change(1)));
+        _settingRefreshers.Add(() => value.text = getValue());
+        column.Add(row);
+    }
+
+    private readonly List<System.Action> _settingRefreshers = new List<System.Action>(); // 창을 열 때 값 글자를 다시 채우는 함수들
+
+    private static Button ArrowButton(string text, System.Action onClick)
+    {
+        var button = new Button(onClick) { text = text };
+        button.focusable = false;
+        button.style.width = 60;
+        button.style.height = 60;
+        button.style.fontSize = 36;
+        PixelStyle.Button(button, PixelStyle.Mint);
+        return button;
+    }
+
+    private static string Percent(float value) => Mathf.RoundToInt(value * 100f) + "%";
+
+    private void OpenSettingsPanel()
+    {
+        foreach (System.Action refresh in _settingRefreshers) refresh();
+        _quitArmed = false;
+        _quitButton.text = "게임 종료";
+        _settingsPanel.style.display = DisplayStyle.Flex;
+        RefreshButtonRowVisibility();
+        Time.timeScale = 0f; // 다른 창과 같이 열려 있는 동안 게임 정지
+        OnSelectorPanelToggled?.Invoke(true);
+    }
+
+    private void CloseSettingsPanel()
+    {
+        _settingsPanel.style.display = DisplayStyle.None;
+        PlayerPrefs.Save(); // 바꾼 설정을 바로 디스크에
+        RefreshButtonRowVisibility();
+        Time.timeScale = 1f;
+        OnSelectorPanelToggled?.Invoke(false);
+    }
+
+    private void GoToMainMenu()
+    {
+        SaveManager.Instance?.SaveNow();
+        PlayerPrefs.Save();
+        Time.timeScale = 1f; // 멈춘 채로 넘어가지 않게
+        SceneManager.LoadScene(MenuSceneName);
+    }
+
+    // 한 번 누르면 확인 문구, 한 번 더 누르면 저장하고 종료
+    private void QuitGame()
+    {
+        if (!_quitArmed)
+        {
+            _quitArmed = true;
+            _quitButton.text = "한 번 더 누르면 종료";
+            return;
+        }
+        SaveManager.Instance?.SaveNow();
+        PlayerPrefs.Save();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
+    // 버튼 줄 맨 오른쪽 톱니 - 버튼 틀 없이 흰 톱니 그림만
+    private Button CreateGearButton()
+    {
+        var button = new Button(OpenSettingsPanel); // 틀 없는 버튼
+        button.focusable = false;
+        button.style.width = 96;
+        button.style.height = 96;
+        button.style.backgroundColor = Color.clear;
+        button.style.backgroundImage = new StyleBackground(GearTexture());
+        button.style.borderTopWidth = button.style.borderBottomWidth = button.style.borderLeftWidth = button.style.borderRightWidth = 0;
+        button.style.paddingTop = button.style.paddingBottom = button.style.paddingLeft = button.style.paddingRight = 0;
+        return button;
+    }
+
+    // 16x16 도트 톱니 (흰색) - 그림 파일 없이 코드로 그림
+    private static Texture2D _gear; // 한 번만 만듦
+    private static Texture2D GearTexture()
+    {
+        if (_gear != null) return _gear;
+        string[] rows =
+        {
+            "......####......",
+            "......####......",
+            "..##.######.##..",
+            "..############..",
+            "...##########...",
+            ".#####....#####.",
+            ".####......####.",
+            "#####......#####",
+            "#####......#####",
+            ".####......####.",
+            ".#####....#####.",
+            "...##########...",
+            "..############..",
+            "..##.######.##..",
+            "......####......",
+            "......####......",
+        };
+        _gear = new Texture2D(16, 16, TextureFormat.RGBA32, false, false) { filterMode = FilterMode.Point }; // sRGB 텍스처
+        Color ink = Color.white; // 흰색
+        for (int y = 0; y < 16; y++)
+            for (int x = 0; x < 16; x++)
+                _gear.SetPixel(x, 15 - y, rows[y][x] == '#' ? ink : Color.clear); // 위에서부터 그린 그림을 아래부터 채움
+        _gear.Apply();
+        return _gear;
+    }
+
+    // ---- 통계 ----
+
+    private void BuildStatsPanel(VisualElement root)
+    {
+        _statsPanel = CreatePopupFrame(CloseStatsPanel, out Label title);
+        title.text = "통계";
+
+        // 1쪽: 기록 | 능력치, 2쪽: 오브젝트별 부순 횟수 (두 칸). 양옆 화살표로 넘기고 아래에 "1 / 2"
+        var columns = StatPage(); // 1쪽
+        var left = StatColumn(columns, "기록");
+        left.style.marginRight = 48;
+        UpgradeManager U() => UpgradeManager.Instance;
+        AddStat(left, "플레이 시간", () => { var t = System.TimeSpan.FromSeconds(GameStats.PlaySeconds); return $"{(int)t.TotalHours}시간 {t.Minutes}분"; });
+        AddStat(left, "부순 오브젝트", () => NumberFormatUtil.Format(GameStats.ObjectsBroken) + "개");
+        AddStat(left, "직접 클릭", () => NumberFormatUtil.Format(GameStats.Clicks) + "번");
+        AddStat(left, "치명타", () => NumberFormatUtil.Format(GameStats.Crits) + "번");
+        AddStat(left, "슈퍼 크리티컬", () => NumberFormatUtil.Format(GameStats.SuperCrits) + "번");
+        AddStat(left, "보스 처치", () => NumberFormatUtil.Format(GameStats.BossClears) + "번");
+        AddStat(left, "얻은 조각", () => NumberFormatUtil.Format(CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalPieces : 0));
+        AddStat(left, "얻은 결정", () => NumberFormatUtil.Format(CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalCrystals : 0));
+        AddStat(left, "해금한 오브젝트", () => UnlockedText(ObjectManager.Instance != null ? ObjectManager.Instance.ObjectCount : 0, i => ObjectManager.Instance.IsUnlocked(i)));
+        AddStat(left, "해금한 무기", () => UnlockedText(WeaponManager.Instance != null ? WeaponManager.Instance.WeaponCount : 0, i => WeaponManager.Instance.IsUnlocked(i)));
+
+        var right = StatColumn(columns, "능력치");
+        AddStat(right, "클릭 데미지", () =>
+        {
+            if (WeaponManager.Instance == null || U() == null) return "-";
+            return NumberFormatUtil.Format(WeaponManager.Instance.CurrentClickDamage + U().GetClickDamageBonus(WeaponManager.Instance.EquippedIndex));
+        });
+        AddStat(right, "치명타 확률", () => U() != null ? Chance(U().CritChanceValue) : "-");
+        AddStat(right, "치명타 데미지", () => U() != null ? $"x{U().CritMultiplierValue:0.##}" : "-");
+        AddStat(right, "슈퍼 크리티컬 확률", () => U() != null ? Chance(U().LuckyClickChance) : "-");
+        AddStat(right, "슈퍼 크리티컬 데미지", () => U() != null ? $"x{U().CritMultiplierValue * 2f:0.##}" : "-");
+        AddStat(right, "더블 클릭 확률", () => U() != null && U().DoubleClickIsUnlocked ? Chance(U().DoubleClickChanceValue) : "잠김");
+        AddStat(right, "조각 획득 보너스", () => U() != null ? $"+{Mathf.RoundToInt((U().PieceGainMultiplier() - 1f) * 100f)}%" : "-");
+        AddStat(right, "결정 확률", () => U() != null ? Chance(U().CrystalDropChance) : "-");
+        AddStat(right, "결정 개수", () => U() != null ? $"{U().CrystalDropAmount}개" : "-");
+        AddStat(right, "커서 범위", () => U() != null && U().HoverPickupIsUnlocked ? $"{U().CursorRadius:0.##}" : "잠김");
+
+        // 2쪽: 오브젝트별 부순 횟수 - 앞 절반 / 뒤 절반
+        var objectsPage = StatPage();
+        int count = ObjectManager.StaticObjectCount; // 오브젝트 종류 수
+        int half = (count + 1) / 2; // 왼쪽 칸에 들어갈 수
+        var objLeft = StatColumn(objectsPage, "부순 횟수");
+        objLeft.style.marginRight = 48;
+        var objRight = StatColumn(objectsPage, "부순 횟수");
+        for (int i = 0; i < count; i++)
+        {
+            int index = i; // 람다에 넘길 번호
+            AddStat(i < half ? objLeft : objRight, ObjectManager.StaticObjectNameAt(index),
+                () => ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(index) && GameStats.BrokenOf(index) == 0
+                    ? "???" : NumberFormatUtil.Format(GameStats.BrokenOf(index)) + "번"); // 아직 못 본 오브젝트는 가림
+        }
+
+        // 양옆 화살표 + 아래 쪽수
+        Button prev = StatArrow("<", -1);
+        prev.style.left = 40;
+        Button next = StatArrow(">", 1);
+        next.style.right = 40;
+        _statPageLabel = new Label();
+        _statPageLabel.pickingMode = PickingMode.Ignore;
+        _statPageLabel.style.position = Position.Absolute;
+        _statPageLabel.style.left = 0;
+        _statPageLabel.style.right = 0;
+        _statPageLabel.style.bottom = 36;
+        _statPageLabel.style.fontSize = 36;
+        _statPageLabel.style.color = PixelStyle.Text.linear;
+        _statPageLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+        _statsPanel.Add(_statPageLabel);
+
+        root.Add(_statsPanel);
+    }
+
+    private readonly List<VisualElement> _statPages = new List<VisualElement>(); // 통계 쪽들
+    private int _statPage; // 지금 보고 있는 쪽
+    private Label _statPageLabel; // 아래 "1 / 2"
+
+    // 두 칸이 나란히 놓이는 통계 한 쪽
+    private VisualElement StatPage()
+    {
+        var page = new VisualElement();
+        page.style.position = Position.Absolute;
+        page.style.left = 0;
+        page.style.right = 0;
+        page.style.top = 110;
+        page.style.flexDirection = FlexDirection.Row;
+        page.style.justifyContent = Justify.Center;
+        page.style.alignItems = Align.FlexStart;
+        _statsPanel.Add(page);
+        _statPages.Add(page);
+        return page;
+    }
+
+    // 화면 가운데 높이의 쪽 넘김 화살표
+    private Button StatArrow(string text, int step)
+    {
+        var button = new Button(() => ShowStatPage(_statPage + step)) { text = text };
+        button.focusable = false;
+        button.style.position = Position.Absolute;
+        button.style.top = Length.Percent(50);
+        button.style.width = 90;
+        button.style.height = 90;
+        button.style.fontSize = 48;
+        PixelStyle.Button(button, PixelStyle.Mint);
+        _statsPanel.Add(button);
+        return button;
+    }
+
+    // page쪽만 보이게 (양 끝에서 넘기면 반대쪽 끝으로)
+    private void ShowStatPage(int page)
+    {
+        _statPage = (page % _statPages.Count + _statPages.Count) % _statPages.Count;
+        for (int i = 0; i < _statPages.Count; i++)
+            _statPages[i].style.display = i == _statPage ? DisplayStyle.Flex : DisplayStyle.None;
+        _statPageLabel.text = $"{_statPage + 1} / {_statPages.Count}";
+    }
+
+    // 머리글이 달린 통계 한 칸
+    private static VisualElement StatColumn(VisualElement parent, string header)
+    {
+        var column = new VisualElement();
+        column.style.alignItems = Align.Center;
+        column.Add(PixelStyle.CardHeader(header));
+        parent.Add(column);
+        return column;
+    }
+
+    // "이름 ........ 값" 한 줄
+    private void AddStat(VisualElement column, string label, System.Func<string> get)
+    {
+        var row = new VisualElement(); // 한 줄
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.alignItems = Align.Center;
+        row.style.width = 640;
+        row.style.paddingLeft = 20;
+        row.style.paddingRight = 20;
+        row.style.paddingTop = 4;
+        row.style.paddingBottom = 8;
+        row.style.marginBottom = 8; // 한 칸에 10줄 + 아래 쪽수가 화면에 들어가게
+        PixelStyle.Frame(row, PixelStyle.Card);
+
+        var name = new Label(label); // 항목 이름
+        name.style.flexGrow = 1;
+        name.style.fontSize = 36;
+        name.style.color = PixelStyle.MutedText.linear;
+        row.Add(name);
+
+        var value = new Label(); // 값
+        value.style.fontSize = 36;
+        value.style.color = PixelStyle.Text.linear;
+        row.Add(value);
+        _statRows.Add((value, get));
+        column.Add(row);
+    }
+
+    private static string Chance(float chance) => $"{chance * 100f:0.##}%";
+
+    private static string UnlockedText(int count, System.Func<int, bool> unlocked)
+    {
+        int n = 0; // 해금된 수
+        for (int i = 0; i < count; i++) if (unlocked(i)) n++;
+        return $"{n} / {count}";
+    }
+
+    private void OpenStatsPanel()
+    {
+        foreach (var (value, get) in _statRows) value.text = get();
+        ShowStatPage(0);
+        _statsPanel.style.display = DisplayStyle.Flex;
+        RefreshButtonRowVisibility();
+        Time.timeScale = 0f;
+        OnSelectorPanelToggled?.Invoke(true);
+    }
+
+    private void CloseStatsPanel()
+    {
+        _statsPanel.style.display = DisplayStyle.None;
+        RefreshButtonRowVisibility();
+        Time.timeScale = 1f;
+        OnSelectorPanelToggled?.Invoke(false);
+    }
+}
