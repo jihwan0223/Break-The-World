@@ -16,7 +16,7 @@ public class MainMenuUI : MonoBehaviour
     private const string SaveFileName = "savedata.json"; // SaveManager의 기본 저장 파일명과 반드시 같아야 "새 게임"이 실제로 지워짐
     private const string MasterVolumeKey = "MasterVolume"; // 마스터 음량을 저장할 PlayerPrefs 키
     private const float ShatterDuration = 0.6f; // 깨진 조각이 사라지는 시간(초)
-    private const float StartDelay = 0.3f; // 버튼이 깨진 뒤 게임 씬으로 넘어가기까지 시간(초) - 조각이 다 사라지기 전에 넘어감
+    private const float StartDelay = 0.6f; // 버튼이 깨진 뒤 화면이 검게 덮이기 시작할 때까지 시간(초) - 조각이 거의 다 떨어질 때쯤
     private const int ShardRows = 3; // 버튼을 가로로 자르는 줄 수
     private const int ShardColumns = 6; // 한 줄을 세로로 자르는 조각 수
     private const float ShardGravity = 2600f; // 조각이 아래로 떨어지는 가속도(px/초²)
@@ -374,12 +374,12 @@ public class MainMenuUI : MonoBehaviour
         if (File.Exists(SavePath))
             File.Delete(SavePath); // 파일이 없으면 SaveManager.Load()가 그냥 기본값으로 시작함 (기존 동작 그대로 재사용)
 
-        SceneManager.LoadScene(MainSceneName);
+        SceneFader.FadeToScene(MainSceneName);
     }
 
     private void LoadGame()
     {
-        SceneManager.LoadScene(MainSceneName);
+        SceneFader.FadeToScene(MainSceneName);
     }
 
     private void QuitGame()
@@ -567,7 +567,7 @@ public class MainMenuUI : MonoBehaviour
         AddOptionRow(options, "프레임 제한", () =>
         {
             int fps = GameSettings.FpsOptions[GameSettings.FpsIndex]; // 제한 값
-            return fps < 0 ? "모니터 맞춤" : $"{fps} FPS";
+            return fps < 0 ? "무제한" : $"{fps} FPS";
         }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length);
 
         var gameHeader = PixelStyle.CardHeader("게임"); // 게임 항목 머리글

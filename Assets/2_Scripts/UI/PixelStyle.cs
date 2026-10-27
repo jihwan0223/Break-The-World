@@ -65,6 +65,8 @@ public static class PixelStyle
         Paint(element, Kind.Frame, tone, dot);
     }
 
+    public const float OutlinedLetterSpacing = 6f; // 굵은 흰 글씨 글자 사이 간격(px) - 테두리끼리 겹쳐 뭉개지지 않게
+
     // 흰 글씨 + 진한 테두리 (Keep on Mining처럼 만화풍으로 또렷하게). 테두리가 먹는 SDF 글꼴로 바꿔 씀
     public static void OutlinedText(VisualElement element, Color outline, float width = 0.35f)
     {
@@ -74,6 +76,7 @@ public static class PixelStyle
         element.style.unityFontStyleAndWeight = FontStyle.Bold; // 굵게 해야 테두리가 그려짐
         element.style.unityTextOutlineColor = outline.linear;
         element.style.unityTextOutlineWidth = width;
+        element.style.letterSpacing = OutlinedLetterSpacing;
     }
 
     // 카드 위 작은 제목 "— 제목 —" (Keep on Mining의 카드 머리글처럼)
@@ -127,6 +130,7 @@ public static class PixelStyle
         text.fontStyle = TMPro.FontStyles.Bold;
         text.outlineColor = tone.text;
         text.outlineWidth = 0.3f;
+        text.characterSpacing = 3f; // 글자 사이 간격 (UI 툴킷 굵은 글씨와 비슷하게, 1/100 em 단위)
         text.margin = new Vector4(0f, 0f, 0f, Depth * dot); // 아래 두께 위 면 가운데에
     }
 

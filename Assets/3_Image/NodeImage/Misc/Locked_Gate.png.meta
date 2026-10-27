@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c56cf227c1f73f3468915ce99806be98
+guid: cf41f0fed7949ab4fadf02f5ccc6fd0c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3653442440414617342
-    second: Fook_0
+      213: -4952329276298916384
+    second: Locked_Gate_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,7 +72,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 1024
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Fook_0
+      name: Locked_Gate_0
       rect:
         serializedVersion: 2
-        x: 10
+        x: 0
         y: 0
-        width: 13
-        height: 31
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: efedf34fa82a3b230800000000000000
-      internalID: 3653442440414617342
+      spriteID: 0ed8f6303cac54bb0800000000000000
+      internalID: -4952329276298916384
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Fook_0: 3653442440414617342
+      Locked_Gate_0: -4952329276298916384
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

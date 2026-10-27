@@ -17,6 +17,98 @@ public partial class SidePanelUI
     private Button _confirmSave; // "저장하고 ~"
     private Button _confirmNoSave; // "저장 안 하고 ~"
     private System.Action _confirmLeave; // 확인창에서 고른 뒤 실제로 나가는 동작 (종료 또는 메뉴로)
+    private VisualElement _demoBox; // 마지막 보스(회사)를 잡으면 뜨는 데모 클리어 창
+    private static SidePanelUI _instance; // 데모 클리어 창을 밖(ZoneBreaker)에서 띄우려고 들고 있음
+    private const float DemoBoxDelay = 2.5f; // 보스를 잡고 슬로우 모션/부서짐 연출이 끝날 때까지 기다렸다 띄우는 시간(초)
+
+    // ---- 데모 클리어 ----
+
+    public static void ShowDemoComplete()
+    {
+        if (_instance != null) _instance.StartCoroutine(_instance.ShowDemoBoxLater());
+    }
+
+    private System.Collections.IEnumerator ShowDemoBoxLater()
+    {
+        yield return new WaitForSecondsRealtime(DemoBoxDelay);
+        _demoBox.style.display = DisplayStyle.Flex;
+    }
+
+    private void CloseDemoBox() => _demoBox.style.display = DisplayStyle.None;
+
+    // 반투명 덮개 + 가운데 크림 창: 리본 제목, 감사 문구, [메인 메뉴로] [계속하기]
+    private void BuildDemoBox(VisualElement root)
+    {
+        _instance = this;
+        _demoBox = new VisualElement(); // 반투명 검은 덮개 (뒤 게임 클릭 막음)
+        _demoBox.style.position = Position.Absolute;
+        _demoBox.style.left = _demoBox.style.right = _demoBox.style.top = _demoBox.style.bottom = 0;
+        _demoBox.style.backgroundColor = new Color(0f, 0f, 0f, 0.55f);
+        _demoBox.style.alignItems = Align.Center;
+        _demoBox.style.justifyContent = Justify.Center;
+        _demoBox.style.display = DisplayStyle.None;
+        _demoBox.RegisterCallback<PointerEnterEvent>(_ => UIPointerGuard.IsPointerOverUI = true);
+        _demoBox.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
+        root.Add(_demoBox);
+
+        var window = new VisualElement(); // 가운데 크림 창
+        window.style.alignItems = Align.Center;
+        window.style.paddingTop = 40;
+        window.style.paddingBottom = 40;
+        window.style.paddingLeft = 64;
+        window.style.paddingRight = 64;
+        PixelStyle.Frame(window, PixelStyle.Window, 6f);
+        _demoBox.Add(window);
+
+        var title = new Label("데모 완료!"); // 분홍 리본 제목 (팝업 창 제목과 같은 모양) - "클"은 테두리 폰트에서 굵게 하면 뭉개져서 안 씀
+        title.style.fontSize = 56;
+        title.style.paddingLeft = 56;
+        title.style.paddingRight = 56;
+        title.style.paddingTop = 12;
+        title.style.paddingBottom = 18; // 리본 아래 그늘 줄만큼 더
+        title.style.marginBottom = 36;
+        title.style.unityFontStyleAndWeight = FontStyle.Bold;
+        PixelStyle.Frame(title, PixelStyle.Ribbon);
+        PixelStyle.OutlinedText(title, PixelStyle.Ribbon.text);
+        window.Add(title);
+
+        string[] lines = // 다른 게임 데모 끝 화면에서 흔히 쓰는 감사 문구
+        {
+            "데모를 끝까지 플레이해 주셔서 감사합니다!",
+            "정식 버전에서는 더 많은 맵과 오브젝트가 기다리고 있어요.",
+            "정식 출시 때 다시 만나요!",
+        };
+        foreach (string text in lines)
+        {
+            var line = new Label(text); // 문구 한 줄
+            line.style.fontSize = 36;
+            line.style.color = PixelStyle.Text.linear;
+            line.style.unityTextAlign = TextAnchor.MiddleCenter;
+            line.style.marginBottom = 10;
+            window.Add(line);
+        }
+
+        var hint = new Label("계속하기를 누르면 지금 진행 그대로 이어서 할 수 있어요."); // 옅은 안내
+        hint.style.fontSize = 28;
+        hint.style.color = PixelStyle.MutedText.linear;
+        hint.style.marginTop = 14;
+        hint.style.marginBottom = 32;
+        window.Add(hint);
+
+        var row = new VisualElement(); // 버튼 줄
+        row.style.flexDirection = FlexDirection.Row;
+        window.Add(row);
+        Button menu = CreateButton("메인 메뉴로", PixelStyle.Sky, () => { SaveManager.Instance?.SaveNow(); GoToMainMenu(); });
+        Button resume = CreateButton("계속하기", PixelStyle.Mint, CloseDemoBox);
+        foreach (Button b in new[] { menu, resume })
+        {
+            b.style.width = 340;
+            b.style.height = 96;
+            b.style.marginLeft = 10;
+            b.style.marginRight = 10;
+            row.Add(b);
+        }
+    }
 
     // ---- 설정 ----
 
@@ -64,7 +156,7 @@ public partial class SidePanelUI
         AddSettingRow(right, "프레임 제한", () =>
         {
             int fps = GameSettings.FpsOptions[GameSettings.FpsIndex]; // 제한 값
-            return fps < 0 ? "모니터 맞춤" : $"{fps} FPS";
+            return fps < 0 ? "무제한" : $"{fps} FPS";
         }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length);
         var gameHeader = PixelStyle.CardHeader("게임"); // 게임 항목 머리글
         gameHeader.style.marginTop = 10;
@@ -131,8 +223,8 @@ public partial class SidePanelUI
         Button back = CreateButton("돌아가기", PixelStyle.Sky, () => _confirmBox.style.display = DisplayStyle.None);
         foreach (Button b in new[] { _confirmSave, _confirmNoSave, back })
         {
-            b.style.width = 380;
-            b.style.height = 96;
+            b.style.width = 460; // "저장 안 하고 나가기"가 넉넉히 들어가게
+            b.style.height = 100;
             b.style.marginLeft = 8;
             b.style.marginRight = 8;
             row.Add(b);

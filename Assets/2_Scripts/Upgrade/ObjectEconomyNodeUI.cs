@@ -17,6 +17,9 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     [SerializeField] private Image doneOverlay; // (미사용) 예전엔 해금 완료/최대 레벨이면 켜두던 초록 오버레이 - 지금은 항상 꺼둠
     [Tooltip("해금 완료(또는 획득량 1레벨 이상)되면 바뀔 스프라이트 (비워두면 기본 이미지 그대로 유지)")]
     [SerializeField] private Sprite upgradedSprite;
+    [Tooltip("이 오브젝트를 해금해야 열리는 노드 (비우면 안 씀). 그 전엔 자물쇠 그림 + 제목/설명 ???, 해금하는 순간 트리 카메라가 와서 자물쇠가 깨지며 열림. 열리면 대상 오브젝트가 아직 없어도 살 수 있음")]
+    [ObjectNameField] [SerializeField] private string gateObjectName;
+    [SerializeField] private Sprite lockedSprite; // 열리기 전 자물쇠 그림
 
     // 선행(부모) 노드는 이 노드로 들어오는 UpgradeTreeLink로 정함 (선 하나 = 선행 하나). 일반 업그레이드 노드에서 오든
     // 다른 해금/획득 노드에서 오든 상관없음. 아래 anchor 필드는 링크가 없을 때만 쓰는 옛날 방식 폴백.
@@ -49,7 +52,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     public bool CanBuy()
     {
         ObjectManager objects = ObjectManager.Instance; // 해금/획득 상태와 가격 조회
-        if (objects == null || CurrencyManager.Instance == null || objectIndex <= 0) return false;
+        if (objects == null || CurrencyManager.Instance == null || objectIndex <= 0 || IsGateClosed) return false;
 
         long cost; // 이번에 내야 하는 조각
         if (isGain)
@@ -127,11 +130,43 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         if (_icon != null) _baseSprite = _icon.sprite;
     }
 
-    // 해금 완료(또는 획득량 최대 레벨)면 upgradedSprite로, 아니면 원래 스프라이트로
+    private void RefreshIconAfterGate() => UpdateIcon();
+
+    // 관문 오브젝트(gateObjectName)를 아직 해금 못해서 자물쇠로 가려져 있는지
+    public bool IsGateClosed => !string.IsNullOrEmpty(gateObjectName) && ObjectManager.Instance != null
+        && !ObjectManager.Instance.IsUnlocked(ObjectManager.StaticIndexOfName(gateObjectName));
+    public string GateObjectName => gateObjectName;
+    private bool _gateWasClosed; // 직전 Refresh 때 자물쇠였는지 - 열리는 순간을 한 번만 잡으려고
+    private bool _gateRevealPending; // 카메라가 오는 동안은 자물쇠 그림을 유지
+
+    // 관문이 방금 열렸으면 트리 카메라를 이 노드로 옮긴 뒤 자물쇠가 깨지며 열림
+    private void CheckGateOpened(bool animateReveal)
+    {
+        bool closed = IsGateClosed; // 지금 자물쇠인지
+        bool justOpened = animateReveal && _refreshedOnce && _gateWasClosed && !closed;
+        _gateWasClosed = closed;
+        if (!justOpened) return;
+        _gateRevealPending = true;
+        if (UpgradeTreeUI.Instance != null) UpgradeTreeUI.Instance.PlayGateReveal(Rect, FinishGateReveal);
+        else FinishGateReveal();
+    }
+
+    // 카메라가 도착한 순간: 자물쇠 -> 원래 그림, 흔들리며 크게 터짐
+    private void FinishGateReveal()
+    {
+        _gateRevealPending = false;
+        RefreshIconAfterGate();
+        PlayShake();
+        NodePurchaseEffect.Play(_rect, NodePurchaseEffect.NormalColor, true);
+    }
+
+    // 해금 완료(또는 획득량 최대 레벨)면 upgradedSprite로, 아니면 원래 스프라이트로. 관문이 닫혀 있으면 자물쇠
     private void UpdateIcon()
     {
         CacheIcon();
-        if (_icon == null || upgradedSprite == null) return;
+        if (_icon == null) return;
+        if (lockedSprite != null && (IsGateClosed || _gateRevealPending)) { _icon.sprite = lockedSprite; return; }
+        if (upgradedSprite == null) { _icon.sprite = _baseSprite; return; }
         bool maxed = ObjectManager.Instance != null && (isGain
             ? ObjectManager.Instance.GetGainLevel(objectIndex) >= ObjectManager.MaxGainLevel
             : ObjectManager.Instance.IsUnlocked(objectIndex)); // 더 올릴 게 없는지
@@ -144,7 +179,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
 
         // 이미 해금된 노드는 TryUnlock이 true를 돌려줘서 따로 막음 - 안 그러면 누를 때마다 구매 이펙트가 터짐
         bool alreadyDone = !isGain && ObjectManager.Instance.IsUnlocked(objectIndex);
-        bool success = !alreadyDone && (isGain ? ObjectManager.Instance.TryUpgradeGain(objectIndex) : ObjectManager.Instance.TryUnlock(objectIndex));
+        bool success = !alreadyDone && !IsGateClosed && (isGain ? ObjectManager.Instance.TryUpgradeGain(objectIndex) : ObjectManager.Instance.TryUnlock(objectIndex));
         if (!success)
         {
             PlayDenyShake(); // 못 살 때(이미 해금/최대/조각 부족)는 좌우로 짧게만 흔들림
@@ -176,6 +211,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         // 첫 Refresh(_refreshedOnce=false)는 제외 - 페이지를 처음 열 때 이미 공개돼있던 노드는 흔들지 않음
         bool justRevealed = animateReveal && _refreshedOnce && isRevealed && !_wasRevealed;
         _wasRevealed = isRevealed;
+        CheckGateOpened(animateReveal);
         _refreshedOnce = true;
 
         gameObject.SetActive(isRevealed);
@@ -191,7 +227,12 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
 
         string objectName = ObjectManager.Instance.GetObjectAt(objectIndex).objectName;
 
-        if (!isGain)
+        if (IsGateClosed)
+        {
+            _tooltipText = "???";
+            if (label != null) label.text = _tooltipText;
+        }
+        else if (!isGain)
         {
             bool unlocked = ObjectManager.Instance.IsUnlocked(objectIndex);
 
@@ -238,6 +279,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         if (ObjectManager.Instance == null) return new UpgradeTooltip.Content { title = "" };
 
         string objectName = ObjectManager.Instance.GetObjectAt(objectIndex).objectName;
+        if (IsGateClosed) return new UpgradeTooltip.Content { title = "???", description = "???", level = "" }; // 관문 전엔 전부 가림
 
         if (!isGain)
         {

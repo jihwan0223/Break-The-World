@@ -69,7 +69,8 @@ public partial class SidePanelUI : MonoBehaviour
 
         if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
 
-        if (_panel.style.display == DisplayStyle.Flex) ClosePanel();
+        if (_demoBox.style.display == DisplayStyle.Flex) CloseDemoBox(); // 데모 클리어 창은 ESC = 계속하기
+        else if (_panel.style.display == DisplayStyle.Flex) ClosePanel();
         else if (_debugPanel.style.display == DisplayStyle.Flex) CloseDebugPanel();
         else if (_statsPanel.style.display == DisplayStyle.Flex) CloseStatsPanel();
         else if (_confirmBox.style.display == DisplayStyle.Flex) _confirmBox.style.display = DisplayStyle.None; // 확인창만 닫기
@@ -249,6 +250,7 @@ public partial class SidePanelUI : MonoBehaviour
         buttonRow.Add(settingsButton);
         root.Add(buttonRow);
 
+        BuildDemoBox(root); // 버튼 줄보다 위에 덮이게 마지막에 붙임
         _buttonRow = buttonRow; // OpenPanel/ClosePanel/업그레이드 화면 토글에서 보이기/숨기기 위해 저장해둠
     }
 
@@ -466,14 +468,14 @@ public partial class SidePanelUI : MonoBehaviour
         // 선택 버튼 / 장착됨 표시 - 미리보기 아래. 장착 여부에 따라 둘 중 하나만 보임 (도감 모드에선 둘 다 숨김)
         var selectButton = new Button() { text = "선택" };
         selectButton.style.width = 360;
-        selectButton.style.height = 64;
+        selectButton.style.height = 80;
         selectButton.style.marginTop = 24;
         selectButton.style.fontSize = 24;
         selectButton.style.unityFontStyleAndWeight = FontStyle.Bold;
         PixelStyle.Button(selectButton, PixelStyle.Mint); // 픽셀 입체 버튼
 
         var equippedLabel = new Label("장착됨");
-        equippedLabel.style.height = 64;
+        equippedLabel.style.height = 80;
         equippedLabel.style.marginTop = 24;
         equippedLabel.style.fontSize = 36;
         equippedLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
@@ -624,7 +626,7 @@ public partial class SidePanelUI : MonoBehaviour
 
         var actionButton = new Button();
         actionButton.style.width = 400;
-        actionButton.style.height = 64;
+        actionButton.style.height = 80;
         actionButton.style.marginTop = 24;
         actionButton.style.fontSize = 24;
         actionButton.style.unityFontStyleAndWeight = FontStyle.Bold;

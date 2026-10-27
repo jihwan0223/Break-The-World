@@ -93,6 +93,7 @@ public class UpgradeManager : MonoBehaviour
         public string description;
         public UpgradeEffect effect;
         public int targetObjectIndex;     // AutoClick 계열이 씀 - -1이면 전역
+        public int gateObjectIndex = -1;  // 이 오브젝트를 해금하면 열리는 노드 (-1이면 관문 없음). 열리면 대상 오브젝트 잠김은 무시
         public int targetWeaponIndex;     // ClickDamage가 씀 - -1이면 전역
         public int maxLevel;
         public string prerequisiteId;     // 이 노드가 공개되려면 필요한 다른 노드 id (빈칸 = 루트) - 들어오는 링크로 결정됨. 표시/디버그용
@@ -204,6 +205,7 @@ public class UpgradeManager : MonoBehaviour
                 description = ui.Description,
                 effect = ui.Effect,
                 targetObjectIndex = targetObjectIndex,
+                gateObjectIndex = string.IsNullOrEmpty(ui.GateObjectName) ? -1 : ObjectManager.StaticIndexOfName(ui.GateObjectName),
                 targetWeaponIndex = WeaponManager.StaticIndexOfWeaponName(ui.TargetWeaponName),
                 maxLevel = Mathf.Max(1, ui.MaxLevel),
                 prerequisiteId = prereqs != null ? string.Join(", ", prereqs.ConvertAll(p => p.id)) : null,
@@ -271,6 +273,8 @@ public class UpgradeManager : MonoBehaviour
     public bool IsTargetLocked(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId);
+        if (node != null && node.gateObjectIndex >= 0) // 관문 노드는 관문 오브젝트만 봄 (열리면 대상이 아직 없어도 살 수 있음)
+            return ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(node.gateObjectIndex);
         return node != null && (IsTargetObjectLocked(node) || IsTargetWeaponLocked(node));
     }
 
@@ -279,6 +283,7 @@ public class UpgradeManager : MonoBehaviour
     {
         UpgradeNode node = GetNode(nodeId); // 이 노드가 가리키는 오브젝트/무기를 찾기 위함
         if (node == null) return "아직 해금할 수 없습니다"; // 못 찾으면 기본 문구로 대체
+        if (node.gateObjectIndex >= 0) return "???"; // 관문 노드는 열리기 전까지 전부 가림
 
         if (IsTargetObjectLocked(node))
             return ObjectManager.Instance.NextRequiredUnlockHintText(node.targetObjectIndex);

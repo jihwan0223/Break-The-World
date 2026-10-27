@@ -252,6 +252,7 @@ public partial class ZoneBreaker
         }
         SaveManager.Instance?.SaveNow();
         BossChallengeUI.PlaySlowMotion();
+        if (IsFinalBoss) SidePanelUI.ShowDemoComplete(); // 마지막 맵 보스 = 데모 끝
     }
 
     // 시간 초과/포기/맵 이동 - 체력이 다시 차고 버튼이 다시 뜸

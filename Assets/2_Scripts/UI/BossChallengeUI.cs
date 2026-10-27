@@ -157,8 +157,8 @@ public class BossChallengeUI : MonoBehaviour
 
         // 포기 - 체력바 바로 오른쪽 (작은 분홍 버튼)
         _giveUpButton = new Button(() => ZoneBreaker.ActiveBoss?.GiveUpBoss()) { text = "포기" };
-        _giveUpButton.style.width = 110;
-        _giveUpButton.style.height = 64;
+        _giveUpButton.style.width = 130;
+        _giveUpButton.style.height = 80;
         _giveUpButton.style.marginLeft = 18;
         _giveUpButton.style.fontSize = 24;
         PixelStyle.Button(_giveUpButton, PixelStyle.Pink);

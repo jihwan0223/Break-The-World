@@ -27,6 +27,9 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     [Tooltip("1레벨 이상 찍으면 바뀔 스프라이트 (비워두면 기본 이미지 그대로 유지)")]
     [SerializeField] private Sprite upgradedSprite;
+    [Tooltip("이 오브젝트를 해금해야 열리는 노드 (비우면 안 씀). 그 전엔 자물쇠 그림 + 제목/설명 ???, 해금하는 순간 트리 카메라가 와서 자물쇠가 깨지며 열림. 열리면 대상 오브젝트가 아직 없어도 살 수 있음")]
+    [ObjectNameField] [SerializeField] private string gateObjectName;
+    [SerializeField] private Sprite lockedSprite; // 열리기 전 자물쇠 그림
 
     // 비용 한 줄 = 조각 또는 결정 + 레벨별 증가 공식. 노드 하나가 여러 줄을 가질 수 있음
     [Serializable]
@@ -82,12 +85,44 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (_icon != null) _baseSprite = _icon.sprite;
     }
 
-    // 최대 레벨(만렙)이면 upgradedSprite(테두리 색 바뀐 그림)로, 아니면 원래 스프라이트로
+    // 최대 레벨(만렙)이면 upgradedSprite(테두리 색 바뀐 그림)로, 아니면 원래 스프라이트로. 관문이 닫혀 있으면 자물쇠
     private void UpdateIcon(int level)
     {
         CacheIcon();
-        if (_icon == null || upgradedSprite == null) return;
+        if (_icon == null) return;
+        if (lockedSprite != null && (IsGateClosed || _gateRevealPending)) { _icon.sprite = lockedSprite; return; }
+        if (upgradedSprite == null) { _icon.sprite = _baseSprite; return; }
         _icon.sprite = level >= maxLevel ? upgradedSprite : _baseSprite;
+    }
+
+    private void RefreshIconAfterGate() => UpdateIcon(UpgradeManager.Instance != null ? UpgradeManager.Instance.GetLevel(Id) : 0);
+
+    // 관문 오브젝트(gateObjectName)를 아직 해금 못해서 자물쇠로 가려져 있는지
+    public bool IsGateClosed => !string.IsNullOrEmpty(gateObjectName) && ObjectManager.Instance != null
+        && !ObjectManager.Instance.IsUnlocked(ObjectManager.StaticIndexOfName(gateObjectName));
+    public string GateObjectName => gateObjectName;
+    private bool _gateWasClosed; // 직전 Refresh 때 자물쇠였는지 - 열리는 순간을 한 번만 잡으려고
+    private bool _gateRevealPending; // 카메라가 오는 동안은 자물쇠 그림을 유지
+
+    // 관문이 방금 열렸으면 트리 카메라를 이 노드로 옮긴 뒤 자물쇠가 깨지며 열림
+    private void CheckGateOpened(bool animateReveal)
+    {
+        bool closed = IsGateClosed; // 지금 자물쇠인지
+        bool justOpened = animateReveal && _refreshedOnce && _gateWasClosed && !closed;
+        _gateWasClosed = closed;
+        if (!justOpened) return;
+        _gateRevealPending = true;
+        if (UpgradeTreeUI.Instance != null) UpgradeTreeUI.Instance.PlayGateReveal(Rect, FinishGateReveal);
+        else FinishGateReveal();
+    }
+
+    // 카메라가 도착한 순간: 자물쇠 -> 원래 그림, 흔들리며 크게 터짐
+    private void FinishGateReveal()
+    {
+        _gateRevealPending = false;
+        RefreshIconAfterGate();
+        PlayShake();
+        NodePurchaseEffect.Play(_rect, NodePurchaseEffect.NormalColor, true);
     }
 
     // 이 노드가 아직 해금 안 된 오브젝트/무기 대상이라 툴팁을 "???"로 가려야 하는지 - 그걸 해금하면 원래 설명으로 돌아옴
@@ -244,6 +279,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         bool justRevealed = animateReveal && _refreshedOnce && isRevealed && !_wasRevealed;
         _wasRevealed = isRevealed;
+        CheckGateOpened(animateReveal);
         _refreshedOnce = true;
 
         gameObject.SetActive(isRevealed);

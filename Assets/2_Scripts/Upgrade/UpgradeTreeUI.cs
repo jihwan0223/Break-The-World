@@ -43,8 +43,8 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
 
         Instance = this;
         CacheNodes();
-        StyleButton("CloseButton", PixelStyle.Pink, "X", new Vector2(64f, 64f));
-        StyleButton("CameraResetButton", PixelStyle.Mint, "카메라 리셋", new Vector2(300f, 64f));
+        StyleButton("CloseButton", PixelStyle.Pink, "X", new Vector2(84f, 84f));
+        StyleButton("CameraResetButton", PixelStyle.Mint, "카메라 리셋", new Vector2(300f, 90f));
     }
 
     // 닫기/카메라 리셋 버튼을 무기·도감 창과 같은 픽셀 버튼으로 입힘
@@ -59,7 +59,8 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
             if (text != null)
             {
                 text.text = label;
-                text.fontSize = 28;
+                text.enableAutoSizing = false; // 씬에서 자동 크기가 켜져 있어 글씨가 버튼을 꽉 채웠음
+                text.fontSize = 32; // 설정 창 버튼(36px, 높이 96)과 비슷한 비율
                 text.alignment = TMPro.TextAlignmentOptions.Center;
             }
             return;
@@ -98,6 +99,11 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
     // SetActive(false)로 꺼질 때마다(=닫힐 때마다) 호출됨
     void OnDisable()
     {
+        // 카메라 이동 중에 창을 닫으면 코루틴이 멈추므로, 기다리던 자물쇠 열림을 바로 끝냄 (그림이 자물쇠로 남지 않게)
+        System.Action pending = _pendingReveals; // 아직 안 끝난 열림들
+        _pendingReveals = null;
+        pending?.Invoke();
+
         if (pauseGameWhileOpen)
             Time.timeScale = 1f; // 멈춰뒀던 게임 시간을 다시 정상 속도로
 
@@ -162,6 +168,50 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         content.localPosition = new Vector3(newLocalPos.x, newLocalPos.y, content.localPosition.z);
 
         content.localScale = new Vector3(newScale, newScale, 1f);
+    }
+
+    // 관문 노드가 열릴 때: 카메라가 그 노드로 부드럽게 이동하며 확대한 뒤 onArrive(자물쇠 깨짐) 호출
+    public void PlayGateReveal(RectTransform node, System.Action onArrive)
+    {
+        if (content == null || !isActiveAndEnabled) { onArrive?.Invoke(); return; }
+        _pendingReveals += onArrive;
+        StartCoroutine(GateRevealRoutine(node, onArrive));
+    }
+
+    private System.Action _pendingReveals; // 카메라가 아직 도착 안 한 자물쇠 열림들 (창이 닫히면 바로 끝냄)
+
+    private System.Collections.IEnumerator GateRevealRoutine(RectTransform node, System.Action onArrive)
+    {
+        const float moveSeconds = 0.9f; // 이동+확대 시간(초)
+        const float revealZoom = 1.1f; // 도착했을 때 배율
+        yield return new WaitForSecondsRealtime(0.25f); // 구매 연출을 잠깐 보여준 뒤 출발
+        Vector2 fromPos = content.anchoredPosition; // 출발 팬
+        float fromZoom = content.localScale.x; // 출발 배율
+        Vector2 toPos = CenteredAnchoredPosition(node, revealZoom); // 노드가 정중앙에 오는 팬
+        for (float t = 0f; t < moveSeconds; t += Time.unscaledDeltaTime)
+        {
+            float k = Mathf.SmoothStep(0f, 1f, t / moveSeconds); // 부드럽게 출발/도착
+            float zoom = Mathf.Lerp(fromZoom, revealZoom, k); // 이번 프레임 배율
+            content.localScale = new Vector3(zoom, zoom, 1f);
+            _zoomTarget = zoom; // 휠 줌 보간이 끼어들지 않게
+            content.anchoredPosition = Vector2.Lerp(fromPos, toPos, k);
+            yield return null;
+        }
+        content.localScale = new Vector3(revealZoom, revealZoom, 1f);
+        _zoomTarget = revealZoom;
+        content.anchoredPosition = toPos;
+        _pendingReveals -= onArrive;
+        onArrive?.Invoke();
+    }
+
+    // node가 zoom 배율에서 뷰포트 정중앙에 오는 content.anchoredPosition
+    private Vector2 CenteredAnchoredPosition(RectTransform node, float zoom)
+    {
+        RectTransform viewport = content.parent as RectTransform; // content를 담고 있는 뷰포트
+        if (viewport == null) return content.anchoredPosition;
+        Vector2 nodeLocalInContent = content.InverseTransformPoint(node.position); // 노드의 content 기준 언스케일 좌표
+        Vector2 viewportHalfSize = new Vector2(viewport.rect.width * 0.5f, -viewport.rect.height * 0.5f); // 뷰포트 정중앙
+        return viewportHalfSize - nodeLocalInContent * zoom;
     }
 
     // "카메라 초기화" 버튼에 연결 - centerNodeId 노드가 뷰포트 정중앙에 오도록 팬을 매번 새로 계산하고, 줌은 defaultZoom으로 되돌림

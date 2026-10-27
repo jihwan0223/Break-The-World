@@ -16,7 +16,7 @@ public static class GameSettings
     private const string ShakeKey = "ScreenShake"; // 화면 흔들림 켜기(1)/끄기(0)
     private const string DamageNumbersKey = "DamageNumbers"; // 데미지 숫자 켜기(1)/끄기(0)
 
-    public static readonly int[] FpsOptions = { 30, 60, 120, -1 }; // 프레임 제한 선택지 (-1 = 화면 주사율에 맞춤)
+    public static readonly int[] FpsOptions = { 30, 60, 120, 144, -1 }; // 프레임 제한 선택지 (-1 = 무제한)
 
     private const string MenuSceneName = "MenuScene"; // 배경음악이 나오는 씬
     private static AudioSource _bgm; // 배경음악 재생기 (씬이 바뀌어도 남아 있음)
@@ -108,8 +108,8 @@ public static class GameSettings
     private static void ApplyFrameRate()
     {
         int fps = FpsOptions[FpsIndex]; // 제한 값
-        QualitySettings.vSyncCount = fps < 0 ? 1 : 0; // 무제한 대신 화면 주사율에 맞춤
-        Application.targetFrameRate = fps < 0 ? -1 : fps;
+        QualitySettings.vSyncCount = 0; // 수직 동기화 끔 - 제한 값(또는 무제한)을 그대로 따름
+        Application.targetFrameRate = fps;
     }
 
     // 메뉴 씬이면 틀고(이미 나오는 중이면 그대로), 게임 씬이면 멈춤
