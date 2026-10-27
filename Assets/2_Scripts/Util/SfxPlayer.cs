@@ -16,7 +16,7 @@ public static class SfxPlayer
     private const int QuietFull = 14; // 이 이상이면 최소 볼륨
     private const float MinBusyVolume = 0.45f; // 연타가 가장 심할 때 볼륨 배율
     private const float PitchJitter = 0.06f; // 피치를 ±이만큼 랜덤으로 흔듦
-    private const float BaseVolume = 0.6f; // 오브젝트 타격/부서짐 소리 전체 크기 (설정의 효과음 볼륨에 곱해짐)
+    private const float BaseVolume = 0.9f; // 효과음 전체 크기 (설정의 효과음 볼륨에 곱해짐) - 0.6에서 50% 키움
 
     public const string VolumeKey = "SfxVolume"; // 효과음 볼륨을 저장할 PlayerPrefs 키 (메인 메뉴 설정과 공유)
 

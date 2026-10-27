@@ -33,6 +33,7 @@ public class SaveData
     public int objectIndex; // 선택된 오브젝트의 ObjectManager 리스트 인덱스
     public int unlockedMaxZone; // 해금된 마지막 존 번호 (0 = 첫 존만 열림, 옛 세이브에는 없어서 0으로 읽힘)
     public int currentZone; // 보고 있던 존 번호
+    public string[] seenGates; // 자물쇠 노드 중 열리는 연출을 이미 본 노드 이름들 (옛 세이브에는 없음 - 열린 관문은 다음에 창 열 때 연출이 한 번 나옴)
     public bool finalBossCleared; // 마지막 보스(회사)를 잡았는지 (맵1/2 보스는 다음 맵 해금 여부로 판단)
     public SavedUpgrade[] upgrades; // 업그레이드 노드별 레벨 (id 기반, 레벨 0인 건 저장 안 함). 옛 세이브의 upgradeLevels(int[])는 무시됨
 }

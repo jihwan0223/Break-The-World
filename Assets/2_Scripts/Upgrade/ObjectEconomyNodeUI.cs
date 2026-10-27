@@ -136,19 +136,17 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     public bool IsGateClosed => !string.IsNullOrEmpty(gateObjectName) && ObjectManager.Instance != null
         && !ObjectManager.Instance.IsUnlocked(ObjectManager.StaticIndexOfName(gateObjectName));
     public string GateObjectName => gateObjectName;
-    private bool _gateWasClosed; // 직전 Refresh 때 자물쇠였는지 - 열리는 순간을 한 번만 잡으려고
     private bool _gateRevealPending; // 카메라가 오는 동안은 자물쇠 그림을 유지
 
-    // 관문이 방금 열렸으면 트리 카메라를 이 노드로 옮긴 뒤 자물쇠가 깨지며 열림
-    private void CheckGateOpened(bool animateReveal)
+    // 관문이 열려 있는데 아직 열리는 연출을 안 봤으면(보스를 잡은 뒤 처음 창을 열 때) 트리 카메라를 이 노드로 옮긴 뒤 자물쇠가 깨지며 열림.
+    // 트리 창이 켜져 있을 때만 - 꺼진 채로 불리면 연출을 아껴뒀다가 다음에 창을 열 때 보여줌
+    private void CheckGateOpened()
     {
-        bool closed = IsGateClosed; // 지금 자물쇠인지
-        bool justOpened = animateReveal && _refreshedOnce && _gateWasClosed && !closed;
-        _gateWasClosed = closed;
-        if (!justOpened) return;
+        if (string.IsNullOrEmpty(gateObjectName) || IsGateClosed) return;
+        UpgradeTreeUI tree = UpgradeTreeUI.Instance; // 연출을 보여줄 트리 창
+        if (tree == null || !tree.isActiveAndEnabled || !GateReveals.TryMarkSeen(name)) return;
         _gateRevealPending = true;
-        if (UpgradeTreeUI.Instance != null) UpgradeTreeUI.Instance.PlayGateReveal(Rect, FinishGateReveal);
-        else FinishGateReveal();
+        tree.PlayGateReveal(Rect, FinishGateReveal);
     }
 
     // 카메라가 도착한 순간: 자물쇠 -> 원래 그림, 흔들리며 크게 터짐
@@ -157,7 +155,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         _gateRevealPending = false;
         RefreshIconAfterGate();
         PlayShake();
-        NodePurchaseEffect.Play(_rect, NodePurchaseEffect.NormalColor, true);
+        NodePurchaseEffect.Play(Rect, NodePurchaseEffect.NormalColor, true);
     }
 
     // 해금 완료(또는 획득량 최대 레벨)면 upgradedSprite로, 아니면 원래 스프라이트로. 관문이 닫혀 있으면 자물쇠
@@ -211,7 +209,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         // 첫 Refresh(_refreshedOnce=false)는 제외 - 페이지를 처음 열 때 이미 공개돼있던 노드는 흔들지 않음
         bool justRevealed = animateReveal && _refreshedOnce && isRevealed && !_wasRevealed;
         _wasRevealed = isRevealed;
-        CheckGateOpened(animateReveal);
+        CheckGateOpened();
         _refreshedOnce = true;
 
         gameObject.SetActive(isRevealed);

@@ -577,6 +577,8 @@ public class MainMenuUI : MonoBehaviour
             _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
         AddOptionRow(options, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기",
             _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
+        AddOptionRow(options, "숫자 표시", () => GameSettings.NumberUnits ? "영어 단위" : "숫자",
+            _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
 
         Button back = CreateMenuButton("뒤로가기", PixelStyle.Pink, WithClick(CloseSettings)); // 메인 메뉴로
         back.style.marginTop = 16;

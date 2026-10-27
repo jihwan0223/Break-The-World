@@ -15,6 +15,7 @@ public static class GameSettings
     private const string FpsKey = "FpsLimit"; // FpsOptions 번호
     private const string ShakeKey = "ScreenShake"; // 화면 흔들림 켜기(1)/끄기(0)
     private const string DamageNumbersKey = "DamageNumbers"; // 데미지 숫자 켜기(1)/끄기(0)
+    private const string NumberUnitsKey = "NumberUnits"; // 큰 숫자를 영어 단위(K/M/B)로(1) / 콤마 숫자로(0)
 
     public static readonly int[] FpsOptions = { 30, 60, 120, 144, -1 }; // 프레임 제한 선택지 (-1 = 무제한)
 
@@ -51,6 +52,25 @@ public static class GameSettings
     {
         get => PlayerPrefs.GetInt(DamageNumbersKey, 1) == 1;
         set => PlayerPrefs.SetInt(DamageNumbersKey, value ? 1 : 0);
+    }
+
+    // 큰 숫자 표시 방식. 처음엔 기기 언어로 정함 - 만/억을 쓰는 한국어/일본어/중국어는 콤마 숫자, 나머지는 K/M/B 단위
+    public static bool NumberUnits
+    {
+        get => PlayerPrefs.GetInt(NumberUnitsKey, DefaultNumberUnits ? 1 : 0) == 1;
+        set { PlayerPrefs.SetInt(NumberUnitsKey, value ? 1 : 0); OnNumberFormatChanged?.Invoke(); }
+    }
+
+    public static event System.Action OnNumberFormatChanged; // 숫자 표시 방식이 바뀌면 - 화면에 이미 떠 있는 숫자를 다시 쓰게
+
+    private static bool DefaultNumberUnits
+    {
+        get
+        {
+            SystemLanguage lang = Application.systemLanguage; // 기기 언어
+            return lang != SystemLanguage.Korean && lang != SystemLanguage.Japanese && lang != SystemLanguage.Chinese
+                && lang != SystemLanguage.ChineseSimplified && lang != SystemLanguage.ChineseTraditional;
+        }
     }
 
     public static bool Fullscreen

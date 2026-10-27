@@ -163,6 +163,7 @@ public partial class SidePanelUI
         right.Add(gameHeader);
         AddSettingRow(right, "화면 흔들림", () => GameSettings.ScreenShake ? "켜기" : "끄기", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
         AddSettingRow(right, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
+        AddSettingRow(right, "숫자 표시", () => GameSettings.NumberUnits ? "영어 단위" : "숫자", _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
 
         var buttons = new VisualElement(); // 아래 버튼 줄
         buttons.style.flexDirection = FlexDirection.Row;
@@ -355,51 +356,22 @@ public partial class SidePanelUI
 #endif
     }
 
-    // 버튼 줄 맨 오른쪽 톱니 - 버튼 틀 없이 흰 톱니 그림만
+    // 버튼 줄 맨 오른쪽 톱니 - 다른 버튼과 같은 픽셀 버튼(정사각형) 위에 톱니 그림
     private Button CreateGearButton()
     {
-        var button = new Button(OpenSettingsPanel); // 틀 없는 버튼
+        Button button = CreateButton("", PixelStyle.Slot, OpenSettingsPanel); // 다른 버튼과 같은 눌림/펀치
         button.focusable = false;
-        button.style.width = 96;
-        button.style.height = 96;
-        button.style.backgroundColor = Color.clear;
-        button.style.backgroundImage = new StyleBackground(GearTexture());
-        button.style.borderTopWidth = button.style.borderBottomWidth = button.style.borderLeftWidth = button.style.borderRightWidth = 0;
-        button.style.paddingTop = button.style.paddingBottom = button.style.paddingLeft = button.style.paddingRight = 0;
-        return button;
-    }
+        button.style.width = 110; // 높이와 같게 정사각형
+        button.style.alignItems = Align.Center;
+        button.style.justifyContent = Justify.Center;
 
-    // 16x16 도트 톱니 (흰색) - 그림 파일 없이 코드로 그림
-    private static Texture2D _gear; // 한 번만 만듦
-    private static Texture2D GearTexture()
-    {
-        if (_gear != null) return _gear;
-        string[] rows =
-        {
-            "......####......",
-            "......####......",
-            "..##.######.##..",
-            "..############..",
-            "...##########...",
-            ".#####....#####.",
-            ".####......####.",
-            "#####......#####",
-            "#####......#####",
-            ".####......####.",
-            ".#####....#####.",
-            "...##########...",
-            "..############..",
-            "..##.######.##..",
-            "......####......",
-            "......####......",
-        };
-        _gear = new Texture2D(16, 16, TextureFormat.RGBA32, false, false) { filterMode = FilterMode.Point }; // sRGB 텍스처
-        Color ink = Color.white; // 흰색
-        for (int y = 0; y < 16; y++)
-            for (int x = 0; x < 16; x++)
-                _gear.SetPixel(x, 15 - y, rows[y][x] == '#' ? ink : Color.clear); // 위에서부터 그린 그림을 아래부터 채움
-        _gear.Apply();
-        return _gear;
+        var icon = new VisualElement(); // 톱니 그림
+        icon.pickingMode = PickingMode.Ignore;
+        icon.style.width = 80;
+        icon.style.height = 80;
+        icon.style.backgroundImage = new StyleBackground(settingsIcon); // 인스펙터에서 넣은 톱니 그림
+        button.Add(icon);
+        return button;
     }
 
     // ---- 통계 ----

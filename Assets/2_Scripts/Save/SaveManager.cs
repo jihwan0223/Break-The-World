@@ -148,6 +148,7 @@ public class SaveManager : MonoBehaviour
             unlockedMaxZone = ZoneManager.Instance != null ? ZoneManager.Instance.UnlockedMaxZone : 0,
             currentZone = ZoneManager.Instance != null ? ZoneManager.Instance.CurrentZone : 0,
             finalBossCleared = ZoneBreaker.FinalBossCleared,
+            seenGates = GateReveals.ToArray(),
             upgrades = upgrades.ToArray(),
         };
 
@@ -160,6 +161,7 @@ public class SaveManager : MonoBehaviour
     public void Load()
     {
         GameStats.Reset(); // 세이브가 없으면(새 게임) 기록도 처음부터
+        GateReveals.Reset();
         if (!File.Exists(SavePath))
             return;
 
@@ -194,6 +196,7 @@ public class SaveManager : MonoBehaviour
 
         ZoneManager.Instance?.SetState(data.unlockedMaxZone, data.currentZone);
         ZoneBreaker.FinalBossCleared = data.finalBossCleared;
+        GateReveals.Load(data.seenGates);
 
         // 해금 상태를 먼저 복원해야 장착이 막히지 않음
         if (WeaponManager.Instance != null && data.unlockedWeapons != null)

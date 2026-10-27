@@ -23,6 +23,7 @@ public class PieceUI : MonoBehaviour
     private const float CountUpSeconds = 0.35f; // 한 번에 얼마를 얻든 이 시간 안에는 화면 숫자가 다 따라붙음 (큰 수일수록 끝자리가 오래 구르던 것 방지)
     private double _countUpFloor; // 지금 따라붙는 동안의 최소 속도(초당) - 얻은 양이 클수록 커지고, 다 따라붙으면 0으로 돌아감
     private Label _crystalLabel; // 결정 개수를 표시하는 라벨
+    private VisualElement _crystalRow; // 결정 줄 전체 (결정을 얻기 전엔 숨김)
     private long _lastCrystals; // 직전에 표시했던 결정 개수 (늘었는지 판단용)
 
     // 라벨 하나의 펄스 대기열 - 연속으로 늘어나면(빗자루로 줍는 중 등) 커졌다 작아졌다를 끊기지 않고 반복
@@ -64,6 +65,7 @@ public class PieceUI : MonoBehaviour
         {
             CurrencyManager.Instance.OnPiecesChanged += UpdatePieceLabel;
             CurrencyManager.Instance.OnCrystalsChanged += UpdateCrystalLabel;
+            GameSettings.OnNumberFormatChanged += RedrawNumbers;
 
             // 저장 파일을 이미 불러왔을 수 있으니, 지금 보유량을 한 번 읽어서 라벨을 미리 채움
             UpdatePieceLabel(CurrencyManager.Instance.GetPieces());
@@ -78,6 +80,7 @@ public class PieceUI : MonoBehaviour
             CurrencyManager.Instance.OnPiecesChanged -= UpdatePieceLabel;
             CurrencyManager.Instance.OnCrystalsChanged -= UpdateCrystalLabel;
         }
+        GameSettings.OnNumberFormatChanged -= RedrawNumbers;
     }
 
     // UXML/USS 없이 코드로 직접 조각 라벨 + 반투명 배경을 구성 (화면 좌상단)
@@ -92,43 +95,90 @@ public class PieceUI : MonoBehaviour
         background.style.position = Position.Absolute;
         background.style.top = topOffset;
         background.style.left = leftOffset;
-        background.style.height = 110;
-        background.style.minWidth = 300;
-        background.style.paddingLeft = 18;
-        background.style.paddingRight = 18;
+        background.style.minWidth = 340;
+        background.style.paddingLeft = 16;
+        background.style.paddingRight = 16;
+        background.style.paddingTop = 14;
+        background.style.paddingBottom = 22; // 아래 두께만큼 더
         background.style.justifyContent = Justify.Center; // 두 줄을 상자 세로 가운데에
-        background.style.alignItems = Align.FlexStart;
+        background.style.alignItems = Align.Stretch; // 줄들을 상자 폭에 맞춤
         PixelStyle.Frame(background, PixelStyle.Box); // 오른쪽 위 버튼과 같은 픽셀 틀 (크림)
 
-        _pieceLabel = CreateLabel(PixelStyle.Text.linear); // 크림 상자 위 진한 갈색
-        background.Add(_pieceLabel);
-
-        _crystalLabel = CreateLabel(new Color(0.23f, 0.53f, 0.66f).linear); // 결정은 진한 하늘색으로 구분 (크림 위에서 보이게)
-        background.Add(_crystalLabel);
+        _pieceLabel = AddRow(background, ShardTexture(WarmShard), PixelStyle.Text.linear, out _); // 크림 위 진한 갈색
+        _crystalLabel = AddRow(background, ShardTexture(SkyShard), new Color(0.23f, 0.53f, 0.66f).linear, out _crystalRow); // 결정은 진한 하늘색
 
         root.Add(background);
     }
 
-    private Label CreateLabel(Color color)
+    // 상자 안 한 줄: 왼쪽 아이콘 + 바로 옆 숫자
+    private Label AddRow(VisualElement box, Texture2D iconTexture, Color color, out VisualElement row)
     {
+        row = new VisualElement();
+        row.pickingMode = PickingMode.Ignore;
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.alignItems = Align.Center;
+        row.style.height = 46;
+        box.Add(row);
+
+        var icon = new VisualElement(); // 조각/결정 도트 그림
+        icon.pickingMode = PickingMode.Ignore;
+        icon.style.width = iconTexture.width * 3;
+        icon.style.height = iconTexture.height * 3;
+        icon.style.flexShrink = 0;
+        icon.style.backgroundImage = new StyleBackground(iconTexture);
+        row.Add(icon);
+
         var label = new Label();
+        label.pickingMode = PickingMode.Ignore;
+        label.style.flexGrow = 1;
+        label.style.marginLeft = 14;
         label.style.fontSize = fontSize;
         label.style.color = color;
-        label.style.marginTop = 1;
-        label.style.marginBottom = 1;
-        label.style.paddingLeft = 0;
-        label.style.paddingRight = 0;
-        label.pickingMode = PickingMode.Ignore;
-        label.style.transformOrigin = new TransformOrigin(Length.Percent(0), Length.Percent(50)); // 커졌다 작아질 때 왼쪽 끝을 기준으로 - 글자가 상자 왼쪽 밖으로 삐져나가지 않게
+        label.style.unityTextAlign = TextAnchor.MiddleLeft;
+        label.style.paddingLeft = label.style.paddingRight = 0;
+        label.style.marginTop = label.style.marginBottom = 0;
+        label.style.transformOrigin = new TransformOrigin(Length.Percent(0), Length.Percent(50)); // 커졌다 작아질 때 왼쪽 끝 기준 - 상자 왼쪽 밖으로 안 넘치게
+        row.Add(label);
         return label;
+    }
+
+    // 조각 도트 (o 테두리, a 밝은 면, b 중간, c 어두운 면, h 반짝) - 업그레이드 노드 그림의 조각과 같은 모양
+    private static readonly string[] ShardRows =
+    {
+        ".....oo.....",
+        "....oaao....",
+        "...oahaao...",
+        "..oaaaaabo..",
+        ".oaaaaabbbo.",
+        "oaaaaabbbbbo",
+        "obbbbbbbccco",
+        ".obbbbcccco.",
+        "..occcccco..",
+        "...oooooo...",
+    };
+    private static readonly Color32[] WarmShard = { new Color32(60, 36, 24, 255), new Color32(255, 214, 120, 255), new Color32(235, 160, 70, 255), new Color32(180, 100, 40, 255), new Color32(255, 255, 230, 255) }; // 조각 색 (o a b c h)
+    private static readonly Color32[] SkyShard = { new Color32(20, 40, 70, 255), new Color32(170, 230, 255, 255), new Color32(90, 180, 240, 255), new Color32(40, 110, 200, 255), new Color32(255, 255, 255, 255) }; // 결정 색 (o a b c h)
+
+    private static Texture2D ShardTexture(Color32[] palette)
+    {
+        int w = ShardRows[0].Length, h = ShardRows.Length; // 도트 크기
+        var tex = new Texture2D(w, h, TextureFormat.RGBA32, false, false) { filterMode = FilterMode.Point }; // sRGB 텍스처
+        for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+            {
+                int k = "oabch".IndexOf(ShardRows[y][x]); // 팔레트 번호 (-1이면 빈칸)
+                tex.SetPixel(x, h - 1 - y, k >= 0 ? (Color)palette[k] : Color.clear); // 위에서부터 그린 그림을 아래부터 채움
+            }
+        tex.Apply();
+        return tex;
     }
 
     private void UpdateCrystalLabel(long amount)
     {
-        _crystalLabel.text = $"결정: {NumberFormatUtil.Format(amount)}";
+        _crystalLabel.text = NumberFormatUtil.Format(amount);
         // 결정을 한 번이라도 얻기 전에는 결정 줄을 숨김 (다 써서 0이 돼도 얻은 적이 있으면 계속 보임)
         bool shown = amount > 0 || (CurrencyManager.Instance != null && CurrencyManager.Instance.EverHadCrystal); // 결정 줄을 보여줄지
-        _crystalLabel.style.display = shown ? DisplayStyle.Flex : DisplayStyle.None;
+        _crystalRow.style.display = shown ? DisplayStyle.Flex : DisplayStyle.None;
 
         bool increased = amount > _lastCrystals;
         _lastCrystals = amount;
@@ -202,7 +252,14 @@ public class PieceUI : MonoBehaviour
         QueuePulse(_pieceLabel); // 올라가는 동안 커졌다 작아졌다 반복 (대기열 상한이 있어서 멈추면 곧 멈춤)
     }
 
-    private void SetPieceText() => _pieceLabel.text = $"조각: {NumberFormatUtil.Format((long)_shownPieces)}";
+    // 숫자 표시 방식(영어 단위/숫자)이 바뀌면 지금 값을 새 방식으로 다시 씀
+    private void RedrawNumbers()
+    {
+        SetPieceText();
+        if (CurrencyManager.Instance != null) _crystalLabel.text = NumberFormatUtil.Format(CurrencyManager.Instance.GetCrystals());
+    }
+
+    private void SetPieceText() => _pieceLabel.text = NumberFormatUtil.Format((long)_shownPieces);
 
     // 조각을 얻은 라벨이 잠깐 커졌다가(ease-out) 다시 원래 크기로 줄어드는(ease-in) 연출
     private IEnumerator PlayPieceGainPulse(Label label)

@@ -103,6 +103,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         System.Action pending = _pendingReveals; // 아직 안 끝난 열림들
         _pendingReveals = null;
         pending?.Invoke();
+        _revealRunning = false;
 
         if (pauseGameWhileOpen)
             Time.timeScale = 1f; // 멈춰뒀던 게임 시간을 다시 정상 속도로
@@ -179,12 +180,15 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
     }
 
     private System.Action _pendingReveals; // 카메라가 아직 도착 안 한 자물쇠 열림들 (창이 닫히면 바로 끝냄)
+    private bool _revealRunning; // 지금 카메라가 한 노드로 가는 중 - 여러 개가 한꺼번에 열리면 차례로 보여줌
 
     private System.Collections.IEnumerator GateRevealRoutine(RectTransform node, System.Action onArrive)
     {
         const float moveSeconds = 0.9f; // 이동+확대 시간(초)
         const float revealZoom = 1.1f; // 도착했을 때 배율
-        yield return new WaitForSecondsRealtime(0.25f); // 구매 연출을 잠깐 보여준 뒤 출발
+        while (_revealRunning) yield return null; // 앞 노드 연출이 끝날 때까지 대기
+        _revealRunning = true;
+        yield return new WaitForSecondsRealtime(0.4f); // 창이 열린 걸 잠깐 보여준 뒤 출발
         Vector2 fromPos = content.anchoredPosition; // 출발 팬
         float fromZoom = content.localScale.x; // 출발 배율
         Vector2 toPos = CenteredAnchoredPosition(node, revealZoom); // 노드가 정중앙에 오는 팬
@@ -202,6 +206,8 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         content.anchoredPosition = toPos;
         _pendingReveals -= onArrive;
         onArrive?.Invoke();
+        yield return new WaitForSecondsRealtime(0.6f); // 깨지는 연출을 보여준 뒤 다음 노드로
+        _revealRunning = false;
     }
 
     // node가 zoom 배율에서 뷰포트 정중앙에 오는 content.anchoredPosition

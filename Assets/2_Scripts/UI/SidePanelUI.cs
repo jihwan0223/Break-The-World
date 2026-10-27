@@ -17,6 +17,7 @@ public partial class SidePanelUI : MonoBehaviour
     // "업그레이드" 버튼을 누르면 이 오브젝트를 직접 SetActive(true)로 켬 - UpgradeTreeUI.Instance를 거치지 않는 이유는
     // 비활성 오브젝트에서는 Awake가 안 돌아서, 맨 처음 열 때는 Instance가 아직 null이라 그걸로 열려고 하면 에러가 나기 때문
     [SerializeField] private GameObject upgradeTreePanel;
+    [SerializeField] private Sprite settingsIcon; // 오른쪽 위 설정(톱니) 버튼 그림
 
     private VisualElement _panel; // 튀어나오는 빈 팝업 패널 (Weapon/Object 전용)
     private Label _panelTitle; // 팝업 가운데 위 제목 ("무기" / "도감")
@@ -380,6 +381,7 @@ public partial class SidePanelUI : MonoBehaviour
             ZoneManager.Instance?.ResetAll();
             ZoneBreaker.ResetBosses();
             GameStats.Reset();
+            GateReveals.Reset();
             UpgradeTreeUI.Instance?.RefreshAll();
             SaveManager.Instance?.SaveNow();
             return "모든 데이터를 처음 상태로 되돌렸습니다";

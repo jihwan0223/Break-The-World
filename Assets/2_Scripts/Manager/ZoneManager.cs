@@ -12,7 +12,6 @@ public class ZoneManager : MonoBehaviour
     [SerializeField] private int[] zoneFirstObjects; // 존 번호별로, 그 존이 열릴 때 조각 없이 공짜로 해금해줄 오브젝트 인덱스 (-1이면 없음). 존이 늘면 여기도 같이 채울 것
 
     private int _currentZone; // 지금 보고 있는 존 번호
-    private int _appliedZone = -1; // 마지막으로 화면에 적용한 존 번호 (존이 실제로 바뀔 때만 체력을 채우려고 기억, -1은 아직 적용 전)
     private int _unlockedMaxZone; // 해금된 마지막 존 번호 (0이면 첫 존만 열린 상태)
 
     public int CurrentZone => _currentZone;
@@ -118,13 +117,10 @@ public class ZoneManager : MonoBehaviour
     }
 
     // 모든 존 루트를 켜두고(자동클릭이 다른 존에서도 계속 돌게), 현재 존이 아닌 것은 그림만 끔.
-    // 다른 존에서 돌아오면 그 존의 오브젝트 체력을 전부 채워서 부서지다 만 상태가 남지 않게 함
+    // 부서지던 체력은 존을 옮겨도 그대로 둠
     private void ApplyZone()
     {
         if (zoneRoots == null) return;
-
-        bool zoneChanged = _appliedZone >= 0 && _appliedZone != _currentZone; // 이전에 보던 존이 있고 이번에 다른 존으로 바뀌었는지 (첫 적용은 체력이 이미 가득이라 제외)
-        _appliedZone = _currentZone;
 
         for (int i = 0; i < zoneRoots.Length; i++)
         {
@@ -135,10 +131,6 @@ public class ZoneManager : MonoBehaviour
             bool hidden = i != _currentZone; // 이 존이 지금 안 보이는 존인지
             foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>(true))
                 renderer.forceRenderingOff = hidden; // enabled와 별개라 UnlockGate/Health가 켜고 꺼도 영향 없음
-
-            if (zoneChanged && !hidden)
-                foreach (Health health in root.GetComponentsInChildren<Health>(true))
-                    health.ResetToFull();
         }
     }
 }
