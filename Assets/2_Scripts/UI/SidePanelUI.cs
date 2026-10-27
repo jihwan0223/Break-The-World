@@ -640,7 +640,7 @@ public partial class SidePanelUI : MonoBehaviour
 
             int index = _weaponBrowse.index; // 지금 보고 있는 무기
             if (weapons.IsUnlocked(index)) weapons.Equip(index);
-            else weapons.TryUnlock(index);
+            else if (weapons.TryUnlock(index)) weapons.Equip(index); // 사면 바로 장착
             redraw();
         };
 

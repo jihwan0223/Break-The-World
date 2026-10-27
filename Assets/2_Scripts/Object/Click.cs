@@ -148,12 +148,21 @@ public class Click : MonoBehaviour
         if (UpgradeManager.Instance != null && (starterCrystal || pityCrystal || Random.value < UpgradeManager.Instance.CrystalDropChance))
         {
             CurrencyManager.Instance.ResetCrystalPity();
-            int crystals = UpgradeManager.Instance.CrystalDropAmount; // 이번에 나온 결정 개수
+            int crystals = UpgradeManager.Instance.CrystalDropAmount * CrystalZoneMultiplier(zone); // 이번에 나온 결정 개수 (뒤 맵일수록 많이)
             if (dropOnFloor)
                 DebrisPool.Instance.DropCrystal(transform.position, crystals, zone);
             else
                 CurrencyManager.Instance.AddCrystals(crystals);
         }
+    }
+
+    private static readonly int[] CrystalZoneMultipliers = { 1, 10, 100 }; // 맵(존)별 결정 개수 배율 - 맵1 x1, 맵2 x10, 맵3 x100
+
+    // zone이 -1이면(존 관리자 없음) 지금 보는 존으로 침
+    private static int CrystalZoneMultiplier(int zone)
+    {
+        if (zone < 0) zone = ZoneManager.Instance != null ? ZoneManager.Instance.CurrentZone : 0;
+        return CrystalZoneMultipliers[Mathf.Clamp(zone, 0, CrystalZoneMultipliers.Length - 1)];
     }
 
     // 직접 클릭 연타 수를 올리고 그만큼 높인 타격음 피치를 돌려줌. 잠깐 쉬면 처음부터

@@ -41,6 +41,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         public float levelGrowth = 2f;          // 레벨 오를 때마다 요구량에 곱해지는 배율
         [Tooltip("0보다 크면 0->1레벨 비용만 이 값으로 (1레벨만 싸게). 2레벨부터는 위 공식 그대로")]
         [Min(0)] public long firstLevelAmount;  // 첫 레벨만 따로 정한 비용 (0이면 안 씀)
+        [Tooltip("비어있지 않으면 위 공식 대신 레벨별 비용을 그대로 씀 (0->1, 1->2, ... 순서, 짧으면 마지막 값 반복)")]
+        public long[] levelAmounts = System.Array.Empty<long>(); // 레벨별로 직접 정한 비용
     }
 
     private Button _button;
@@ -217,7 +219,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.ObjectDoubleDrop: return $"{obj} 부술 때 조각이 2배로 나올 확률이 +{n}% 증가합니다.";
             case UpgradeManager.UpgradeEffect.WeaponKillBonus: return $"{KoreanJosa.EuroRo(weapon)} 부술 때 조각을 +{n}개 더 얻습니다.";
             case UpgradeManager.UpgradeEffect.CrystalChance: return $"오브젝트를 부술 때 결정이 나올 확률이 +{n}% 증가합니다.";
-            case UpgradeManager.UpgradeEffect.CrystalAmount: return $"결정이 나올 때 개수가 +{n}개 증가합니다.";
+            case UpgradeManager.UpgradeEffect.CrystalAmount: return "결정이 나올 때 개수가 2배가 됩니다.";
             case UpgradeManager.UpgradeEffect.GroundPieceCap: return $"바닥에 쌓일 수 있는 조각 개수가 +{n}개 증가합니다.";
             case UpgradeManager.UpgradeEffect.AutoClickSpeed: return $"{targetObjectName} 자동 클릭 간격이 {n}초 줄어듭니다.";
             case UpgradeManager.UpgradeEffect.AutoClickCount: return $"{targetObjectName} 자동 클릭 한 번에 때리는 횟수가 +{n}회 증가합니다.";

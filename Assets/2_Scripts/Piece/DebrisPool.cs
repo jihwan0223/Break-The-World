@@ -341,11 +341,28 @@ public class DebrisPool : MonoBehaviour
         }
     }
 
-    // 결정 하나를 zone 바닥에 떨어뜨림 (amount개짜리 한 덩어리, zone이 -1이면 보고 있는 존). 바닥이 꽉 차 있어도 떨어짐
+    private const int MaxGroundCrystals = 50; // 존 하나 바닥에 결정 덩어리가 이만큼 있으면 새 결정은 이미 있는 결정에 합쳐짐
+
+    // 결정 하나를 zone 바닥에 떨어뜨림 (amount개짜리 한 덩어리, zone이 -1이면 보고 있는 존). 파편 바닥이 꽉 차 있어도 떨어짐.
+    // 결정 덩어리가 MaxGroundCrystals개 이상이면 새로 만들지 않고 바닥 결정 하나에 개수를 더함 (떨어지는 모습만 보여줌)
     public void DropCrystal(Vector3 fromPosition, long amount, int zone = -1)
     {
         if (amount <= 0) return;
         if (zone < 0) zone = CurrentZone; // 떨어뜨릴 존
+        Piece mergeInto = null; // 합칠 바닥 결정
+        int crystals = 0; // 이 존 바닥 결정 덩어리 수
+        foreach (Piece piece in _groundPieces)
+        {
+            if (piece.zone != zone || !piece.isCrystal) continue;
+            crystals++;
+            if (Random.Range(0, crystals) == 0) mergeInto = piece; // 하나만 계속 커지지 않게 아무거나 고름
+        }
+        if (crystals >= MaxGroundCrystals && mergeInto != null)
+        {
+            mergeInto.value += amount;
+            if (zone == CurrentZone) EmitShard(fromPosition, GetLandingPoint(0f), crystalColor);
+            return;
+        }
         Spawn(fromPosition, zone, amount, true, crystalColor, pieceSize * crystalSizeMultiplier, (float)CountInZone(zone) / Mathf.Max(1, MaxGroundPieces));
     }
 
