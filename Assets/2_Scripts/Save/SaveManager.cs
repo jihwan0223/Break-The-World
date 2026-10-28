@@ -3,25 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-// 조각/무기/오브젝트 선택 상태를 JSON 파일로 저장하고 불러오는 매니저.
-// 값이 바뀔 때마다 바로 쓰지 않고, 일정 시간 동안 변경이 없을 때 한 번만 저장(디바운스)해서
-// 연속 클릭 중에 매번 디스크에 쓰는 걸 방지함.
 public class SaveManager : MonoBehaviour
 {
-    // 씬 어디서든 SaveManager.Instance로 접근하기 위한 싱글톤
     public static SaveManager Instance { get; private set; }
 
-    [SerializeField] private string saveFileName = "savedata.json"; // 저장 파일 이름
-    [SerializeField] private float saveDebounceDelay = 1f; // 마지막 변경 후 이 시간(초)만큼 조용하면 저장
+    [SerializeField] private string saveFileName = "savedata.json";
+    [SerializeField] private float saveDebounceDelay = 1f; // 초
 
     private string SavePath => Path.Combine(Application.persistentDataPath, saveFileName);
 
-    private bool _isDirty; // 저장 안 된 변경사항이 있는지
-    private Coroutine _saveRoutine; // 디바운스 대기 중인 저장 코루틴
+    private bool _isDirty;
+    private Coroutine _saveRoutine;
 
     void Awake()
     {
-        // 씬에 SaveManager가 중복으로 존재하지 않도록 방지
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -63,12 +58,10 @@ public class SaveManager : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        // 디바운스 대기 중이던 변경사항이 있으면 종료 직전에 마지막으로 한 번 저장
         if (_isDirty)
             SaveNow();
     }
 
-    // "저장 안 하고 종료/나가기" - 자동 저장 대기 중인 변경을 버리고, 종료 직전 저장도 안 함
     public void DiscardPending()
     {
         if (_saveRoutine != null) StopCoroutine(_saveRoutine);
@@ -91,10 +84,8 @@ public class SaveManager : MonoBehaviour
         _saveRoutine = null;
     }
 
-    // 각 매니저의 현재 상태를 모아서 즉시 파일에 저장
     public void SaveNow()
     {
-        // 업그레이드 노드별 레벨을 id로 저장 (레벨 0인 건 생략)
         var upgrades = new List<SavedUpgrade>();
         if (UpgradeManager.Instance != null)
         {
@@ -106,7 +97,6 @@ public class SaveManager : MonoBehaviour
             }
         }
 
-        // 오브젝트별 해금 상태 / 획득량 업그레이드 레벨
         int objectCount = ObjectManager.Instance != null ? ObjectManager.Instance.ObjectCount : 0;
         var unlockedObjects = new bool[objectCount];
         var gainLevels = new int[objectCount];
@@ -157,10 +147,9 @@ public class SaveManager : MonoBehaviour
         _isDirty = false;
     }
 
-    // 저장 파일이 있으면 읽어서 각 매니저에 적용, 없으면 아무것도 안 함(기본값 그대로 시작)
     public void Load()
     {
-        GameStats.Reset(); // 세이브가 없으면(새 게임) 기록도 처음부터
+        GameStats.Reset();
         GateReveals.Reset();
         if (!File.Exists(SavePath))
             return;
@@ -181,7 +170,7 @@ public class SaveManager : MonoBehaviour
         if (PieceTutorial.Instance != null)
             PieceTutorial.Instance.Done = data.pieceTutorialDone;
 
-        // 해금 상태를 먼저 복원해야 그 다음 Equip()이 막히지 않음
+        // Equip 전에 해금 상태부터 복원
         if (ObjectManager.Instance != null && data.unlockedObjects != null)
         {
             for (int i = 0; i < data.unlockedObjects.Length; i++)
@@ -198,7 +187,7 @@ public class SaveManager : MonoBehaviour
         ZoneBreaker.FinalBossCleared = data.finalBossCleared;
         GateReveals.Load(data.seenGates);
 
-        // 해금 상태를 먼저 복원해야 장착이 막히지 않음
+        // 장착 전에 해금 상태부터 복원
         if (WeaponManager.Instance != null && data.unlockedWeapons != null)
         {
             for (int i = 0; i < data.unlockedWeapons.Length; i++)
@@ -207,22 +196,19 @@ public class SaveManager : MonoBehaviour
         WeaponManager.Instance?.Equip(data.weaponIndex);
         ObjectManager.Instance?.Equip(data.objectIndex);
 
-        // 업그레이드 레벨을 id로 복원 (지금 존재하지 않는 id는 SetLevel 내부에서 무시됨).
-        // 옛 세이브에는 upgrades가 없어서 업그레이드만 전부 0부터 시작함 (조각/오브젝트/무기는 그대로 로드됨)
         if (UpgradeManager.Instance != null && data.upgrades != null)
         {
             foreach (SavedUpgrade u in data.upgrades)
                 UpgradeManager.Instance.SetLevel(u.id, u.level);
         }
 
-        // 결정은 업그레이드까지 복원한 뒤에 넣음 - 옛 세이브에는 누적 조각/결정 획득 여부가 없어서
-        // 보유량과 커서 줍기(결정으로 사는 첫 노드) 구매 여부로 채우고, 결정 표시가 그 값을 보고 그려지게 함
+        // 업그레이드를 복원한 뒤에 넣음 (옛 세이브 보정에 필요)
         if (CurrencyManager.Instance != null)
         {
             bool hadCrystal = data.everHadCrystal || data.crystals > 0
-                || (UpgradeManager.Instance != null && UpgradeManager.Instance.HoverPickupIsUnlocked); // 결정을 얻은 적이 있는 세이브인지
+                || (UpgradeManager.Instance != null && UpgradeManager.Instance.HoverPickupIsUnlocked);
             CurrencyManager.Instance.SetProgress(System.Math.Max(data.totalPieces, data.pieces), hadCrystal, data.killsSinceCrystal,
-                System.Math.Max(data.totalCrystals, data.crystals)); // 옛 세이브는 보유량으로 채움
+                System.Math.Max(data.totalCrystals, data.crystals)); // 옛 세이브는 보유량으로
             CurrencyManager.Instance.SetCrystals(data.crystals);
         }
     }

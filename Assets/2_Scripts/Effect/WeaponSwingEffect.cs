@@ -2,25 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// 클릭이 성공했을 때, 맞은 오브젝트 콜라이더의 테두리(외곽선) 위 랜덤한 지점에
-// 현재 장착 중인 무기 이미지를 잠깐 띄워서 "때리는" 느낌을 주는 이펙트.
-// 더블클릭/자동클릭처럼 한 프레임에 여러 번 때릴 때 각각 따로 보이도록, 호출마다 풀에서 독립된 오브젝트를 꺼내 씀
-// (DebrisPool과 같은 방식: GameObject를 재사용하되, 동시에 여러 개가 떠 있을 수 있게 함)
 public class WeaponSwingEffect : MonoBehaviour
 {
-    // 씬 어디서든 WeaponSwingEffect.Instance로 접근하기 위한 싱글톤
     public static WeaponSwingEffect Instance { get; private set; }
 
-    [SerializeField] private float swingSize = 0.05f; // 무기 이미지가 표시될 크기 (월드 유닛)
-    [SerializeField] private float swingDuration = 0.15f; // 타격 연출이 재생되는 시간(초)
-    [SerializeField] private float viewMargin = 0.8f; // 랜덤 위치 타격 연출이 화면 가장자리에서 최소 이만큼(월드 유닛) 안쪽에 나오게
+    [SerializeField] private float swingSize = 0.05f; // 월드 유닛
+    [SerializeField] private float swingDuration = 0.15f; // 초
+    [SerializeField] private float viewMargin = 0.8f; // 월드 유닛
 
-    private readonly Stack<SpriteRenderer> _pool = new Stack<SpriteRenderer>(); // 재사용 가능한(비활성) 타격 연출 오브젝트들
-    private Vector3? _lastPoint; // 바로 직전 타격 연출이 나타났던 위치 - 다음 연출이 그 자리와 겹치지 않게 확인하는 데 씀
+    private readonly Stack<SpriteRenderer> _pool = new Stack<SpriteRenderer>();
+    private Vector3? _lastPoint;
 
     void Awake()
     {
-        // 씬에 WeaponSwingEffect가 중복으로 존재하지 않도록 방지
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -30,8 +24,6 @@ public class WeaponSwingEffect : MonoBehaviour
         Instance = this;
     }
 
-    // hitCollider의 외곽선 위 랜덤한 지점(onSurface면 콜라이더 안쪽 면 아무 데나)에 icon을 잠깐 띄움. 같은 프레임에 여러 번 불러도 각각 독립적으로 보임
-    // cursorPoint가 있으면(플레이어가 직접 클릭한 위치) 그 자리에, 없으면(자동클릭 등) 위처럼 랜덤한 지점에 띄움
     public void PlaySwing(Collider2D hitCollider, Sprite icon, bool onSurface = false, Vector2? cursorPoint = null)
     {
         if (icon == null || hitCollider == null)
@@ -43,11 +35,9 @@ public class WeaponSwingEffect : MonoBehaviour
         else
             point = ClampToView(onSurface ? GetRandomPointInsideCollider(hitCollider) : GetRandomPointOnColliderEdge(hitCollider));
 
-        // 이미지의 "위쪽"(로컬 +Y)이 그 지점에서 콜라이더 중심을 향하도록 회전 계산
         Vector2 towardCollider = (Vector2)(hitCollider.bounds.center - point);
         float angle = Mathf.Atan2(towardCollider.y, towardCollider.x) * Mathf.Rad2Deg - 90f;
 
-        // 현재 장착 중인 무기의 크기 배율/회전 보정값을 그때그때 조회 (플레이 중 인스펙터 값 수정이 바로 반영되도록)
         float sizeMultiplier = 1f;
         float rotationOffset = 0f;
 
@@ -78,21 +68,19 @@ public class WeaponSwingEffect : MonoBehaviour
         _pool.Push(spriteRenderer);
     }
 
-    // 도로처럼 화면보다 큰 오브젝트는 랜덤 지점이 화면 밖으로 나갈 수 있어서, 화면 가장자리에서 viewMargin만큼 안쪽으로 당김
     private Vector3 ClampToView(Vector3 point)
     {
-        Camera cam = Camera.main; // 화면 범위를 구할 카메라
+        Camera cam = Camera.main;
         if (cam == null || !cam.orthographic) return point;
 
-        float halfHeight = cam.orthographicSize - viewMargin; // 연출이 들어갈 수 있는 세로 절반 범위
-        float halfWidth = cam.orthographicSize * cam.aspect - viewMargin; // 연출이 들어갈 수 있는 가로 절반 범위
-        Vector3 center = cam.transform.position; // 화면 중심
+        float halfHeight = cam.orthographicSize - viewMargin;
+        float halfWidth = cam.orthographicSize * cam.aspect - viewMargin;
+        Vector3 center = cam.transform.position;
         point.x = Mathf.Clamp(point.x, center.x - halfWidth, center.x + halfWidth);
         point.y = Mathf.Clamp(point.y, center.y - halfHeight, center.y + halfHeight);
         return point;
     }
 
-    // 재사용 가능한 연출 오브젝트를 풀에서 꺼내거나, 없으면(동시에 여러 개가 떠 있는 상황) 새로 만듦
     private SpriteRenderer GetFromPool()
     {
         if (_pool.Count > 0)
@@ -102,25 +90,21 @@ public class WeaponSwingEffect : MonoBehaviour
         visualObject.transform.SetParent(transform);
 
         var spriteRenderer = visualObject.AddComponent<SpriteRenderer>();
-        spriteRenderer.sortingOrder = 20; // 도트/오브젝트보다도 위에 그려지도록
+        spriteRenderer.sortingOrder = 20;
 
         visualObject.SetActive(false);
         return spriteRenderer;
     }
 
-    // 콜라이더가 PolygonCollider2D면 바깥 테두리(Path) 위 랜덤한 점을 반환하되, 직전 연출 위치와 너무 가까우면 다시 뽑음.
-    // 다른 콜라이더 타입이면 정확한 외곽선을 알 수 없으니 콜라이더 중심으로 대체
     private Vector3 GetRandomPointOnColliderEdge(Collider2D collider)
     {
         if (collider is PolygonCollider2D polygon && polygon.pathCount > 0)
         {
-            // 금이 가거나 뚫린 부분이 있는 스프라이트는 콜라이더에 안쪽 작은 경로(구멍)가 추가로 생기는데,
-            // 그 경로를 뽑으면 무기가 오브젝트 한가운데(틈 안쪽)에 나타나 버림 - 그래서 항상 둘레가 가장 긴(=바깥 테두리) 경로만 씀
+            // 구멍 경로를 피하려고 둘레가 가장 긴 바깥 경로만 씀
             Vector2[] points = GetOutermostPath(polygon);
 
             if (points != null && points.Length >= 2)
             {
-                // 같은 자리(직전 연출 위치)가 다시 나오지 않도록 최소 거리 이상 떨어진 점이 나올 때까지 몇 번 다시 뽑음
                 float minDistance = collider.bounds.size.magnitude * 0.35f;
 
                 for (int attempt = 0; attempt < 8; attempt++)
@@ -139,13 +123,11 @@ public class WeaponSwingEffect : MonoBehaviour
         return collider.bounds.center;
     }
 
-    // 콜라이더 안쪽(면) 랜덤한 점. 책상처럼 큰 오브젝트가 항상 중앙에만 맞는 걸로 보이지 않게 함.
-    // 바운딩 박스에서 뽑되 실제 콜라이더 안에 들어오는 점만 쓰고, 직전 연출 위치와 너무 가까우면 다시 뽑음
     private Vector3 GetRandomPointInsideCollider(Collider2D collider)
     {
         Bounds bounds = collider.bounds;
-        float minDistance = bounds.size.magnitude * 0.2f; // 직전 위치와 이 거리 이상 떨어지게
-        Vector2 fallback = bounds.center; // 안쪽 점을 하나도 못 찾았을 때 쓸 값
+        float minDistance = bounds.size.magnitude * 0.2f;
+        Vector2 fallback = bounds.center;
 
         for (int attempt = 0; attempt < 20; attempt++)
         {
@@ -160,7 +142,6 @@ public class WeaponSwingEffect : MonoBehaviour
         return fallback;
     }
 
-    // 폴리곤 콜라이더의 여러 경로(Path) 중 둘레가 가장 긴 것을 바깥 테두리로 간주해서 반환
     private Vector2[] GetOutermostPath(PolygonCollider2D polygon)
     {
         Vector2[] outermost = null;

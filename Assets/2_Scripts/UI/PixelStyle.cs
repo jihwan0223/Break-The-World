@@ -2,19 +2,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// 픽셀 힐링 느낌의 UI 툴킷 꾸밈 (크림 + 민트 파스텔). 그림 파일 없이 코드로 작은 도트 틀 그림(12x12)을 만들어 9칸 늘리기로 씀:
-// 모서리 한 칸을 깎은 갈색 외곽선 + 위쪽 밝은 줄 + (버튼은) 아래 두께. 버튼은 마우스를 올리면 밝아지고 누르면 두께만큼 내려감.
-// 이 화면은 색을 실제보다 밝게 그리는 설정이라(선형 색공간) 여기 적은 색 그대로 보이게 .linear로 바꿔 넣음
+// 선형 색공간이라 .linear로 넣어야 적은 색 그대로 보임
 public static class PixelStyle
 {
-    // 틀 하나의 색 묶음
     public readonly struct Tone
     {
-        public readonly Color face; // 면
-        public readonly Color light; // 위쪽 밝은 줄
-        public readonly Color dark; // 아래 두께/그늘
-        public readonly Color outline; // 외곽선
-        public readonly Color text; // 이 틀 위 글씨
+        public readonly Color face;
+        public readonly Color light;
+        public readonly Color dark;
+        public readonly Color outline;
+        public readonly Color text;
 
         public Tone(Color face, Color light, Color dark, Color outline, Color text)
         {
@@ -28,46 +25,42 @@ public static class PixelStyle
 
     private static Color Hex(string hex) => ColorUtility.TryParseHtmlString(hex, out Color c) ? c : Color.magenta;
 
-    private static readonly Color Outline = Hex("#8B6B4A"); // 공통 외곽선 (부드러운 갈색)
-    public static readonly Color Text = Hex("#5A3E2B"); // 크림 위 기본 글씨 (진한 갈색)
-    public static readonly Color MutedText = Hex("#7E5E40"); // 항목 이름 같은 옅은 글씨
-    public static readonly Color Good = Hex("#3E7A60"); // 장착 중/해금 완료 (진한 민트)
-    public static readonly Color Bad = Hex("#B8524A"); // 잠김 (벽돌색)
-    public static readonly Color Hidden = Hex("#B8A48C"); // ???로 가린 값
-    public static readonly Color Highlight = Hex("#E9A23B"); // 강조 테두리 (무기 슬롯 - 장착 중)
+    private static readonly Color Outline = Hex("#8B6B4A");
+    public static readonly Color Text = Hex("#5A3E2B");
+    public static readonly Color MutedText = Hex("#7E5E40");
+    public static readonly Color Good = Hex("#3E7A60");
+    public static readonly Color Bad = Hex("#B8524A");
+    public static readonly Color Hidden = Hex("#B8A48C");
+    public static readonly Color Highlight = Hex("#E9A23B");
 
-    // 버튼 색 (같은 크림 톤 안에서 버튼마다 다른 파스텔)
-    public static readonly Tone Mint = new Tone(Hex("#7FC8A9"), Hex("#B5E6CF"), Hex("#4F9A7A"), Outline, Hex("#21473A")); // 업그레이드 / 기본
-    public static readonly Tone Pink = new Tone(Hex("#F2A7A0"), Hex("#F9D0CB"), Hex("#C9776F"), Outline, Hex("#5A2E2A")); // 무기 / 닫기
-    public static readonly Tone Sky = new Tone(Hex("#9CC7EA"), Hex("#CBE3F6"), Hex("#6A98C2"), Outline, Hex("#23415E")); // 도감
-    public static readonly Tone Butter = new Tone(Hex("#F4D58D"), Hex("#FAE9C0"), Hex("#C9A452"), Outline, Hex("#5A4316")); // 디버그
+    public static readonly Tone Mint = new Tone(Hex("#7FC8A9"), Hex("#B5E6CF"), Hex("#4F9A7A"), Outline, Hex("#21473A"));
+    public static readonly Tone Pink = new Tone(Hex("#F2A7A0"), Hex("#F9D0CB"), Hex("#C9776F"), Outline, Hex("#5A2E2A"));
+    public static readonly Tone Sky = new Tone(Hex("#9CC7EA"), Hex("#CBE3F6"), Hex("#6A98C2"), Outline, Hex("#23415E"));
+    public static readonly Tone Butter = new Tone(Hex("#F4D58D"), Hex("#FAE9C0"), Hex("#C9A452"), Outline, Hex("#5A4316"));
 
-    // 판 색
-    public static readonly Tone Window = new Tone(Hex("#FFF6E6"), Hex("#FFFDF7"), Hex("#EAD9BE"), Outline, Text); // 팝업 창 바탕
-    public static readonly Tone Card = new Tone(Hex("#FDEBD0"), Hex("#FFF6E6"), Hex("#E8CFA8"), Hex("#C9A67E"), Text); // 정보 카드/액자
-    public static readonly Tone Ribbon = new Tone(Hex("#F2A7A0"), Hex("#F9D0CB"), Hex("#C9776F"), Outline, Hex("#5A2E2A")); // 제목 리본
-    public static readonly Tone Box = new Tone(Hex("#FFF6E6"), Hex("#FFFDF7"), Hex("#EAD9BE"), Outline, Text); // 조각 표시 상자
+    public static readonly Tone Window = new Tone(Hex("#FFF6E6"), Hex("#FFFDF7"), Hex("#EAD9BE"), Outline, Text);
+    public static readonly Tone Card = new Tone(Hex("#FDEBD0"), Hex("#FFF6E6"), Hex("#E8CFA8"), Hex("#C9A67E"), Text);
+    public static readonly Tone Ribbon = new Tone(Hex("#F2A7A0"), Hex("#F9D0CB"), Hex("#C9776F"), Outline, Hex("#5A2E2A"));
+    public static readonly Tone Box = new Tone(Hex("#FFF6E6"), Hex("#FFFDF7"), Hex("#EAD9BE"), Outline, Text);
     public static readonly Tone Slot = new Tone(
-        new Color(0.42f, 0.52f, 0.64f), new Color(0.54f, 0.64f, 0.76f), new Color(0.32f, 0.40f, 0.51f), new Color(0.22f, 0.28f, 0.37f), Color.white); // 유리관 음량 조절기 뒤 홈 (차분한 푸른 회색) - 메뉴/게임 설정 공용
+        new Color(0.42f, 0.52f, 0.64f), new Color(0.54f, 0.64f, 0.76f), new Color(0.32f, 0.40f, 0.51f), new Color(0.22f, 0.28f, 0.37f), Color.white);
 
-    private const int Size = 12; // 틀 그림 한 변(도트)
-    private const int Slice = 4; // 9칸 늘리기에서 테두리로 남길 도트 수
-    private const float Dot = 4f; // 도트 한 칸의 화면 크기(px)
-    private const int Depth = 2; // 버튼 아래 두께(도트) - 누르면 이만큼 내려감
+    private const int Size = 12; // 도트
+    private const int Slice = 4; // 도트
+    private const float Dot = 4f; // px
+    private const int Depth = 2; // 도트
 
-    private enum Kind { Frame, Button, Hover, Pressed } // 틀 그림 종류
+    private enum Kind { Frame, Button, Hover, Pressed }
 
-    private static readonly Dictionary<(Kind, Color, Color, Color, Color), Texture2D> _cache = new Dictionary<(Kind, Color, Color, Color, Color), Texture2D>(); // 만든 틀 그림 (색/종류별로 한 번만)
+    private static readonly Dictionary<(Kind, Color, Color, Color, Color), Texture2D> _cache = new Dictionary<(Kind, Color, Color, Color, Color), Texture2D>();
 
-    // 판 (창/카드/리본/표시 상자): 깎인 모서리 외곽선 + 위 밝은 줄 + 아래 그늘 한 줄
     public static void Frame(VisualElement element, Tone tone, float dot = Dot)
     {
         Paint(element, Kind.Frame, tone, dot);
     }
 
-    public const float OutlinedLetterSpacing = 6f; // 굵은 흰 글씨 글자 사이 간격(px) - 테두리끼리 겹쳐 뭉개지지 않게
+    public const float OutlinedLetterSpacing = 6f; // px
 
-    // 흰 글씨 + 진한 테두리 (Keep on Mining처럼 만화풍으로 또렷하게). 테두리가 먹는 SDF 글꼴로 바꿔 씀
     public static void OutlinedText(VisualElement element, Color outline, float width = 0.35f)
     {
         if (GameFonts.UiOutlined != null)
@@ -79,10 +72,9 @@ public static class PixelStyle
         element.style.letterSpacing = OutlinedLetterSpacing;
     }
 
-    // 카드 위 작은 제목 "— 제목 —" (Keep on Mining의 카드 머리글처럼)
     public static Label CardHeader(string title)
     {
-        var header = new Label($"— {title} —"); // 양옆 줄이 달린 작은 제목
+        var header = new Label($"— {title} —");
         header.pickingMode = PickingMode.Ignore;
         header.style.fontSize = 36;
         header.style.color = MutedText.linear;
@@ -91,7 +83,6 @@ public static class PixelStyle
         return header;
     }
 
-    // 입체 버튼: 마우스를 올리면 밝아지고, 누르면 두께만큼 내려감. 글씨는 흰색 + 버튼 색의 진한 그림자
     public static void Button(Button button, Tone tone, float dot = Dot)
     {
         OutlinedText(button, tone.text);
@@ -102,12 +93,11 @@ public static class PixelStyle
         button.RegisterCallback<PointerUpEvent>(_ => Paint(button, Kind.Hover, tone, dot), TrickleDown.TrickleDown);
     }
 
-    private static readonly Dictionary<(Kind, Color, Color, Color, Color), Sprite> _sprites = new Dictionary<(Kind, Color, Color, Color, Color), Sprite>(); // uGUI용 틀 스프라이트 (9칸 테두리 포함)
+    private static readonly Dictionary<(Kind, Color, Color, Color, Color), Sprite> _sprites = new Dictionary<(Kind, Color, Color, Color, Color), Sprite>();
 
-    // uGUI(Canvas) 버튼에도 같은 픽셀 버튼 모양 - 평소/마우스 올림/누름 그림을 바꿔 끼움. 글씨는 흰색 + 버튼 색의 진한 테두리
     public static void UguiButton(UnityEngine.UI.Button button, Tone tone, float dot = Dot)
     {
-        var image = button.targetGraphic as UnityEngine.UI.Image; // 버튼 그림
+        var image = button.targetGraphic as UnityEngine.UI.Image;
         if (image == null) image = button.GetComponent<UnityEngine.UI.Image>();
         if (image != null)
         {
@@ -124,23 +114,23 @@ public static class PixelStyle
             pressedSprite = SpriteOf(Kind.Pressed, tone),
         };
 
-        var text = button.GetComponentInChildren<TMPro.TMP_Text>(true); // 버튼 글씨
+        var text = button.GetComponentInChildren<TMPro.TMP_Text>(true);
         if (text == null) return;
         text.color = Color.white;
         text.fontStyle = TMPro.FontStyles.Bold;
         text.outlineColor = tone.text;
         text.outlineWidth = 0.3f;
-        text.characterSpacing = 3f; // 글자 사이 간격 (UI 툴킷 굵은 글씨와 비슷하게, 1/100 em 단위)
-        text.margin = new Vector4(0f, 0f, 0f, Depth * dot); // 아래 두께 위 면 가운데에
+        text.characterSpacing = 3f; // 1/100 em
+        text.margin = new Vector4(0f, 0f, 0f, Depth * dot);
     }
 
     private static Sprite SpriteOf(Kind kind, Tone tone)
     {
-        var key = (kind, tone.face, tone.light, tone.dark, tone.outline); // 캐시 키
+        var key = (kind, tone.face, tone.light, tone.dark, tone.outline);
         if (_sprites.TryGetValue(key, out Sprite cached) && cached != null) return cached;
-        Texture2D texture = Texture(kind, tone); // UI 툴킷과 같은 틀 그림
+        Texture2D texture = Texture(kind, tone);
         var sprite = Sprite.Create(texture, new Rect(0, 0, Size, Size), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect,
-            new Vector4(Slice, Slice, Slice, Slice)); // 9칸 늘리기 테두리
+            new Vector4(Slice, Slice, Slice, Slice));
         _sprites[key] = sprite;
         return sprite;
     }
@@ -153,7 +143,7 @@ public static class PixelStyle
         element.style.unitySliceBottom = Slice;
         element.style.unitySliceLeft = Slice;
         element.style.unitySliceRight = Slice;
-        element.style.unitySliceScale = dot; // 도트 한 칸 = dot px
+        element.style.unitySliceScale = dot;
         element.style.borderTopWidth = 0;
         element.style.borderBottomWidth = 0;
         element.style.borderLeftWidth = 0;
@@ -164,32 +154,31 @@ public static class PixelStyle
         element.style.borderBottomRightRadius = 0;
         if (kind == Kind.Frame) return;
 
-        bool pressed = kind == Kind.Pressed; // 눌린 상태
-        element.style.translate = new Translate(0f, pressed ? Depth * dot : 0f); // 눌리면 두께만큼 내려감
-        element.style.paddingBottom = pressed ? 0f : Depth * dot; // 글자를 두께 위 면 가운데에
+        bool pressed = kind == Kind.Pressed;
+        element.style.translate = new Translate(0f, pressed ? Depth * dot : 0f);
+        element.style.paddingBottom = pressed ? 0f : Depth * dot;
         element.style.paddingTop = 0f;
     }
 
-    // 12x12 도트 틀 그림 (색/종류별로 캐시)
     private static Texture2D Texture(Kind kind, Tone tone)
     {
-        var key = (kind, tone.face, tone.light, tone.dark, tone.outline); // 캐시 키
+        var key = (kind, tone.face, tone.light, tone.dark, tone.outline);
         if (_cache.TryGetValue(key, out Texture2D cached) && cached != null) return cached;
 
-        Color face = kind == Kind.Hover ? Color.Lerp(tone.face, Color.white, 0.18f) : tone.face; // 마우스를 올리면 살짝 밝게
-        var texture = new Texture2D(Size, Size, TextureFormat.RGBA32, false, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp }; // sRGB 그림 - 그림 색은 글자/면 색보다 한 번 더 밝아져서 .linear 값을 넣어야 적은 색 그대로 보임
+        Color face = kind == Kind.Hover ? Color.Lerp(tone.face, Color.white, 0.18f) : tone.face;
+        var texture = new Texture2D(Size, Size, TextureFormat.RGBA32, false, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp }; // sRGB 텍스처라 .linear 값을 넣음
         for (int y = 0; y < Size; y++) // y = 0이 맨 위
             for (int x = 0; x < Size; x++)
             {
-                bool edgeX = x == 0 || x == Size - 1, edgeY = y == 0 || y == Size - 1; // 맨 바깥 줄
-                Color c; // 이 도트 색
-                if (edgeX && edgeY) c = Color.clear; // 모서리 한 칸 깎기
+                bool edgeX = x == 0 || x == Size - 1, edgeY = y == 0 || y == Size - 1;
+                Color c;
+                if (edgeX && edgeY) c = Color.clear;
                 else if (edgeX || edgeY) c = tone.outline;
-                else if (kind == Kind.Pressed) c = y == 1 ? tone.dark : face; // 눌림: 위에 안쪽 그늘, 두께 없음
-                else if (y == 1) c = tone.light; // 위 밝은 줄
-                else if (kind == Kind.Frame) c = y == Size - 2 ? tone.dark : face; // 판: 아래 그늘 한 줄
-                else c = y >= Size - 1 - Depth ? tone.dark : face; // 버튼: 아래 두께
-                texture.SetPixel(x, Size - 1 - y, c.linear); // 텍스처는 아래가 y=0
+                else if (kind == Kind.Pressed) c = y == 1 ? tone.dark : face;
+                else if (y == 1) c = tone.light;
+                else if (kind == Kind.Frame) c = y == Size - 2 ? tone.dark : face;
+                else c = y >= Size - 1 - Depth ? tone.dark : face;
+                texture.SetPixel(x, Size - 1 - y, c.linear); // 텍스처는 아래가 y = 0
             }
         texture.Apply();
         _cache[key] = texture;

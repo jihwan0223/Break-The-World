@@ -5,23 +5,21 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class Health : MonoBehaviour
 {
-    [SerializeField] private int weaponTier = 1; // 이 오브젝트를 부수는 데 필요한 무기 티어 (1부터 시작)
-    [SerializeField] private int objectIndexInTier = 1; // 같은 무기 티어 내에서 이 오브젝트의 순번 (1부터 시작)
-    [SerializeField] private float hpMultiplier = 1f; // 계산된 체력에 곱하는 배수 - 마일스톤(지형 전환) 오브젝트만 높임
-    [SerializeField] private int fixedObjectIndex = -1; // -1이면 지금 장착 중인 오브젝트. 0 이상이면 파괴 사운드를 그 오브젝트 걸로
-    [SerializeField] private float respawnDelay = 1f; // 죽고 나서 재생성까지 대기하는 시간(초)
-    [SerializeField] private float dieFadeDuration = 0.25f; // 죽을 때 흐려지며 사라지는 연출 시간(초)
-    [SerializeField] private float respawnFadeDuration = 0.25f; // 재생성될 때 서서히 나타나는 연출 시간(초)
-    [SerializeField] private bool stayVisibleWhenDead; // 켜두면 죽어도 흐려지거나 숨지 않고 부서진 그림 그대로 두었다가 리셋 - 배경 자체인 책상처럼 사라지면 뒤가 텅 비는 오브젝트용
+    [SerializeField] private int weaponTier = 1; // 1부터
+    [SerializeField] private int objectIndexInTier = 1; // 1부터
+    [SerializeField] private float hpMultiplier = 1f;
+    [SerializeField] private int fixedObjectIndex = -1; // -1 = 장착 중인 오브젝트
+    [SerializeField] private float respawnDelay = 1f; // 초, 0 이하면 바로 부활
+    [SerializeField] private float dieFadeDuration = 0.25f; // 초
+    [SerializeField] private float respawnFadeDuration = 0.25f; // 초
+    [SerializeField] private bool stayVisibleWhenDead; // 죽어도 사라지지 않음 (배경 오브젝트용)
 
-    private int maxHP; // weaponTier/objectIndexInTier(×hpMultiplier)로부터 자동 계산된 최대 체력
+    private int maxHP;
 
-    private const float GlobalHpScale = 3f; // 모든 오브젝트(지형 포함) 체력에 곱하는 배율 - 해금하고 부수는 속도가 너무 빨라서 3배로 올림
+    private const float GlobalHpScale = 3f;
 
-    // 맵(무기 티어 2개씩)마다 체력에 곱하는 배율 - 다음 맵 첫 오브젝트가 앞 맵 지형(책상/도로)보다 단단하게
     private static readonly float[] MapHpScale = { 1f, 2f, 4f };
 
-    // 계산된 기본 체력에 배수, 맵 배율, 전체 배율을 곱해 반올림
     public static int ComputeMaxHP(int tier, int indexInTier, float multiplier) =>
         Mathf.Max(1, Mathf.RoundToInt(ObjectHealthCalculator.Calculate(tier, indexInTier) * multiplier
             * MapHpScale[Mathf.Clamp((tier - 1) / 2, 0, MapHpScale.Length - 1)] * GlobalHpScale));
@@ -30,25 +28,20 @@ public class Health : MonoBehaviour
     public int CurrentHP { get; private set; }
     public bool IsDead { get; private set; }
 
-    // 재생성 대기 시간이 있는지 (0 이하면 "부수자마자 바로 부활"형이라, 연타 중 클릭이 씹히지 않게 즉시 부활 처리함)
     public bool HasRespawnDelay => respawnDelay > 0f;
 
-    // 재생성까지 남은 시간 (죽은 상태가 아니면 0) - RespawnTimerUI가 매 프레임 읽어감
     public float RespawnRemaining { get; private set; }
 
-    // 체력이 깎일 때마다 (현재체력, 최대체력)을 전달 - 체력바 UI, 스프라이트 전환 등이 구독
     public event Action<int, int> OnDamaged;
 
-    // 체력이 0 이하가 되는 순간 한 번 발행 - 보상 지급 등이 구독
     public event Action OnDied;
 
-    // 재생성이 끝나는 순간 한 번 발행
     public event Action OnRespawned;
 
-    private SpriteRenderer _spriteRenderer; // 페이드 연출에 사용할 스프라이트 렌더러
-    private Collider2D _collider; // 죽어있는 동안 클릭을 막기 위한 콜라이더
-    private AudioSource _audioSource; // 파괴 사운드 재생용
-    private Color _originalColor; // 페이드 애니메이션 후 되돌아갈 원래 색상(알파 포함)
+    private SpriteRenderer _spriteRenderer;
+    private Collider2D _collider;
+    private AudioSource _audioSource;
+    private Color _originalColor;
 
     void Awake()
     {
@@ -60,10 +53,9 @@ public class Health : MonoBehaviour
         _originalColor = _spriteRenderer != null ? _spriteRenderer.color : Color.white;
     }
 
-    // ObjectManager에서 다른 오브젝트로 선택이 바뀌었을 때 호출 - 티어를 바꾸고 체력을 꽉 채운 상태로 리셋
     public void ApplyObjectTier(int newWeaponTier, int newIndexInTier, float newHpMultiplier = 1f)
     {
-        StopAllCoroutines(); // 진행 중이던 사망/재생성 연출은 중단 (오브젝트 자체가 바뀌는 거라 의미 없음)
+        StopAllCoroutines();
 
         weaponTier = newWeaponTier;
         objectIndexInTier = newIndexInTier;
@@ -81,15 +73,13 @@ public class Health : MonoBehaviour
 
         if (_collider != null) _collider.enabled = true;
 
-        // 오브젝트를 바꿀 때 크기를 원래(1배)로 되돌림 - HitFeedback의 클릭 펀치 연출이 연타 중에 끊겨서
-        // 커진 채로 멈춰있는 상태로 오브젝트가 바뀌면, 새 오브젝트도 그 커진 크기를 그대로 물려받는 문제가 있었음
+        // HitFeedback이 커진 채 끊겼을 수 있어 크기 원복
         transform.localScale = Vector3.one;
 
         OnDamaged?.Invoke(CurrentHP, maxHP);
     }
 
-    // 존을 다시 볼 때 호출 - 부서지다 만/죽어 있던 상태를 지우고 체력을 꽉 채운 온전한 모습으로 되돌림.
-    // 아직 해금 전이라 UnlockGate가 꺼둔 오브젝트는 그림/콜라이더를 켜면 안 되므로 건드리지 않음
+    // UnlockGate가 꺼둔 오브젝트는 건드리지 않음
     public void ResetToFull()
     {
         if (!enabled) return;
@@ -106,12 +96,11 @@ public class Health : MonoBehaviour
         }
         if (_collider != null) _collider.enabled = true;
 
-        OnDamaged?.Invoke(CurrentHP, maxHP); // 스프라이트를 온전한 단계로 되돌림
+        OnDamaged?.Invoke(CurrentHP, maxHP);
     }
 
     public void TakeDamage(int amount)
     {
-        // 죽어서 재생성을 기다리는 동안은 데미지를 받지 않음
         if (IsDead)
             return;
 
@@ -129,7 +118,6 @@ public class Health : MonoBehaviour
         IsDead = true;
         OnDied?.Invoke();
 
-        // 파괴 사운드 재생 - 고정 오브젝트면 그 오브젝트 걸로, 아니면 지금 장착 중인 것
         AudioClip breakSound = null;
         if (ObjectManager.Instance != null)
         {
@@ -137,25 +125,20 @@ public class Health : MonoBehaviour
                 ? ObjectManager.Instance.GetObjectAt(fixedObjectIndex).breakSound
                 : ObjectManager.Instance.CurrentObject.breakSound;
         }
-        if (breakSound != null && !(ZoneManager.Instance != null && ZoneManager.Instance.IsHidden(transform))) // 안 보이는 존이면 소리 안 냄
+        if (breakSound != null && !(ZoneManager.Instance != null && ZoneManager.Instance.IsHidden(transform)))
             SfxPlayer.Play(_audioSource, breakSound, priority: true);
 
-        // 파편은 Click.HandleDied가 "획득한 조각 수만큼" 떨어뜨림 (여기서 안 함)
-
-        // 재생성 대기가 있는 오브젝트만 즉시 클릭을 막음. 바로 부활형(delay<=0)은 콜라이더를 켜둬서
-        // 페이드아웃 도중 클릭해도 씹히지 않고 Click이 즉시 부활시키며 맞게 함
+        // 바로 부활형은 콜라이더를 켜둬서 페이드 중 클릭도 맞게
         if (_collider != null && HasRespawnDelay) _collider.enabled = false;
 
         StartCoroutine(DieAndRespawnRoutine());
     }
 
-    // 재생성 대기 중인(또는 페이드 중인) 오브젝트를 즉시 되살림 - 연타 중 클릭이 씹히지 않도록 Click이 호출.
-    // 대기 시간이 있는 오브젝트는 그대로 두고, 바로 부활형만 즉시 처리함
     public void ForceRespawnNow()
     {
         if (!IsDead || HasRespawnDelay) return;
 
-        StopAllCoroutines(); // 진행 중이던 페이드아웃/재생성 연출 중단
+        StopAllCoroutines();
         RespawnRemaining = 0f;
         CurrentHP = maxHP;
         IsDead = false;
@@ -167,7 +150,7 @@ public class Health : MonoBehaviour
         }
         if (_collider != null) _collider.enabled = true;
 
-        OnDamaged?.Invoke(CurrentHP, maxHP); // 스프라이트를 온전한 단계로 되돌림
+        OnDamaged?.Invoke(CurrentHP, maxHP);
         OnRespawned?.Invoke();
     }
 
@@ -192,12 +175,9 @@ public class Health : MonoBehaviour
         CurrentHP = maxHP;
         IsDead = false;
 
-        // 다시 나타나기 전에 미리 활성화해야 페이드 인 애니메이션이 보임
         if (_spriteRenderer != null) _spriteRenderer.enabled = true;
         if (_collider != null) _collider.enabled = true;
 
-        // 페이드 인이 시작되기 전에 먼저 스프라이트를 100% 상태로 되돌려야
-        // 깨진 이미지가 아니라 원래(온전한) 이미지가 서서히 나타난다
         OnDamaged?.Invoke(CurrentHP, maxHP);
 
         if (!stayVisibleWhenDead)
@@ -206,25 +186,23 @@ public class Health : MonoBehaviour
         OnRespawned?.Invoke();
     }
 
-    // 투명한 상태에서 duration초 동안 서서히 나타남 (보스전 보호막 오브젝트 등장용)
     public void FadeIn(float duration)
     {
         if (_spriteRenderer == null || !isActiveAndEnabled) return;
-        Color color = _originalColor; // 처음엔 완전히 투명하게
+        Color color = _originalColor;
         color.a = 0f;
         _spriteRenderer.color = color;
         StartCoroutine(Fade(0f, _originalColor.a, duration));
     }
 
-    // 지정한 시간 동안 스프라이트 알파값을 from -> to로 보간 (흐려지며 사라지고/나타나는 연출)
     private IEnumerator Fade(float fromAlpha, float toAlpha, float duration)
     {
-        float elapsed = 0f; // 코루틴 시작 후 흐른 시간
+        float elapsed = 0f;
 
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float progress = Mathf.Clamp01(elapsed / duration); // 0~1 진행률
+            float progress = Mathf.Clamp01(elapsed / duration);
 
             if (_spriteRenderer != null)
             {

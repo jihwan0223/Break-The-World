@@ -2,8 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using TMPro;
 
-// Tools ▸ Break The World ▸ 폰트 세팅 : Assets/8_Font/Resources/MonaS12.ttf 로 TMP 폰트 애셋을 만들고
-// TMP 기본 폰트로 지정한다. UI 툴킷 쪽은 코드에서 GameFonts.Ui를 쓰므로 이 메뉴만 한 번 돌리면 됨.
+// Tools ▸ Break The World ▸ 폰트 세팅
 public static class GameFontSetup
 {
     private const string SdfPath = "Assets/8_Font/Resources/MonaS12 SDF.asset";
@@ -17,7 +16,7 @@ public static class GameFontSetup
         var sdf = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(SdfPath);
         if (sdf == null)
         {
-            sdf = TMP_FontAsset.CreateFontAsset(font); // 동적(atlas 자동 확장) SDF 폰트 애셋
+            sdf = TMP_FontAsset.CreateFontAsset(font);
             sdf.name = "MonaS12 SDF";
             AssetDatabase.CreateAsset(sdf, SdfPath);
             if (sdf.material != null) AssetDatabase.AddObjectToAsset(sdf.material, sdf);
@@ -34,7 +33,6 @@ public static class GameFontSetup
         so.ApplyModifiedProperties();
         EditorUtility.SetDirty(settings);
 
-        // 이미 씬/프리팹에 박혀 있는 TMP 텍스트들도 이 폰트로 (material까지 알아서 따라감)
         int changed = 0;
         foreach (var t in Object.FindObjectsByType<TMP_Text>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {

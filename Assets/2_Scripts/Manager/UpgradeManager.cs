@@ -2,106 +2,95 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// 업그레이드 데이터(이름/설명/횟수/효과/비용)는 각 노드의 UpgradeNodeUI 컴포넌트에 직접 적어둠 - 이 매니저는
-// 씬에 있는 UpgradeNodeUI들을 전부 찾아 읽어서 레벨/구매 로직만 담당함. 선행조건은 UpgradeTreeLink가
-// 어떤 노드에서 어떤 노드로 이어지는지를 보고 자동으로 정해짐 (선 하나 그으면 그게 곧 선행 설정).
 public class UpgradeManager : MonoBehaviour
 {
-    // 씬 어디서든 UpgradeManager.Instance로 접근하기 위한 싱글톤
     public static UpgradeManager Instance { get; private set; }
 
-    // 업그레이드가 실제로 건드리는 게임 수치의 종류
     public enum UpgradeEffect
     {
-        [InspectorName("클릭 데미지")] ClickDamage,               // 클릭 데미지 +값. Target Weapon Name 비우면 전역, 채우면 그 무기 장착 중일 때만
-        [InspectorName("치명타 확률")] CritChance,                 // 크리티컬 확률 +값 % (기본 10% 위에 더함)
-        [InspectorName("치명타 데미지")] CritDamage,               // 크리티컬 배율 +값 % (기본 150% 위에 더함)
-        [InspectorName("자동클릭 해금")] AutoClickUnlock,          // 자동 클릭 기능 해금 (레벨 1이면 켜짐)
-        [InspectorName("자동클릭 주기 단축")] AutoClickSpeed,      // 자동 클릭 주기 -값 초
-        [InspectorName("자동클릭 횟수 증가")] AutoClickCount,      // 자동 클릭 1회당 +값 번
-        [InspectorName("(사용 안 함) 콤보 해금")] ComboUnlock,           // 콤보 기능은 지웠음 - 뒤 번호가 밀리지 않게 자리만 남김
-        [InspectorName("(사용 안 함) 콤보 쿨타임")] ComboCooldown,       // 콤보 기능은 지웠음 - 자리만 남김
-        [InspectorName("(사용 안 함) 콤보 지속시간")] ComboDuration,     // 콤보 기능은 지웠음 - 자리만 남김
-        [InspectorName("슈퍼 크리티컬 해금")] LuckyClick,          // 슈퍼 크리티컬 해금 (예전 럭키 클릭 자리) - 터지면 치명타 데미지의 2배
-        [InspectorName("더블 클릭 해금")] DoubleClick,             // 더블 클릭 해금
-        [InspectorName("자동 채굴 해금")] AutoMineUnlock,          // 자동 채굴 해금
-        [InspectorName("자동 채굴 주기 단축")] AutoMineSpeed,      // 자동 채굴 주기 -값 초
-        // 아래는 나중에 추가된 것들 - enum은 int로 직렬화되니 새 값은 항상 맨 뒤에만 붙일 것
-        [InspectorName("자동 채굴 획득량 증가")] AutoMineYield,    // 자동 채굴 1틱당 획득량 +값 배 (대상 오브젝트 기본 보상 기준)
-        [InspectorName("(사용 안 함) 콤보 배율")] ComboMultiplier,       // 콤보 기능은 지웠음 - 자리만 남김
-        [InspectorName("슈퍼 크리티컬 확률 증가")] LuckyClickChanceUp, // 슈퍼 크리티컬 확률 +값 %
-        [InspectorName("더블클릭 확률 증가")] DoubleClickChanceUp, // 더블클릭 발동 확률 +값 %
-        [InspectorName("전역 조각 획득 증가")] PieceGainGlobal,    // 모든 오브젝트 조각 획득 +값 %
-        [InspectorName("오브젝트 조각 획득 증가")] PieceGainObject, // Target Object Name 오브젝트 처치 시 조각 +(기본 보상의 값 %, 최소 1개)
-        [InspectorName("오브젝트 2배 드랍 확률")] ObjectDoubleDrop, // Target Object Name 오브젝트 처치 시 파편 2배 확률 +값 %
-        [InspectorName("무기 처치 보너스 조각")] WeaponKillBonus,   // Target Weapon Name 무기로 처치 시 보너스 조각 +값
-        [InspectorName("바닥 파편 최대 개수 증가")] GroundPieceCap, // 바닥에 동시에 떨어져 있을 수 있는 파편 최대 개수 +값
-        [InspectorName("결정 확률 증가")] CrystalChance,          // 오브젝트 처치 시 결정이 나올 확률 +값 %
-        [InspectorName("결정 드랍량 증가")] CrystalAmount,        // 결정이 나올 때 개수 x2^값 (효과 1 = 2배)
-        [InspectorName("자동 줍기 해금")] AutoSweepUnlock,        // 주기마다 바닥을 쓸고 지나가며 파편을 주워주는 기능 해금
-        [InspectorName("자동 줍기 주기 단축")] AutoSweepSpeed,    // 자동 줍기 주기 -값 초
-        [InspectorName("자동 줍기 층 증가")] AutoSweepLayers,     // 자동 줍기가 한 번 지나갈 때 쓸어 담는 파편 층 +값 (맨 위층부터)
-        [InspectorName("호버 줍기 해금")] HoverPickupUnlock,       // 커서를 파편 위에 올리기만 해도 맨 위 파편부터 주워지는 기능 해금
-        [InspectorName("존 자동 파괴 해금")] ZoneAutoBreakUnlock,   // Target Object Name(책상/도로)이 갈라져서 그 존의 다른 오브젝트가 주기마다 계속 부서지는 기능 해금
-        [InspectorName("오브젝트 추가 배치")] ObjectExtraCopies,   // Target Object Name 오브젝트(비우면 모든 오브젝트)를 +값 개 더 배치. 추가분은 씬에 미리 놓아두고 UnlockGate로 켬
-        [InspectorName("커서 범위 증가")] CursorRange,          // 커서 범위 반지름 +값 (월드 단위). 범위에 걸친 오브젝트가 한 번에 클릭되고 커서 줍기도 이 범위로 주움
-        [InspectorName("커서 타격 해금")] HoverClickUnlock,       // 클릭하지 않아도 커서를 오브젝트에 올려두면 일정 간격으로 계속 때리는 기능 해금 (지형 제외)
-        [InspectorName("조각 합치기 (표시용)")] PieceMergeDecoy, // 실제 효과 없음 - 바닥이 차면 조각이 합쳐지는 건 원래 기능인데, 업그레이드로 얻은 것처럼 보이게 하는 노드용
-        [InspectorName("왁스 코팅 해금")] WaxCoatUnlock,          // Target Object Name 지형(책상/도로/아파트)에 왁스를 입힘 - 일반 오브젝트는 처음부터 왁스가 덮여 있음
-        [InspectorName("커서 줍기 층 증가")] HoverPickupLayers,  // 커서 줍기가 한 번에 줍는 파편 층 +값 (0이면 맨 위 파편 1개만, 1 이상이면 커서 밑의 위쪽 그 층 수만큼 전부)
-        [InspectorName("통계 창 해금")] StatsUnlock,              // 화면 위 버튼 줄에 통계 버튼이 생김
+        [InspectorName("클릭 데미지")] ClickDamage, // +값, 무기 이름을 비우면 전역
+        [InspectorName("치명타 확률")] CritChance, // +값 %
+        [InspectorName("치명타 데미지")] CritDamage, // +값 %
+        [InspectorName("자동클릭 해금")] AutoClickUnlock,
+        [InspectorName("자동클릭 주기 단축")] AutoClickSpeed, // -값 초
+        [InspectorName("자동클릭 횟수 증가")] AutoClickCount, // +값 번
+        [InspectorName("(사용 안 함) 콤보 해금")] ComboUnlock, // 사용 안 함 - 번호 유지용 자리
+        [InspectorName("(사용 안 함) 콤보 쿨타임")] ComboCooldown,
+        [InspectorName("(사용 안 함) 콤보 지속시간")] ComboDuration,
+        [InspectorName("슈퍼 크리티컬 해금")] LuckyClick,
+        [InspectorName("더블 클릭 해금")] DoubleClick,
+        [InspectorName("자동 채굴 해금")] AutoMineUnlock,
+        [InspectorName("자동 채굴 주기 단축")] AutoMineSpeed, // -값 초
+        // enum은 int로 저장되니 새 값은 맨 뒤에만 추가
+        [InspectorName("자동 채굴 획득량 증가")] AutoMineYield, // +값 배
+        [InspectorName("(사용 안 함) 콤보 배율")] ComboMultiplier,
+        [InspectorName("슈퍼 크리티컬 확률 증가")] LuckyClickChanceUp, // +값 %
+        [InspectorName("더블클릭 확률 증가")] DoubleClickChanceUp, // +값 %
+        [InspectorName("전역 조각 획득 증가")] PieceGainGlobal, // +값 %
+        [InspectorName("오브젝트 조각 획득 증가")] PieceGainObject, // +기본 보상의 값 %, 최소 1개
+        [InspectorName("오브젝트 2배 드랍 확률")] ObjectDoubleDrop, // +값 %
+        [InspectorName("무기 처치 보너스 조각")] WeaponKillBonus, // +값 개
+        [InspectorName("바닥 파편 최대 개수 증가")] GroundPieceCap, // +값 개
+        [InspectorName("결정 확률 증가")] CrystalChance, // +값 %
+        [InspectorName("결정 드랍량 증가")] CrystalAmount, // x2^값
+        [InspectorName("자동 줍기 해금")] AutoSweepUnlock,
+        [InspectorName("자동 줍기 주기 단축")] AutoSweepSpeed, // -값 초
+        [InspectorName("자동 줍기 층 증가")] AutoSweepLayers, // +값 층
+        [InspectorName("호버 줍기 해금")] HoverPickupUnlock,
+        [InspectorName("존 자동 파괴 해금")] ZoneAutoBreakUnlock,
+        [InspectorName("오브젝트 추가 배치")] ObjectExtraCopies, // +값 개, 대상을 비우면 전체
+        [InspectorName("커서 범위 증가")] CursorRange, // +값 월드 유닛
+        [InspectorName("커서 타격 해금")] HoverClickUnlock,
+        [InspectorName("조각 합치기 (표시용)")] PieceMergeDecoy, // 효과 없음 (표시용)
+        [InspectorName("왁스 코팅 해금")] WaxCoatUnlock,
+        [InspectorName("커서 줍기 층 증가")] HoverPickupLayers, // +값 층
+        [InspectorName("통계 창 해금")] StatsUnlock,
     }
 
-    // 선행 노드와 잇는 선의 모양 (UpgradeTreeLink가 이 값을 보고 세그먼트를 배치함)
     public enum LinkRouting
     {
-        Straight,            // 직선
-        ElbowVerticalFirst,  // ㄱ자: 세로로 내려간 뒤 가로
-        ElbowHorizontalFirst,// ㄴ자: 가로로 간 뒤 세로
-        Stepped,             // 계단(Z): 중간에서 한 번 꺾어 3세그먼트
+        Straight,
+        ElbowVerticalFirst,
+        ElbowHorizontalFirst,
+        Stepped,
     }
 
-    // 효과 계산에 쓰는 기준값들
     [Header("기준값")]
-    [SerializeField] private float baseCritChance = 0.1f;        // 크리티컬 기본 확률 (CritDamage 노드가 1레벨 이상일 때만 적용)
-    [SerializeField] private float baseCritMultiplier = 1.5f;    // 크리티컬 기본 배율
-    [SerializeField] private float baseAutoClickInterval = 7f;   // 자동 클릭 기본 주기(초)
-    [SerializeField] private float minAutoClickInterval = 2.5f;  // 자동 클릭 주기 하한
-    [SerializeField] private float autoClickIntervalGrowthPerObject = 1f; // 오브젝트 번호가 1 늘 때마다 자동 클릭 주기에 곱해지는 배율 (1이면 모두 같은 주기, 클수록 뒤쪽 오브젝트가 늦게 깨짐)
-    [SerializeField] private int baseAutoClickCount = 1;         // 자동 클릭 1회당 기본 클릭 수
-    [SerializeField] private float luckyClickChanceValue = 0.001f; // 슈퍼 크리티컬 기본 확률 (0.1%) - LuckyClickChanceUp이 위에 더함
-    [SerializeField] private float baseDoubleClickChance = 0.25f;// 더블클릭 해금 직후 발동 확률 - DoubleClickChanceUp이 위에 더함
-    [SerializeField] private float baseAutoMineInterval = 8f;    // 자동 채굴 기본 주기(초)
-    [SerializeField] private float minAutoMineInterval = 2f;     // 자동 채굴 주기 하한
-    [SerializeField] private int autoMineTierOffset = 3;         // 지금 캐는 오브젝트보다 몇 단계 전을 자동으로 캘지
-    [SerializeField] private int baseMaxGroundPieces = 400;       // 바닥 파편 최대 개수 기본값 - GroundPieceCap이 위에 더함
-    [SerializeField] private float baseCrystalChance = 0.05f;    // 오브젝트 처치 시 결정 기본 확률 (5%) - CrystalChance가 위에 더함 (만렙 +20% = 25%)
-    [SerializeField] private int baseCrystalAmount = 1;          // 결정이 나올 때 기본 개수 - CrystalAmount 레벨마다 2배
-    [SerializeField] private float hoverPickupBaseRadius = 0.2f; // 커서 줍기를 해금하면 생기는 기본 커서 범위 반지름(월드) - 마우스 커서보다 살짝 큰 정도. CursorRange가 위에 더함
-    [SerializeField] private float baseAutoSweepInterval = 20f;  // 자동 줍기 기본 주기(초)
-    [SerializeField] private float minAutoSweepInterval = 3f;    // 자동 줍기 주기 하한
-    [SerializeField] private int baseAutoSweepLayers = 1;        // 자동 줍기가 기본으로 쓸어 담는 파편 층 수 (맨 위층부터) - AutoSweepLayers가 위에 더함
-    [SerializeField] private float hoverClickInterval = 0.7f;    // 커서 타격이 같은 오브젝트를 다시 때리기까지의 간격(초)
+    [SerializeField] private float baseCritChance = 0.1f; // 치명타 데미지를 1레벨 이상 사야 적용
+    [SerializeField] private float baseCritMultiplier = 1.5f;
+    [SerializeField] private float baseAutoClickInterval = 7f; // 초
+    [SerializeField] private float minAutoClickInterval = 2.5f; // 초
+    [SerializeField] private float autoClickIntervalGrowthPerObject = 1f;
+    [SerializeField] private int baseAutoClickCount = 1;
+    [SerializeField] private float luckyClickChanceValue = 0.001f; // 0.1%
+    [SerializeField] private float baseDoubleClickChance = 0.25f;
+    [SerializeField] private float baseAutoMineInterval = 8f; // 초
+    [SerializeField] private float minAutoMineInterval = 2f; // 초
+    [SerializeField] private int autoMineTierOffset = 3;
+    [SerializeField] private int baseMaxGroundPieces = 400;
+    [SerializeField] private float baseCrystalChance = 0.05f;
+    [SerializeField] private int baseCrystalAmount = 1;
+    [SerializeField] private float hoverPickupBaseRadius = 0.2f; // 월드 유닛
+    [SerializeField] private float baseAutoSweepInterval = 20f; // 초
+    [SerializeField] private float minAutoSweepInterval = 3f; // 초
+    [SerializeField] private int baseAutoSweepLayers = 1;
+    [SerializeField] private float hoverClickInterval = 0.7f; // 초
 
-    // ---- 씬의 UpgradeNodeUI를 읽어 구성한 실제 노드 ----
-
-    // 노드 하나 = UpgradeNodeUI 하나. 세이브/트리/UI가 node.id(=오브젝트 이름)로 다룬다
     public class UpgradeNode
     {
-        public string id;                 // UpgradeNodeUI.Id (오브젝트 이름) - 세이브 키
+        public string id;
         public string displayName;
         public string description;
         public UpgradeEffect effect;
-        public int targetObjectIndex;     // AutoClick 계열이 씀 - -1이면 전역
-        public int gateObjectIndex = -1;  // 이 오브젝트를 해금하면 열리는 노드 (-1이면 관문 없음). 열리면 대상 오브젝트 잠김은 무시
-        public int targetWeaponIndex;     // ClickDamage가 씀 - -1이면 전역
+        public int targetObjectIndex; // -1 = 전역
+        public int gateObjectIndex = -1; // -1 = 관문 없음
+        public int targetWeaponIndex; // -1 = 전역
         public int maxLevel;
-        public string prerequisiteId;     // 이 노드가 공개되려면 필요한 다른 노드 id (빈칸 = 루트) - 들어오는 링크로 결정됨. 표시/디버그용
-        public System.Func<bool> prerequisiteSatisfied; // 선행 충족 검사 (null = 루트). 일반 노드면 레벨>=1, 오브젝트 해금/획득 노드면 그 노드 IsLeveled()
+        public string prerequisiteId;
+        public System.Func<bool> prerequisiteSatisfied; // null = 루트
         public float[] valuePerLevel;
-        public (bool isCrystal, long baseAmount, float levelGrowth, long firstLevelAmount, long[] levelAmounts)[] costs; // 비용 줄별 공식 (조각/결정 동시 가능, firstLevelAmount > 0이면 첫 레벨만 그 값, levelAmounts가 있으면 레벨별 그대로)
+        public (bool isCrystal, long baseAmount, float levelGrowth, long firstLevelAmount, long[] levelAmounts)[] costs;
 
-        // 이 노드의 level(1..maxLevel)에서 "그 레벨을 올렸을 때 추가되는" 효과 값
         public float ValueAtLevel(int level)
         {
             if (valuePerLevel == null || valuePerLevel.Length == 0) return 0f;
@@ -109,8 +98,6 @@ public class UpgradeManager : MonoBehaviour
             return valuePerLevel[idx];
         }
 
-        // currentLevel(0..maxLevel-1)에서 다음 레벨로 올리는 비용. 이미 최대면 null.
-        // 비용 줄마다 한 항목씩 - CurrencyManager가 전부 있는지 확인하고 한번에 차감함
         public PieceCost[] CostForLevel(int currentLevel)
         {
             if (currentLevel >= maxLevel) return null;
@@ -119,34 +106,32 @@ public class UpgradeManager : MonoBehaviour
             var result = new PieceCost[costs.Length];
             for (int i = 0; i < costs.Length; i++)
             {
-                // float로 곱하면 고레벨에서 long 범위를 넘어 음수로 뒤집히므로 double로 계산 후 long 최대값에서 자름
-                long[] fixedAmounts = costs[i].levelAmounts; // 레벨별로 직접 정한 비용 (없으면 공식)
+                // long을 넘으면 음수가 되니 double로 계산 후 자름
+                long[] fixedAmounts = costs[i].levelAmounts;
                 double raw = fixedAmounts != null && fixedAmounts.Length > 0
                     ? fixedAmounts[Mathf.Min(currentLevel, fixedAmounts.Length - 1)]
                     : currentLevel == 0 && costs[i].firstLevelAmount > 0
-                    ? costs[i].firstLevelAmount // 첫 레벨만 따로 싸게 정한 비용
+                    ? costs[i].firstLevelAmount
                     : costs[i].baseAmount * System.Math.Pow(costs[i].levelGrowth, currentLevel);
                 long amount = raw >= long.MaxValue ? long.MaxValue : (long)System.Math.Max(1d, raw);
-                if (!costs[i].isCrystal) amount = NumberFormatUtil.RoundPrice(amount); // 조각 가격은 딱 떨어지는 수로 (결정은 개수가 작아서 그대로)
+                if (!costs[i].isCrystal) amount = NumberFormatUtil.RoundPrice(amount); // 결정은 그대로
                 result[i] = new PieceCost(amount, costs[i].isCrystal);
             }
             return result;
         }
     }
 
-    private readonly List<UpgradeNode> _nodes = new List<UpgradeNode>(); // 씬을 훑어 구성한 전체 노드 (Awake에서 구성)
+    private readonly List<UpgradeNode> _nodes = new List<UpgradeNode>();
     private readonly Dictionary<string, UpgradeNode> _nodeById = new Dictionary<string, UpgradeNode>();
-    private readonly Dictionary<string, int> _levels = new Dictionary<string, int>(); // node.id -> 현재 레벨 (없으면 0)
-    private ObjectEconomyNodeUI[] _economyNodes = System.Array.Empty<ObjectEconomyNodeUI>(); // 씬의 오브젝트 해금/획득 노드 전부 (살 수 있는 게 있는지 훑을 때 씀)
+    private readonly Dictionary<string, int> _levels = new Dictionary<string, int>();
+    private ObjectEconomyNodeUI[] _economyNodes = System.Array.Empty<ObjectEconomyNodeUI>();
 
-    // 어떤 노드의 레벨이 바뀔 때마다 (node.id, 새 레벨) 전달 - 트리 UI, SaveManager 등이 구독
     public event Action<string, int> OnUpgradeChanged;
 
-    public IReadOnlyList<UpgradeNode> Nodes => _nodes; // 세이브 등이 순회함
+    public IReadOnlyList<UpgradeNode> Nodes => _nodes;
 
     void Awake()
     {
-        // 씬에 UpgradeManager가 중복으로 존재하지 않도록 방지
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -157,8 +142,6 @@ public class UpgradeManager : MonoBehaviour
         BuildNodes();
     }
 
-    // 씬의 모든 UpgradeNodeUI/UpgradeTreeLink를 읽어 _nodes를 구성.
-    // 선행관계는 "이 노드로 들어오는 링크의 시작 노드"로 결정함 - 별도 prereq 필드를 안 써도 됨
     private void BuildNodes()
     {
         _nodes.Clear();
@@ -168,9 +151,6 @@ public class UpgradeManager : MonoBehaviour
         var links = FindObjectsByType<UpgradeTreeLink>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         _economyNodes = FindObjectsByType<ObjectEconomyNodeUI>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
-        // 각 노드로 들어오는 링크(들)의 선행 노드(들)를 전부 모아둠 - 링크 하나가 선행을 여러 개(fromNode+extraFromNodes)
-        // 가질 수 있고, 같은 toNode를 가리키는 링크가 여러 개일 수도 있으므로 전부 합쳐서 하나라도(OR) 충족되면 공개됨.
-        // 시작이 일반 업그레이드 노드면 그 노드 레벨로, 오브젝트 해금/획득 노드(ObjectEconomyNodeUI)면 IsLeveled()로 판단함
         var prereqsByToRect = new Dictionary<RectTransform, List<(string id, System.Func<bool> satisfied)>>();
         foreach (UpgradeTreeLink link in links)
         {
@@ -213,7 +193,7 @@ public class UpgradeManager : MonoBehaviour
                 maxLevel = Mathf.Max(1, ui.MaxLevel),
                 prerequisiteId = prereqs != null ? string.Join(", ", prereqs.ConvertAll(p => p.id)) : null,
                 prerequisiteSatisfied = prereqs != null && prereqs.Count > 0
-                    ? () => prereqs.Exists(p => p.satisfied()) // 선행 여러 개면 OR - 하나만 충족돼도 공개
+                    ? () => prereqs.Exists(p => p.satisfied()) // OR
                     : null,
                 valuePerLevel = ui.ValuePerLevel,
                 costs = ResolveCosts(ui.Costs),
@@ -224,7 +204,6 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    // UpgradeNodeUI의 비용 줄들을 노드 데이터로 옮김
     private static (bool, long, float, long, long[])[] ResolveCosts(UpgradeNodeUI.NodeCost[] uiCosts)
     {
         if (uiCosts == null || uiCosts.Length == 0) return System.Array.Empty<(bool, long, float, long, long[])>();
@@ -235,8 +214,6 @@ public class UpgradeManager : MonoBehaviour
         return result;
     }
 
-    // ---- 노드 단위 조회/구매 (트리 UI가 사용) ----
-
     public UpgradeNode GetNode(string nodeId)
     {
         if (string.IsNullOrEmpty(nodeId)) return null;
@@ -245,48 +222,40 @@ public class UpgradeManager : MonoBehaviour
 
     public int GetLevel(string nodeId) => _levels.TryGetValue(nodeId, out int level) ? level : 0;
 
-    // 다음 레벨 비용 (없거나 최대면 null)
     public PieceCost[] GetNextCost(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId);
         return node?.CostForLevel(GetLevel(nodeId));
     }
 
-    // 이 노드가 트리에 공개(보이고 구매 가능)됐는지 - 루트는 항상, 그 외엔 선행 노드를 1레벨 이상 찍어야 공개.
-    // (선행 노드가 한 번이라도 업그레이드되면 이 노드와 잇는 선이 뜸)
     public bool IsRevealed(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId);
         if (node == null) return false;
-        if (node.prerequisiteSatisfied == null) return true; // 들어오는 링크 없음 = 루트
+        if (node.prerequisiteSatisfied == null) return true;
 
         return node.prerequisiteSatisfied();
     }
 
-    // 조각을 소모해서 한 레벨 올림. 실패(미공개/최대레벨/조각부족) 시 false
-    // 이 노드가 특정 오브젝트 대상인데 그 오브젝트를 아직 해금하지 못했는지
     private bool IsTargetObjectLocked(UpgradeNode node) =>
         node.targetObjectIndex >= 0 && ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(node.targetObjectIndex);
 
-    // 이 노드가 특정 무기 대상인데 그 무기를 아직 해금하지 못했는지
     private bool IsTargetWeaponLocked(UpgradeNode node) =>
         node.targetWeaponIndex >= 0 && WeaponManager.Instance != null && !WeaponManager.Instance.IsUnlocked(node.targetWeaponIndex);
 
-    // 대상 오브젝트/무기가 아직 잠겨 있는지 - UI는 "???"로 가리고, 구매도 막음
     public bool IsTargetLocked(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId);
-        if (node != null && node.gateObjectIndex >= 0) // 관문 노드는 관문 오브젝트만 봄 (열리면 대상이 아직 없어도 살 수 있음)
+        if (node != null && node.gateObjectIndex >= 0) // 관문 노드는 관문 오브젝트만 봄
             return ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(node.gateObjectIndex);
         return node != null && (IsTargetObjectLocked(node) || IsTargetWeaponLocked(node));
     }
 
-    // IsTargetLocked가 true일 때 툴팁에 보여줄 안내 문구 - 무엇을 먼저 해금해야 하는지
     public string LockedTargetHintText(string nodeId)
     {
-        UpgradeNode node = GetNode(nodeId); // 이 노드가 가리키는 오브젝트/무기를 찾기 위함
-        if (node == null) return "아직 해금할 수 없습니다"; // 못 찾으면 기본 문구로 대체
-        if (node.gateObjectIndex >= 0) return "???"; // 관문 노드는 열리기 전까지 전부 가림
+        UpgradeNode node = GetNode(nodeId);
+        if (node == null) return "아직 해금할 수 없습니다";
+        if (node.gateObjectIndex >= 0) return "???";
 
         if (IsTargetObjectLocked(node))
             return ObjectManager.Instance.NextRequiredUnlockHintText(node.targetObjectIndex);
@@ -294,20 +263,16 @@ public class UpgradeManager : MonoBehaviour
         return $"{WeaponManager.StaticWeaponNameAt(node.targetWeaponIndex)} 무기 해금이 필요합니다";
     }
 
-    // 지금 바로 한 레벨 올릴 수 있는지 (공개됨 + 대상 해금됨 + 최대 레벨 아님 + 재화 충분) - 느낌표 표시용
     public bool CanUpgrade(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId);
         if (node == null || CurrencyManager.Instance == null) return false;
 
-        int level = GetLevel(nodeId); // 현재 레벨
+        int level = GetLevel(nodeId);
         return level < node.maxLevel && IsRevealed(nodeId) && !IsTargetLocked(nodeId)
             && CurrencyManager.Instance.CanAfford(node.CostForLevel(level));
     }
 
-    // 트리 안에 지금 살 수 있는 노드가 하나라도 있는지 - 업그레이드 버튼 느낌표용.
-    // crystal이면 결정으로 사는 노드만, 아니면 조각으로 사는 노드(일반 노드 + 오브젝트 해금/획득 노드)만 봄.
-    // 트리 화면을 한 번도 안 열어도(노드들이 꺼져 있어도) 판단할 수 있게 여기서 직접 훑음
     public bool AnyUpgradeAvailable(bool crystal)
     {
         foreach (UpgradeNode node in _nodes)
@@ -320,7 +285,6 @@ public class UpgradeManager : MonoBehaviour
         return false;
     }
 
-    // 결정으로 사는 노드인지 (비용 줄 중 하나라도 결정이면)
     public bool UsesCrystals(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId);
@@ -368,7 +332,6 @@ public class UpgradeManager : MonoBehaviour
         return true;
     }
 
-    // 저장 파일 로드 시 구매 로직 없이 레벨을 그대로 대입 (없는 id는 무시)
     public void SetLevel(string nodeId, int level)
     {
         UpgradeNode node = GetNode(nodeId);
@@ -382,21 +345,18 @@ public class UpgradeManager : MonoBehaviour
         OnUpgradeChanged?.Invoke(nodeId, level);
     }
 
-    // 테스트용 - 모든 업그레이드 노드를 1레벨만 해금 (조각 소모 없음)
     public void UnlockAllDebug()
     {
         foreach (UpgradeNode node in _nodes)
             SetLevelInternal(node.id, 1);
     }
 
-    // 테스트용 - 모든 업그레이드 노드를 만렙으로 (조각 소모 없음)
     public void MaxAllDebug()
     {
         foreach (UpgradeNode node in _nodes)
             SetLevelInternal(node.id, node.maxLevel);
     }
 
-    // 테스트용 - 모든 업그레이드 레벨을 0으로 (조각 환불은 없음)
     public void ResetAll()
     {
         foreach (UpgradeNode node in _nodes)
@@ -406,9 +366,6 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    // ---- 효과 값 (Click.cs 등에서 사용) ----
-
-    // 특정 효과의 "구매한 레벨들의 값 총합" (선택적으로 대상 오브젝트가 일치하는 노드만)
     private float SumEffect(UpgradeEffect effect, int objectIndexFilter = int.MinValue)
     {
         float total = 0f;
@@ -424,7 +381,6 @@ public class UpgradeManager : MonoBehaviour
         return total;
     }
 
-    // 해금류 - 그 효과를 가진 노드 중 하나라도 1레벨 이상이면 true (objectIndexFilter 주면 그 오브젝트 대상 노드만 봄)
     private bool AnyUnlocked(UpgradeEffect effect, int objectIndexFilter = int.MinValue)
     {
         foreach (UpgradeNode node in _nodes)
@@ -436,8 +392,6 @@ public class UpgradeManager : MonoBehaviour
         return false;
     }
 
-    // 장착한 무기로 클릭할 때의 데미지 보너스. 노드의 Target Weapon Name이 비어있으면 전역이라 항상 합산되고,
-    // 채워져 있으면 그 무기를 지금 장착 중일 때만 합산됨 (전역/특정무기 강화를 같은 Effect로 다룸)
     public int GetClickDamageBonus(int equippedWeaponIndex)
     {
         float total = 0f;
@@ -450,7 +404,7 @@ public class UpgradeManager : MonoBehaviour
             for (int L = 1; L <= level; L++)
                 total += node.ValueAtLevel(L);
         }
-        // 노드 값은 그대로 두고, 장착한 무기 티어의 배율(무기 데미지/체력과 같은 값)로 키움 - 전역 강화도 좋은 무기일수록 크게 붙음
+        // 노드 값에 장착 무기 티어 배율을 곱함
         return Mathf.RoundToInt(total * ObjectHealthCalculator.ScaleOfTier(equippedWeaponIndex + 1));
     }
 
@@ -458,7 +412,7 @@ public class UpgradeManager : MonoBehaviour
     {
         get
         {
-            if (SumEffectRawCount(UpgradeEffect.CritDamage) <= 0) return 0f; // 크리티컬 강화를 한 번도 안 샀으면 크리티컬 자체가 발동 안 함
+            if (SumEffectRawCount(UpgradeEffect.CritDamage) <= 0) return 0f; // 치명타 데미지를 한 번도 안 샀으면 치명타 없음
             float bonus = SumEffect(UpgradeEffect.CritChance) / 100f;
             return Mathf.Clamp01(baseCritChance + bonus);
         }
@@ -473,7 +427,6 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    // "그 효과 노드들의 레벨 합" - CritDamage를 한 번이라도 올렸는지 판단용
     private int SumEffectRawCount(UpgradeEffect effect)
     {
         int total = 0;
@@ -482,10 +435,8 @@ public class UpgradeManager : MonoBehaviour
         return total;
     }
 
-    // 자동클릭은 오브젝트별로 따로 켜짐 - 지금 장착 중인 오브젝트를 대상으로 하는 노드가 있어야 작동함
     public bool AutoClickIsUnlockedFor(int objectIndex) => AnyUnlocked(UpgradeEffect.AutoClickUnlock, objectIndex);
 
-    // 업그레이드로 줄인 공통 주기에 오브젝트 번호별 배율을 곱함 - 뒤쪽 오브젝트일수록 주기가 길고, 하한도 같은 배율로 같이 늘어남
     public float AutoClickIntervalSecondsFor(int objectIndex) =>
         Mathf.Max(minAutoClickInterval, baseAutoClickInterval - SumEffect(UpgradeEffect.AutoClickSpeed, objectIndex))
         * Mathf.Pow(autoClickIntervalGrowthPerObject, Mathf.Max(0, objectIndex));
@@ -507,50 +458,40 @@ public class UpgradeManager : MonoBehaviour
     public float AutoMineIntervalSeconds =>
         Mathf.Max(minAutoMineInterval, baseAutoMineInterval - SumEffect(UpgradeEffect.AutoMineSpeed));
 
-    // 자동 채굴 1틱당 추가로 주는 파편 (기본 지급량 위에 더함)
     public int AutoMineYieldBonus => Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoMineYield));
 
-    // ---- 파편 획득 관련 (Click.HandleDied에서 사용) ----
-
-    // 파편 획득 배율 = 1 + 전역% / 100 (오브젝트별 드랍량 강화는 배율이 아니라 ObjectPieceBonus로 개수를 더함)
     public float PieceGainMultiplier() => 1f + SumEffect(UpgradeEffect.PieceGainGlobal) / 100f;
 
-    // 오브젝트 드랍량 강화 한 레벨이 더해주는 조각 수 = 그 오브젝트 기본 보상의 valuePercent%, 단 최소 1개.
-    // 기본 보상이 1~4개인 초반 오브젝트는 %로는 1개도 안 늘어서, 찍으면 반드시 1개는 늘어나게 함
+    // 기본 보상의 value%, 최소 1개
     public static double ObjectPieceBonusPerLevel(long baseReward, float valuePercent) =>
         System.Math.Max(1.0, baseReward * (double)valuePercent / 100.0);
 
-    // objectIndex 오브젝트의 드랍량 강화로 처치 한 번마다 더 얻는 조각 수 (구매한 레벨들의 합)
     public double ObjectPieceBonus(int objectIndex, long baseReward)
     {
-        double total = 0; // 지금까지 더한 보너스 조각
+        double total = 0;
         foreach (UpgradeNode node in _nodes)
         {
             if (node.effect != UpgradeEffect.PieceGainObject || node.targetObjectIndex != objectIndex) continue;
 
-            int level = GetLevel(node.id); // 이 노드를 찍은 횟수
+            int level = GetLevel(node.id);
             for (int L = 1; L <= level; L++)
                 total += ObjectPieceBonusPerLevel(baseReward, node.ValueAtLevel(L));
         }
         return total;
     }
 
-    // 이 오브젝트 처치 시 파편이 2배로 나올 확률 (0~1)
     public float ObjectDoubleDropChance(int objectIndex) =>
         Mathf.Clamp01(SumEffect(UpgradeEffect.ObjectDoubleDrop, objectIndex) / 100f);
 
-    // 바닥(한 존)에 동시에 떨어져 있을 수 있는 파편 최대 개수
     public int MaxGroundPieces => baseMaxGroundPieces + Mathf.RoundToInt(SumEffect(UpgradeEffect.GroundPieceCap));
 
-    // 오브젝트 처치 시 결정이 나올 확률 (0~1)
     public float CrystalDropChance => Mathf.Clamp01(baseCrystalChance + SumEffect(UpgradeEffect.CrystalChance) / 100f);
 
-    // 결정이 나올 때 한 번에 나오는 개수
-    public long CrystalDropAmount => (long)baseCrystalAmount << Mathf.Clamp(Mathf.RoundToInt(SumEffect(UpgradeEffect.CrystalAmount)), 0, 20); // 드랍량 노드 레벨(효과 1씩)마다 2배 (만렙 10 = 1,024배)
+    public long CrystalDropAmount => (long)baseCrystalAmount << Mathf.Clamp(Mathf.RoundToInt(SumEffect(UpgradeEffect.CrystalAmount)), 0, 20); // 레벨마다 2배
 
-    private static readonly int[] CrystalZoneMultipliers = { 1, 10, 100 }; // 맵(존)별 결정 개수 배율 - 맵1 x1, 맵2 x10, 맵3 x100
+    private static readonly int[] CrystalZoneMultipliers = { 1, 10, 100 }; // 맵1 x1, 맵2 x10, 맵3 x100
 
-    // zone 존에서 결정이 나올 때 한 번에 나오는 개수 (뒤 맵일수록 많이). zone이 -1이면 지금 보는 존
+    // zone -1 = 지금 보는 존
     public long CrystalDropAmountIn(int zone)
     {
         if (zone < 0) zone = ZoneManager.Instance != null ? ZoneManager.Instance.CurrentZone : 0;
@@ -558,30 +499,27 @@ public class UpgradeManager : MonoBehaviour
     }
 
     public bool AutoSweepIsUnlocked => AnyUnlocked(UpgradeEffect.AutoSweepUnlock);
-    // objectIndex(책상/도로)의 "갈라져서 존 전체가 계속 부서지는" 기능을 해금했는지
     public bool ZoneAutoBreakIsUnlockedFor(int objectIndex) => AnyUnlocked(UpgradeEffect.ZoneAutoBreakUnlock, objectIndex);
-    public bool WaxIsUnlockedFor(int objectIndex) => AnyUnlocked(UpgradeEffect.WaxCoatUnlock, objectIndex); // 지형 왁스 코팅 해금 여부
-    // objectIndex 오브젝트를 업그레이드로 몇 개 더 배치했는지 (모든 오브젝트 대상 노드 + 그 오브젝트 전용 노드 합산)
+    public bool WaxIsUnlockedFor(int objectIndex) => AnyUnlocked(UpgradeEffect.WaxCoatUnlock, objectIndex);
     public int ExtraObjectCopies(int objectIndex) =>
         Mathf.RoundToInt(SumEffect(UpgradeEffect.ObjectExtraCopies, -1) + SumEffect(UpgradeEffect.ObjectExtraCopies, objectIndex));
-    public bool HoverPickupIsUnlocked => AnyUnlocked(UpgradeEffect.HoverPickupUnlock); // 호버 줍기 해금 여부
-    // 커서 범위 반지름(월드 단위). 0이면 범위 없이 커서 한 점만. 커서 줍기를 해금하면 기본 범위가 생기고 범위 증가가 그 위에 더해짐
+    public bool HoverPickupIsUnlocked => AnyUnlocked(UpgradeEffect.HoverPickupUnlock);
+    // 월드 유닛, 0이면 커서 한 점
     public float CursorRadius => SumEffect(UpgradeEffect.CursorRange) + (HoverPickupIsUnlocked ? hoverPickupBaseRadius : 0f);
-    public bool HoverClickIsUnlocked => AnyUnlocked(UpgradeEffect.HoverClickUnlock); // 커서 타격 해금 여부
-    public bool StatsIsUnlocked => AnyUnlocked(UpgradeEffect.StatsUnlock); // 통계 창 해금 여부
-    public float HoverClickIntervalSeconds => Mathf.Max(0.02f, hoverClickInterval); // 커서 타격 간격(초) - 0 이하로 넣어도 매 프레임 때리지 않게 하한을 둠
+    public bool HoverClickIsUnlocked => AnyUnlocked(UpgradeEffect.HoverClickUnlock);
+    public bool StatsIsUnlocked => AnyUnlocked(UpgradeEffect.StatsUnlock);
+    public float HoverClickIntervalSeconds => Mathf.Max(0.02f, hoverClickInterval); // 0 이하로 넣어도 매 프레임은 안 때리게
 
     public float AutoSweepIntervalSeconds =>
         Mathf.Max(minAutoSweepInterval, baseAutoSweepInterval - SumEffect(UpgradeEffect.AutoSweepSpeed));
 
-    // 자동 줍기가 한 번 지나갈 때 쓸어 담는 파편 층 수 (1 = 맨 위층만, DebrisPool.LayerCount = 전부)
-    // 커서 줍기가 한 번에 줍는 층 수 - 0이면 커서 밑 맨 위 파편 1개만 (층 업그레이드 전)
+    // 1 = 맨 위층만
+    // 0 = 맨 위 1개만
     public int HoverPickupLayerCount => Mathf.Clamp(Mathf.RoundToInt(SumEffect(UpgradeEffect.HoverPickupLayers)), 0, DebrisPool.LayerCount);
 
     public int AutoSweepLayers =>
         Mathf.Clamp(baseAutoSweepLayers + Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoSweepLayers)), 1, DebrisPool.LayerCount);
 
-    // 이 무기를 장착하고 오브젝트를 처치했을 때 추가로 주는 파편 (전역 노드는 targetWeaponIndex -1이라 항상 포함)
     public long WeaponKillBonusPieces(int equippedWeaponIndex)
     {
         float total = 0f;

@@ -5,61 +5,54 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 
-// 오브젝트 해금(Unlock) 또는 획득량 증가(Gain) 노드 하나. Canvas에 손으로 배치하는 프리팹에 붙여서 씀 -
-// objectIndex와 isGain만 인스펙터에서 지정하면 나머지는 알아서 처리됨.
-// (예: objectIndex=2, isGain=false면 "2번 오브젝트 해금" 버튼, isGain=true면 "2번 오브젝트 획득량 증가" 버튼)
 [RequireComponent(typeof(Button))]
 public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private int objectIndex; // 대상 오브젝트 인덱스 (1번부터 - 0번은 처음부터 해금이라 대상 아님)
-    [SerializeField] private bool isGain; // false면 해금(Unlock) 노드, true면 획득량 증가(Gain) 노드
-    [SerializeField] private TextMeshProUGUI label; // 이름/레벨(또는 완료)/비용을 표시할 텍스트
-    [SerializeField] private Image doneOverlay; // (미사용) 예전엔 해금 완료/최대 레벨이면 켜두던 초록 오버레이 - 지금은 항상 꺼둠
+    [SerializeField] private int objectIndex; // 1부터 (0번은 처음부터 해금)
+    [SerializeField] private bool isGain;
+    [SerializeField] private TextMeshProUGUI label;
+    [SerializeField] private Image doneOverlay; // 미사용
     [Tooltip("해금 완료(또는 획득량 1레벨 이상)되면 바뀔 스프라이트 (비워두면 기본 이미지 그대로 유지)")]
     [SerializeField] private Sprite upgradedSprite;
     [Tooltip("이 오브젝트를 해금해야 열리는 노드 (비우면 안 씀). 그 전엔 자물쇠 그림 + 제목/설명 ???, 해금하는 순간 트리 카메라가 와서 자물쇠가 깨지며 열림. 열리면 대상 오브젝트가 아직 없어도 살 수 있음")]
     [ObjectNameField] [SerializeField] private string gateObjectName;
-    [SerializeField] private Sprite lockedSprite; // 열리기 전 자물쇠 그림
+    [SerializeField] private Sprite lockedSprite;
 
-    // 선행(부모) 노드는 이 노드로 들어오는 UpgradeTreeLink로 정함 (선 하나 = 선행 하나). 일반 업그레이드 노드에서 오든
-    // 다른 해금/획득 노드에서 오든 상관없음. 아래 anchor 필드는 링크가 없을 때만 쓰는 옛날 방식 폴백.
-    [SerializeField] private UpgradeNodeUI anchorMainNode;       // (폴백) 들어오는 링크가 없을 때 선행으로 볼 일반 업그레이드 노드
-    [SerializeField] private ObjectEconomyNodeUI anchorEconomyNode; // (폴백) 들어오는 링크가 없을 때 선행으로 볼 해금/획득 노드
+    // 선행은 들어오는 UpgradeTreeLink로 정해짐 - anchor 필드는 링크가 없을 때만 씀
+    [SerializeField] private UpgradeNodeUI anchorMainNode;
+    [SerializeField] private ObjectEconomyNodeUI anchorEconomyNode;
 
     private Button _button;
     private Image _icon;
-    private Sprite _baseSprite; // 원래(미해금/0레벨) 스프라이트 - Awake 시점에 저장해둠
+    private Sprite _baseSprite;
     private RectTransform _rect;
-    private Coroutine _denyRoutine; // 지금 재생 중인 "못 삼" 흔들림 (중첩 방지)
-    private Vector2 _denyBasePivot; // "못 삼" 흔들림 전 원래 pivot
-    private Coroutine _shakeRoutine; // 지금 재생 중인 흔들림 (중첩 방지)
-    private bool _wasRevealed; // 직전 Refresh 때 이 노드가 공개 상태였는지 - hidden→revealed로 바뀌는 "등장 순간"을 한 번만 잡으려고 추적
-    private bool _refreshedOnce; // Refresh가 최소 한 번 돌았는지 - 첫 호출 때는 등장 흔들림을 재생 안 함(이미 열려있던 노드로 취급)
-    private GameObject _badge; // 지금 조각으로 살 수 있을 때 오른쪽 위에 뜨는 느낌표 (처음 필요할 때 만듦)
+    private Coroutine _denyRoutine;
+    private Vector2 _denyBasePivot;
+    private Coroutine _shakeRoutine;
+    private bool _wasRevealed;
+    private bool _refreshedOnce;
+    private GameObject _badge;
 
-    private readonly List<MonoBehaviour> _prereqNodes = new List<MonoBehaviour>(); // 들어오는 링크(들)의 선행 노드 전부 (UpgradeNodeUI 또는 ObjectEconomyNodeUI). 비어있으면 링크 없음
-    private bool _prereqResolved;        // _prereqNodes를 한 번 찾았는지 (씬의 링크는 안 바뀌니 최초 1회만 탐색)
-    private string _tooltipText;         // Refresh()가 label에 쓴 것과 같은 문구 - 마우스 호버 툴팁에도 그대로 씀
+    private readonly List<MonoBehaviour> _prereqNodes = new List<MonoBehaviour>();
+    private bool _prereqResolved;
+    private string _tooltipText;
 
     public RectTransform Rect => _rect != null ? _rect : (_rect = (RectTransform)transform);
 
-    // 이 노드를 다른 노드의 anchor로 쓸 때 확인함: Gain 노드는 1레벨 이상 올렸는지, Unlock 노드는 해금 완료됐는지
     public bool IsLeveled() => ObjectManager.Instance != null &&
         (isGain ? ObjectManager.Instance.GetGainLevel(objectIndex) >= 1 : ObjectManager.Instance.IsUnlocked(objectIndex));
 
-    // 지금 조각으로 바로 살 수 있는지 (공개됨 + 순서 충족 + 완료/최대 아님 + 조각 충분) - 느낌표 표시용.
-    // 트리 화면이 꺼져 있어도(Awake 전이어도) 부를 수 있음
     public bool CanBuy()
     {
-        ObjectManager objects = ObjectManager.Instance; // 해금/획득 상태와 가격 조회
+        ObjectManager objects = ObjectManager.Instance;
         if (objects == null || CurrencyManager.Instance == null || objectIndex <= 0 || IsGateClosed) return false;
 
-        long cost; // 이번에 내야 하는 조각
+        long cost;
         if (isGain)
         {
             if (!objects.IsUnlocked(objectIndex)) return false;
             cost = objects.GetNextGainCost(objectIndex);
-            if (cost < 0) return false; // 최대 레벨
+            if (cost < 0) return false;
         }
         else
         {
@@ -69,8 +62,6 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         return CurrencyManager.Instance.GetPieces() >= cost;
     }
 
-    // 선행 노드(들) 중 하나라도 충족됐는지 - 이 노드로 들어오는 UpgradeTreeLink(들)의 선행 노드 중 하나라도(OR) 1레벨
-    // 이상/해금 완료면 true. 들어오는 링크가 없으면 옛날 anchor 필드로 폴백, 그것도 없으면 루트로 보고 항상 true.
     private bool PrerequisiteSatisfied()
     {
         if (!_prereqResolved)
@@ -100,10 +91,9 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             return false;
         }
 
-        // 링크 없음 - 옛날 방식 폴백
         if (anchorMainNode != null) return anchorMainNode.IsLeveled();
         if (anchorEconomyNode != null) return anchorEconomyNode.IsLeveled();
-        return true; // 선행 자체가 없으면 루트
+        return true;
     }
 
     void Awake()
@@ -113,7 +103,6 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         _button.onClick.AddListener(HandleClicked);
         CacheIcon();
 
-        // 미사용 오버레이 - 클릭을 가로채지 않도록만 처리
         if (doneOverlay != null)
         {
             doneOverlay.raycastTarget = false;
@@ -121,8 +110,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         }
     }
 
-    // 아이콘과 원래(미해금) 스프라이트를 처음 한 번만 잡아둠. 트리를 처음 열 때는 패널 OnEnable의 RefreshAll이
-    // 이 노드의 Awake보다 먼저 불려서, UpdateIcon에서도 불러야 저장된 상태의 그림이 바로 반영됨
+    // 패널 Refresh가 이 Awake보다 먼저 불릴 수 있어 여기서도 잡음
     private void CacheIcon()
     {
         if (_icon != null) return;
@@ -132,35 +120,30 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
 
     private void RefreshIconAfterGate() => UpdateIcon();
 
-    // 관문 오브젝트(gateObjectName)를 아직 해금 못해서 자물쇠로 가려져 있는지
     public bool IsGateClosed => !string.IsNullOrEmpty(gateObjectName) && ObjectManager.Instance != null
         && !ObjectManager.Instance.IsUnlocked(ObjectManager.StaticIndexOfName(gateObjectName));
     public string GateObjectName => gateObjectName;
-    private bool _gateRevealPending; // 카메라가 오는 동안은 자물쇠 그림을 유지
+    private bool _gateRevealPending;
 
-    // 관문이 열려 있는데 아직 열리는 연출을 안 봤으면(보스를 잡은 뒤 처음 창을 열 때) 트리 카메라를 이 노드로 옮긴 뒤 자물쇠가 깨지며 열림.
-    // 트리 창이 켜져 있을 때만 - 꺼진 채로 불리면 연출을 아껴뒀다가 다음에 창을 열 때 보여줌
     private void CheckGateOpened()
     {
         if (string.IsNullOrEmpty(gateObjectName) || IsGateClosed) return;
-        UpgradeTreeUI tree = UpgradeTreeUI.Instance; // 연출을 보여줄 트리 창
+        UpgradeTreeUI tree = UpgradeTreeUI.Instance;
         if (tree == null || !tree.isActiveAndEnabled || !GateReveals.TryMarkSeen(name)) return;
-        if (SaveManager.Instance != null) SaveManager.Instance.MarkDirty(); // 본 연출은 세이브에 남김 (다른 변경 없이 꺼도 다시 안 나오게)
+        if (SaveManager.Instance != null) SaveManager.Instance.MarkDirty(); // 본 연출을 세이브에 남김
         _gateRevealPending = true;
         tree.PlayGateReveal(Rect, FinishGateReveal);
     }
 
-    // 카메라가 도착한 순간: 자물쇠 -> 원래 그림, 흔들리며 크게 터짐
     private void FinishGateReveal()
     {
         _gateRevealPending = false;
         RefreshIconAfterGate();
-        if (!isActiveAndEnabled) return; // 카메라가 오는 중에 창을 닫음 - 꺼진 노드에선 코루틴/연출을 못 돌림
+        if (!isActiveAndEnabled) return; // 창을 닫아 꺼졌으면 연출 생략
         PlayShake();
         NodePurchaseEffect.Play(Rect, NodePurchaseEffect.NormalColor, true);
     }
 
-    // 해금 완료(또는 획득량 최대 레벨)면 upgradedSprite로, 아니면 원래 스프라이트로. 관문이 닫혀 있으면 자물쇠
     private void UpdateIcon()
     {
         CacheIcon();
@@ -169,7 +152,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         if (upgradedSprite == null) { _icon.sprite = _baseSprite; return; }
         bool maxed = ObjectManager.Instance != null && (isGain
             ? ObjectManager.Instance.GetGainLevel(objectIndex) >= ObjectManager.MaxGainLevel
-            : ObjectManager.Instance.IsUnlocked(objectIndex)); // 더 올릴 게 없는지
+            : ObjectManager.Instance.IsUnlocked(objectIndex));
         _icon.sprite = maxed ? upgradedSprite : _baseSprite;
     }
 
@@ -177,24 +160,22 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     {
         if (ObjectManager.Instance == null) return;
 
-        // 이미 해금된 노드는 TryUnlock이 true를 돌려줘서 따로 막음 - 안 그러면 누를 때마다 구매 이펙트가 터짐
+        // 이미 해금됐으면 TryUnlock이 true라 따로 막음
         bool alreadyDone = !isGain && ObjectManager.Instance.IsUnlocked(objectIndex);
         bool success = !alreadyDone && !IsGateClosed && (isGain ? ObjectManager.Instance.TryUpgradeGain(objectIndex) : ObjectManager.Instance.TryUnlock(objectIndex));
         if (!success)
         {
-            PlayDenyShake(); // 못 살 때(이미 해금/최대/조각 부족)는 좌우로 짧게만 흔들림
+            PlayDenyShake();
             return;
         }
 
         PlayShake();
-        NodePurchaseEffect.Play(_rect, NodePurchaseEffect.NormalColor, !isGain); // 해금은 크게 터짐
-        UpgradeTooltip.Instance?.PlayShake(); // 호버로 떠있는 툴팁도 같이 흔들림
+        NodePurchaseEffect.Play(_rect, NodePurchaseEffect.NormalColor, !isGain);
+        UpgradeTooltip.Instance?.PlayShake();
 
-        UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true); // 방금 해금된 자식 노드들이 나타나도록 트리 전체를 새로고침 (등장 흔들림 재생)
+        UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true);
     }
 
-    // UpgradeTreeUI가 전체를 새로고침할 때마다 호출함.
-    // animateReveal: 구매로 인한 새로고침이면 true - 이 노드가 이번에 처음 공개됐다면 등장 흔들림을 재생함
     public void Refresh(bool animateReveal = false)
     {
         if (ObjectManager.Instance == null)
@@ -203,18 +184,15 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             return;
         }
 
-        // 공개 조건: Unlock 노드는 선행(들어오는 링크의 시작) 노드가 1레벨 이상(또는 해금 완료)이면 나타남.
-        // Gain 노드는 자기 오브젝트가 실제로 해금 완료됐을 때 나타남 (선행이 자기 오브젝트라 링크 불필요)
+        // Gain 노드는 자기 오브젝트가 해금되면 나타남
         bool isRevealed = isGain ? ObjectManager.Instance.IsUnlocked(objectIndex) : PrerequisiteSatisfied();
 
-        // hidden→revealed로 처음 바뀌는 순간 + 구매로 인한 새로고침(animateReveal)일 때만 등장 흔들림.
-        // 첫 Refresh(_refreshedOnce=false)는 제외 - 페이지를 처음 열 때 이미 공개돼있던 노드는 흔들지 않음
         bool justRevealed = animateReveal && _refreshedOnce && isRevealed && !_wasRevealed;
         _wasRevealed = isRevealed;
         _refreshedOnce = true;
 
         gameObject.SetActive(isRevealed);
-        if (!isRevealed) return; // 안 보이는 노드는 열리는 연출도 아껴둠 (공개된 뒤 처음 창을 열 때 보여줌)
+        if (!isRevealed) return; // 안 보이는 노드의 관문 연출은 공개 뒤로 미룸
 
         CheckGateOpened();
         UpdateIcon();
@@ -242,7 +220,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             }
             else if (!ObjectManager.Instance.IsUnlockOrderMet(objectIndex))
             {
-                _tooltipText = "해금\n???"; // 앞 오브젝트를 아직 해금 못했으면 이름과 가격을 가림
+                _tooltipText = "해금\n???";
             }
             else
             {
@@ -252,7 +230,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             if (label != null) label.text = _tooltipText;
 
             if (doneOverlay != null)
-                doneOverlay.gameObject.SetActive(false); // 해금 완료돼도 초록 오버레이는 안 켬 (요청)
+                doneOverlay.gameObject.SetActive(false);
         }
         else
         {
@@ -264,34 +242,30 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             if (label != null) label.text = _tooltipText;
 
             if (doneOverlay != null)
-                doneOverlay.gameObject.SetActive(false); // 최대 레벨이어도 초록 오버레이는 안 켬 (요청)
+                doneOverlay.gameObject.SetActive(false);
         }
     }
-
-    // ---- 호버 툴팁 (일반 업그레이드 노드와 동일하게 동작) ----
 
     public void OnPointerEnter(PointerEventData eventData) => UpgradeTooltip.Instance?.Show(BuildTooltipContent(), Rect);
     public void OnPointerExit(PointerEventData eventData) => UpgradeTooltip.Instance?.Hide();
 
-    // 툴팁에 보여줄 내용 - 제목/설명/레벨/가격 4줄 (노드 위에 직접 쓰는 짧은 label 문구와는 별개)
     private UpgradeTooltip.Content BuildTooltipContent()
     {
         if (ObjectManager.Instance == null) return new UpgradeTooltip.Content { title = "" };
 
         string objectName = ObjectManager.Instance.GetObjectAt(objectIndex).objectName;
-        if (IsGateClosed) return new UpgradeTooltip.Content { title = "???", description = "???", level = "" }; // 관문 전엔 전부 가림
+        if (IsGateClosed) return new UpgradeTooltip.Content { title = "???", description = "???", level = "" };
 
         if (!isGain)
         {
             bool unlocked = ObjectManager.Instance.IsUnlocked(objectIndex);
-            // 부수면 다음 맵이 열리는 오브젝트(책상 등)면 그 사실을 알려줌 - 다음 맵이 이미 열렸으면 생략
             string zoneHint = ObjectManager.Instance.OpensNextZone(objectIndex) && !ObjectManager.Instance.IsUnlocked(objectIndex + 1)
                 ? "부수면 다음 맵이 열립니다." : null;
             if (unlocked)
                 return new UpgradeTooltip.Content { title = $"{objectName} 해금", description = zoneHint ?? "이미 해금했습니다.", level = "완료" };
 
             if (!ObjectManager.Instance.IsUnlockOrderMet(objectIndex))
-                return new UpgradeTooltip.Content { title = "???", description = ObjectManager.Instance.NextRequiredUnlockHintText(objectIndex), level = "0 / 1" }; // 가격 대신 다음에 해금할 오브젝트 안내
+                return new UpgradeTooltip.Content { title = "???", description = ObjectManager.Instance.NextRequiredUnlockHintText(objectIndex), level = "0 / 1" };
 
             long cost = ObjectManager.Instance.GetUnlockCost(objectIndex);
             return new UpgradeTooltip.Content
@@ -305,7 +279,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
 
         int level = ObjectManager.Instance.GetGainLevel(objectIndex);
         bool maxed = level >= 5;
-        string gain = NumberFormatUtil.Format(ObjectManager.Instance.GainBonusPerLevel(objectIndex)); // 레벨당 이 오브젝트 처치 시 더 주는 조각 개수
+        string gain = NumberFormatUtil.Format(ObjectManager.Instance.GainBonusPerLevel(objectIndex));
         return new UpgradeTooltip.Content
         {
             title = $"{objectName} 획득량",
@@ -315,7 +289,6 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         };
     }
 
-    // 구매 성공 / 노드 등장 공용 흔들림 - 색 반짝임 없이 좌우로 살짝 기울었다 돌아옴 (일반 업그레이드 노드와 동일)
     private void PlayShake()
     {
         if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
@@ -325,14 +298,14 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
 
     private IEnumerator ShakeRoutine()
     {
-        const float duration = 0.25f;            // 흔들림 총 시간(초)
-        const float amplitudeDegrees = 7f;       // 최대 각도
-        const float oscillations = 1.5f;         // 좌우 왕복 횟수
+        const float duration = 0.25f;
+        const float amplitudeDegrees = 7f;
+        const float oscillations = 1.5f;
 
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            elapsed += Time.unscaledDeltaTime;   // 업그레이드 화면이 timeScale 0이라 unscaled
+            elapsed += Time.unscaledDeltaTime; // timeScale 0이라 unscaled
             float progress = Mathf.Clamp01(elapsed / duration);
 
             float angle = amplitudeDegrees * Mathf.Sin(progress * oscillations * Mathf.PI * 2f) * (1f - progress);
@@ -345,10 +318,9 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         _shakeRoutine = null;
     }
 
-    // 흔드는 도중 트리를 닫으면 코루틴이 멈추니 원래 자리로 되돌림
     void OnDisable()
     {
-        if (_shakeRoutine != null) // 흔드는 도중에 꺼지면 기운 채로 남지 않게
+        if (_shakeRoutine != null)
         {
             _rect.localRotation = Quaternion.identity;
             _shakeRoutine = null;
@@ -358,28 +330,27 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         _denyRoutine = null;
     }
 
-    // 못 살 때 흔들림 - 터지는 이펙트 없이 좌우로 짧게 (일반 업그레이드 노드와 동일)
     private void PlayDenyShake()
     {
         if (_denyRoutine != null) StopCoroutine(_denyRoutine);
-        else _denyBasePivot = _rect.pivot; // 흔드는 중이 아닐 때만 원래 pivot 기억 (연타해도 자리가 안 밀리게)
+        else _denyBasePivot = _rect.pivot;
         _denyRoutine = StartCoroutine(DenyShakeRoutine());
     }
 
     private IEnumerator DenyShakeRoutine()
     {
-        const float duration = 0.18f;      // 흔들림 총 시간(초)
-        const float amplitudeRatio = 0.06f; // 최대 이동 거리 (노드 폭 기준 비율)
-        // anchoredPosition은 선(UpgradeTreeLink)이 읽는 값이라 건드리지 않고 pivot만 밀어서 그림만 흔듦 - 선은 제자리
-        const float oscillations = 2f;     // 좌우 왕복 횟수
+        const float duration = 0.18f;
+        const float amplitudeRatio = 0.06f;
+        // 선이 anchoredPosition을 읽어서 pivot만 밀어 그림만 흔듦
+        const float oscillations = 2f;
 
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            elapsed += Time.unscaledDeltaTime; // 업그레이드 화면이 timeScale 0이라 unscaled
+            elapsed += Time.unscaledDeltaTime; // timeScale 0이라 unscaled
             float progress = Mathf.Clamp01(elapsed / duration);
-            float offset = amplitudeRatio * Mathf.Sin(progress * oscillations * Mathf.PI * 2f) * (1f - progress); // 이번 프레임 이동 (폭 비율)
-            _rect.pivot = _denyBasePivot - new Vector2(offset, 0f); // pivot을 줄이면 그림이 오른쪽으로 감
+            float offset = amplitudeRatio * Mathf.Sin(progress * oscillations * Mathf.PI * 2f) * (1f - progress);
+            _rect.pivot = _denyBasePivot - new Vector2(offset, 0f);
             yield return null;
         }
 

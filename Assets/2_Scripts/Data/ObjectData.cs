@@ -1,21 +1,17 @@
 using System;
 using UnityEngine;
 
-// 파괴 대상 오브젝트 하나의 데이터. WeaponData와 같은 이유로 순수 C# 클래스로 둠
-// (ScriptableObject 애셋 15개를 에디터에서 직접 만들 필요 없이 코드에 바로 정의)
 [Serializable]
 public class ObjectData
 {
-    public int tier; // 이 오브젝트가 속한 무기 티어 (1부터 시작, WeaponData.tier와 대응)
-    public int indexInTier; // 같은 티어 내에서 이 오브젝트의 순번 (1부터 시작, ObjectHealthCalculator에 그대로 넘김)
-    public float hpMultiplier = 1f; // 계산된 체력에 곱하는 배수 - 마일스톤(지형 전환) 오브젝트만 2 정도로 올림
-    public string objectName; // 화면에 보일 오브젝트 이름 (영어)
-    public Color pileColor; // 이 오브젝트를 부술 때 DebrisPool에 쌓이는 조각 색상 (지금은 placeholder, 나중에 조정)
-    public AudioClip[] clickSounds; // 이 오브젝트를 클릭할 때 랜덤 재생할 사운드 목록 (ObjectManager 인스펙터에서 채워짐)
-    public AudioClip breakSound; // 이 오브젝트가 파괴될 때 재생할 사운드 (ObjectManager 인스펙터에서 채워짐)
-    public Sprite[] healthStages; // 체력 100% -> 0% 순서의 스프라이트 단계 (ObjectManager 인스펙터에서 채워짐)
-    // 크기 보정값(오브젝트 전체/단계별)은 여기 저장하지 않고 ObjectManager.GetSizeMultiplier/GetStageScaleMultiplier로 그때그때 조회함
-    // (플레이 중 인스펙터 값 수정이 바로 반영되도록 하기 위함)
+    public int tier; // 1부터
+    public int indexInTier; // 티어 안 순번, 1부터
+    public float hpMultiplier = 1f;
+    public string objectName;
+    public Color pileColor;
+    public AudioClip[] clickSounds;
+    public AudioClip breakSound;
+    public Sprite[] healthStages;
 
     public ObjectData(int tier, int indexInTier, string objectName, Color pileColor)
     {

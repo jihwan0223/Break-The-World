@@ -1,18 +1,15 @@
 using System;
 using UnityEngine;
 
-// 지역(존) 전환 관리. 존 루트를 하나만 켜두는 방식이라 존마다 배경/오브젝트를 통째로 갈아끼운다.
-// 해금은 ★ 지형 오브젝트(책상 등)를 처음 부술 때 UnlockZone으로 열어준다.
 public class ZoneManager : MonoBehaviour
 {
-    // 씬 어디서든 ZoneManager.Instance로 접근하기 위한 싱글톤
     public static ZoneManager Instance { get; private set; }
 
-    [SerializeField] private GameObject[] zoneRoots; // 존 번호 순서대로 넣을 것 (0 = 책상 위)
-    [SerializeField] private int[] zoneFirstObjects; // 존 번호별로, 그 존이 열릴 때 조각 없이 공짜로 해금해줄 오브젝트 인덱스 (-1이면 없음). 존이 늘면 여기도 같이 채울 것
+    [SerializeField] private GameObject[] zoneRoots; // 0 = 책상 위
+    [SerializeField] private int[] zoneFirstObjects; // -1 = 없음
 
-    private int _currentZone; // 지금 보고 있는 존 번호
-    private int _unlockedMaxZone; // 해금된 마지막 존 번호 (0이면 첫 존만 열린 상태)
+    private int _currentZone;
+    private int _unlockedMaxZone; // 0 = 첫 존만
 
     public int CurrentZone => _currentZone;
     public int UnlockedMaxZone => _unlockedMaxZone;
@@ -21,7 +18,6 @@ public class ZoneManager : MonoBehaviour
     public bool CanGoPrev => _currentZone > 0;
     public bool CanGoNext => _currentZone < _unlockedMaxZone;
 
-    // 존이 바뀌거나 새로 해금될 때 발행 - 화살표 UI가 구독해서 표시를 갱신함
     public event Action OnZoneChanged;
 
     void Awake()
@@ -36,7 +32,6 @@ public class ZoneManager : MonoBehaviour
         ApplyZone();
     }
 
-    // 세이브 로드용 - 구매/연출 없이 상태만 대입
     public void SetState(int unlockedMaxZone, int currentZone)
     {
         _unlockedMaxZone = Mathf.Clamp(unlockedMaxZone, 0, Mathf.Max(0, ZoneCount - 1));
@@ -46,7 +41,6 @@ public class ZoneManager : MonoBehaviour
         OnZoneChanged?.Invoke();
     }
 
-    // 테스트용 - 첫 존만 열린 처음 상태로 되돌림 (디버그 메뉴의 "존 해금 초기화"). 존 해금으로 공짜로 열렸던 오브젝트도 다시 잠그고, 첫 파괴 연출도 다시 나옴
     public void ResetAll()
     {
         if (ObjectManager.Instance != null && zoneFirstObjects != null)
@@ -57,11 +51,9 @@ public class ZoneManager : MonoBehaviour
         SetState(0, 0);
     }
 
-    // 조각으로 사는 게 아니라 존이 열릴 때 공짜로 풀리는 오브젝트인지 (가로등 등)
     public bool IsZoneFirstObject(int objectIndex) =>
         objectIndex >= 0 && zoneFirstObjects != null && Array.IndexOf(zoneFirstObjects, objectIndex) >= 1;
 
-    // 해당 존을 해금 (이미 열려있으면 무시). 실제 호출은 ★ 오브젝트 첫 파괴 시점
     public void UnlockZone(int zone)
     {
         if (zone <= _unlockedMaxZone || zone >= ZoneCount) return;
@@ -83,27 +75,24 @@ public class ZoneManager : MonoBehaviour
     public void GoPrev() => GoTo(_currentZone - 1);
     public void GoNext() => GoTo(_currentZone + 1);
 
-    // 열려 있는 존들의 첫 오브젝트를 해금 (이미 해금된 건 건너뜀). 저장 파일을 불러올 때도 불려서, 이미 열린 존의 오브젝트가 빠져있지 않게 맞춰줌
     private void GrantZoneObjects()
     {
         if (ObjectManager.Instance == null || zoneFirstObjects == null) return;
 
         for (int zone = 1; zone <= _unlockedMaxZone && zone < zoneFirstObjects.Length; zone++)
         {
-            int objectIndex = zoneFirstObjects[zone]; // 이 존이 열리면 같이 열어줄 오브젝트
+            int objectIndex = zoneFirstObjects[zone];
             if (objectIndex >= 0 && !ObjectManager.Instance.IsUnlocked(objectIndex))
                 ObjectManager.Instance.SetUnlocked(objectIndex, true);
         }
     }
 
-    // 이 Transform이 지금 안 보이는 존 안에 있는지 - 안 보이는 존의 오브젝트는 계속 돌아가지만(자동클릭) 그림/소리/연출은 내지 않음
     public bool IsHidden(Transform target)
     {
-        int zone = ZoneOf(target); // 이 Transform이 속한 존
-        return zone >= 0 && zone != _currentZone; // 어느 존에도 속하지 않으면 항상 보이는 것으로 취급
+        int zone = ZoneOf(target);
+        return zone >= 0 && zone != _currentZone;
     }
 
-    // 이 Transform이 속한 존 번호 (어느 존 루트 아래에도 없으면 -1)
     public int ZoneOf(Transform target)
     {
         if (zoneRoots == null) return -1;
@@ -116,21 +105,20 @@ public class ZoneManager : MonoBehaviour
         return -1;
     }
 
-    // 모든 존 루트를 켜두고(자동클릭이 다른 존에서도 계속 돌게), 현재 존이 아닌 것은 그림만 끔.
-    // 부서지던 체력은 존을 옮겨도 그대로 둠
+    // 자동클릭이 다른 존에서도 돌게 루트는 다 켜두고 그림만 끔
     private void ApplyZone()
     {
         if (zoneRoots == null) return;
 
         for (int i = 0; i < zoneRoots.Length; i++)
         {
-            GameObject root = zoneRoots[i]; // 이 번호의 존 루트
+            GameObject root = zoneRoots[i];
             if (root == null) continue;
 
             root.SetActive(true);
-            bool hidden = i != _currentZone; // 이 존이 지금 안 보이는 존인지
+            bool hidden = i != _currentZone;
             foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>(true))
-                renderer.forceRenderingOff = hidden; // enabled와 별개라 UnlockGate/Health가 켜고 꺼도 영향 없음
+                renderer.forceRenderingOff = hidden; // enabled와 별개라 UnlockGate/Health와 충돌 없음
         }
     }
 }

@@ -2,24 +2,20 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// 책상을 처음 부술 때 나오는 "새 지역 해금" 연출: 흰 화면 번쩍임 + 카메라 흔들림 + 안내 문구.
-// 번쩍임이 가라앉기 시작할 때 존을 해금해서 화살표가 연출과 함께 튀어나오게 한다.
-// ZoneArrowsUI와 같은 GameObject(UIDocument 공용)에 붙이고, 오버레이는 재생할 때만 만들었다가 지움.
 [RequireComponent(typeof(UIDocument))]
 public class ZoneUnlockEffect : MonoBehaviour
 {
-    [SerializeField] private float unlockDelay = 0.2f; // 번쩍임 시작 후 존을 해금(화살표 등장)하기까지 걸리는 시간(초)
-    [SerializeField] private float flashDuration = 0.6f; // 흰 화면이 사라지는 데 걸리는 시간(초)
-    [SerializeField] private float shakeDuration = 0.5f; // 카메라 흔들림 시간(초)
-    [SerializeField] private float shakeAmount = 0.3f; // 카메라 흔들림 최대 세기(월드 유닛, 갈수록 약해짐)
-    [SerializeField] private float bannerDelay = 0.15f; // 안내 문구가 나타나기 시작하는 시점(초)
-    [SerializeField] private float bannerFadeIn = 0.3f; // 안내 문구가 서서히 나타나는 시간(초)
-    [SerializeField] private float bannerHold = 2f; // 안내 문구가 완전히 보인 채로 머무는 시간(초)
-    [SerializeField] private float bannerFadeOut = 0.5f; // 안내 문구가 서서히 사라지는 시간(초)
+    [SerializeField] private float unlockDelay = 0.2f; // 초
+    [SerializeField] private float flashDuration = 0.6f; // 초
+    [SerializeField] private float shakeDuration = 0.5f; // 초
+    [SerializeField] private float shakeAmount = 0.3f; // 월드 유닛
+    [SerializeField] private float bannerDelay = 0.15f; // 초
+    [SerializeField] private float bannerFadeIn = 0.3f; // 초
+    [SerializeField] private float bannerHold = 2f; // 초
+    [SerializeField] private float bannerFadeOut = 0.5f; // 초
 
-    private bool _playing; // 재생 중 중복 호출 방지
+    private bool _playing;
 
-    // zone 존을 해금하면서 연출 재생 (이미 재생 중이면 무시)
     public void Play(int zone)
     {
         if (!_playing)
@@ -29,9 +25,9 @@ public class ZoneUnlockEffect : MonoBehaviour
     private IEnumerator Run(int zone)
     {
         _playing = true;
-        VisualElement root = GetComponent<UIDocument>().rootVisualElement; // 오버레이를 붙일 UI 루트
+        VisualElement root = GetComponent<UIDocument>().rootVisualElement;
 
-        VisualElement flash = new VisualElement(); // 화면 전체를 덮는 흰 막
+        VisualElement flash = new VisualElement();
         flash.pickingMode = PickingMode.Ignore;
         flash.style.position = Position.Absolute;
         flash.style.left = 0;
@@ -40,7 +36,7 @@ public class ZoneUnlockEffect : MonoBehaviour
         flash.style.bottom = 0;
         flash.style.backgroundColor = Color.white;
 
-        VisualElement banner = new VisualElement(); // 화면 위쪽에 뜨는 안내 문구 묶음
+        VisualElement banner = new VisualElement();
         banner.pickingMode = PickingMode.Ignore;
         banner.style.position = Position.Absolute;
         banner.style.left = 0;
@@ -55,10 +51,9 @@ public class ZoneUnlockEffect : MonoBehaviour
         root.Add(banner);
 
         CameraShake.Shake(shakeAmount, shakeDuration);
-        float bannerEnd = bannerDelay + bannerFadeIn + bannerHold + bannerFadeOut; // 연출이 전부 끝나는 시점
-        bool unlocked = false; // 존 해금을 이미 했는지
+        float bannerEnd = bannerDelay + bannerFadeIn + bannerHold + bannerFadeOut;
+        bool unlocked = false;
 
-        // timeScale이 바뀌어도 연출이 안 늘어지도록 실제 시간(unscaled)으로 진행
         for (float t = 0f; t < bannerEnd; t += Time.unscaledDeltaTime)
         {
             flash.style.opacity = 1f - Mathf.Clamp01(t / flashDuration);
@@ -81,10 +76,9 @@ public class ZoneUnlockEffect : MonoBehaviour
         _playing = false;
     }
 
-    // 반투명 검은 바탕 위의 흰 글씨 한 줄 (밝은 화면 위에서도 읽히게)
     private static Label CreateLabel(string text, int fontSize)
     {
-        Label label = new Label(text); // 만들어서 돌려줄 라벨
+        Label label = new Label(text);
         label.pickingMode = PickingMode.Ignore;
         label.style.fontSize = fontSize;
         label.style.unityFontStyleAndWeight = FontStyle.Bold;

@@ -1,21 +1,15 @@
 using UnityEngine;
 
-// objectIndex 오브젝트가 ObjectManager에서 해금됐을 때만 이 GameObject가 보이고 부술 수 있게 한다.
-// 씬에 파괴 대상 오브젝트(가운데 스왑 오브젝트를 복붙해서 위치만 잡은 것)를 미리 배치해두고 이 컴포넌트를 붙인 뒤
-// objectIndex를 그 오브젝트 번호로 맞추면 됨 (Click/Health/HealthSpriteSwitcher의 Fixed Object Index도 같은 번호로).
-// 해금 전에는 이 오브젝트의 렌더러/콜라이더/Click/Health/HitFeedback을 자동으로 꺼서 안 보이고 클릭도 안 되게 한다.
 public class UnlockGate : MonoBehaviour
 {
-    [SerializeField] private int objectIndex; // ObjectManager objects 리스트 인덱스 (0 = 첫 오브젝트, 항상 해금)
+    [SerializeField] private int objectIndex; // 0 = 항상 해금
 
-    // 켜두면 해금 전에도 그림은 그대로 보이고 클릭만 막음 - 책상처럼 오브젝트 자체가 배경인 경우에 씀
+    // 해금 전에도 그림은 보임 (배경 오브젝트용)
     [SerializeField] private bool keepVisibleWhenLocked;
 
-    // 0이면 기본으로 놓이는 오브젝트. 1 이상이면 "오브젝트 추가 배치" 업그레이드로 이 수만큼 더 배치돼야 나타나는 추가분
-    // (같은 오브젝트의 2번째 = 1, 3번째 = 2, 4번째 = 3). 추가분은 기본 오브젝트를 복제해서 원하는 자리에 놓고 이 값만 바꾸면 됨
+    // 1 이상이면 추가 배치 업그레이드로 나오는 n번째 추가분
     [SerializeField] private int requiredExtraCopies;
 
-    // 자동으로 못 찾는 걸 추가로 끄고 싶을 때만 채움 (보통 비워둠)
     [SerializeField] private Behaviour[] extraBehaviours;
     [SerializeField] private Renderer[] extraRenderers;
 
@@ -30,7 +24,6 @@ public class UnlockGate : MonoBehaviour
     {
         _renderers = GetComponentsInChildren<Renderer>(true);
         _colliders = GetComponentsInChildren<Collider2D>(true);
-        // 이 스크립트 자신은 빼고, 게이팅 대상이 될 만한 컴포넌트만 (Click / Health / HealthSpriteSwitcher / HitFeedback / SpriteColliderSync)
         var all = GetComponentsInChildren<MonoBehaviour>(true);
         var list = new System.Collections.Generic.List<Behaviour>();
         foreach (var m in all)
@@ -40,14 +33,14 @@ public class UnlockGate : MonoBehaviour
         _behaviours = list.ToArray();
     }
 
-    void OnEnable() => _applied = false; // 다시 켜질 때 강제 재적용
+    void OnEnable() => _applied = false;
 
     void Update()
     {
         bool show = ObjectManager.Instance == null || ObjectManager.Instance.IsUnlocked(objectIndex);
-        if (show && requiredExtraCopies > 0) // 추가분은 업그레이드로 그만큼 더 배치했을 때만
+        if (show && requiredExtraCopies > 0)
             show = UpgradeManager.Instance != null && UpgradeManager.Instance.ExtraObjectCopies(objectIndex) >= requiredExtraCopies;
-        if (_applied && show == _shown) return; // 상태 안 바뀌었으면 아무것도 안 함 (대부분의 프레임)
+        if (_applied && show == _shown) return;
 
         _applied = true;
         _shown = show;

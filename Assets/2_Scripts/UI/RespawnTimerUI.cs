@@ -43,7 +43,7 @@ public class RespawnTimerUI : MonoBehaviour
         _background.style.borderTopRightRadius = 4;
         _background.style.borderBottomLeftRadius = 4;
         _background.style.borderBottomRightRadius = 4;
-        _background.style.display = DisplayStyle.None; // 평소엔 숨김, 재생성 대기 중일 때만 표시
+        _background.style.display = DisplayStyle.None;
 
         _label = new Label();
         _label.style.fontSize = 18;

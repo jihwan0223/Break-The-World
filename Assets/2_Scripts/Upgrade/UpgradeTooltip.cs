@@ -3,24 +3,22 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-// 업그레이드 노드에 마우스를 올리면 그 노드 위에 뜨는 설명 박스. 노드와 달리 Content(줌/팬 대상) 밖,
-// UpgradeTreePanel 바로 아래에 두어 확대/축소 영향을 안 받게 함. 배경 Image + TMP 텍스트를 코드로 만든다.
+// 줌 영향을 안 받게 Content 밖, UpgradeTreePanel 바로 아래에 둠
 [RequireComponent(typeof(RectTransform))]
 public class UpgradeTooltip : MonoBehaviour
 {
     public static UpgradeTooltip Instance { get; private set; }
 
-    [SerializeField] private float maxWidth = 560f;    // 툴팁 고정 폭 (텍스트는 이 안에서 줄바꿈)
-    [SerializeField] private float gapAboveNode = 18f;  // 노드 위 여백(px)
+    [SerializeField] private float maxWidth = 560f;
+    [SerializeField] private float gapAboveNode = 18f; // px
     [SerializeField] private Vector2 padding = new Vector2(22f, 16f);
-    [SerializeField] private float fontSize = 32f;      // 설명 글자 크기 (줌 아웃해도 잘 보이게 크게) - 제목/메타는 이 값에서 비율로 계산됨
-    [SerializeField] private Color backgroundColor = new Color(0f, 0f, 0f, 1f); // 완전 검은색 배경
-    [SerializeField] private Color mutedTextColor = new Color(0.62f, 0.62f, 0.66f, 1f); // 설명/라벨 색
-    [SerializeField] private Color borderColor = Color.white;   // 테두리 선 색
-    [SerializeField] private float borderThickness = 3f;        // 테두리 선 두께(px)
-    [SerializeField] private Color dividerColor = new Color(1f, 1f, 1f, 0.5f); // 줄 사이 구분선 색
+    [SerializeField] private float fontSize = 32f;
+    [SerializeField] private Color backgroundColor = new Color(0f, 0f, 0f, 1f);
+    [SerializeField] private Color mutedTextColor = new Color(0.62f, 0.62f, 0.66f, 1f);
+    [SerializeField] private Color borderColor = Color.white;
+    [SerializeField] private float borderThickness = 3f; // px
+    [SerializeField] private Color dividerColor = new Color(1f, 1f, 1f, 0.5f);
 
-    // 제목 - 설명 - 레벨 - 가격 4줄 구조. description/level/price가 비어있으면 그 줄은 안 보임(예: 해금 완료 시 가격 줄 숨김 등)
     public struct Content
     {
         public string title;
@@ -33,9 +31,9 @@ public class UpgradeTooltip : MonoBehaviour
     private RectTransform _content;
     private TextMeshProUGUI _titleText;
     private TextMeshProUGUI _descriptionText;
-    private RectTransform _dividerAfterTitle;       // 제목-설명 사이 구분선
-    private RectTransform _dividerAfterDescription;  // 설명-레벨 사이 구분선
-    private RectTransform _dividerAfterLevel;        // 레벨-가격 사이 구분선
+    private RectTransform _dividerAfterTitle;
+    private RectTransform _dividerAfterDescription;
+    private RectTransform _dividerAfterLevel;
     private TextMeshProUGUI _levelText;
     private TextMeshProUGUI _priceText;
     private Coroutine _shakeRoutine;
@@ -56,8 +54,8 @@ public class UpgradeTooltip : MonoBehaviour
     private void Build()
     {
         _rect.anchorMin = _rect.anchorMax = new Vector2(0.5f, 0.5f);
-        _rect.pivot = new Vector2(0.5f, 0f); // 아래쪽 기준 - 노드 위에 놓기 편하게
-        _rect.sizeDelta = new Vector2(maxWidth, 0f); // 폭은 고정, 높이는 내용에 따라 매번 다시 계산됨
+        _rect.pivot = new Vector2(0.5f, 0f);
+        _rect.sizeDelta = new Vector2(maxWidth, 0f);
 
         var bgGo = new GameObject("Background", typeof(RectTransform), typeof(Image));
         var bg = (RectTransform)bgGo.transform;
@@ -69,15 +67,11 @@ public class UpgradeTooltip : MonoBehaviour
         bgImg.color = backgroundColor;
         bgImg.raycastTarget = false;
 
-        // 테두리: 4개 얇은 흰색 막대를 상하좌우 가장자리에 스트레치 앵커로 붙임 (프레임 스프라이트 없이 순수 코드로)
         CreateBorderEdge("BorderTop", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, borderThickness));
         CreateBorderEdge("BorderBottom", new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, borderThickness));
         CreateBorderEdge("BorderLeft", new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(borderThickness, 0f));
         CreateBorderEdge("BorderRight", new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), new Vector2(borderThickness, 0f));
-        // ↑ 각 호출의 마지막 Vector2는 sizeDelta: 두께 축만 값을 주고 나머지 축은 0(=부모 폭/높이에 꽉 붙는 스트레치)
 
-        // Content: 제목/설명/구분선/레벨/가격을 세로로 쌓는 컨테이너. 위치/높이는 Unity 레이아웃 시스템에 맡기지 않고
-        // ApplyContent()가 직접 계산해서 넣음 (LayoutRow 참고). RectMask2D는 혹시 모를 폭 초과에 대한 안전장치.
         var contentGo = new GameObject("Content", typeof(RectTransform), typeof(RectMask2D));
         _content = (RectTransform)contentGo.transform;
         _content.anchorMin = new Vector2(0f, 1f);
@@ -85,7 +79,7 @@ public class UpgradeTooltip : MonoBehaviour
         _content.pivot = new Vector2(0.5f, 1f);
         _content.SetParent(_rect, false);
         _content.anchoredPosition = Vector2.zero;
-        _content.sizeDelta = Vector2.zero; // 높이는 ApplyContent가 매번 직접 재계산해서 넣어줌
+        _content.sizeDelta = Vector2.zero;
 
         _titleText = CreateText("Title", fontSize * 1.05f, FontStyles.Bold, Color.white);
         _dividerAfterTitle = CreateDivider("DividerAfterTitle");
@@ -96,7 +90,6 @@ public class UpgradeTooltip : MonoBehaviour
         _priceText = CreateText("Price", fontSize * 0.82f, FontStyles.Normal, Color.white);
     }
 
-    // Content 아래에 가로 한 줄짜리 구분선 생성 (제목/설명/레벨/가격 사이에 씀). 위치/높이는 ApplyContent가 직접 배치.
     private RectTransform CreateDivider(string name)
     {
         var go = new GameObject(name, typeof(RectTransform), typeof(Image));
@@ -113,7 +106,6 @@ public class UpgradeTooltip : MonoBehaviour
         return rt;
     }
 
-    // 툴팁 테두리용 얇은 막대 하나. anchorMin/Max로 가장자리에 스트레치시키고 sizeDelta의 두께 축만 값을 줌
     private void CreateBorderEdge(string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 sizeDelta)
     {
         var go = new GameObject(name, typeof(RectTransform), typeof(Image));
@@ -129,8 +121,6 @@ public class UpgradeTooltip : MonoBehaviour
         img.raycastTarget = false;
     }
 
-    // Content 아래에 TMP 텍스트 한 줄 생성 (제목/설명/레벨/가격 공용). 가로 폭은 패딩만큼 인셋된 고정 앵커.
-    // 세로 위치/높이는 ApplyContent()의 LayoutRow가 매번 직접 넣어줌.
     private TextMeshProUGUI CreateText(string name, float size, FontStyles style, Color color)
     {
         var go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
@@ -154,19 +144,17 @@ public class UpgradeTooltip : MonoBehaviour
         return tmp;
     }
 
-    // anchor 노드 위에 툴팁을 띄움
     public void Show(Content content, RectTransform anchor)
     {
         gameObject.SetActive(true);
-        _rect.localRotation = Quaternion.identity; // 직전 흔들림이 멈춰서 기울어진 채 남아있을 수 있음
+        _rect.localRotation = Quaternion.identity; // 직전 흔들림이 멈춰 기울어진 채 남았을 수 있음
         ApplyContent(content);
 
-        // 노드 화면 위치 + 노드 렌더 높이 절반 + 여백 만큼 위로
         float nodeHalfHeight = anchor.rect.height * 0.5f * anchor.lossyScale.y;
         _rect.position = anchor.position + Vector3.up * (nodeHalfHeight + gapAboveNode);
 
         ClampInsideParent();
-        _rect.SetAsLastSibling(); // 항상 맨 앞
+        _rect.SetAsLastSibling();
     }
 
     public void Hide()
@@ -174,14 +162,12 @@ public class UpgradeTooltip : MonoBehaviour
         if (this != null) gameObject.SetActive(false);
     }
 
-    // 이미 떠있는 툴팁의 내용만 갈아끼움 (위치/회전은 안 건드림) - 구매로 레벨이 바뀌었을 때 씀
     public void UpdateContent(Content content)
     {
         if (!gameObject.activeSelf) return;
         ApplyContent(content);
     }
 
-    // 제목/설명/레벨/가격 텍스트를 채우고(빈 줄은 숨김) 각 줄을 위에서부터 차례로 직접 쌓아 박스 높이를 맞춤
     private void ApplyContent(Content content)
     {
         _titleText.text = content.title;
@@ -189,17 +175,16 @@ public class UpgradeTooltip : MonoBehaviour
         SetRow(_levelText.gameObject, _levelText, content.level);
         SetRow(_priceText.gameObject, _priceText, content.price);
 
-        bool hasDescription = !string.IsNullOrEmpty(content.description); // 제목은 항상 있으니 따로 안 봐도 됨
+        bool hasDescription = !string.IsNullOrEmpty(content.description);
         bool hasLevel = !string.IsNullOrEmpty(content.level);
         bool hasPrice = !string.IsNullOrEmpty(content.price);
 
-        // 각 구분선은 "바로 앞 줄이 보이고 + 뒤에 보일 줄이 하나라도 있을 때"만 켜서, 줄이 비어 숨겨져도 선만 덩그러니 남지 않게 함
         _dividerAfterTitle.gameObject.SetActive(hasDescription || hasLevel || hasPrice);
         _dividerAfterDescription.gameObject.SetActive(hasDescription && (hasLevel || hasPrice));
         _dividerAfterLevel.gameObject.SetActive(hasLevel && hasPrice);
 
-        float spacing = fontSize * 0.2f; // 줄 사이 간격
-        float cursorY = padding.y; // 위쪽 패딩만큼 아래로 시작해서 한 줄씩 내려가며 쌓음
+        float spacing = fontSize * 0.2f;
+        float cursorY = padding.y;
 
         cursorY = LayoutRow(_titleText, cursorY, spacing);
         cursorY = LayoutDivider(_dividerAfterTitle, cursorY, spacing);
@@ -209,13 +194,12 @@ public class UpgradeTooltip : MonoBehaviour
         cursorY = LayoutDivider(_dividerAfterLevel, cursorY, spacing);
         if (hasPrice) cursorY = LayoutRow(_priceText, cursorY, spacing);
 
-        float totalHeight = cursorY + padding.y; // 마지막 줄 뒤 아래쪽 패딩 추가
+        float totalHeight = cursorY + padding.y;
         _rect.sizeDelta = new Vector2(maxWidth, totalHeight);
-        _content.sizeDelta = new Vector2(_content.sizeDelta.x, totalHeight); // RectMask2D가 이 rect 기준으로 자르므로 같이 갱신
+        _content.sizeDelta = new Vector2(_content.sizeDelta.x, totalHeight); // RectMask2D가 이 rect 기준으로 자름
     }
 
-    // 보이는 TMP 한 줄을 cursorY(박스 상단에서부터의 거리) 위치에 배치하고, 실제 줄바꿈 높이만큼 커서를 내림.
-    // ForceMeshUpdate()로 지금 폭 기준 줄바꿈을 즉시 계산해서 정확한 preferredHeight를 얻음.
+    // ForceMeshUpdate로 지금 폭 기준 줄바꿈 높이를 바로 계산
     private float LayoutRow(TextMeshProUGUI tmp, float cursorY, float spacing)
     {
         tmp.ForceMeshUpdate();
@@ -226,7 +210,6 @@ public class UpgradeTooltip : MonoBehaviour
         return cursorY + height + spacing;
     }
 
-    // 구분선 한 줄(고정 두께 1px)을 cursorY에 배치. 안 보이면 커서 그대로 반환(자리 안 차지함)
     private float LayoutDivider(RectTransform divider, float cursorY, float spacing)
     {
         if (!divider.gameObject.activeSelf) return cursorY;
@@ -244,10 +227,9 @@ public class UpgradeTooltip : MonoBehaviour
         if (has) tmp.text = text;
     }
 
-    // 노드에서 구매/해금 성공 시 호출 - 떠있는 툴팁도 노드처럼 대각선으로 흔들림
     public void PlayShake()
     {
-        if (!gameObject.activeSelf) return; // 안 떠 있으면 무시
+        if (!gameObject.activeSelf) return;
         if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
         _rect.localRotation = Quaternion.identity;
         _shakeRoutine = StartCoroutine(ShakeRoutine());
@@ -255,14 +237,14 @@ public class UpgradeTooltip : MonoBehaviour
 
     private IEnumerator ShakeRoutine()
     {
-        const float duration = 0.22f;       // 흔들림 총 시간(초)
-        const float amplitudeDegrees = 7f;  // 최대 각도
-        const float oscillations = 1.5f;    // 좌우 왕복 횟수
+        const float duration = 0.22f; // 초
+        const float amplitudeDegrees = 7f; // 도
+        const float oscillations = 1.5f;
 
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            elapsed += Time.unscaledDeltaTime; // 업그레이드 화면이 timeScale 0이라 unscaled
+            elapsed += Time.unscaledDeltaTime; // timeScale 0이라 unscaled
             float p = Mathf.Clamp01(elapsed / duration);
             float angle = amplitudeDegrees * Mathf.Sin(p * oscillations * Mathf.PI * 2f) * (1f - p);
             _rect.localRotation = Quaternion.Euler(0f, 0f, angle);
@@ -273,7 +255,6 @@ public class UpgradeTooltip : MonoBehaviour
         _shakeRoutine = null;
     }
 
-    // 부모(패널) 바깥으로 삐져나가면 안쪽으로 밀어넣음
     private void ClampInsideParent()
     {
         if (_rect.parent is not RectTransform parent) return;

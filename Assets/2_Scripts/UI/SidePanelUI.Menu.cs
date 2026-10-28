@@ -3,25 +3,22 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
-// 게임 화면의 설정 창(오른쪽 위 톱니)과 통계 창(결정 업그레이드로 해금). 디버그 창은 설정 창 안 버튼으로 엶
 public partial class SidePanelUI
 {
-    private const string MenuSceneName = "MenuScene"; // 설정 창의 "메인 메뉴로"가 이동할 씬
+    private const string MenuSceneName = "MenuScene";
 
-    private Button _statsButton; // 버튼 줄의 통계 버튼 (해금 전엔 숨김)
-    private VisualElement _statsPanel; // 통계 창
-    private readonly List<(Label value, System.Func<string> get)> _statRows = new List<(Label, System.Func<string>)>(); // 통계 값 줄 - 열 때마다 다시 채움
-    private VisualElement _settingsPanel; // 설정 창
-    private VisualElement _confirmBox; // 종료/메뉴로 나가기 확인창 (설정 창 위에 덮음)
-    private Label _confirmMessage; // 확인창 질문
-    private Button _confirmSave; // "저장하고 ~"
-    private Button _confirmNoSave; // "저장 안 하고 ~"
-    private System.Action _confirmLeave; // 확인창에서 고른 뒤 실제로 나가는 동작 (종료 또는 메뉴로)
-    private VisualElement _demoBox; // 마지막 보스(회사)를 잡으면 뜨는 데모 클리어 창
-    private static SidePanelUI _instance; // 데모 클리어 창을 밖(ZoneBreaker)에서 띄우려고 들고 있음
-    private const float DemoBoxDelay = 2.5f; // 보스를 잡고 슬로우 모션/부서짐 연출이 끝날 때까지 기다렸다 띄우는 시간(초)
-
-    // ---- 데모 클리어 ----
+    private Button _statsButton;
+    private VisualElement _statsPanel;
+    private readonly List<(Label value, System.Func<string> get)> _statRows = new List<(Label, System.Func<string>)>();
+    private VisualElement _settingsPanel;
+    private VisualElement _confirmBox;
+    private Label _confirmMessage;
+    private Button _confirmSave;
+    private Button _confirmNoSave;
+    private System.Action _confirmLeave;
+    private VisualElement _demoBox;
+    private static SidePanelUI _instance;
+    private const float DemoBoxDelay = 2.5f; // 초
 
     public static void ShowDemoComplete()
     {
@@ -36,11 +33,10 @@ public partial class SidePanelUI
 
     private void CloseDemoBox() => _demoBox.style.display = DisplayStyle.None;
 
-    // 반투명 덮개 + 가운데 크림 창: 리본 제목, 감사 문구, [메인 메뉴로] [계속하기]
     private void BuildDemoBox(VisualElement root)
     {
         _instance = this;
-        _demoBox = new VisualElement(); // 반투명 검은 덮개 (뒤 게임 클릭 막음)
+        _demoBox = new VisualElement();
         _demoBox.style.position = Position.Absolute;
         _demoBox.style.left = _demoBox.style.right = _demoBox.style.top = _demoBox.style.bottom = 0;
         _demoBox.style.backgroundColor = new Color(0f, 0f, 0f, 0.55f);
@@ -51,7 +47,7 @@ public partial class SidePanelUI
         _demoBox.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
         root.Add(_demoBox);
 
-        var window = new VisualElement(); // 가운데 크림 창
+        var window = new VisualElement();
         window.style.alignItems = Align.Center;
         window.style.paddingTop = 40;
         window.style.paddingBottom = 40;
@@ -60,19 +56,19 @@ public partial class SidePanelUI
         PixelStyle.Frame(window, PixelStyle.Window, 6f);
         _demoBox.Add(window);
 
-        var title = new Label("데모 완료!"); // 분홍 리본 제목 (팝업 창 제목과 같은 모양) - "클"은 테두리 폰트에서 굵게 하면 뭉개져서 안 씀
+        var title = new Label("데모 완료!"); // '클'은 테두리 폰트에서 뭉개져서 '완료'로
         title.style.fontSize = 56;
         title.style.paddingLeft = 56;
         title.style.paddingRight = 56;
         title.style.paddingTop = 12;
-        title.style.paddingBottom = 18; // 리본 아래 그늘 줄만큼 더
+        title.style.paddingBottom = 18;
         title.style.marginBottom = 36;
         title.style.unityFontStyleAndWeight = FontStyle.Bold;
         PixelStyle.Frame(title, PixelStyle.Ribbon);
         PixelStyle.OutlinedText(title, PixelStyle.Ribbon.text);
         window.Add(title);
 
-        string[] lines = // 다른 게임 데모 끝 화면에서 흔히 쓰는 감사 문구
+        string[] lines =
         {
             "데모를 끝까지 플레이해 주셔서 감사합니다!",
             "정식 버전에서는 더 많은 맵과 오브젝트가 기다리고 있어요.",
@@ -80,7 +76,7 @@ public partial class SidePanelUI
         };
         foreach (string text in lines)
         {
-            var line = new Label(text); // 문구 한 줄
+            var line = new Label(text);
             line.style.fontSize = 36;
             line.style.color = PixelStyle.Text.linear;
             line.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -88,14 +84,14 @@ public partial class SidePanelUI
             window.Add(line);
         }
 
-        var hint = new Label("계속하기를 누르면 지금 진행 그대로 이어서 할 수 있어요."); // 옅은 안내
+        var hint = new Label("계속하기를 누르면 지금 진행 그대로 이어서 할 수 있어요.");
         hint.style.fontSize = 28;
         hint.style.color = PixelStyle.MutedText.linear;
         hint.style.marginTop = 14;
         hint.style.marginBottom = 32;
         window.Add(hint);
 
-        var row = new VisualElement(); // 버튼 줄
+        var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
         window.Add(row);
         Button menu = CreateButton("메인 메뉴로", PixelStyle.Sky, () => { SaveManager.Instance?.SaveNow(); GoToMainMenu(); });
@@ -110,33 +106,31 @@ public partial class SidePanelUI
         }
     }
 
-    // ---- 설정 ----
-
     private void BuildSettingsPanel(VisualElement root)
     {
         _settingsPanel = CreatePopupFrame(CloseSettingsPanel, out Label title);
         title.text = "설정";
 
-        var body = new VisualElement(); // 화면 가운데: [소리] [화면+게임], 그 아래 버튼 줄 (메뉴 설정과 같은 배치)
+        var body = new VisualElement();
         body.style.position = Position.Absolute;
         body.style.left = 0;
         body.style.right = 0;
-        body.style.top = 100; // 제목 리본 아래부터
+        body.style.top = 100;
         body.style.bottom = 0;
         body.style.alignItems = Align.Center;
         body.style.justifyContent = Justify.Center;
         _settingsPanel.Add(body);
 
-        var columns = new VisualElement(); // 두 칸
+        var columns = new VisualElement();
         columns.style.flexDirection = FlexDirection.Row;
         columns.style.alignItems = Align.FlexStart;
         body.Add(columns);
 
-        var left = new VisualElement(); // 소리
+        var left = new VisualElement();
         left.style.marginRight = 56;
         left.style.alignItems = Align.Center;
         columns.Add(left);
-        var right = new VisualElement(); // 화면 + 게임
+        var right = new VisualElement();
         right.style.alignItems = Align.Center;
         columns.Add(right);
 
@@ -148,24 +142,24 @@ public partial class SidePanelUI
         AddSettingRow(right, "화면 모드", () => GameSettings.Fullscreen ? "전체화면" : "창 모드", _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
         AddSettingRow(right, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
         {
-            List<Vector2Int> list = GameSettings.Resolutions; // 고를 수 있는 해상도
+            List<Vector2Int> list = GameSettings.Resolutions;
             if (list.Count == 0) return;
-            int index = Mathf.Max(0, list.IndexOf(GameSettings.Resolution)); // 지금 해상도 번호
+            int index = Mathf.Max(0, list.IndexOf(GameSettings.Resolution));
             GameSettings.Resolution = list[(index + step + list.Count) % list.Count];
         });
         AddSettingRow(right, "프레임 제한", () =>
         {
-            int fps = GameSettings.FpsOptions[GameSettings.FpsIndex]; // 제한 값
+            int fps = GameSettings.FpsOptions[GameSettings.FpsIndex];
             return fps < 0 ? "무제한" : $"{fps} FPS";
         }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length);
-        var gameHeader = PixelStyle.CardHeader("게임"); // 게임 항목 머리글
+        var gameHeader = PixelStyle.CardHeader("게임");
         gameHeader.style.marginTop = 10;
         right.Add(gameHeader);
         AddSettingRow(right, "화면 흔들림", () => GameSettings.ScreenShake ? "켜기" : "끄기", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
         AddSettingRow(right, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
         AddSettingRow(right, "숫자 표시", () => GameSettings.NumberUnits ? "영어 단위" : "숫자", _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
 
-        var buttons = new VisualElement(); // 아래 버튼 줄
+        var buttons = new VisualElement();
         buttons.style.flexDirection = FlexDirection.Row;
         buttons.style.marginTop = 36;
         body.Add(buttons);
@@ -186,10 +180,9 @@ public partial class SidePanelUI
         root.Add(_settingsPanel);
     }
 
-    // 설정 창 위에 덮는 확인창: 질문 + [저장하고 ~] [저장 안 하고 ~] [돌아가기]
     private void BuildLeaveConfirm()
     {
-        _confirmBox = new VisualElement(); // 반투명 검은 덮개 (뒤 설정 창 클릭 막음)
+        _confirmBox = new VisualElement();
         _confirmBox.style.position = Position.Absolute;
         _confirmBox.style.left = 0;
         _confirmBox.style.right = 0;
@@ -201,7 +194,7 @@ public partial class SidePanelUI
         _confirmBox.style.display = DisplayStyle.None;
         _settingsPanel.Add(_confirmBox);
 
-        var window = new VisualElement(); // 가운데 크림 창
+        var window = new VisualElement();
         window.style.alignItems = Align.Center;
         window.style.paddingTop = 36;
         window.style.paddingBottom = 36;
@@ -210,13 +203,13 @@ public partial class SidePanelUI
         PixelStyle.Frame(window, PixelStyle.Window, 6f);
         _confirmBox.Add(window);
 
-        _confirmMessage = new Label(); // 질문
+        _confirmMessage = new Label();
         _confirmMessage.style.fontSize = 36;
         _confirmMessage.style.color = PixelStyle.Text.linear;
         _confirmMessage.style.marginBottom = 30;
         window.Add(_confirmMessage);
 
-        var row = new VisualElement(); // 버튼 줄
+        var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
         window.Add(row);
         _confirmSave = CreateButton("", PixelStyle.Mint, () => Leave(true));
@@ -224,7 +217,7 @@ public partial class SidePanelUI
         Button back = CreateButton("돌아가기", PixelStyle.Sky, () => _confirmBox.style.display = DisplayStyle.None);
         foreach (Button b in new[] { _confirmSave, _confirmNoSave, back })
         {
-            b.style.width = 460; // "저장 안 하고 나가기"가 넉넉히 들어가게
+            b.style.width = 460;
             b.style.height = 100;
             b.style.marginLeft = 8;
             b.style.marginRight = 8;
@@ -232,7 +225,6 @@ public partial class SidePanelUI
         }
     }
 
-    // verb: "종료" / "나가기" - 버튼 글자에 붙음
     private void ShowLeaveConfirm(string question, string verb, System.Action leave)
     {
         _confirmMessage.text = question;
@@ -242,7 +234,6 @@ public partial class SidePanelUI
         _confirmBox.style.display = DisplayStyle.Flex;
     }
 
-    // 저장 여부를 정하고 나감. 저장 안 하면 아직 안 쓴 변경(자동 저장 대기분)을 버림
     private void Leave(bool save)
     {
         if (save) SaveManager.Instance?.SaveNow();
@@ -251,17 +242,16 @@ public partial class SidePanelUI
         _confirmLeave?.Invoke();
     }
 
-    // 메뉴 설정과 같은 모양: "이름 퍼센트" 글자 + 그 밑 홈 안의 유리관 (누르거나 끌어서 조절)
     private void AddVolumeBar(VisualElement column, string label, System.Func<float> get, System.Action<float> set)
     {
-        var caption = new Label(); // 유리관 위 "이름 퍼센트"
+        var caption = new Label();
         caption.style.fontSize = 36;
         caption.style.color = PixelStyle.Text.linear;
         caption.style.marginBottom = 6;
         column.Add(caption);
 
-        var cylinder = new GlassCylinderSlider(get(), v => { set(v); caption.text = $"{label}  {Percent(v)}"; }, _ => { }); // 유리관 조절기
-        var slot = new VisualElement(); // 유리관이 놓이는 홈
+        var cylinder = new GlassCylinderSlider(get(), v => { set(v); caption.text = $"{label}  {Percent(v)}"; }, _ => { });
+        var slot = new VisualElement();
         slot.style.paddingTop = 14;
         slot.style.paddingBottom = 18;
         slot.style.paddingLeft = 18;
@@ -271,13 +261,12 @@ public partial class SidePanelUI
         slot.Add(cylinder);
         column.Add(slot);
 
-        _settingRefreshers.Add(() => { cylinder.SetValue(get()); caption.text = $"{label}  {Percent(get())}"; }); // 창을 열 때 저장된 값으로
+        _settingRefreshers.Add(() => { cylinder.SetValue(get()); caption.text = $"{label}  {Percent(get())}"; });
     }
 
-    // "이름  < 값 >" 한 줄 - 화살표로 값을 바꾸고 바로 저장/적용
     private void AddSettingRow(VisualElement column, string label, System.Func<string> getValue, System.Action<int> step)
     {
-        var row = new VisualElement(); // 한 줄
+        var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
         row.style.alignItems = Align.Center;
         row.style.width = 640;
@@ -288,18 +277,18 @@ public partial class SidePanelUI
         row.style.marginBottom = 12;
         PixelStyle.Frame(row, PixelStyle.Card);
 
-        var name = new Label(label); // 항목 이름
+        var name = new Label(label);
         name.style.flexGrow = 1;
         name.style.fontSize = 36;
         name.style.color = PixelStyle.Text.linear;
         row.Add(name);
 
-        var value = new Label(); // 지금 값 (창을 열 때 다시 읽음)
+        var value = new Label();
         value.style.width = 230;
         value.style.fontSize = 36;
         value.style.color = PixelStyle.Text.linear;
         value.style.unityTextAlign = TextAnchor.MiddleCenter;
-        System.Action<int> change = d => { step(d); value.text = getValue(); }; // 바꾸고 다시 표시
+        System.Action<int> change = d => { step(d); value.text = getValue(); };
         row.Add(ArrowButton("<", () => change(-1)));
         row.Add(value);
         row.Add(ArrowButton(">", () => change(1)));
@@ -307,7 +296,7 @@ public partial class SidePanelUI
         column.Add(row);
     }
 
-    private readonly List<System.Action> _settingRefreshers = new List<System.Action>(); // 창을 열 때 값 글자를 다시 채우는 함수들
+    private readonly List<System.Action> _settingRefreshers = new List<System.Action>();
 
     private static Button ArrowButton(string text, System.Action onClick)
     {
@@ -328,14 +317,14 @@ public partial class SidePanelUI
         _confirmBox.style.display = DisplayStyle.None;
         _settingsPanel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility();
-        Time.timeScale = 0f; // 다른 창과 같이 열려 있는 동안 게임 정지
+        Time.timeScale = 0f;
         OnSelectorPanelToggled?.Invoke(true);
     }
 
     private void CloseSettingsPanel()
     {
         _settingsPanel.style.display = DisplayStyle.None;
-        PlayerPrefs.Save(); // 바꾼 설정을 바로 디스크에
+        PlayerPrefs.Save();
         RefreshButtonRowVisibility();
         Time.timeScale = 1f;
         OnSelectorPanelToggled?.Invoke(false);
@@ -343,7 +332,7 @@ public partial class SidePanelUI
 
     private void GoToMainMenu()
     {
-        Time.timeScale = 1f; // 멈춘 채로 넘어가지 않게
+        Time.timeScale = 1f;
         SceneManager.LoadScene(MenuSceneName);
     }
 
@@ -356,33 +345,29 @@ public partial class SidePanelUI
 #endif
     }
 
-    // 버튼 줄 맨 오른쪽 톱니 - 다른 버튼과 같은 픽셀 버튼(정사각형) 위에 톱니 그림
     private Button CreateGearButton()
     {
-        Button button = CreateButton("", PixelStyle.Slot, OpenSettingsPanel); // 다른 버튼과 같은 눌림/펀치
+        Button button = CreateButton("", PixelStyle.Slot, OpenSettingsPanel);
         button.focusable = false;
-        button.style.width = 110; // 높이와 같게 정사각형
+        button.style.width = 110;
         button.style.alignItems = Align.Center;
         button.style.justifyContent = Justify.Center;
 
-        var icon = new VisualElement(); // 톱니 그림
+        var icon = new VisualElement();
         icon.pickingMode = PickingMode.Ignore;
         icon.style.width = 80;
         icon.style.height = 80;
-        icon.style.backgroundImage = new StyleBackground(settingsIcon); // 인스펙터에서 넣은 톱니 그림
+        icon.style.backgroundImage = new StyleBackground(settingsIcon);
         button.Add(icon);
         return button;
     }
-
-    // ---- 통계 ----
 
     private void BuildStatsPanel(VisualElement root)
     {
         _statsPanel = CreatePopupFrame(CloseStatsPanel, out Label title);
         title.text = "통계";
 
-        // 1쪽: 기록 | 능력치, 2쪽: 오브젝트별 부순 횟수 (두 칸). 양옆 화살표로 넘기고 아래에 "1 / 2"
-        var columns = StatPage(); // 1쪽
+        var columns = StatPage();
         var left = StatColumn(columns, "기록");
         left.style.marginRight = 48;
         UpgradeManager U() => UpgradeManager.Instance;
@@ -410,25 +395,23 @@ public partial class SidePanelUI
         AddStat(right, "더블 클릭 확률", () => U() != null && U().DoubleClickIsUnlocked ? Chance(U().DoubleClickChanceValue) : "잠김");
         AddStat(right, "조각 획득 보너스", () => U() != null ? $"+{Mathf.RoundToInt((U().PieceGainMultiplier() - 1f) * 100f)}%" : "-");
         AddStat(right, "결정 확률", () => U() != null ? Chance(U().CrystalDropChance) : "-");
-        AddStat(right, "결정 개수", () => U() != null ? $"{NumberFormatUtil.Format(U().CrystalDropAmountIn(-1))}개" : "-"); // 지금 보는 맵 기준
+        AddStat(right, "결정 개수", () => U() != null ? $"{NumberFormatUtil.Format(U().CrystalDropAmountIn(-1))}개" : "-");
         AddStat(right, "커서 범위", () => U() != null && U().HoverPickupIsUnlocked ? $"{U().CursorRadius:0.##}" : "잠김");
 
-        // 2쪽: 오브젝트별 부순 횟수 - 앞 절반 / 뒤 절반
         var objectsPage = StatPage();
-        int count = ObjectManager.StaticObjectCount; // 오브젝트 종류 수
-        int half = (count + 1) / 2; // 왼쪽 칸에 들어갈 수
+        int count = ObjectManager.StaticObjectCount;
+        int half = (count + 1) / 2;
         var objLeft = StatColumn(objectsPage, "부순 횟수");
         objLeft.style.marginRight = 48;
         var objRight = StatColumn(objectsPage, "부순 횟수");
         for (int i = 0; i < count; i++)
         {
-            int index = i; // 람다에 넘길 번호
+            int index = i;
             AddStat(i < half ? objLeft : objRight, ObjectManager.StaticObjectNameAt(index),
                 () => ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(index) && GameStats.BrokenOf(index) == 0
-                    ? "???" : NumberFormatUtil.Format(GameStats.BrokenOf(index)) + "번"); // 아직 못 본 오브젝트는 가림
+                    ? "???" : NumberFormatUtil.Format(GameStats.BrokenOf(index)) + "번");
         }
 
-        // 양옆 화살표 + 아래 쪽수
         Button prev = StatArrow("<", -1);
         prev.style.left = 40;
         Button next = StatArrow(">", 1);
@@ -447,11 +430,10 @@ public partial class SidePanelUI
         root.Add(_statsPanel);
     }
 
-    private readonly List<VisualElement> _statPages = new List<VisualElement>(); // 통계 쪽들
-    private int _statPage; // 지금 보고 있는 쪽
-    private Label _statPageLabel; // 아래 "1 / 2"
+    private readonly List<VisualElement> _statPages = new List<VisualElement>();
+    private int _statPage;
+    private Label _statPageLabel;
 
-    // 두 칸이 나란히 놓이는 통계 한 쪽
     private VisualElement StatPage()
     {
         var page = new VisualElement();
@@ -467,7 +449,6 @@ public partial class SidePanelUI
         return page;
     }
 
-    // 화면 가운데 높이의 쪽 넘김 화살표
     private Button StatArrow(string text, int step)
     {
         var button = new Button(() => ShowStatPage(_statPage + step)) { text = text };
@@ -482,7 +463,6 @@ public partial class SidePanelUI
         return button;
     }
 
-    // page쪽만 보이게 (양 끝에서 넘기면 반대쪽 끝으로)
     private void ShowStatPage(int page)
     {
         _statPage = (page % _statPages.Count + _statPages.Count) % _statPages.Count;
@@ -491,7 +471,6 @@ public partial class SidePanelUI
         _statPageLabel.text = $"{_statPage + 1} / {_statPages.Count}";
     }
 
-    // 머리글이 달린 통계 한 칸
     private static VisualElement StatColumn(VisualElement parent, string header)
     {
         var column = new VisualElement();
@@ -501,10 +480,9 @@ public partial class SidePanelUI
         return column;
     }
 
-    // "이름 ........ 값" 한 줄
     private void AddStat(VisualElement column, string label, System.Func<string> get)
     {
-        var row = new VisualElement(); // 한 줄
+        var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
         row.style.alignItems = Align.Center;
         row.style.width = 640;
@@ -512,16 +490,16 @@ public partial class SidePanelUI
         row.style.paddingRight = 20;
         row.style.paddingTop = 4;
         row.style.paddingBottom = 8;
-        row.style.marginBottom = 8; // 한 칸에 10줄 + 아래 쪽수가 화면에 들어가게
+        row.style.marginBottom = 8; // 한 칸에 10줄이 화면에 들어가게
         PixelStyle.Frame(row, PixelStyle.Card);
 
-        var name = new Label(label); // 항목 이름
+        var name = new Label(label);
         name.style.flexGrow = 1;
         name.style.fontSize = 36;
         name.style.color = PixelStyle.MutedText.linear;
         row.Add(name);
 
-        var value = new Label(); // 값
+        var value = new Label();
         value.style.fontSize = 36;
         value.style.color = PixelStyle.Text.linear;
         row.Add(value);
@@ -533,7 +511,7 @@ public partial class SidePanelUI
 
     private static string UnlockedText(int count, System.Func<int, bool> unlocked)
     {
-        int n = 0; // 해금된 수
+        int n = 0;
         for (int i = 0; i < count; i++) if (unlocked(i)) n++;
         return $"{n} / {count}";
     }

@@ -1,22 +1,18 @@
 using System;
 using UnityEngine;
 
-// 무기 하나의 데이터. ScriptableObject가 아니라 순수 C# 클래스로 둬서
-// WeaponManager 코드 안에 10개를 바로 정의할 수 있게 함 (에디터에서 애셋 10개 만들 필요 없음)
 [Serializable]
 public class WeaponData
 {
-    public int tier; // 몇 번째 무기인지 (1부터 시작, 1=맨손)
-    public string weaponName; // 화면에 보일 무기 이름 (영어)
-    public int clickDamage; // 이 무기 장착 시 클릭 한 번당 데미지
-    public Sprite icon; // 타격 연출 등에 쓸 무기 이미지. 생성자가 아니라 WeaponManager가 인스펙터 배열로 나중에 채워줌
-    // sizeMultiplier/rotationOffset은 여기 저장하지 않고, WeaponManager.GetSizeMultiplier/GetRotationOffset으로 그때그때 조회함
-    // (Awake 시점에 한 번만 복사해두면 플레이 중 인스펙터 값 수정이 반영되지 않는 문제가 있어서)
+    public int tier; // 1부터 (1 = 맨손)
+    public string weaponName;
+    public int clickDamage;
+    public Sprite icon;
 
     public WeaponData(int tier, string weaponName, int clickDamage)
     {
         this.tier = tier;
         this.weaponName = weaponName;
-        this.clickDamage = clickDamage * ObjectHealthCalculator.ScaleOfTier(tier); // 같은 티어 오브젝트의 체력과 같은 배율로 키움
+        this.clickDamage = clickDamage * ObjectHealthCalculator.ScaleOfTier(tier); // 같은 티어 오브젝트 체력과 같은 배율
     }
 }

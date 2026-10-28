@@ -3,24 +3,22 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// 설정창에서 바꾸는 값들 (PlayerPrefs에 저장). 게임을 켜면 저장된 화면/음량 설정을 바로 적용함. 배경음악은 메뉴 씬에서만 나옴.
-// 마스터 음량은 MainMenuUI, 효과음 음량은 SfxPlayer가 따로 저장함 (예전부터 쓰던 키 그대로)
 public static class GameSettings
 {
-    private const string MasterVolumeKey = "MasterVolume"; // 마스터 음량 (MainMenuUI와 같은 키)
-    private const string BgmVolumeKey = "BgmVolume"; // 배경음악 음량
-    private const float BgmLoudness = 0.2f; // 배경음악 원래 소리 크기 배율 - 원본이 커서 크게 줄임 (음량 100%여도 원본의 20%)
-    private const string FullscreenKey = "Fullscreen"; // 1 = 전체화면, 0 = 창 모드
+    private const string MasterVolumeKey = "MasterVolume";
+    private const string BgmVolumeKey = "BgmVolume";
+    private const float BgmLoudness = 0.2f; // 음량 100%에서도 원본의 20%
+    private const string FullscreenKey = "Fullscreen"; // 1 = 전체화면, 0 = 창
     private const string ResolutionKey = "Resolution"; // "가로x세로"
-    private const string FpsKey = "FpsLimit"; // FpsOptions 번호
-    private const string ShakeKey = "ScreenShake"; // 화면 흔들림 켜기(1)/끄기(0)
-    private const string DamageNumbersKey = "DamageNumbers"; // 데미지 숫자 켜기(1)/끄기(0)
-    private const string NumberUnitsKey = "NumberUnits"; // 큰 숫자를 영어 단위(K/M/B)로(1) / 콤마 숫자로(0)
+    private const string FpsKey = "FpsLimit";
+    private const string ShakeKey = "ScreenShake";
+    private const string DamageNumbersKey = "DamageNumbers";
+    private const string NumberUnitsKey = "NumberUnits";
 
-    public static readonly int[] FpsOptions = { 30, 60, 120, 144, -1 }; // 프레임 제한 선택지 (-1 = 무제한)
+    public static readonly int[] FpsOptions = { 30, 60, 120, 144, -1 }; // -1 = 무제한
 
-    private const string MenuSceneName = "MenuScene"; // 배경음악이 나오는 씬
-    private static AudioSource _bgm; // 배경음악 재생기 (씬이 바뀌어도 남아 있음)
+    private const string MenuSceneName = "MenuScene";
+    private static AudioSource _bgm; // 씬이 바뀌어도 유지
 
     public static float MasterVolume
     {
@@ -54,20 +52,19 @@ public static class GameSettings
         set => PlayerPrefs.SetInt(DamageNumbersKey, value ? 1 : 0);
     }
 
-    // 큰 숫자 표시 방식. 처음엔 기기 언어로 정함 - 만/억을 쓰는 한국어/일본어/중국어는 콤마 숫자, 나머지는 K/M/B 단위
     public static bool NumberUnits
     {
         get => PlayerPrefs.GetInt(NumberUnitsKey, DefaultNumberUnits ? 1 : 0) == 1;
         set { PlayerPrefs.SetInt(NumberUnitsKey, value ? 1 : 0); OnNumberFormatChanged?.Invoke(); }
     }
 
-    public static event System.Action OnNumberFormatChanged; // 숫자 표시 방식이 바뀌면 - 화면에 이미 떠 있는 숫자를 다시 쓰게
+    public static event System.Action OnNumberFormatChanged;
 
     private static bool DefaultNumberUnits
     {
         get
         {
-            SystemLanguage lang = Application.systemLanguage; // 기기 언어
+            SystemLanguage lang = Application.systemLanguage;
             return lang != SystemLanguage.Korean && lang != SystemLanguage.Japanese && lang != SystemLanguage.Chinese
                 && lang != SystemLanguage.ChineseSimplified && lang != SystemLanguage.ChineseTraditional;
         }
@@ -85,7 +82,6 @@ public static class GameSettings
         set { PlayerPrefs.SetInt(FpsKey, Mathf.Clamp(value, 0, FpsOptions.Length - 1)); ApplyFrameRate(); }
     }
 
-    // 고를 수 있는 해상도 (같은 크기는 하나만, 작은 것부터)
     public static List<Vector2Int> Resolutions =>
         Screen.resolutions.Select(r => new Vector2Int(r.width, r.height)).Distinct().OrderBy(r => r.x * r.y).ToList();
 
@@ -93,7 +89,7 @@ public static class GameSettings
     {
         get
         {
-            string saved = PlayerPrefs.GetString(ResolutionKey, ""); // 저장된 "가로x세로"
+            string saved = PlayerPrefs.GetString(ResolutionKey, "");
             string[] parts = saved.Split('x');
             if (parts.Length == 2 && int.TryParse(parts[0], out int w) && int.TryParse(parts[1], out int h)) return new Vector2Int(w, h);
             return new Vector2Int(Screen.currentResolution.width, Screen.currentResolution.height);
@@ -101,17 +97,16 @@ public static class GameSettings
         set { PlayerPrefs.SetString(ResolutionKey, $"{value.x}x{value.y}"); ApplyDisplay(); }
     }
 
-    // 게임이 켜질 때 저장된 설정을 적용하고, 씬이 바뀔 때마다 배경음악을 켜거나 끔
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Startup()
     {
 #if !UNITY_EDITOR && !DEVELOPMENT_BUILD
-        Debug.unityLogger.filterLogType = LogType.Warning; // 출시 빌드는 경고/에러만 기록 (클릭마다 찍히는 일반 로그 끔)
+        Debug.unityLogger.filterLogType = LogType.Warning; // 출시 빌드는 경고/에러만 기록
 #endif
         AudioListener.volume = MasterVolume;
         ApplyFrameRate();
 #if !UNITY_EDITOR
-        ApplyDisplay(); // 에디터 게임 화면 크기는 건드리지 않음
+        ApplyDisplay();
 #endif
         UpdateBgm();
         SceneManager.sceneLoaded += (_, __) => UpdateBgm();
@@ -120,19 +115,18 @@ public static class GameSettings
     private static void ApplyDisplay()
     {
 #if !UNITY_EDITOR
-        Vector2Int size = Resolution; // 적용할 해상도
+        Vector2Int size = Resolution;
         Screen.SetResolution(size.x, size.y, Fullscreen ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed);
 #endif
     }
 
     private static void ApplyFrameRate()
     {
-        int fps = FpsOptions[FpsIndex]; // 제한 값
-        QualitySettings.vSyncCount = 0; // 수직 동기화 끔 - 제한 값(또는 무제한)을 그대로 따름
+        int fps = FpsOptions[FpsIndex];
+        QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = fps;
     }
 
-    // 메뉴 씬이면 틀고(이미 나오는 중이면 그대로), 게임 씬이면 멈춤
     private static void UpdateBgm()
     {
         if (SceneManager.GetActiveScene().name != MenuSceneName)
@@ -146,7 +140,7 @@ public static class GameSettings
             return;
         }
         if (GameAudio.Instance == null || GameAudio.Instance.bgm == null) return;
-        var go = new GameObject("BGM"); // 배경음악 재생기
+        var go = new GameObject("BGM");
         Object.DontDestroyOnLoad(go);
         _bgm = go.AddComponent<AudioSource>();
         _bgm.clip = GameAudio.Instance.bgm;

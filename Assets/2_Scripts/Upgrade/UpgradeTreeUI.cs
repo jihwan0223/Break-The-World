@@ -11,30 +11,27 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
     [SerializeField] private RectTransform content;
 
     [Header("줌")]
-    [SerializeField] private float minZoom = 0.15f; // 최소 축소 배율
-    [SerializeField] private float maxZoom = 1.5f; // 최대 확대 배율
-    [SerializeField] private float zoomStep = 0.1f; // 휠 한 틱당 목표 배율이 곱해지는 비율 (0.1 = 틱당 ±10%, 곱셈이라 어느 배율에서든 체감이 균일함)
-    [SerializeField] private float zoomSmoothSpeed = 8f; // 목표 배율을 따라잡는 속도 (클수록 빠르게/뚝뚝 끊기게, 작을수록 부드럽게)
+    [SerializeField] private float minZoom = 0.15f;
+    [SerializeField] private float maxZoom = 1.5f;
+    [SerializeField] private float zoomStep = 0.1f; // 곱셈 비율 (0.1 = 틱당 ±10%)
+    [SerializeField] private float zoomSmoothSpeed = 8f;
 
-    // 씬에 있는 노드들 - Awake 시 content 아래에서 자동으로 찾음
     private UpgradeNodeUI[] _upgradeNodes = System.Array.Empty<UpgradeNodeUI>();
     private ObjectEconomyNodeUI[] _economyNodes = System.Array.Empty<ObjectEconomyNodeUI>();
 
-    private float _zoomTarget = 1f; // 스크롤 입력이 가리키는 목표 배율 - 실제 적용은 Update()에서 매 프레임 이 값을 향해 부드럽게 보간됨
-    private Vector2 _zoomFocalPoint; // 스크롤할 때의 커서 위치(Viewport 로컬 좌표) - 보간되는 동안 이 지점이 화면에서 안 움직이게 고정하는 기준점
+    private float _zoomTarget = 1f;
+    private Vector2 _zoomFocalPoint;
 
-    // "카메라 초기화" 버튼을 누르면 이 이름의 노드가 항상 뷰포트 정중앙에 오도록 매번 위치를 다시 계산함
-    // (트리를 재배치해도 이 노드의 현재 좌표를 그대로 따라가므로 defaultAnchoredPosition을 손으로 다시 맞출 필요 없음)
+    // 카메라 초기화 때 정중앙에 올 노드
     [SerializeField] private string centerNodeId = "0_달걀_드랍량_강화";
-    // centerNodeId 노드를 못 찾았을 때만 쓰는 폴백 팬 값
+    // centerNodeId를 못 찾을 때만
     [SerializeField] private Vector2 defaultAnchoredPosition = new Vector2(1500f, -2200f);
     [SerializeField] private float defaultZoom = 0.5f;
 
-    [SerializeField] private bool pauseGameWhileOpen = true; // 열려있는 동안 Time.timeScale을 0으로 멈출지
+    [SerializeField] private bool pauseGameWhileOpen = true;
 
     void Awake()
     {
-        // 씬에 UpgradeTreeUI가 중복으로 존재하지 않도록 방지
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -47,7 +44,6 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         StyleButton("CameraResetButton", PixelStyle.Mint, "카메라 리셋", new Vector2(300f, 90f));
     }
 
-    // 닫기/카메라 리셋 버튼을 무기·도감 창과 같은 픽셀 버튼으로 입힘
     private void StyleButton(string buttonName, PixelStyle.Tone tone, string label, Vector2 size)
     {
         foreach (UnityEngine.UI.Button button in GetComponentsInChildren<UnityEngine.UI.Button>(true))
@@ -55,19 +51,18 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
             if (button.name != buttonName) continue;
             ((RectTransform)button.transform).sizeDelta = size;
             PixelStyle.UguiButton(button, tone);
-            var text = button.GetComponentInChildren<TMPro.TMP_Text>(true); // 버튼 글씨
+            var text = button.GetComponentInChildren<TMPro.TMP_Text>(true);
             if (text != null)
             {
                 text.text = label;
-                text.enableAutoSizing = false; // 씬에서 자동 크기가 켜져 있어 글씨가 버튼을 꽉 채웠음
-                text.fontSize = 32; // 설정 창 버튼(36px, 높이 96)과 비슷한 비율
+                text.enableAutoSizing = false;
+                text.fontSize = 32;
                 text.alignment = TMPro.TextAlignmentOptions.Center;
             }
             return;
         }
     }
 
-    // content 아래의 모든 업그레이드/이코노미 노드를 찾아 캐시 (손으로 배치한 노드도 여기서 잡힘)
     private void CacheNodes()
     {
         Transform root = content != null ? content : transform;
@@ -75,51 +70,42 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         _economyNodes = root.GetComponentsInChildren<ObjectEconomyNodeUI>(true);
     }
 
-    private bool _hasOpenedBefore; // 맨 처음 한 번만 기본 카메라 위치로 맞추고, 그 뒤로는 유저가 옮겨둔 팬/줌을 유지하기 위한 플래그
+    private bool _hasOpenedBefore;
 
-    // SetActive(true)로 켜질 때마다(=열릴 때마다) 호출됨. Awake는 최초 1번만 돌지만 OnEnable은 켤 때마다 매번 돎
     void OnEnable()
     {
-        // 맨 처음 여는 순간에만 기본 위치/배율로 맞춤 - 안 그러면 Content가 씬에 저장된(또는 마지막에 있던)
-        // 위치 그대로 보여서, Default Anchored Position/Zoom을 설정해놔도 처음 열 때는 반영이 안 됨
         if (!_hasOpenedBefore)
         {
             ResetCamera();
             _hasOpenedBefore = true;
         }
 
-        RefreshAll(); // 열 때마다 최신 레벨/조각 상태로 다시 그림
+        RefreshAll();
 
         if (pauseGameWhileOpen)
-            Time.timeScale = 0f; // 업그레이드 보는 동안 자동클릭 등이 계속 진행되는 걸 막음
+            Time.timeScale = 0f;
 
-        OnTreeToggled?.Invoke(true); // PieceUI 등에게 알려서 우상단 조각 표시가 스스로 숨게 함
+        OnTreeToggled?.Invoke(true);
     }
 
-    // SetActive(false)로 꺼질 때마다(=닫힐 때마다) 호출됨
     void OnDisable()
     {
-        // 카메라 이동 중에 창을 닫으면 코루틴이 멈추므로, 기다리던 자물쇠 열림을 바로 끝냄 (그림이 자물쇠로 남지 않게)
-        System.Action pending = _pendingReveals; // 아직 안 끝난 열림들
+        // 이동 중 닫히면 코루틴이 멈춰서 바로 끝냄
+        System.Action pending = _pendingReveals;
         _pendingReveals = null;
         pending?.Invoke();
         _revealRunning = false;
 
         if (pauseGameWhileOpen)
-            Time.timeScale = 1f; // 멈춰뒀던 게임 시간을 다시 정상 속도로
+            Time.timeScale = 1f;
 
-        UIPointerGuard.IsPointerOverUI = false; // 닫히는 순간 마우스가 다른 UI 위에 있지 않다면 다시 월드 클릭이 되도록
+        UIPointerGuard.IsPointerOverUI = false;
 
-        OnTreeToggled?.Invoke(false); // PieceUI 등에게 알려서 우상단 조각 표시가 다시 보이게 함
+        OnTreeToggled?.Invoke(false);
     }
 
-    // 화면 안의 닫기(X) 버튼 OnClick()에 연결 - 이 화면이 이미 열려있어야만 누를 수 있는 버튼이라 Instance가 항상 준비돼있음
     public void Close() => gameObject.SetActive(false);
 
-    // 노드를 하나라도 새로 만들거나 지울 일은 거의 없으니, 구매 성공/실패와 무관하게 항상 전체를 다시 그림 -
-    // 개수가 많지 않아서(최대 16 + 25쌍 정도) 매번 전체를 훑어도 부담 없음
-    // animateReveals: 이번 새로고침이 "구매"로 인한 것이면 true - 이때 새로 공개되는 노드는 등장 흔들림을 재생함.
-    //                 페이지를 열거나 초기화할 때(false)는 이미 공개된 노드가 다시 흔들리면 안 되니 재생 안 함
     public void RefreshAll(bool animateReveals = false)
     {
         foreach (UpgradeNodeUI node in _upgradeNodes)
@@ -129,20 +115,17 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
             if (node != null) node.Refresh(animateReveals);
     }
 
-    // 마우스 휠로 확대/축소 (ScrollRect의 자체 휠 스크롤은 꺼두고 이걸로 대체함).
-    // 여기선 "목표" 값만 갱신하고, 실제 적용은 Update()에서 매 프레임 부드럽게 보간함 (뚝뚝 끊기지 않게)
     public void OnScroll(PointerEventData eventData)
     {
         if (content == null) return;
 
-        // 스크롤할 때마다 커서 위치(Viewport 로컬 좌표)를 갱신해둠 - Update()에서 이 지점을 고정한 채로 줌을 적용함
         RectTransform viewport = content.parent as RectTransform;
         if (viewport != null)
             RectTransformUtility.ScreenPointToLocalPointInRectangle(viewport, eventData.position, eventData.pressEventCamera, out _zoomFocalPoint);
 
-        // scrollDelta.y는 OS/마우스에 따라 한 틱에 1~3까지 들쭉날쭉 들어오므로 부호(방향)만 사용해서 틱당 변화량을 일정하게 고정함
-        float dir = Mathf.Sign(eventData.scrollDelta.y); // 휠 방향: 위로 굴리면 +1(확대), 아래로 굴리면 -1(축소)
-        float factor = dir > 0f ? (1f + zoomStep) : (1f / (1f + zoomStep)); // 곱셈 방식 배율 - 확대/축소가 서로 정확히 역연산이라 왕복해도 원래 배율로 돌아옴
+        // OS마다 틱 크기가 달라 부호만 씀
+        float dir = Mathf.Sign(eventData.scrollDelta.y);
+        float factor = dir > 0f ? (1f + zoomStep) : (1f / (1f + zoomStep));
         _zoomTarget = Mathf.Clamp(_zoomTarget * factor, minZoom, maxZoom);
     }
 
@@ -153,16 +136,12 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         float currentScale = content.localScale.x;
         if (Mathf.Approximately(currentScale, _zoomTarget)) return;
 
-        // 업그레이드 화면이 열려있는 동안 Time.timeScale이 0이라 deltaTime 대신 unscaledDeltaTime을 써야 줌 보간이 계속 동작함.
-        // 1 - Exp(-speed * dt) 는 프레임레이트가 흔들려도 같은 시간이면 같은 거리를 따라잡는 보간 계수 (단순 Lerp의 t = speed*dt 는 프레임 저하 시 확 튐)
-        float t = 1f - Mathf.Exp(-zoomSmoothSpeed * Time.unscaledDeltaTime); // 이번 프레임에 목표 배율 쪽으로 좁힐 비율 (0~1)
+        // timeScale 0이라 unscaled
+        // 프레임레이트와 무관한 보간 계수
+        float t = 1f - Mathf.Exp(-zoomSmoothSpeed * Time.unscaledDeltaTime);
         float newScale = Mathf.Lerp(currentScale, _zoomTarget, t);
 
-        // 그냥 localScale만 바꾸면 Content의 피벗 기준으로 확대/축소되면서 노드 전체가 화면에서 쭉 밀려 보임
-        // (피벗이 화면 중앙이나 커서 위치가 아니라서). 커서 아래의 지점이 확대/축소돼도 화면에서 안 움직이도록
-        // 스크롤 시점에 저장해둔 커서 위치(_zoomFocalPoint)를 기준으로 위치도 같이 보정함.
-        // anchoredPosition은 Content의 anchor 기준점(지금은 부모 좌상단)에서 잰 값이라 _zoomFocalPoint(부모 pivot 기준)랑
-        // 원점이 달라서 안 맞음 - localPosition은 항상 부모 pivot 기준이라 원점이 같음
+        // anchoredPosition은 원점이 달라 localPosition으로 보정
         float ratio = newScale / currentScale;
         Vector2 localPos = content.localPosition;
         Vector2 newLocalPos = _zoomFocalPoint - (_zoomFocalPoint - localPos) * ratio;
@@ -171,7 +150,6 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         content.localScale = new Vector3(newScale, newScale, 1f);
     }
 
-    // 관문 노드가 열릴 때: 카메라가 그 노드로 부드럽게 이동하며 확대한 뒤 onArrive(자물쇠 깨짐) 호출
     public void PlayGateReveal(RectTransform node, System.Action onArrive)
     {
         if (content == null || !isActiveAndEnabled) { onArrive?.Invoke(); return; }
@@ -179,25 +157,25 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         StartCoroutine(GateRevealRoutine(node, onArrive));
     }
 
-    private System.Action _pendingReveals; // 카메라가 아직 도착 안 한 자물쇠 열림들 (창이 닫히면 바로 끝냄)
-    private bool _revealRunning; // 지금 카메라가 한 노드로 가는 중 - 여러 개가 한꺼번에 열리면 차례로 보여줌
+    private System.Action _pendingReveals;
+    private bool _revealRunning;
 
     private System.Collections.IEnumerator GateRevealRoutine(RectTransform node, System.Action onArrive)
     {
-        const float moveSeconds = 0.9f; // 이동+확대 시간(초)
-        const float revealZoom = 1.1f; // 도착했을 때 배율
-        while (_revealRunning) yield return null; // 앞 노드 연출이 끝날 때까지 대기
+        const float moveSeconds = 0.9f; // 초
+        const float revealZoom = 1.1f;
+        while (_revealRunning) yield return null;
         _revealRunning = true;
-        yield return new WaitForSecondsRealtime(0.4f); // 창이 열린 걸 잠깐 보여준 뒤 출발
-        Vector2 fromPos = content.anchoredPosition; // 출발 팬
-        float fromZoom = content.localScale.x; // 출발 배율
-        Vector2 toPos = CenteredAnchoredPosition(node, revealZoom); // 노드가 정중앙에 오는 팬
+        yield return new WaitForSecondsRealtime(0.4f);
+        Vector2 fromPos = content.anchoredPosition;
+        float fromZoom = content.localScale.x;
+        Vector2 toPos = CenteredAnchoredPosition(node, revealZoom);
         for (float t = 0f; t < moveSeconds; t += Time.unscaledDeltaTime)
         {
-            float k = Mathf.SmoothStep(0f, 1f, t / moveSeconds); // 부드럽게 출발/도착
-            float zoom = Mathf.Lerp(fromZoom, revealZoom, k); // 이번 프레임 배율
+            float k = Mathf.SmoothStep(0f, 1f, t / moveSeconds);
+            float zoom = Mathf.Lerp(fromZoom, revealZoom, k);
             content.localScale = new Vector3(zoom, zoom, 1f);
-            _zoomTarget = zoom; // 휠 줌 보간이 끼어들지 않게
+            _zoomTarget = zoom;
             content.anchoredPosition = Vector2.Lerp(fromPos, toPos, k);
             yield return null;
         }
@@ -206,49 +184,42 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         content.anchoredPosition = toPos;
         _pendingReveals -= onArrive;
         onArrive?.Invoke();
-        yield return new WaitForSecondsRealtime(0.6f); // 깨지는 연출을 보여준 뒤 다음 노드로
+        yield return new WaitForSecondsRealtime(0.6f);
         _revealRunning = false;
     }
 
-    // node가 zoom 배율에서 뷰포트 정중앙에 오는 content.anchoredPosition
     private Vector2 CenteredAnchoredPosition(RectTransform node, float zoom)
     {
-        RectTransform viewport = content.parent as RectTransform; // content를 담고 있는 뷰포트
+        RectTransform viewport = content.parent as RectTransform;
         if (viewport == null) return content.anchoredPosition;
-        Vector2 nodeLocalInContent = content.InverseTransformPoint(node.position); // 노드의 content 기준 언스케일 좌표
-        Vector2 viewportHalfSize = new Vector2(viewport.rect.width * 0.5f, -viewport.rect.height * 0.5f); // 뷰포트 정중앙
+        Vector2 nodeLocalInContent = content.InverseTransformPoint(node.position);
+        Vector2 viewportHalfSize = new Vector2(viewport.rect.width * 0.5f, -viewport.rect.height * 0.5f);
         return viewportHalfSize - nodeLocalInContent * zoom;
     }
 
-    // "카메라 초기화" 버튼에 연결 - centerNodeId 노드가 뷰포트 정중앙에 오도록 팬을 매번 새로 계산하고, 줌은 defaultZoom으로 되돌림
     public void ResetCamera()
     {
         if (content == null) return;
 
         content.localScale = new Vector3(defaultZoom, defaultZoom, 1f);
-        _zoomTarget = defaultZoom; // 목표값도 같이 맞춰야 함 - 안 그러면 다음 프레임에 Update()가 예전 목표로 다시 보간해버림
+        _zoomTarget = defaultZoom; // 목표도 맞춰야 Update가 되돌리지 않음
         content.anchoredPosition = ComputeCenteredAnchoredPosition();
     }
 
-    // centerNodeId 노드가 뷰포트 정중앙에 오는 content.anchoredPosition 계산.
-    // 주의: centerNode.Rect.anchoredPosition은 노드의 "바로 위 부모(Object 컨테이너) 기준" 좌표라 content 기준과 다름
-    // (Object 컨테이너 자체가 content 중앙에 앵커돼있어 오프셋이 낌) - 그래서 실제 트랜스폼으로 content 기준
-    // 언스케일 로컬 좌표를 직접 측정함(InverseTransformPoint는 content의 현재 팬/줌과 무관하게 정확한 값을 줌).
-    // 노드를 못 찾으면(이름이 바뀌었거나 트리에서 지워짐) defaultAnchoredPosition으로 폴백함.
+    // 노드 anchoredPosition은 부모 기준이라 실제 트랜스폼으로 잼
     private Vector2 ComputeCenteredAnchoredPosition()
     {
-        UpgradeNodeUI centerNode = System.Array.Find(_upgradeNodes, n => n != null && n.Id == centerNodeId); // 대상 노드 검색
+        UpgradeNodeUI centerNode = System.Array.Find(_upgradeNodes, n => n != null && n.Id == centerNodeId);
         if (centerNode == null) return defaultAnchoredPosition;
 
-        RectTransform viewport = content.parent as RectTransform; // content를 담고 있는 뷰포트 (없으면 폴백)
+        RectTransform viewport = content.parent as RectTransform;
         if (viewport == null) return defaultAnchoredPosition;
 
-        Vector2 nodeLocalInContent = content.InverseTransformPoint(centerNode.Rect.position); // 노드의 content 기준 언스케일 로컬 좌표
-        Vector2 viewportHalfSize = new Vector2(viewport.rect.width * 0.5f, -viewport.rect.height * 0.5f); // 뷰포트 좌상단 기준 정중앙까지의 오프셋
+        Vector2 nodeLocalInContent = content.InverseTransformPoint(centerNode.Rect.position);
+        Vector2 viewportHalfSize = new Vector2(viewport.rect.width * 0.5f, -viewport.rect.height * 0.5f);
         return viewportHalfSize - nodeLocalInContent * defaultZoom;
     }
 
-    // 열려있는 동안은 뒤쪽 월드 오브젝트(Click.cs)가 클릭되지 않도록 플래그를 켜고 끔
     public void OnPointerEnter(PointerEventData eventData) => UIPointerGuard.IsPointerOverUI = true;
     public void OnPointerExit(PointerEventData eventData) => UIPointerGuard.IsPointerOverUI = false;
 }

@@ -2,51 +2,47 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// 보스전 UI: 평소엔 조각 표시 아래에 지금 맵 보스의 "보스 도전" 버튼, 보스전 중엔 화면 위에 보스 체력/보호막/남은 시간 + 포기 버튼,
-// 시간 초과로 실패하면 재도전/나가기 창.
-// 보스전 동안은 다른 UI(조각 표시 포함)를 전부 숨김. 성공 순간 슬로우 모션도 여기서 돌림.
-// 씬에 따로 놓을 필요 없이 ZoneBreaker가 처음 켜질 때 만들어짐
 public class BossChallengeUI : MonoBehaviour
 {
-    private const float Left = 20f; // 화면 왼쪽 여백 (조각 표시와 맞춤)
-    private const float Top = 142f; // 화면 위쪽 여백 - 조각 표시(위 20 + 높이 110) 바로 아래
-    private const float SlowScale = 0.3f; // 성공 순간 게임 속도
-    private const float SlowSeconds = 1f; // 원래 속도로 돌아오는 데 걸리는 실제 시간(초)
+    private const float Left = 20f;
+    private const float Top = 142f; // 조각 표시(위 20 + 높이 110) 바로 아래
+    private const float SlowScale = 0.3f;
+    private const float SlowSeconds = 1f; // 실제 시간(초)
 
-    private static BossChallengeUI _instance; // 하나뿐인 인스턴스
+    private static BossChallengeUI _instance;
 
-    private UIDocument _document; // 이 UI를 그리는 문서
-    private Button _challengeButton; // 보스 도전 버튼
-    private VisualElement _fightPanel; // 보스전 중 상자 (체력/보호막/시간/포기) - 화면 위 가운데
-    private Button _giveUpButton; // 포기 버튼 - 보스전 상자 안, 체력바 오른쪽
-    private VisualElement _failPopup; // 실패 창 (재도전/나가기)
-    private ZoneBreaker _failedBoss; // 방금 실패한 보스 - 재도전 대상
+    private UIDocument _document;
+    private Button _challengeButton;
+    private VisualElement _fightPanel;
+    private Button _giveUpButton;
+    private VisualElement _failPopup;
+    private ZoneBreaker _failedBoss;
 
-    private static readonly Color HpColor = new Color(0.91f, 0.38f, 0.35f); // 보스 체력 (산호빛 빨강)
-    private static readonly Color HpBack = new Color(0.45f, 0.32f, 0.24f); // 체력/타이머 바 빈 곳 (갈색)
-    private static readonly Color TimeColor = new Color(0.96f, 0.84f, 0.55f); // 타이머 (버터색)
-    private const float PanelAlpha = 0.7f; // 보스전 상자 바탕 불투명도 (1 = 꽉 참)
-    private static readonly Color ShieldTextColor = new Color(0.25f, 0.47f, 0.72f); // 보호막 감소율 글자 (크림 바탕에서 잘 보이는 파랑)
-    private Label _timeLabel; // 남은 시간 숫자 (타이머 바 오른쪽)
-    private VisualElement _timeFill; // 타이머 바 채움 - 시간이 갈수록 줄어듦
-    private VisualElement _hpFill; // 보스 체력바 채움 (빨강)
-    private VisualElement _shieldFill; // 체력바 위에 겹치는 보호막 (흰색) - 보호막 오브젝트가 깎일수록 줄어듦
-    private Label _shieldLabel; // 체력바 오른쪽 "보호막 -N%" - 지금 줄어드는 데미지 비율 (보호막 없으면 안 보임)
-    private ZoneBreaker _ready; // 지금 도전 버튼이 가리키는 보스
-    private bool _wasFighting; // 지난 프레임에 보스전 중이었는지 - 바뀔 때만 다른 UI를 숨기고/되돌림
-    private readonly List<(VisualElement root, DisplayStyle display)> _hidden = new List<(VisualElement, DisplayStyle)>(); // 보스전 동안 숨긴 다른 UI와 원래 표시 상태
-    private float _slowElapsed = -1f; // 슬로우 모션이 시작된 뒤 흐른 실제 시간 (-1이면 안 하는 중)
-    private float _slowSetScale; // 슬로우 모션이 마지막으로 넣은 게임 속도 - 그새 다른 곳(창 열림)이 바꿨으면 손 뗌
-    private float _baseFixedDelta; // 원래 물리 간격 - 느려진 동안 물리도 촘촘하게 돌려 파편이 끊겨 보이지 않게
+    private static readonly Color HpColor = new Color(0.91f, 0.38f, 0.35f);
+    private static readonly Color HpBack = new Color(0.45f, 0.32f, 0.24f);
+    private static readonly Color TimeColor = new Color(0.96f, 0.84f, 0.55f);
+    private const float PanelAlpha = 0.7f; // 1 = 불투명
+    private static readonly Color ShieldTextColor = new Color(0.25f, 0.47f, 0.72f);
+    private Label _timeLabel;
+    private VisualElement _timeFill;
+    private VisualElement _hpFill;
+    private VisualElement _shieldFill;
+    private Label _shieldLabel;
+    private ZoneBreaker _ready;
+    private bool _wasFighting;
+    private readonly List<(VisualElement root, DisplayStyle display)> _hidden = new List<(VisualElement, DisplayStyle)>();
+    private float _slowElapsed = -1f;
+    private float _slowSetScale;
+    private float _baseFixedDelta; // 느려진 동안 물리도 촘촘하게
 
     public static void Ensure()
     {
         if (_instance != null) return;
-        var uiObject = new GameObject("BossChallengeUI"); // UI 문서를 담을 오브젝트
-        uiObject.SetActive(false); // 문서 설정을 마친 뒤 켜서 처음부터 제대로 그려지게
-        var document = uiObject.AddComponent<UIDocument>(); // 이 UI를 그릴 문서 (먼저 붙여야 켜질 때 먼저 준비됨)
-        PieceUI pieceUI = FindFirstObjectByType<PieceUI>(); // 조각 표시와 같은 화면 설정(크기 배율/순서)을 씀
-        PanelSettings settings = pieceUI != null ? pieceUI.GetComponent<UIDocument>().panelSettings : null; // 공유할 화면 설정
+        var uiObject = new GameObject("BossChallengeUI");
+        uiObject.SetActive(false); // 설정을 마친 뒤 켜야 처음부터 제대로 그려짐
+        var document = uiObject.AddComponent<UIDocument>();
+        PieceUI pieceUI = FindFirstObjectByType<PieceUI>();
+        PanelSettings settings = pieceUI != null ? pieceUI.GetComponent<UIDocument>().panelSettings : null;
         if (settings == null)
         {
             settings = ScriptableObject.CreateInstance<PanelSettings>();
@@ -54,12 +50,11 @@ public class BossChallengeUI : MonoBehaviour
             settings.sortingOrder = 100;
         }
         document.panelSettings = settings;
-        document.sortingOrder = 10; // 같은 화면 설정을 쓰는 조각 표시보다 위
+        document.sortingOrder = 10; // 조각 표시보다 위
         _instance = uiObject.AddComponent<BossChallengeUI>();
         uiObject.SetActive(true);
     }
 
-    // 보스를 잡은 순간 - 게임 속도를 확 낮췄다가 1초 동안 부드럽게 원래대로
     public static void PlaySlowMotion()
     {
         Ensure();
@@ -69,14 +64,13 @@ public class BossChallengeUI : MonoBehaviour
     void OnEnable()
     {
         _document = GetComponent<UIDocument>();
-        VisualElement root = _document.rootVisualElement; // 이 문서의 최상위
+        VisualElement root = _document.rootVisualElement;
         root.Clear();
         GameFonts.Apply(root);
         if (GameFonts.UiColored != null)
-            root.style.unityFontDefinition = FontDefinition.FromSDFFont(GameFonts.UiColored); // 글자색이 먹는 글꼴
+            root.style.unityFontDefinition = FontDefinition.FromSDFFont(GameFonts.UiColored);
         root.pickingMode = PickingMode.Ignore; // 빈 곳 클릭은 게임으로
 
-        // 보스 도전 버튼 - 조각 표시 아래 (분홍 픽셀 버튼)
         _challengeButton = new Button(() => { if (_ready != null) _ready.StartBoss(); }) { text = "보스 도전!" };
         Place(_challengeButton);
         _challengeButton.style.width = 300;
@@ -87,75 +81,73 @@ public class BossChallengeUI : MonoBehaviour
         GuardPointer(_challengeButton);
         root.Add(_challengeButton);
 
-        // 보스전 상자 - 화면 위 가운데: [체력바 + 타이머] [포기]
         _fightPanel = new VisualElement();
         _fightPanel.style.position = Position.Absolute;
         _fightPanel.style.top = 24;
         _fightPanel.style.left = Length.Percent(17);
-        _fightPanel.style.right = Length.Percent(17); // 가로 66%
+        _fightPanel.style.right = Length.Percent(17);
         _fightPanel.style.flexDirection = FlexDirection.Row;
         _fightPanel.style.alignItems = Align.Center;
         _fightPanel.style.paddingLeft = 20;
         _fightPanel.style.paddingRight = 16;
         _fightPanel.style.paddingTop = 14;
         _fightPanel.style.paddingBottom = 16;
-        PixelStyle.Frame(_fightPanel, PixelStyle.Box); // 크림 픽셀 틀
-        _fightPanel.style.unityBackgroundImageTintColor = new Color(1f, 1f, 1f, PanelAlpha); // 틀만 살짝 투명하게 (바/글자는 그대로) - 맵 배경과 어울리게
+        PixelStyle.Frame(_fightPanel, PixelStyle.Box);
+        _fightPanel.style.unityBackgroundImageTintColor = new Color(1f, 1f, 1f, PanelAlpha);
         _fightPanel.style.display = DisplayStyle.None;
         GuardPointer(_fightPanel);
 
-        var bars = new VisualElement(); // 체력바 + 타이머 줄
+        var bars = new VisualElement();
         bars.style.flexGrow = 1;
 
-        var hpBack = new VisualElement(); // 체력바 바탕
+        var hpBack = new VisualElement();
         hpBack.style.height = 24;
         hpBack.style.backgroundColor = HpBack.linear;
-        SetBorder(hpBack, 3, PixelStyle.Text.linear); // 진갈색 테두리
+        SetBorder(hpBack, 3, PixelStyle.Text.linear);
         _hpFill = new VisualElement();
         _hpFill.style.height = Length.Percent(100);
         _hpFill.style.backgroundColor = HpColor.linear;
         hpBack.Add(_hpFill);
         _shieldFill = new VisualElement();
-        _shieldFill.style.position = Position.Absolute; // 빨간 체력 위에 겹침
+        _shieldFill.style.position = Position.Absolute;
         _shieldFill.style.left = 0;
         _shieldFill.style.top = 0;
         _shieldFill.style.height = Length.Percent(100);
-        _shieldFill.style.backgroundColor = new Color(1f, 1f, 1f, 0.65f); // 반투명 흰색 - 체력 위에 씌운 보호막
+        _shieldFill.style.backgroundColor = new Color(1f, 1f, 1f, 0.65f);
         hpBack.Add(_shieldFill);
         hpBack.style.flexGrow = 1;
-        var hpRow = new VisualElement(); // 체력바 + 보호막 감소율
+        var hpRow = new VisualElement();
         hpRow.style.flexDirection = FlexDirection.Row;
         hpRow.style.alignItems = Align.Center;
         hpRow.Add(hpBack);
         _shieldLabel = MakeLabel(36, ShieldTextColor.linear);
-        _shieldLabel.style.width = 230; // 숫자가 바뀌어도 바 길이가 안 흔들리게 (보호막 없을 땐 투명하게 자리만 차지)
+        _shieldLabel.style.width = 230; // 숫자가 바뀌어도 바 길이가 안 흔들리게
         _shieldLabel.style.marginLeft = 12;
         _shieldLabel.style.unityTextAlign = TextAnchor.MiddleRight;
         hpRow.Add(_shieldLabel);
         bars.Add(hpRow);
 
-        var timeRow = new VisualElement(); // 타이머 바 + 남은 초
+        var timeRow = new VisualElement();
         timeRow.style.flexDirection = FlexDirection.Row;
         timeRow.style.alignItems = Align.Center;
         timeRow.style.marginTop = 8;
-        var timeBack = new VisualElement(); // 타이머 바 바탕
+        var timeBack = new VisualElement();
         timeBack.style.flexGrow = 1;
         timeBack.style.height = 12;
         timeBack.style.backgroundColor = HpBack.linear;
         SetBorder(timeBack, 2, PixelStyle.Text.linear);
         _timeFill = new VisualElement();
         _timeFill.style.height = Length.Percent(100);
-        _timeFill.style.backgroundColor = TimeColor.linear; // 버터색 타이머
+        _timeFill.style.backgroundColor = TimeColor.linear;
         timeBack.Add(_timeFill);
         timeRow.Add(timeBack);
         _timeLabel = MakeLabel(36, PixelStyle.Text.linear);
-        _timeLabel.style.width = 242; // 위 보호막 글자 자리와 같은 폭 - 체력바/타이머 바 오른쪽 끝을 맞춤
+        _timeLabel.style.width = 242;
         _timeLabel.style.unityTextAlign = TextAnchor.MiddleRight;
         timeRow.Add(_timeLabel);
         bars.Add(timeRow);
         _fightPanel.Add(bars);
 
-        // 포기 - 체력바 바로 오른쪽 (작은 분홍 버튼)
         _giveUpButton = new Button(() => ZoneBreaker.ActiveBoss?.GiveUpBoss()) { text = "포기" };
         _giveUpButton.style.width = 130;
         _giveUpButton.style.height = 80;
@@ -174,7 +166,6 @@ public class BossChallengeUI : MonoBehaviour
         ZoneBreaker.BossFailed -= ShowFailPopup;
     }
 
-    // 실패 창: 어둡게 덮은 화면 가운데 크림 창 - "보스전 실패" + [재도전] [나가기]
     private void BuildFailPopup(VisualElement root)
     {
         _failPopup = new VisualElement();
@@ -183,13 +174,13 @@ public class BossChallengeUI : MonoBehaviour
         _failPopup.style.right = 0;
         _failPopup.style.top = 0;
         _failPopup.style.bottom = 0;
-        _failPopup.style.backgroundColor = new Color(0f, 0f, 0f, 0.45f); // 뒤 게임을 어둡게
+        _failPopup.style.backgroundColor = new Color(0f, 0f, 0f, 0.45f);
         _failPopup.style.alignItems = Align.Center;
         _failPopup.style.justifyContent = Justify.Center;
         _failPopup.style.display = DisplayStyle.None;
         GuardPointer(_failPopup);
 
-        var window = new VisualElement(); // 가운데 창
+        var window = new VisualElement();
         window.style.width = 620;
         window.style.alignItems = Align.Center;
         window.style.paddingTop = 36;
@@ -198,7 +189,7 @@ public class BossChallengeUI : MonoBehaviour
         window.style.paddingRight = 32;
         PixelStyle.Frame(window, PixelStyle.Window, 6f);
 
-        var title = new Label("보스전 실패"); // 제목 리본
+        var title = new Label("보스전 실패");
         title.style.fontSize = 36;
         title.style.paddingLeft = 40;
         title.style.paddingRight = 40;
@@ -209,13 +200,13 @@ public class BossChallengeUI : MonoBehaviour
         PixelStyle.OutlinedText(title, PixelStyle.Ribbon.text);
         window.Add(title);
 
-        var message = MakeLabel(36, PixelStyle.Text.linear); // 안내 문구
+        var message = MakeLabel(36, PixelStyle.Text.linear);
         message.text = "시간 안에 부수지 못했어요";
         message.style.marginTop = 24;
         message.style.marginBottom = 28;
         window.Add(message);
 
-        var buttons = new VisualElement(); // [재도전] [나가기]
+        var buttons = new VisualElement();
         buttons.style.flexDirection = FlexDirection.Row;
         var retry = new Button(() => CloseFailPopup(true)) { text = "재도전" };
         var exit = new Button(() => CloseFailPopup(false)) { text = "나가기" };
@@ -237,16 +228,14 @@ public class BossChallengeUI : MonoBehaviour
         root.Add(_failPopup);
     }
 
-    // 실패했을 때 - 게임을 멈추고 실패 창을 띄움
     private void ShowFailPopup(ZoneBreaker boss)
     {
         _failedBoss = boss;
         _failPopup.style.display = DisplayStyle.Flex;
         if (_slowElapsed >= 0f) StopSlow();
-        Time.timeScale = 0f; // 창이 떠 있는 동안 게임 정지 (다른 창들과 같음)
+        Time.timeScale = 0f;
     }
 
-    // retry면 같은 보스에 바로 다시 도전, 아니면 그냥 게임으로 돌아감
     private void CloseFailPopup(bool retry)
     {
         _failPopup.style.display = DisplayStyle.None;
@@ -260,17 +249,17 @@ public class BossChallengeUI : MonoBehaviour
     {
         if (_challengeButton == null) return;
 
-        ZoneBreaker active = ZoneBreaker.ActiveBoss; // 보스전 중인 보스
-        _ready = active == null && Time.timeScale > 0f ? ZoneBreaker.ChallengeableBoss() : null; // 업그레이드 창/실패 창 등으로 게임이 멈춰 있으면 안 띄움
+        ZoneBreaker active = ZoneBreaker.ActiveBoss;
+        _ready = active == null && Time.timeScale > 0f ? ZoneBreaker.ChallengeableBoss() : null; // 게임이 멈춰 있으면 버튼 숨김
 
         SetShown(_challengeButton, _ready != null);
         if (_ready != null)
         {
-            float pulse = 1f + Mathf.Sin(Time.unscaledTime * 4f) * 0.04f; // 커졌다 작아졌다
+            float pulse = 1f + Mathf.Sin(Time.unscaledTime * 4f) * 0.04f;
             _challengeButton.style.scale = new Scale(new Vector3(pulse, pulse, 1f));
         }
 
-        bool fighting = active != null; // 보스전 중인지
+        bool fighting = active != null;
         SetShown(_fightPanel, fighting);
         if (fighting != _wasFighting) HideOtherUI(fighting);
         _wasFighting = fighting;
@@ -279,8 +268,8 @@ public class BossChallengeUI : MonoBehaviour
             _timeLabel.text = $"{Mathf.Max(0f, active.BossTimeLeft):0.0}";
             _timeFill.style.width = Length.Percent(active.BossTimeRatio * 100f);
             _hpFill.style.width = Length.Percent(active.BossHpRatio * 100f);
-            _shieldFill.style.width = Length.Percent(active.BossHpRatio * active.ShieldFill * 100f); // 빨간 체력 중 보호막이 덮은 만큼
-            int shieldPercent = Mathf.RoundToInt(active.ShieldRatio * 100f); // 지금 줄어드는 데미지 %
+            _shieldFill.style.width = Length.Percent(active.BossHpRatio * active.ShieldFill * 100f);
+            int shieldPercent = Mathf.RoundToInt(active.ShieldRatio * 100f);
             _shieldLabel.text = $"보호막 -{shieldPercent}%";
             _shieldLabel.style.visibility = shieldPercent > 0 ? Visibility.Visible : Visibility.Hidden;
         }
@@ -294,7 +283,6 @@ public class BossChallengeUI : MonoBehaviour
         if (_wasFighting) HideOtherUI(false);
     }
 
-    // 보스전 동안 이 UI만 남기고 다른 UI 문서(조각 표시 포함)를 숨김 / 끝나면 원래대로
     private void HideOtherUI(bool hide)
     {
         if (hide)
@@ -303,7 +291,7 @@ public class BossChallengeUI : MonoBehaviour
             foreach (UIDocument document in FindObjectsByType<UIDocument>(FindObjectsSortMode.None))
             {
                 if (document == _document || document.rootVisualElement == null) continue;
-                VisualElement root = document.rootVisualElement; // 숨길 UI
+                VisualElement root = document.rootVisualElement;
                 _hidden.Add((root, root.style.display.value));
                 root.style.display = DisplayStyle.None;
             }
@@ -314,7 +302,7 @@ public class BossChallengeUI : MonoBehaviour
                 if (root != null) root.style.display = display;
             _hidden.Clear();
         }
-        UIPointerGuard.IsPointerOverUI = false; // 숨긴 UI 위에 있던 포인터 표시가 남아 월드 클릭이 막히지 않게
+        UIPointerGuard.IsPointerOverUI = false; // 숨긴 UI의 포인터 표시가 남아 월드 클릭이 막히지 않게
     }
 
     private void StartSlow()
@@ -327,12 +315,12 @@ public class BossChallengeUI : MonoBehaviour
     private void UpdateSlow()
     {
         if (_slowElapsed < 0f) return;
-        if (!Mathf.Approximately(Time.timeScale, _slowSetScale)) { StopSlow(); return; } // 창이 열려 시간이 멈추는 등 다른 곳이 바꿈
+        if (!Mathf.Approximately(Time.timeScale, _slowSetScale)) { StopSlow(); return; } // 다른 곳(창 열림)이 timeScale을 바꿨으면 중단
 
         _slowElapsed += Time.unscaledDeltaTime;
-        float t = Mathf.Clamp01(_slowElapsed / SlowSeconds); // 0~1 진행률
+        float t = Mathf.Clamp01(_slowElapsed / SlowSeconds);
         if (t >= 1f) { Time.timeScale = 1f; StopSlow(); return; }
-        SetSlowScale(Mathf.Lerp(SlowScale, 1f, t * t)); // 처음엔 느리게 머물다 점점 빨리 돌아옴
+        SetSlowScale(Mathf.Lerp(SlowScale, 1f, t * t));
     }
 
     private void SetSlowScale(float scale)
@@ -355,17 +343,15 @@ public class BossChallengeUI : MonoBehaviour
         element.style.top = Top;
     }
 
-    // 이 UI 위에 포인터가 있으면 뒤의 오브젝트가 같이 맞지 않게
     private static void GuardPointer(VisualElement element)
     {
         element.RegisterCallback<PointerEnterEvent>(_ => UIPointerGuard.IsPointerOverUI = true);
         element.RegisterCallback<PointerLeaveEvent>(_ => UIPointerGuard.IsPointerOverUI = false);
     }
 
-    // 보였다/숨었다가 바뀔 때만 적용 - 숨는 순간 포인터가 위에 있었으면 표시를 풀어줌
     private static void SetShown(VisualElement element, bool shown)
     {
-        DisplayStyle display = shown ? DisplayStyle.Flex : DisplayStyle.None; // 바꿀 표시 상태
+        DisplayStyle display = shown ? DisplayStyle.Flex : DisplayStyle.None;
         if (element.style.display.value == display) return;
         element.style.display = display;
         if (!shown) UIPointerGuard.IsPointerOverUI = false;
