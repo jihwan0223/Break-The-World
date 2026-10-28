@@ -145,6 +145,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         if (string.IsNullOrEmpty(gateObjectName) || IsGateClosed) return;
         UpgradeTreeUI tree = UpgradeTreeUI.Instance; // 연출을 보여줄 트리 창
         if (tree == null || !tree.isActiveAndEnabled || !GateReveals.TryMarkSeen(name)) return;
+        if (SaveManager.Instance != null) SaveManager.Instance.MarkDirty(); // 본 연출은 세이브에 남김 (다른 변경 없이 꺼도 다시 안 나오게)
         _gateRevealPending = true;
         tree.PlayGateReveal(Rect, FinishGateReveal);
     }
@@ -154,6 +155,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     {
         _gateRevealPending = false;
         RefreshIconAfterGate();
+        if (!isActiveAndEnabled) return; // 카메라가 오는 중에 창을 닫음 - 꺼진 노드에선 코루틴/연출을 못 돌림
         PlayShake();
         NodePurchaseEffect.Play(Rect, NodePurchaseEffect.NormalColor, true);
     }
@@ -209,12 +211,12 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         // 첫 Refresh(_refreshedOnce=false)는 제외 - 페이지를 처음 열 때 이미 공개돼있던 노드는 흔들지 않음
         bool justRevealed = animateReveal && _refreshedOnce && isRevealed && !_wasRevealed;
         _wasRevealed = isRevealed;
-        CheckGateOpened();
         _refreshedOnce = true;
 
         gameObject.SetActive(isRevealed);
-        if (!isRevealed) return;
+        if (!isRevealed) return; // 안 보이는 노드는 열리는 연출도 아껴둠 (공개된 뒤 처음 창을 열 때 보여줌)
 
+        CheckGateOpened();
         UpdateIcon();
         NoticeBadge.Set(ref _badge, Rect, CanBuy());
         if (justRevealed)
@@ -346,6 +348,11 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     // 흔드는 도중 트리를 닫으면 코루틴이 멈추니 원래 자리로 되돌림
     void OnDisable()
     {
+        if (_shakeRoutine != null) // 흔드는 도중에 꺼지면 기운 채로 남지 않게
+        {
+            _rect.localRotation = Quaternion.identity;
+            _shakeRoutine = null;
+        }
         if (_denyRoutine == null) return;
         _rect.pivot = _denyBasePivot;
         _denyRoutine = null;

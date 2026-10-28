@@ -112,6 +112,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (string.IsNullOrEmpty(gateObjectName) || IsGateClosed) return;
         UpgradeTreeUI tree = UpgradeTreeUI.Instance; // 연출을 보여줄 트리 창
         if (tree == null || !tree.isActiveAndEnabled || !GateReveals.TryMarkSeen(name)) return;
+        if (SaveManager.Instance != null) SaveManager.Instance.MarkDirty(); // 본 연출은 세이브에 남김 (다른 변경 없이 꺼도 다시 안 나오게)
         _gateRevealPending = true;
         tree.PlayGateReveal(Rect, FinishGateReveal);
     }
@@ -121,6 +122,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         _gateRevealPending = false;
         RefreshIconAfterGate();
+        if (!isActiveAndEnabled) return; // 카메라가 오는 중에 창을 닫음 - 꺼진 노드에선 코루틴/연출을 못 돌림
         PlayShake();
         NodePurchaseEffect.Play(Rect, NodePurchaseEffect.NormalColor, true);
     }
@@ -219,7 +221,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.ObjectDoubleDrop: return $"{obj} 부술 때 조각이 2배로 나올 확률이 +{n}% 증가합니다.";
             case UpgradeManager.UpgradeEffect.WeaponKillBonus: return $"{KoreanJosa.EuroRo(weapon)} 부술 때 조각을 +{n}개 더 얻습니다.";
             case UpgradeManager.UpgradeEffect.CrystalChance: return $"오브젝트를 부술 때 결정이 나올 확률이 +{n}% 증가합니다.";
-            case UpgradeManager.UpgradeEffect.CrystalAmount: return "결정이 나올 때 개수가 2배가 됩니다.";
+            case UpgradeManager.UpgradeEffect.CrystalAmount: return $"결정이 나올 때 개수가 {1L << Mathf.Clamp(Mathf.RoundToInt(value), 0, 20)}배가 됩니다.";
             case UpgradeManager.UpgradeEffect.GroundPieceCap: return $"바닥에 쌓일 수 있는 조각 개수가 +{n}개 증가합니다.";
             case UpgradeManager.UpgradeEffect.AutoClickSpeed: return $"{targetObjectName} 자동 클릭 간격이 {n}초 줄어듭니다.";
             case UpgradeManager.UpgradeEffect.AutoClickCount: return $"{targetObjectName} 자동 클릭 한 번에 때리는 횟수가 +{n}회 증가합니다.";
@@ -279,12 +281,12 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         bool justRevealed = animateReveal && _refreshedOnce && isRevealed && !_wasRevealed;
         _wasRevealed = isRevealed;
-        CheckGateOpened();
         _refreshedOnce = true;
 
         gameObject.SetActive(isRevealed);
-        if (!isRevealed) return;
+        if (!isRevealed) return; // 안 보이는 노드는 열리는 연출도 아껴둠 (공개된 뒤 처음 창을 열 때 보여줌)
 
+        CheckGateOpened();
         UpdateIcon(UpgradeManager.Instance.GetLevel(Id));
         NoticeBadge.Set(ref _badge, Rect, UpgradeManager.Instance.CanUpgrade(Id), UpgradeManager.Instance.UsesCrystals(Id)); // 결정 노드는 노란 느낌표
         if (justRevealed)
@@ -337,6 +339,11 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     // 흔드는 도중 트리를 닫으면 코루틴이 멈추니 원래 자리로 되돌림
     void OnDisable()
     {
+        if (_shakeRoutine != null) // 흔드는 도중에 꺼지면 기운 채로 남지 않게
+        {
+            _rect.localRotation = Quaternion.identity;
+            _shakeRoutine = null;
+        }
         if (_denyRoutine == null) return;
         _rect.pivot = _denyBasePivot;
         _denyRoutine = null;

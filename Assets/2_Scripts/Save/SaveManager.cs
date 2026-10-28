@@ -76,7 +76,7 @@ public class SaveManager : MonoBehaviour
         _isDirty = false;
     }
 
-    private void MarkDirty()
+    public void MarkDirty()
     {
         _isDirty = true;
 
