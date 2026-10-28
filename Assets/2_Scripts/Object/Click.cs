@@ -26,7 +26,7 @@ public class Click : MonoBehaviour
 
     [SerializeField] private float projectileWorldSize = 0.9f; // 자동클릭 때 날아오는 무기 그림의 크기(월드 유닛, 긴 변 기준)
     private const float SuperCritMultiplier = 2f; // 슈퍼 크리티컬 데미지 = 일반 치명타 데미지의 이 배수
-    private const float AutoClickDamageRatio = 0.5f; // 자동클릭 한 번이 주는 데미지 = 직접 클릭 데미지의 이 비율
+    private const float AutoClickDamageRatio = 1f; // 자동클릭 한 번이 주는 데미지 = 직접 클릭 데미지의 이 비율 (0.5였을 땐 후반 자동클릭 수입이 직접 클릭의 0.1%뿐이라 올림)
     [SerializeField] private float projectileFlightSeconds = 2f; // 타격 몇 초 전부터 날아오기 시작할지(초) - 자동클릭 주기보다 길면 주기만큼만 날아옴
     [SerializeField] private float projectileSpinDegreesPerSecond = 720f; // 날아오는 동안 도는 속도
     [SerializeField] private float projectileStaggerSeconds = 0.1f; // 한 번에 여러 번 때릴 때 투사체 사이의 간격(초)

@@ -67,7 +67,7 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private float baseCritMultiplier = 1.5f;    // 크리티컬 기본 배율
     [SerializeField] private float baseAutoClickInterval = 7f;   // 자동 클릭 기본 주기(초)
     [SerializeField] private float minAutoClickInterval = 2.5f;  // 자동 클릭 주기 하한
-    [SerializeField] private float autoClickIntervalGrowthPerObject = 1.05f; // 오브젝트 번호가 1 늘 때마다 자동 클릭 주기에 곱해지는 배율 (1이면 모두 같은 주기, 클수록 뒤쪽 오브젝트가 늦게 깨짐)
+    [SerializeField] private float autoClickIntervalGrowthPerObject = 1f; // 오브젝트 번호가 1 늘 때마다 자동 클릭 주기에 곱해지는 배율 (1이면 모두 같은 주기, 클수록 뒤쪽 오브젝트가 늦게 깨짐)
     [SerializeField] private int baseAutoClickCount = 1;         // 자동 클릭 1회당 기본 클릭 수
     [SerializeField] private float luckyClickChanceValue = 0.001f; // 슈퍼 크리티컬 기본 확률 (0.1%) - LuckyClickChanceUp이 위에 더함
     [SerializeField] private float baseDoubleClickChance = 0.25f;// 더블클릭 해금 직후 발동 확률 - DoubleClickChanceUp이 위에 더함
