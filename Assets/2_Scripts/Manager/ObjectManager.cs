@@ -72,7 +72,7 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(5, 2, "간판", new Color(0.92f, 0.92f, 0.90f)),
         new ObjectData(5, 3, "트럭", new Color(0.95f, 0.95f, 0.95f)),
         new ObjectData(6, 1, "컨베이어 벨트", new Color(0.35f, 0.38f, 0.45f)),
-        new ObjectData(6, 2, "회사", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 163500f / 37000f }, // ★ 데모 마지막 (체력 163,500 = 철퇴 풀업 + 전역 강화 + 치명타 풀업 한 방)
+        new ObjectData(6, 2, "회사", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 163500f / 37000f * 0.65f }, // ★ 데모 마지막 (최종 체력 약 1,275,000 - 철퇴 풀업이면 30초 보스전을 초당 약 3회 클릭으로 잡을 수 있게 0.65배로 낮춤)
     };
 
     private int equippedIndex; // 실제로 선택된 오브젝트의 objects 리스트 인덱스 (0부터 시작)
@@ -91,7 +91,7 @@ public class ObjectManager : MonoBehaviour
     // 해금 비용 = 직전 오브젝트의 기본 파편(강화 전) x 부숴야 하는 횟수 (무기 해금 비용도 이걸 따라감)
     // 횟수는 방치형 게임 흔한 방식처럼 오브젝트마다 일정 배율로 곱해져 올라감 (Start x Growth^(index-1))
     private const double UnlockBreaksStart = 25; // 사과를 열려면 달걀(강화 전 파편 기준)을 이만큼 부숴야 함
-    private const double UnlockBreaksGrowth = 1.15; // 뒤 오브젝트로 갈 때마다 부숴야 하는 횟수에 곱해지는 배율 (회사는 트럭 약 154번)
+    private const double UnlockBreaksGrowth = 1.15; // 뒤 오브젝트로 갈 때마다 부숴야 하는 횟수에 곱해지는 배율 (회사는 컨베이어 벨트 약 154번 x 맵3 배율 3 - 맵3 조각 x10이라 실제로는 약 46번)
     public const long UnlockCostBase = 15; // 획득량 증가(Gain) 비용 계산의 기준 횟수
 
     // 오브젝트가 새로 해금될 때 (objectIndex) 전달 - Object 선택 UI 등이 구독
@@ -242,7 +242,7 @@ public class ObjectManager : MonoBehaviour
     public long GetBaseReward(int index) => Math.Max(1L, (long)(RawBaseReward(index) * (index >= ObjectsPerMap * 2 ? Map3DropMultiplier : 1.0)));
 
     // 맵3(왁뿌볼~회사)에서 얻는 조각만 이만큼 곱함 - 후반 업그레이드(수억~수십억)를 살 수 있게 후반 인플레를 키움.
-    // 해금/획득량 가격은 RawBaseReward 기준이라 그대로 (그만큼 더 빨리 모임)
+    // 해금/획득량 가격은 RawBaseReward 기준이라 x10이 안 붙음 - 대신 맵3 해금 비용은 Map3UnlockCostMultiplier(3배)를 따로 곱함
     private const double Map3DropMultiplier = 10;
 
     // 소수점을 버리기 전의 기본 보상 - 해금 비용이 이 값을 기준으로 계산됨
@@ -259,8 +259,13 @@ public class ObjectManager : MonoBehaviour
         if (index <= 0) return 0;
         // 가격은 강화와 상관없이 고정. 드랍량/획득량/데미지/자동 클릭을 강화할수록 같은 가격을 더 빨리 모음
         double breaksNeeded = UnlockBreaksStart * Math.Pow(UnlockBreaksGrowth, index - 1); // 앞 오브젝트를 (강화 전 기준) 부숴야 하는 횟수
+        if (index > ObjectsPerMap * 2) breaksNeeded *= Map3UnlockCostMultiplier; // 맵3(왁뿌볼 다음 간판부터)은 조각이 x10이라 그만큼 비싸게
         return NumberFormatUtil.RoundPrice((long)(breaksNeeded * RawBaseReward(index - 1))); // 딱 떨어지는 가격으로
     }
+
+    // 맵3 해금 비용 배율 - 맵3 조각이 x10이라 그대로면 앞 오브젝트를 10번 남짓만 부숴도 다음이 열려 맵3가 몇 분 만에 끝남.
+    // 3배로 올려 맵3도 맵2와 비슷한 시간이 걸리게 함 (철퇴 가격도 컨베이어 벨트 해금 비용을 따라 같이 오름)
+    private const double Map3UnlockCostMultiplier = 3;
 
     // 조각으로 index번째 오브젝트를 해금 시도.
     // 바로 앞 오브젝트가 해금돼 있어야 하고, 조각이 충분해야 함 (트리 링크만으로는 갈래가 나뉘어 순서가 안 지켜져서 여기서 막음)
