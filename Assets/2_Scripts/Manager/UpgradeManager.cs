@@ -37,7 +37,7 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("무기 처치 보너스 조각")] WeaponKillBonus,   // Target Weapon Name 무기로 처치 시 보너스 조각 +값
         [InspectorName("바닥 파편 최대 개수 증가")] GroundPieceCap, // 바닥에 동시에 떨어져 있을 수 있는 파편 최대 개수 +값
         [InspectorName("결정 확률 증가")] CrystalChance,          // 오브젝트 처치 시 결정이 나올 확률 +값 %
-        [InspectorName("결정 드랍량 증가")] CrystalAmount,        // 결정이 나올 때 개수 +값
+        [InspectorName("결정 드랍량 증가")] CrystalAmount,        // 결정이 나올 때 개수 x2^값 (효과 1 = 2배)
         [InspectorName("자동 줍기 해금")] AutoSweepUnlock,        // 주기마다 바닥을 쓸고 지나가며 파편을 주워주는 기능 해금
         [InspectorName("자동 줍기 주기 단축")] AutoSweepSpeed,    // 자동 줍기 주기 -값 초
         [InspectorName("자동 줍기 층 증가")] AutoSweepLayers,     // 자동 줍기가 한 번 지나갈 때 쓸어 담는 파편 층 +값 (맨 위층부터)
@@ -546,7 +546,16 @@ public class UpgradeManager : MonoBehaviour
     public float CrystalDropChance => Mathf.Clamp01(baseCrystalChance + SumEffect(UpgradeEffect.CrystalChance) / 100f);
 
     // 결정이 나올 때 한 번에 나오는 개수
-    public int CrystalDropAmount => baseCrystalAmount << Mathf.Clamp(Mathf.RoundToInt(SumEffect(UpgradeEffect.CrystalAmount)), 0, 20); // 드랍량 노드 레벨(효과 1씩)마다 2배 (만렙 10 = 1,024배)
+    public long CrystalDropAmount => (long)baseCrystalAmount << Mathf.Clamp(Mathf.RoundToInt(SumEffect(UpgradeEffect.CrystalAmount)), 0, 20); // 드랍량 노드 레벨(효과 1씩)마다 2배 (만렙 10 = 1,024배)
+
+    private static readonly int[] CrystalZoneMultipliers = { 1, 10, 100 }; // 맵(존)별 결정 개수 배율 - 맵1 x1, 맵2 x10, 맵3 x100
+
+    // zone 존에서 결정이 나올 때 한 번에 나오는 개수 (뒤 맵일수록 많이). zone이 -1이면 지금 보는 존
+    public long CrystalDropAmountIn(int zone)
+    {
+        if (zone < 0) zone = ZoneManager.Instance != null ? ZoneManager.Instance.CurrentZone : 0;
+        return CrystalDropAmount * CrystalZoneMultipliers[Mathf.Clamp(zone, 0, CrystalZoneMultipliers.Length - 1)];
+    }
 
     public bool AutoSweepIsUnlocked => AnyUnlocked(UpgradeEffect.AutoSweepUnlock);
     // objectIndex(책상/도로)의 "갈라져서 존 전체가 계속 부서지는" 기능을 해금했는지

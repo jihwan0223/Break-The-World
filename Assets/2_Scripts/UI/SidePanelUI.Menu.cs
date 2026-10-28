@@ -410,7 +410,7 @@ public partial class SidePanelUI
         AddStat(right, "더블 클릭 확률", () => U() != null && U().DoubleClickIsUnlocked ? Chance(U().DoubleClickChanceValue) : "잠김");
         AddStat(right, "조각 획득 보너스", () => U() != null ? $"+{Mathf.RoundToInt((U().PieceGainMultiplier() - 1f) * 100f)}%" : "-");
         AddStat(right, "결정 확률", () => U() != null ? Chance(U().CrystalDropChance) : "-");
-        AddStat(right, "결정 개수", () => U() != null ? $"{U().CrystalDropAmount}개" : "-");
+        AddStat(right, "결정 개수", () => U() != null ? $"{NumberFormatUtil.Format(U().CrystalDropAmountIn(-1))}개" : "-"); // 지금 보는 맵 기준
         AddStat(right, "커서 범위", () => U() != null && U().HoverPickupIsUnlocked ? $"{U().CursorRadius:0.##}" : "잠김");
 
         // 2쪽: 오브젝트별 부순 횟수 - 앞 절반 / 뒤 절반
