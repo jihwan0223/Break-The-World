@@ -17,6 +17,7 @@ public class DebrisPool : MonoBehaviour
     [SerializeField] private float pieceSize = 1f; // 월드 유닛
     [SerializeField] private float pickupColliderScale = 1.4f;
     [SerializeField] private Sprite[] pieceSprites;
+    [SerializeField] private Sprite[] crystalSprites; // 이미 색칠된 결정 그림 - 비우면 조각 그림에 crystalColor
     [SerializeField] private float initialSpread = 1f; // 월드 유닛
     [SerializeField] private float fallDuration = 0.4f; // 초
     [SerializeField] private Color crystalColor = new Color(0.45f, 0.9f, 1f);
@@ -351,8 +352,9 @@ public class DebrisPool : MonoBehaviour
         piece.landed = false;
         piece.sweepMarked = false;
         piece.sweepOnLand = false;
-        piece.renderer.sprite = GetRandomPieceSprite();
-        piece.renderer.color = color;
+        bool ownSprite = isCrystal && crystalSprites != null && crystalSprites.Length > 0; // 결정 전용 그림이 있으면 색칠 안 함
+        piece.renderer.sprite = ownSprite ? crystalSprites[Random.Range(0, crystalSprites.Length)] : GetRandomPieceSprite();
+        piece.renderer.color = ownSprite ? Color.white : color;
         piece.renderer.sortingOrder = isCrystal ? 11 : 10; // 결정이 파편에 묻히지 않게 위에
         piece.renderer.forceRenderingOff = zone != CurrentZone;
         piece.renderer.transform.localScale = Vector3.one * size;

@@ -6191,10 +6191,21 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 799a38a9c4964362b0db62b07288c6f9, type: 3}
   - {fileID: 21300000, guid: b08522c1d50d484aa571186aa95f442f, type: 3}
   - {fileID: 21300000, guid: 207254f055d244d09b18dfc866ddf9da, type: 3}
+  crystalSprites:
+  - {fileID: 21300000, guid: 640f6d7af81d9134495e32290aef8bed, type: 3}
+  - {fileID: 21300000, guid: b0383dd6758f98846987544b4e3588d3, type: 3}
+  - {fileID: 21300000, guid: 7487c9fd5dc40b14fa251c4bb7da3f94, type: 3}
+  - {fileID: 21300000, guid: de7cda2256d875f4dbb58f27fa3576c1, type: 3}
+  - {fileID: 21300000, guid: e617ecfa9c8db684189bfbca6021b95f, type: 3}
+  - {fileID: 21300000, guid: 8521e29a823d57a4e971a087d25de492, type: 3}
+  - {fileID: 21300000, guid: 05ada5e39bd79db48bc146b46d52abe5, type: 3}
+  - {fileID: 21300000, guid: bcef5dd065d32df49a83d3b9750c42bd, type: 3}
+  - {fileID: 21300000, guid: a72054b8c8a71ef409e45fdce6d0abd8, type: 3}
+  - {fileID: 21300000, guid: 33c972e2cc3a78d4da880a7cdf6ef6f0, type: 3}
   initialSpread: 1
   fallDuration: 0.4
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 1}
-  crystalSizeMultiplier: 1.6
+  crystalSizeMultiplier: 1.2
   maxFallingShards: 800
   hoverPickupRadiusScale: 0.7
   maxCarriedPieces: 80
