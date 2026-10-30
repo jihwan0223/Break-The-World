@@ -2207,6 +2207,7 @@ GameObject:
   - component: {fileID: 123007885}
   - component: {fileID: 123007884}
   - component: {fileID: 123007894}
+  - component: {fileID: 123007895}
   m_Layer: 0
   m_Name: "Map3_\uCEE8\uBCA0\uC774\uC5B4\uBCA8\uD2B8"
   m_TagString: Untagged
@@ -2686,6 +2687,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ConveyorBelt
   speed: 1.2
   stepPixels: 4
+--- !u!114 &123007895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 123007882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbc8a147d2fce46458d883b3395af2fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WaxCoating
 --- !u!1 &123547892
 GameObject:
   m_ObjectHideFlags: 0
@@ -26715,6 +26728,7 @@ GameObject:
   - component: {fileID: 1469939285}
   - component: {fileID: 1469939284}
   - component: {fileID: 1469939283}
+  - component: {fileID: 1469939294}
   m_Layer: 0
   m_Name: "Map3_\uD68C\uC0AC"
   m_TagString: Untagged
@@ -27213,6 +27227,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1469939294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469939281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbc8a147d2fce46458d883b3395af2fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WaxCoating
 --- !u!1 &1482502564
 GameObject:
   m_ObjectHideFlags: 0
@@ -38369,11 +38395,11 @@ MonoBehaviour:
   - healthStages:
     - {fileID: 21300000, guid: ae004a25c0e630745ba952e5178e7a93, type: 3}
     waxColor: {r: 0, g: 0, b: 0, a: 0}
-    noWax: 1
+    noWax: 0
   - healthStages:
     - {fileID: 21300000, guid: 69f38ab5d2b18fb4cb45009e868da818, type: 3}
     waxColor: {r: 0, g: 0, b: 0, a: 0}
-    noWax: 1
+    noWax: 0
   debugUnlockAll: 0
 --- !u!114 &1994684769 stripped
 MonoBehaviour:

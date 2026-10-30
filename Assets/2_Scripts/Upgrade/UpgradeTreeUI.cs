@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -126,7 +127,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         // OS마다 틱 크기가 달라 부호만 씀
         float dir = Mathf.Sign(eventData.scrollDelta.y);
         float factor = dir > 0f ? (1f + zoomStep) : (1f / (1f + zoomStep));
-        _zoomTarget = Mathf.Clamp(_zoomTarget * factor, minZoom, maxZoom);
+        _zoomTarget = Mathf.Clamp(_zoomTarget * factor, Mathf.Min(minZoom, FitAllZoom()), maxZoom);
     }
 
     void Update()
@@ -186,6 +187,27 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         onArrive?.Invoke();
         yield return new WaitForSecondsRealtime(0.6f);
         _revealRunning = false;
+    }
+
+    private float _fitAllZoom; // 노드 전체가 한 화면에 들어오는 배율 (한 번만 계산)
+
+    private float FitAllZoom()
+    {
+        if (_fitAllZoom > 0f) return _fitAllZoom;
+        RectTransform viewport = content.parent as RectTransform;
+        if (viewport == null) return minZoom;
+        var bounds = new Bounds();
+        bool first = true;
+        foreach (RectTransform rect in _upgradeNodes.Select(n => n != null ? n.Rect : null).Concat(_economyNodes.Select(n => n != null ? n.Rect : null)))
+        {
+            if (rect == null) continue;
+            var b = new Bounds(content.InverseTransformPoint(rect.position), rect.rect.size);
+            if (first) { bounds = b; first = false; }
+            else bounds.Encapsulate(b);
+        }
+        if (first) return minZoom;
+        _fitAllZoom = Mathf.Min(viewport.rect.width / bounds.size.x, viewport.rect.height / bounds.size.y) * 0.95f;
+        return _fitAllZoom;
     }
 
     private Vector2 CenteredAnchoredPosition(RectTransform node, float zoom)

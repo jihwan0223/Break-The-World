@@ -82,8 +82,18 @@ public static class GameSettings
         set { PlayerPrefs.SetInt(FpsKey, Mathf.Clamp(value, 0, FpsOptions.Length - 1)); ApplyFrameRate(); }
     }
 
-    public static List<Vector2Int> Resolutions =>
-        Screen.resolutions.Select(r => new Vector2Int(r.width, r.height)).Distinct().OrderBy(r => r.x * r.y).ToList();
+    // 고를 수 있는 해상도: UI가 깨지지 않게 16:9이고 1920x1080 이상인 것만 (같은 크기는 하나만, 작은 것부터).
+    // 모니터가 그보다 작으면 1920x1080 하나만
+    public static List<Vector2Int> Resolutions
+    {
+        get
+        {
+            List<Vector2Int> list = Screen.resolutions.Select(r => new Vector2Int(r.width, r.height)).Distinct()
+                .Where(r => r.x >= 1920 && r.y >= 1080 && r.x * 9 == r.y * 16).OrderBy(r => r.x * r.y).ToList(); // 허용 해상도
+            if (list.Count == 0) list.Add(new Vector2Int(1920, 1080));
+            return list;
+        }
+    }
 
     public static Vector2Int Resolution
     {
@@ -91,8 +101,10 @@ public static class GameSettings
         {
             string saved = PlayerPrefs.GetString(ResolutionKey, "");
             string[] parts = saved.Split('x');
-            if (parts.Length == 2 && int.TryParse(parts[0], out int w) && int.TryParse(parts[1], out int h)) return new Vector2Int(w, h);
-            return new Vector2Int(Screen.currentResolution.width, Screen.currentResolution.height);
+            List<Vector2Int> allowed = Resolutions; // 고를 수 있는 해상도
+            if (parts.Length == 2 && int.TryParse(parts[0], out int w) && int.TryParse(parts[1], out int h) && allowed.Contains(new Vector2Int(w, h)))
+                return new Vector2Int(w, h);
+            return allowed[allowed.Count - 1]; // 저장값이 없거나 허용 밖(예전 4:3 등)이면 가장 큰 16:9
         }
         set { PlayerPrefs.SetString(ResolutionKey, $"{value.x}x{value.y}"); ApplyDisplay(); }
     }
