@@ -46,6 +46,18 @@ public static class GameSettings
         set => PlayerPrefs.SetInt(ShakeKey, value ? 1 : 0);
     }
 
+    // 데모면 맵3(회사)까지만 - 디버그에서 전환
+    public static bool IsDemo
+    {
+        get => PlayerPrefs.GetInt("FullVersion", 0) == 0;
+        set => PlayerPrefs.SetInt("FullVersion", value ? 0 : 1);
+    }
+    public const int DemoZoneCount = 3;
+    public const int DemoObjectCount = 15; // 데모는 회사(14)까지
+    public const int DemoWeaponCount = 6; // 데모는 철퇴(5)까지 - 나중에 추가하는 무기는 풀버전 전용
+    public static bool IsDemoLockedObject(int objectIndex) => IsDemo && objectIndex >= DemoObjectCount;
+    public static bool IsDemoLockedWeapon(int weaponIndex) => IsDemo && weaponIndex >= DemoWeaponCount;
+
     public static bool DamageNumbers
     {
         get => PlayerPrefs.GetInt(DamageNumbersKey, 1) == 1;

@@ -14,6 +14,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
     [SerializeField] private Image doneOverlay; // 미사용
     [Tooltip("해금 완료(또는 획득량 1레벨 이상)되면 바뀔 스프라이트 (비워두면 기본 이미지 그대로 유지)")]
     [SerializeField] private Sprite upgradedSprite;
+    [Tooltip("체크하면 데모 버전에서는 안 보임")] [SerializeField] private bool fullVersionOnly;
     [Tooltip("이 오브젝트를 해금해야 열리는 노드 (비우면 안 씀). 그 전엔 자물쇠 그림 + 제목/설명 ???, 해금하는 순간 트리 카메라가 와서 자물쇠가 깨지며 열림. 열리면 대상 오브젝트가 아직 없어도 살 수 있음")]
     [ObjectNameField] [SerializeField] private string gateObjectName;
     [SerializeField] private Sprite lockedSprite;
@@ -185,7 +186,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         }
 
         // Gain 노드는 자기 오브젝트가 해금되면 나타남
-        bool isRevealed = isGain ? ObjectManager.Instance.IsUnlocked(objectIndex) : PrerequisiteSatisfied();
+        bool isRevealed = !(GameSettings.IsDemo && fullVersionOnly) && !GameSettings.IsDemoLockedObject(objectIndex) && (isGain ? ObjectManager.Instance.IsUnlocked(objectIndex) : PrerequisiteSatisfied());
 
         bool justRevealed = animateReveal && _refreshedOnce && isRevealed && !_wasRevealed;
         _wasRevealed = isRevealed;

@@ -379,8 +379,8 @@ public partial class SidePanelUI
         AddStat(left, "보스 처치", () => NumberFormatUtil.Format(GameStats.BossClears) + "번");
         AddStat(left, "얻은 조각", () => NumberFormatUtil.Format(CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalPieces : 0));
         AddStat(left, "얻은 결정", () => NumberFormatUtil.Format(CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalCrystals : 0));
-        AddStat(left, "해금한 오브젝트", () => UnlockedText(ObjectManager.Instance != null ? ObjectManager.Instance.ObjectCount : 0, i => ObjectManager.Instance.IsUnlocked(i)));
-        AddStat(left, "해금한 무기", () => UnlockedText(WeaponManager.Instance != null ? WeaponManager.Instance.WeaponCount : 0, i => WeaponManager.Instance.IsUnlocked(i)));
+        AddStat(left, "해금한 오브젝트", () => UnlockedText(ObjectManager.Instance != null ? ObjectManager.Instance.VisibleObjectCount : 0, i => ObjectManager.Instance.IsUnlocked(i)));
+        AddStat(left, "해금한 무기", () => UnlockedText(WeaponManager.Instance != null ? WeaponManager.Instance.VisibleWeaponCount : 0, i => WeaponManager.Instance.IsUnlocked(i)));
 
         var right = StatColumn(columns, "능력치");
         AddStat(right, "클릭 데미지", () =>
@@ -399,7 +399,7 @@ public partial class SidePanelUI
         AddStat(right, "커서 범위", () => U() != null && U().HoverPickupIsUnlocked ? $"{U().CursorRadius:0.##}" : "잠김");
 
         var objectsPage = StatPage();
-        int count = ObjectManager.StaticObjectCount;
+        int count = GameSettings.IsDemo ? Mathf.Min(GameSettings.DemoObjectCount, ObjectManager.StaticObjectCount) : ObjectManager.StaticObjectCount; // 데모는 풀버전 오브젝트 빼고
         int half = (count + 1) / 2;
         var objLeft = StatColumn(objectsPage, "부순 횟수");
         objLeft.style.marginRight = 48;

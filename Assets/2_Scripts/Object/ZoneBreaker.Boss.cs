@@ -231,7 +231,7 @@ public partial class ZoneBreaker
         }
         SaveManager.Instance?.SaveNow();
         BossChallengeUI.PlaySlowMotion();
-        if (IsFinalBoss) SidePanelUI.ShowDemoComplete();
+        if (IsFinalBoss && GameSettings.IsDemo) SidePanelUI.ShowDemoComplete();
     }
 
     private void LoseBoss()

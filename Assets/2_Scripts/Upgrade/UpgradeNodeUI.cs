@@ -25,6 +25,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     [Tooltip("1레벨 이상 찍으면 바뀔 스프라이트 (비워두면 기본 이미지 그대로 유지)")]
     [SerializeField] private Sprite upgradedSprite;
+    [Tooltip("체크하면 데모 버전에서는 안 보임")] [SerializeField] private bool fullVersionOnly;
+    public bool FullVersionOnly => fullVersionOnly;
     [Tooltip("이 오브젝트를 해금해야 열리는 노드 (비우면 안 씀). 그 전엔 자물쇠 그림 + 제목/설명 ???, 해금하는 순간 트리 카메라가 와서 자물쇠가 깨지며 열림. 열리면 대상 오브젝트가 아직 없어도 살 수 있음")]
     [ObjectNameField] [SerializeField] private string gateObjectName;
     [SerializeField] private Sprite lockedSprite;

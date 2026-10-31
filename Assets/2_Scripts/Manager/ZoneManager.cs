@@ -13,7 +13,7 @@ public class ZoneManager : MonoBehaviour
 
     public int CurrentZone => _currentZone;
     public int UnlockedMaxZone => _unlockedMaxZone;
-    public int ZoneCount => zoneRoots != null ? zoneRoots.Length : 0;
+    public int ZoneCount => zoneRoots == null ? 0 : GameSettings.IsDemo ? Mathf.Min(GameSettings.DemoZoneCount, zoneRoots.Length) : zoneRoots.Length; // 데모는 맵3까지
 
     public bool CanGoPrev => _currentZone > 0;
     public bool CanGoNext => _currentZone < _unlockedMaxZone;
@@ -115,7 +115,7 @@ public class ZoneManager : MonoBehaviour
             GameObject root = zoneRoots[i];
             if (root == null) continue;
 
-            root.SetActive(true);
+            root.SetActive(i < ZoneCount); // 데모에서 막힌 맵은 끔
             bool hidden = i != _currentZone;
             foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>(true))
                 renderer.forceRenderingOff = hidden; // enabled와 별개라 UnlockGate/Health와 충돌 없음

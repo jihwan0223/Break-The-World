@@ -66,11 +66,18 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(5, 3, "트럭", new Color(0.95f, 0.95f, 0.95f)),
         new ObjectData(6, 1, "컨베이어 벨트", new Color(0.35f, 0.38f, 0.45f)),
         new ObjectData(6, 2, "회사", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 163500f / 37000f * 0.65f }, // ★ 데모 마지막 - 철퇴 풀업이면 초당 약 3클릭으로 30초 보스전 클리어
+        // 존4: 바다 (풀버전) - 튜브는 존4가 열릴 때 공짜
+        new ObjectData(7, 1, "튜브", new Color(1.00f, 0.55f, 0.70f)),
+        new ObjectData(7, 2, "부표", new Color(0.90f, 0.30f, 0.30f)),
+        new ObjectData(7, 3, "요트", new Color(0.92f, 0.94f, 0.98f)),
+        new ObjectData(8, 1, "등대", new Color(0.95f, 0.40f, 0.40f)),
+        new ObjectData(8, 2, "배", new Color(0.25f, 0.35f, 0.65f)) { hpMultiplier = 163500f / 37000f * 0.65f }, // ★ 존4 관문
     };
 
     private int equippedIndex;
 
     public int ObjectCount => objects.Count;
+    public int VisibleObjectCount => GameSettings.IsDemo ? Math.Min(GameSettings.DemoObjectCount, objects.Count) : objects.Count; // 데모에선 풀버전 오브젝트 숨김 (도감/통계)
     public static int StaticObjectCount => objects.Count;
     public int EquippedIndex => equippedIndex;
     public ObjectData CurrentObject => objects[equippedIndex];

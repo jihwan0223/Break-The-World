@@ -85,6 +85,7 @@ public class UpgradeManager : MonoBehaviour
         public int targetObjectIndex; // -1 = 전역
         public int gateObjectIndex = -1; // -1 = 관문 없음
         public int targetWeaponIndex; // -1 = 전역
+        public bool fullVersionOnly; // 데모에선 숨김
         public int maxLevel;
         public string prerequisiteId;
         public System.Func<bool> prerequisiteSatisfied; // null = 루트
@@ -190,6 +191,7 @@ public class UpgradeManager : MonoBehaviour
                 targetObjectIndex = targetObjectIndex,
                 gateObjectIndex = string.IsNullOrEmpty(ui.GateObjectName) ? -1 : ObjectManager.StaticIndexOfName(ui.GateObjectName),
                 targetWeaponIndex = WeaponManager.StaticIndexOfWeaponName(ui.TargetWeaponName),
+                fullVersionOnly = ui.FullVersionOnly,
                 maxLevel = Mathf.Max(1, ui.MaxLevel),
                 prerequisiteId = prereqs != null ? string.Join(", ", prereqs.ConvertAll(p => p.id)) : null,
                 prerequisiteSatisfied = prereqs != null && prereqs.Count > 0
@@ -232,6 +234,8 @@ public class UpgradeManager : MonoBehaviour
     {
         UpgradeNode node = GetNode(nodeId);
         if (node == null) return false;
+        if (GameSettings.IsDemo && (node.fullVersionOnly || GameSettings.IsDemoLockedObject(node.targetObjectIndex) || GameSettings.IsDemoLockedWeapon(node.targetWeaponIndex)))
+            return false; // 데모에선 풀버전 내용 숨김
         if (node.prerequisiteSatisfied == null) return true;
 
         return node.prerequisiteSatisfied();
@@ -489,7 +493,7 @@ public class UpgradeManager : MonoBehaviour
 
     public long CrystalDropAmount => (long)baseCrystalAmount << Mathf.Clamp(Mathf.RoundToInt(SumEffect(UpgradeEffect.CrystalAmount)), 0, 20); // 레벨마다 2배
 
-    private static readonly int[] CrystalZoneMultipliers = { 1, 10, 100 }; // 맵1 x1, 맵2 x10, 맵3 x100
+    private static readonly int[] CrystalZoneMultipliers = { 1, 10, 100, 1000 }; // 맵1 x1, 맵2 x10, 맵3 x100, 맵4 x1000
 
     // zone -1 = 지금 보는 존
     public long CrystalDropAmountIn(int zone)

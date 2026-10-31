@@ -156,7 +156,7 @@ public partial class SidePanelUI : MonoBehaviour
 
         _objectContent = BuildSelectorSection(
             _objectBrowse,
-            () => ObjectManager.Instance != null ? ObjectManager.Instance.ObjectCount : 0,
+            () => ObjectManager.Instance != null ? ObjectManager.Instance.VisibleObjectCount : 0,
             index => ObjectManager.Instance != null ? ObjectManager.Instance.GetObjectAt(index).objectName : "",
             index =>
             {
@@ -336,6 +336,22 @@ public partial class SidePanelUI : MonoBehaviour
             _weaponBrowse.index = 0;
             UpgradeTreeUI.Instance?.RefreshAll();
             return "맨손만 남기고 모든 무기를 잠갔습니다";
+        });
+        AddDebugButton(list, "데모/풀버전 전환", () =>
+        {
+            ZoneManager zones = ZoneManager.Instance;
+            bool toDemo = !GameSettings.IsDemo; // 바꿀 쪽
+            int max = zones != null ? zones.UnlockedMaxZone : 0;
+            // 마지막 보스 처치 기록을 모드에 맞게 옮김: 데모의 회사 처치 = 풀버전의 맵4 열림
+            if (toDemo) { if (max >= GameSettings.DemoZoneCount) ZoneBreaker.FinalBossCleared = true; }
+            else if (ZoneBreaker.FinalBossCleared) { ZoneBreaker.FinalBossCleared = false; max = Mathf.Max(max, GameSettings.DemoZoneCount); }
+            GameSettings.IsDemo = toDemo;
+            zones?.SetState(max, zones.CurrentZone);
+            if (toDemo && WeaponManager.Instance != null && WeaponManager.Instance.EquippedIndex >= WeaponManager.Instance.VisibleWeaponCount)
+                WeaponManager.Instance.Equip(WeaponManager.Instance.VisibleWeaponCount - 1); // 풀버전 무기를 들고 있었으면 데모 마지막 무기로
+            UpgradeTreeUI.Instance?.RefreshAll();
+            SaveManager.Instance?.SaveNow();
+            return toDemo ? "데모 모드 (맵3 회사까지)" : "풀버전 모드 (맵4까지)";
         });
         AddDebugButton(list, "맵 해금 초기화", () =>
         {
@@ -643,7 +659,7 @@ public partial class SidePanelUI : MonoBehaviour
         return content;
     }
 
-    private static int WeaponCount() => WeaponManager.Instance != null ? WeaponManager.Instance.WeaponCount : 0;
+    private static int WeaponCount() => WeaponManager.Instance != null ? WeaponManager.Instance.VisibleWeaponCount : 0;
 
     private void RefreshWeaponSection(Button prevButton, Button nextButton, Image preview, Label nameLabel,
         VisualElement card, Button actionButton, List<Image> slots)
@@ -651,7 +667,7 @@ public partial class SidePanelUI : MonoBehaviour
         WeaponManager weapons = WeaponManager.Instance;
         if (weapons == null) return;
 
-        int index = Mathf.Clamp(_weaponBrowse.index, 0, weapons.WeaponCount - 1);
+        int index = Mathf.Clamp(_weaponBrowse.index, 0, weapons.VisibleWeaponCount - 1);
         _weaponBrowse.index = index;
         WeaponData data = weapons.GetWeaponAt(index);
 
@@ -661,7 +677,7 @@ public partial class SidePanelUI : MonoBehaviour
         bool hidden = !unlocked && !buyable;
 
         prevButton.SetEnabled(index > 0);
-        nextButton.SetEnabled(index < weapons.WeaponCount - 1);
+        nextButton.SetEnabled(index < weapons.VisibleWeaponCount - 1);
 
         preview.sprite = data.icon;
         preview.tintColor = unlocked ? Color.white : Color.black;

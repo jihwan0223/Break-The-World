@@ -27,6 +27,7 @@ public class WeaponManager : MonoBehaviour
     public event Action<int> OnUnlockChanged;
 
     public int WeaponCount => weapons.Count;
+    public int VisibleWeaponCount => GameSettings.IsDemo ? Mathf.Min(GameSettings.DemoWeaponCount, weapons.Count) : weapons.Count; // 데모에선 풀버전 무기 숨김
     public int EquippedIndex => equippedIndex;
     public WeaponData CurrentWeapon => weapons[equippedIndex];
     public int CurrentClickDamage => CurrentWeapon.clickDamage;
@@ -81,14 +82,14 @@ public class WeaponManager : MonoBehaviour
         if (CurrencyManager.Instance == null) return false;
 
         long have = CurrencyManager.Instance.GetPieces();
-        for (int i = 1; i < weapons.Count; i++)
+        for (int i = 1; i < VisibleWeaponCount; i++)
             if (!_unlocked[i] && IsUnlockOrderMet(i) && have >= GetUnlockCost(i)) return true;
         return false;
     }
 
     public bool TryUnlock(int index)
     {
-        if (index <= 0 || index >= weapons.Count || _unlocked[index] || !IsUnlockOrderMet(index)) return false;
+        if (index <= 0 || index >= VisibleWeaponCount || _unlocked[index] || !IsUnlockOrderMet(index)) return false;
 
         var cost = new List<PieceCost> { new PieceCost(GetUnlockCost(index)) };
         if (CurrencyManager.Instance == null || !CurrencyManager.Instance.TrySpendPieces(cost)) return false;
@@ -138,7 +139,7 @@ public class WeaponManager : MonoBehaviour
 
     public void Equip(int index)
     {
-        index = Mathf.Clamp(index, 0, weapons.Count - 1);
+        index = Mathf.Clamp(index, 0, VisibleWeaponCount - 1);
         if (!IsUnlocked(index)) return;
         equippedIndex = index;
         OnWeaponChanged?.Invoke(CurrentWeapon);
