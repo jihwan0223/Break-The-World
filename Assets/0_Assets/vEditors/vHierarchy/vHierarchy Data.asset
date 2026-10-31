@@ -323,6 +323,29 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1395364305-0
         - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-47477070-0
         - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1469939281-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-361855513-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-72493099-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-202739402-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1235555101-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1807296574-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1413005559-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1211901936-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-124873142-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-275017856-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1846680512-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1287251597-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-910424994-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1855622416-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-64107678-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1082731614-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-108990188-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-605324160-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1598442616-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1714374390-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1316583999-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1129066670-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1258685949-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-580216478-0
         values:
         - colorIndex: 7
           iconNameOrGuid: Camera Icon
@@ -534,6 +557,98 @@ MonoBehaviour:
           isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: 69f38ab5d2b18fb4cb45009e868da818
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 4f0c31e360869144db45c45c44edab0a
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: c6d1564596c3a1d4d9ad45903ab9abcb
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 88f1c75b49e5e8d47ae807493cb46d99
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 48ff371505c301948a318f694692c1c2
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 61d68808623437d4fa3e4488a3951706
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 61d68808623437d4fa3e4488a3951706
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 191214a8c5d7b494985936cc88f94bee
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 191214a8c5d7b494985936cc88f94bee
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 191214a8c5d7b494985936cc88f94bee
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 191214a8c5d7b494985936cc88f94bee
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 5b37c1d18d4395c4cb121e82c9a3f59f
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 5b37c1d18d4395c4cb121e82c9a3f59f
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 5b37c1d18d4395c4cb121e82c9a3f59f
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: 5b37c1d18d4395c4cb121e82c9a3f59f
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: e0fe288dfe3d1de4d9923bdf6e158a85
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: e0fe288dfe3d1de4d9923bdf6e158a85
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: e0fe288dfe3d1de4d9923bdf6e158a85
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: e0fe288dfe3d1de4d9923bdf6e158a85
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: c3141815d4ad6764b89a92aa49802ab3
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: c3141815d4ad6764b89a92aa49802ab3
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: c3141815d4ad6764b89a92aa49802ab3
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: c3141815d4ad6764b89a92aa49802ab3
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: c50c803f4ebf06040904c9fa3ac330eb
           isIconRecursive: 0
           isColorRecursive: 0
   bookmarks: []
