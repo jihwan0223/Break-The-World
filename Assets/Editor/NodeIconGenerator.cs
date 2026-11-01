@@ -67,6 +67,7 @@ public static class NodeIconGenerator
         }
         foreach (var node in Object.FindObjectsByType<ObjectEconomyNodeUI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
+            if (IsHandDrawn(node)) continue;
             var so = new SerializedObject(node);
             targets.Add((node, so.FindProperty("objectIndex").intValue, so.FindProperty("isGain").boolValue ? "DropRate" : "UnLock"));
         }
@@ -162,6 +163,14 @@ public static class NodeIconGenerator
         AssetDatabase.DeleteAsset(OutDir);
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         Debug.Log($"[NodeIcon] 노드 {restored}개 원래 그림으로 복구 (씬 저장 필요)");
+    }
+
+    // 직접 그린 해금 그림(NodeImage/UnLock)은 덮어쓰지 않음
+    const string HandDrawnDir = "Assets/3_Image/NodeImage/UnLock/";
+    static bool IsHandDrawn(Component node)
+    {
+        var image = node.GetComponent<Image>();
+        return image != null && image.sprite != null && AssetDatabase.GetAssetPath(image.sprite).StartsWith(HandDrawnDir);
     }
 
     static bool KeepsOriginal(string name, string badge) =>

@@ -26060,11 +26060,11 @@ PrefabInstance:
     - target: {fileID: -2551560563756291639, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 21300000, guid: a97bea4537d927449802fb9314c1ee14, type: 3}
+      objectReference: {fileID: 21300000, guid: c28e89238f7301549b264ae2e172a4e1, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: e5e7d94d13fe671488eb6c37d61e109f, type: 3}
+      objectReference: {fileID: 21300000, guid: 0a2aa09e998e6bc4d87ff6120e730a73, type: 3}
     - target: {fileID: 1556740884150353402, guid: 5f3dbf6f86b35db41b490e046fdc1881, type: 3}
       propertyPath: m_Color.b
       value: 1
