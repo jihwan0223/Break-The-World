@@ -38,8 +38,7 @@ public class PieceUI : MonoBehaviour
         if (uiDocument.panelSettings == null)
         {
             // PanelSettings가 비어 있으면 런타임에 만들어 넣음
-            var settings = ScriptableObject.CreateInstance<PanelSettings>();
-            settings.themeStyleSheet = Resources.Load<ThemeStyleSheet>("UnityDefaultRuntimeTheme");
+            var settings = PixelStyle.NewPanelSettings();
             uiDocument.panelSettings = settings;
         }
 

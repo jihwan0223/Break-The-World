@@ -47,8 +47,7 @@ public partial class SidePanelUI : MonoBehaviour
 
         if (uiDocument.panelSettings == null)
         {
-            var settings = ScriptableObject.CreateInstance<PanelSettings>();
-            settings.themeStyleSheet = Resources.Load<ThemeStyleSheet>("UnityDefaultRuntimeTheme");
+            var settings = PixelStyle.NewPanelSettings();
             uiDocument.panelSettings = settings;
         }
 
@@ -244,7 +243,7 @@ public partial class SidePanelUI : MonoBehaviour
         panel.style.right = 0;
         panel.style.top = 0;
         panel.style.bottom = 0;
-        PixelStyle.Frame(panel, PixelStyle.Window, 6f);
+        PixelStyle.ScreenFrame(panel, PixelStyle.Window, 6f);
 
         panel.style.display = DisplayStyle.None;
 

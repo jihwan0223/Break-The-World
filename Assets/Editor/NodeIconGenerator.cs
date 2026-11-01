@@ -26,6 +26,7 @@ public static class NodeIconGenerator
     static readonly RectInt CrispBox = new RectInt(2, 15, 26, 15);
     const int CrispScale = 2;
     static readonly string[] StripObjects = { "도로", "컨베이어 벨트" };
+    static readonly string[] SternObjects = { "배" }; // 너무 긴 그림이라 오른쪽(선교) 부분만
     const string BeltName = "컨베이어 벨트";
     const string BeltRider = "왁뿌볼";
     static readonly Color32 BorderX = new Color32(255, 255, 255, 255);
@@ -96,10 +97,11 @@ public static class NodeIconGenerator
                 Sprite source = SourceSprite(visuals, t.objectIndex);
                 if (source == null) { Debug.LogWarning($"[NodeIcon] {name} 그림 없음"); continue; }
                 bool strip = System.Array.IndexOf(StripObjects, name) >= 0;
+                bool stern = System.Array.IndexOf(SternObjects, name) >= 0;
                 bool crisp = System.Array.IndexOf(CrispObjects, name) >= 0;
-                RectInt box = strip ? WideBox : crisp ? CrispBox : ObjectBox;
+                RectInt box = strip || stern ? WideBox : crisp ? CrispBox : ObjectBox;
                 if (crisp) { scale = CrispScale; box = new RectInt(box.x * scale, box.y * scale, box.width * scale, box.height * scale); }
-                layers.Add((FitObject(source, box, strip ? StripAspect : 0f, crisp), box));
+                layers.Add((FitObject(source, box, strip || stern ? StripAspect : 0f, crisp, stern), box));
             }
             if (name == BeltName)
             {
@@ -239,7 +241,7 @@ public static class NodeIconGenerator
         return result;
     }
 
-    static Color32[] FitObject(Sprite sprite, RectInt box, float cropAspect, bool crisp)
+    static Color32[] FitObject(Sprite sprite, RectInt box, float cropAspect, bool crisp, bool cropRight = false)
     {
         const int CrispHighlightPercent = 25;
         Color32[] tex = LoadTopDown(AssetDatabase.GetAssetPath(sprite.texture), out int tw, out int th);
@@ -259,7 +261,12 @@ public static class NodeIconGenerator
         var result = new Color32[box.width * box.height];
         if (maxX < 0) return result;
         int cw = maxX - minX + 1, ch = maxY - minY + 1;
-        if (cropAspect > 0f) cw = Mathf.Min(cw, Mathf.RoundToInt(ch * cropAspect));
+        if (cropAspect > 0f && cw > ch * cropAspect)
+        {
+            int keep = Mathf.RoundToInt(ch * cropAspect);
+            if (cropRight) minX = maxX - keep + 1;
+            cw = keep;
+        }
         float scale = Mathf.Min((float)box.width / cw, (float)box.height / ch);
         int dw = Mathf.Max(1, Mathf.RoundToInt(cw * scale)), dh = Mathf.Max(1, Mathf.RoundToInt(ch * scale));
         int ox = (box.width - dw) / 2, oy = box.height - dh;

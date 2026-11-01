@@ -346,6 +346,8 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1129066670-0
         - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-1258685949-0
         - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-580216478-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-938947939-0
+        - globalObjectIdString: GlobalObjectId_V1-2-520ec06349891af4883ce67b19733166-2009455275-0
         values:
         - colorIndex: 7
           iconNameOrGuid: Camera Icon
@@ -649,6 +651,14 @@ MonoBehaviour:
           isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: c50c803f4ebf06040904c9fa3ac330eb
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: a1178458333fa22468663507af435e68
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: a1178458333fa22468663507af435e68
           isIconRecursive: 0
           isColorRecursive: 0
   bookmarks: []

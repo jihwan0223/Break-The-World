@@ -45,8 +45,7 @@ public class BossChallengeUI : MonoBehaviour
         PanelSettings settings = pieceUI != null ? pieceUI.GetComponent<UIDocument>().panelSettings : null;
         if (settings == null)
         {
-            settings = ScriptableObject.CreateInstance<PanelSettings>();
-            settings.themeStyleSheet = Resources.Load<ThemeStyleSheet>("UnityDefaultRuntimeTheme");
+            settings = PixelStyle.NewPanelSettings();
             settings.sortingOrder = 100;
         }
         document.panelSettings = settings;

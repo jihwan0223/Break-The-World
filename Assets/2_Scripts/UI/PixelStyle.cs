@@ -59,6 +59,23 @@ public static class PixelStyle
         Paint(element, Kind.Frame, tone, dot);
     }
 
+    // 1920x1080 기준으로 해상도에 맞춰 같이 커지고 작아짐
+    public static PanelSettings NewPanelSettings()
+    {
+        var settings = ScriptableObject.CreateInstance<PanelSettings>();
+        settings.themeStyleSheet = Resources.Load<ThemeStyleSheet>("UnityDefaultRuntimeTheme");
+        settings.scaleMode = PanelScaleMode.ScaleWithScreenSize;
+        settings.referenceResolution = new Vector2Int(1920, 1080);
+        return settings;
+    }
+
+    // 화면 전체를 덮는 창: 모서리 투명 칸을 테두리 색으로 채워 뒤가 안 비침
+    public static void ScreenFrame(VisualElement element, Tone tone, float dot = Dot)
+    {
+        Paint(element, Kind.Frame, tone, dot);
+        element.style.backgroundColor = tone.outline.linear;
+    }
+
     public const float OutlinedLetterSpacing = 6f; // px
 
     public static void OutlinedText(VisualElement element, Color outline, float width = 0.35f)

@@ -64,8 +64,7 @@ public class MainMenuUI : MonoBehaviour
 
         if (uiDocument.panelSettings == null)
         {
-            var settings = ScriptableObject.CreateInstance<PanelSettings>();
-            settings.themeStyleSheet = Resources.Load<ThemeStyleSheet>("UnityDefaultRuntimeTheme");
+            var settings = PixelStyle.NewPanelSettings();
             uiDocument.panelSettings = settings;
         }
 
@@ -111,7 +110,7 @@ public class MainMenuUI : MonoBehaviour
         if (GameFonts.UiColored != null)
             root.style.unityFontDefinition = FontDefinition.FromSDFFont(GameFonts.UiColored);
         root.style.flexGrow = 1;
-        PixelStyle.Frame(root, PixelStyle.Window, 8f);
+        PixelStyle.ScreenFrame(root, PixelStyle.Window, 8f);
 
         var title = new Label("BREAK THE WORLD");
         title.style.position = Position.Absolute;

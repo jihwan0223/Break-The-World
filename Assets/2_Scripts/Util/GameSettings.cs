@@ -94,18 +94,11 @@ public static class GameSettings
         set { PlayerPrefs.SetInt(FpsKey, Mathf.Clamp(value, 0, FpsOptions.Length - 1)); ApplyFrameRate(); }
     }
 
-    // 고를 수 있는 해상도: UI가 깨지지 않게 16:9이고 1920x1080 이상인 것만 (같은 크기는 하나만, 작은 것부터).
-    // 모니터가 그보다 작으면 1920x1080 하나만
-    public static List<Vector2Int> Resolutions
-    {
-        get
-        {
-            List<Vector2Int> list = Screen.resolutions.Select(r => new Vector2Int(r.width, r.height)).Distinct()
-                .Where(r => r.x >= 1920 && r.y >= 1080 && r.x * 9 == r.y * 16).OrderBy(r => r.x * r.y).ToList(); // 허용 해상도
-            if (list.Count == 0) list.Add(new Vector2Int(1920, 1080));
-            return list;
-        }
-    }
+    // 고를 수 있는 해상도: 16:9 표준 크기 전부 (작은 것부터)
+    private static readonly Vector2Int[] StandardResolutions =
+        { new Vector2Int(1280, 720), new Vector2Int(1600, 900), new Vector2Int(1920, 1080), new Vector2Int(2560, 1440), new Vector2Int(3840, 2160) };
+
+    public static List<Vector2Int> Resolutions => StandardResolutions.ToList();
 
     public static Vector2Int Resolution
     {
@@ -116,7 +109,11 @@ public static class GameSettings
             List<Vector2Int> allowed = Resolutions; // 고를 수 있는 해상도
             if (parts.Length == 2 && int.TryParse(parts[0], out int w) && int.TryParse(parts[1], out int h) && allowed.Contains(new Vector2Int(w, h)))
                 return new Vector2Int(w, h);
-            return allowed[allowed.Count - 1]; // 저장값이 없거나 허용 밖(예전 4:3 등)이면 가장 큰 16:9
+            // 저장값이 없으면 모니터 이하 중 가장 큰 것
+            UnityEngine.Resolution screen = Screen.currentResolution;
+            Vector2Int fit = allowed[0];
+            foreach (Vector2Int r in allowed) if (r.x <= screen.width && r.y <= screen.height) fit = r;
+            return fit;
         }
         set { PlayerPrefs.SetString(ResolutionKey, $"{value.x}x{value.y}"); ApplyDisplay(); }
     }

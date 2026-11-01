@@ -72,6 +72,12 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(7, 3, "요트", new Color(0.92f, 0.94f, 0.98f)),
         new ObjectData(8, 1, "등대", new Color(0.95f, 0.40f, 0.40f)),
         new ObjectData(8, 2, "배", new Color(0.25f, 0.35f, 0.65f)) { hpMultiplier = 163500f / 37000f * 0.65f }, // ★ 존4 관문
+        // 존5: 우주 (풀버전) - 인공위성은 존5가 열릴 때 공짜
+        new ObjectData(9, 1, "인공위성", new Color(0.75f, 0.78f, 0.85f)),
+        new ObjectData(9, 2, "로켓", new Color(0.95f, 0.95f, 0.95f)),
+        new ObjectData(9, 3, "UFO", new Color(0.55f, 0.85f, 0.55f)),
+        new ObjectData(10, 1, "달", new Color(0.85f, 0.85f, 0.75f)),
+        new ObjectData(10, 2, "지구", new Color(0.30f, 0.55f, 0.85f)) { hpMultiplier = 163500f / 37000f * 0.65f }, // ★ 최종 보스
     };
 
     private int equippedIndex;

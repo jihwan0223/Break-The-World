@@ -26,8 +26,7 @@ public class ZoneArrowsUI : MonoBehaviour
 
         if (uiDocument.panelSettings == null)
         {
-            var settings = ScriptableObject.CreateInstance<PanelSettings>();
-            settings.themeStyleSheet = Resources.Load<ThemeStyleSheet>("UnityDefaultRuntimeTheme");
+            var settings = PixelStyle.NewPanelSettings();
             uiDocument.panelSettings = settings;
         }
 

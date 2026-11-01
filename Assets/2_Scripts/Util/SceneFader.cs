@@ -34,11 +34,8 @@ public class SceneFader : MonoBehaviour
         var go = new GameObject("SceneFader");
         DontDestroyOnLoad(go);
         var document = go.AddComponent<UIDocument>();
-        var settings = ScriptableObject.CreateInstance<PanelSettings>();
-        settings.themeStyleSheet = Resources.Load<ThemeStyleSheet>("UnityDefaultRuntimeTheme");
+        var settings = PixelStyle.NewPanelSettings();
         settings.sortingOrder = 10000;
-        settings.scaleMode = PanelScaleMode.ScaleWithScreenSize;
-        settings.referenceResolution = new Vector2Int(1920, 1080);
         document.panelSettings = settings;
         var fader = go.AddComponent<SceneFader>();
         fader.StartCoroutine(fader.Run(document, sceneName));
