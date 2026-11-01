@@ -493,7 +493,7 @@ public class UpgradeManager : MonoBehaviour
 
     public long CrystalDropAmount => (long)baseCrystalAmount << Mathf.Clamp(Mathf.RoundToInt(SumEffect(UpgradeEffect.CrystalAmount)), 0, 20); // 레벨마다 2배
 
-    private static readonly int[] CrystalZoneMultipliers = { 1, 10, 100, 1000 }; // 맵1 x1, 맵2 x10, 맵3 x100, 맵4 x1000
+    private static readonly int[] CrystalZoneMultipliers = { 1, 10, 100, 1000, 10000 }; // 맵1 x1 ~ 맵5 x10000
 
     // zone -1 = 지금 보는 존
     public long CrystalDropAmountIn(int zone)
