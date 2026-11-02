@@ -471,7 +471,12 @@ public class MainMenuUI : MonoBehaviour
         public VisualElement element;
         public System.Action<int> onStep;
         public System.Action onEnter;
+        public bool holdRepeat; // 방향키를 누르고 있으면 계속 조절 (볼륨)
     }
+
+    private const float HoldDelay = 0.35f; // 초, 누르고 이만큼 지나면 반복 시작
+    private const float HoldInterval = 0.03f; // 초, 반복 간격 (1%씩이면 초당 약 33%)
+    private float _nextHoldStep; // 다음 반복 시각 (unscaledTime)
 
     private VisualElement BuildSettingsPanel()
     {
@@ -592,7 +597,7 @@ public class MainMenuUI : MonoBehaviour
         wrap.style.paddingLeft = 18;
         wrap.style.paddingRight = 18;
         wrap.style.marginBottom = 22;
-        PixelStyle.Frame(wrap, PixelStyle.Slot);
+        PixelStyle.Frame(wrap, PixelStyle.GlassTrack);
         wrap.Add(cylinder);
         column.Add(wrap);
 
@@ -602,6 +607,7 @@ public class MainMenuUI : MonoBehaviour
         {
             element = wrap,
             onStep = step => cylinder.SetValue(cylinder.Value + step * GlassCylinderSlider.Step),
+            holdRepeat = true,
         });
     }
 
@@ -687,7 +693,15 @@ public class MainMenuUI : MonoBehaviour
         else if (kb.upArrowKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame)
             SelectSetting((_settingsSelectedIndex + (kb.downArrowKey.wasPressedThisFrame ? 1 : -1) + count) % count);
         else if (kb.leftArrowKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame)
+        {
             item.onStep?.Invoke(kb.rightArrowKey.wasPressedThisFrame ? 1 : -1);
+            _nextHoldStep = Time.unscaledTime + HoldDelay;
+        }
+        else if (item.holdRepeat && (kb.leftArrowKey.isPressed != kb.rightArrowKey.isPressed) && Time.unscaledTime >= _nextHoldStep)
+        {
+            item.onStep?.Invoke(kb.rightArrowKey.isPressed ? 1 : -1);
+            _nextHoldStep = Time.unscaledTime + HoldInterval;
+        }
         else if (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
             item.onEnter?.Invoke();
     }

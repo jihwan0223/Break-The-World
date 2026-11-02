@@ -5,12 +5,15 @@ public class GlassCylinderSlider : VisualElement
 {
     private const float Length = 400f; // px
     private const float Thickness = 26f; // px
-    public const float Step = 0.05f;
+    public const float Step = 0.01f; // 1%
+    private const float ChipStep = 0.05f; // 깨진 조각/톱니 모양은 5%마다 (1%마다 하면 드래그 중 너무 자주 튐)
     private const float ToothDepth = 12f; // px
     private const float WallWidth = 2f; // px
 
-    private static readonly Color GlassColor = new Color(0.6f, 0.85f, 1f, 0.25f);
-    private static readonly Color GlassEdgeColor = new Color(0.75f, 0.92f, 1f, 0.9f);
+    // 선형 색공간이라 .linear로 넣어야 적은 색 그대로 보임 (흰 배경 위에서 잘 보이게 진한 하늘색)
+    private static readonly Color GlassColor = new Color(110f / 255f, 180f / 255f, 240f / 255f, 0.78f).linear;
+    private static readonly Color GlassEdgeColor = new Color(70f / 255f, 130f / 255f, 200f / 255f, 1f).linear;
+    private static readonly Color ShineColor = new Color(1f, 1f, 1f, 0.8f); // 유리 위 반사 선
     private static readonly Color GhostColor = new Color(1f, 1f, 1f, 0.12f);
     private static readonly float[] Teeth = { 0.2f, 1f, 0.35f, 0.8f, 0f, 0.65f }; // 0~1, 위에서 아래 순
 
@@ -57,7 +60,7 @@ public class GlassCylinderSlider : VisualElement
         float snapped = Snap(value);
         if (Mathf.Approximately(snapped, _value)) return;
 
-        bool chipped = snapped < _value;
+        bool chipped = Mathf.FloorToInt(snapped / ChipStep + 0.001f) < Mathf.FloorToInt(_value / ChipStep + 0.001f); // 5% 경계를 내려갈 때만
         _value = snapped;
         MarkDirtyRepaint();
         _onChanged?.Invoke(_value);
@@ -80,7 +83,7 @@ public class GlassCylinderSlider : VisualElement
         painter.Stroke();
 
         bool whole = _value >= 1f;
-        int shift = Mathf.RoundToInt(_value / Step);
+        int shift = Mathf.FloorToInt(_value / ChipStep + 0.001f);
         painter.lineWidth = WallWidth;
         painter.strokeColor = GlassEdgeColor;
         painter.fillColor = GlassColor;
@@ -101,7 +104,7 @@ public class GlassCylinderSlider : VisualElement
         if (bodyEnd < 12f) return;
 
         painter.lineWidth = 2f;
-        painter.strokeColor = new Color(1f, 1f, 1f, 0.35f);
+        painter.strokeColor = ShineColor;
         painter.BeginPath();
         painter.MoveTo(new Vector2(8f, Thickness * 0.3f));
         painter.LineTo(new Vector2(bodyEnd - 6f, Thickness * 0.3f));

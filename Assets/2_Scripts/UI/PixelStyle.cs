@@ -42,6 +42,7 @@ public static class PixelStyle
     public static readonly Tone Card = new Tone(Hex("#FDEBD0"), Hex("#FFF6E6"), Hex("#E8CFA8"), Hex("#C9A67E"), Text);
     public static readonly Tone Ribbon = new Tone(Hex("#F2A7A0"), Hex("#F9D0CB"), Hex("#C9776F"), Outline, Hex("#5A2E2A"));
     public static readonly Tone Box = new Tone(Hex("#FFF6E6"), Hex("#FFFDF7"), Hex("#EAD9BE"), Outline, Text);
+    public static readonly Tone GlassTrack = new Tone(Hex("#FFFFFF"), Hex("#E6F3FC"), Hex("#CBE3F6"), Hex("#6A98C2"), Text); // 볼륨 막대 뒤 흰 유리
     public static readonly Tone Slot = new Tone(
         new Color(0.42f, 0.52f, 0.64f), new Color(0.54f, 0.64f, 0.76f), new Color(0.32f, 0.40f, 0.51f), new Color(0.22f, 0.28f, 0.37f), Color.white);
 

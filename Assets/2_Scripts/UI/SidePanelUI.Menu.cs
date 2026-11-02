@@ -262,7 +262,7 @@ public partial class SidePanelUI
         slot.style.paddingLeft = 18;
         slot.style.paddingRight = 18;
         slot.style.marginBottom = 18;
-        PixelStyle.Frame(slot, PixelStyle.Slot);
+        PixelStyle.Frame(slot, PixelStyle.GlassTrack);
         slot.Add(cylinder);
         column.Add(slot);
 
