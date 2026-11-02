@@ -216,7 +216,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.HoverPickupLayers: return Loc.T("커서 줍기가 한 번에 줍는 조각 층이 +{0}층 증가합니다.", n);
             case UpgradeManager.UpgradeEffect.CursorRange: return Loc.T("커서 범위가 더 증가합니다.");
             case UpgradeManager.UpgradeEffect.ObjectExtraCopies:
-                return Loc.T("맵에 {0}이(가) +{1}개 더 놓입니다. 동시에 여러 개를 부술 수 있어 조각을 더 빨리 모읍니다.", targetObjectName, n);
+                return Loc.T("맵에 {0}이(가) +{1}개 더 놓입니다.", targetObjectName, n);
             default: return null;
         }
     }
