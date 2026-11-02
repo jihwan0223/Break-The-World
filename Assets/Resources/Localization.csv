@@ -36,10 +36,14 @@
 {0} 무기 해금이 필요합니다,Requires weapon: {0},武器「{0}」の解放が必要です,需要解锁武器：{0},Требуется оружие: {0},Requiere el arma: {0},Requer a arma: {0},Benötigt die Waffe: {0},Nécessite l'arme : {0}
 맨손,Bare Hands,素手,徒手,Голые руки,Manos,Mãos,Fäuste,Mains nues
 프라이팬,Frying Pan,フライパン,平底锅,Сковорода,Sartén,Frigideira,Bratpfanne,Poêle
-망치,Hammer,ハンマー,锤子,Молоток,Martillo,Martelo,Hammer,Marteau
 야구 방망이,Baseball Bat,バット,棒球棍,Бита,Bate,Taco de beisebol,Baseballschläger,Batte
+교통 표지판,Traffic Sign,道路標識,交通标志,Дорожный знак,Señal de tráfico,Placa de trânsito,Verkehrsschild,Panneau routier
 곡괭이,Pickaxe,ツルハシ,镐,Кирка,Pico,Picareta,Spitzhacke,Pioche
-철퇴,Mace,メイス,狼牙棒,Булава,Maza,Maça,Streitkolben,Masse
+다이너마이트,Dynamite,ダイナマイト,炸弹,Динамит,Dinamita,Dinamite,Dynamit,Dynamite
+작살,Harpoon,銛,鱼叉,Гарпун,Arpón,Arpão,Harpune,Harpon
+닻,Anchor,錨,船锚,Якорь,Ancla,Âncora,Anker,Ancre
+미사일,Missile,ミサイル,导弹,Ракета,Misil,Míssil,Rakete,Missile
+블랙홀,Black Hole,ブラックホール,黑洞,Чёрная дыра,Agujero negro,Buraco negro,Schwarzes Loch,Trou noir
 보스 도전!,Boss Fight!,ボスに挑戦！,挑战首领！,На босса!,¡Al jefe!,Enfrentar chefe!,Bosskampf!,Défi boss !
 포기,Give Up,あきらめる,放弃,Сдаться,Rendirse,Desistir,Aufgeben,Abandonner
 보스전 실패,Boss Failed,ボス戦失敗,首领战失败,Босс не побеждён,Jefe fallido,Falha no chefe,Bosskampf verloren,Boss raté
@@ -281,13 +285,14 @@ UFO 자동클릭 횟수,UFO Auto Click Hits,UFOオートクリック回数,飞�
 일정 확률로 한 번 더 때립니다.,Chance to hit one more time.,一定確率でもう1回叩きます。,有一定概率多打击一次。,С некоторым шансом бьёт ещё раз.,Probabilidad de golpear una vez más.,Chance de golpear mais uma vez.,"Chance, ein weiteres Mal zu treffen.",Chance de frapper une fois de plus.
 더블클릭,Double Click,ダブルクリック,双击,Двойной клик,Doble clic,Clique duplo,Doppelklick,Double clic
 지구 자동클릭 속도,Earth Auto Click Speed,地球オートクリック速度,地球自动点击速度,Земля: скорость автоклика,Tierra: velocidad de clic auto.,Terra: velocidade do clique auto.,Erde: Auto-Klick-Tempo,Terre : vitesse du clic auto
-철퇴 데미지,Mace Damage,メイスダメージ,狼牙棒伤害,Булава: урон,Maza: daño,Maça: dano,Streitkolben: Schaden,Masse : dégâts
+다이너마이트 데미지,Dynamite Damage,ダイナマイトダメージ,炸弹伤害,Динамит: урон,Dinamita: daño,Dinamite: dano,Dynamit: Schaden,Dynamite : dégâts
 커서 범위가 넓어집니다.,Widens cursor range.,カーソル範囲が広がります。,光标范围扩大。,Увеличивает радиус курсора.,Amplía el alcance del cursor.,Amplia o alcance do cursor.,Vergrößert die Cursor-Reichweite.,Élargit la portée du curseur.
 간판 자동클릭,Signboard Auto Click,看板オートクリック,招牌自动点击,Вывеска: автоклик,Letrero: clic automático,Placa: clique automático,Schild: Auto-Klick,Enseigne : clic auto
 배 자동클릭,Ship Auto Click,船オートクリック,船自动点击,Корабль: автоклик,Barco: clic automático,Navio: clique automático,Schiff: Auto-Klick,Navire : clic auto
 지구 드랍량,Earth Drops,地球ドロップ量,地球掉落量,Земля: добыча,Tierra: botín,Terra: saque,Erde: Ausbeute,Terre : butin
 요트 추가 배치,Extra Yacht,ヨット追加配置,追加游艇,Яхта: доп. копии,Yate extra,Iate extra,Jacht: Extra,Yacht supplémentaire
 달 추가 지구치,Extra Moon,月追加配置,追加月球,Луна: доп. копии,Luna extra,Lua extra,Mond: Extra,Lune supplémentaire
+닻 데미지,Anchor Damage,錨ダメージ,船锚伤害,Якорь: урон,Ancla: daño,Âncora: dano,Anker: Schaden,Ancre : dégâts
 배 자동클릭 속도,Ship Auto Click Speed,船オートクリック速度,船自动点击速度,Корабль: скорость автоклика,Barco: velocidad de clic auto.,Navio: velocidade do clique auto.,Schiff: Auto-Klick-Tempo,Navire : vitesse du clic auto
 인공위성 드랍량,Satellite Drops,人工衛星ドロップ量,人造卫星掉落量,Спутник: добыча,Satélite: botín,Satélite: saque,Satellit: Ausbeute,Satellite : butin
 배 드랍량,Ship Drops,船ドロップ量,船掉落量,Корабль: добыча,Barco: botín,Navio: saque,Schiff: Ausbeute,Navire : butin
@@ -309,9 +314,10 @@ UFO 자동클릭 속도,UFO Auto Click Speed,UFOオートクリック速度,飞�
 튜브 자동클릭 횟수,Swim Ring Auto Click Hits,浮き輪オートクリック回数,游泳圈自动点击次数,Надувной круг: удары автоклика,Flotador: golpes de clic auto.,Boia inflável: golpes do clique auto.,Schwimmring: Auto-Klick-Treffer,Bouée gonflable : coups du clic auto
 왁뿌볼 추가 배치,Extra Wakppu Ball,ワクップボール追加配置,追加瓦克普球,Вакпу-мяч: доп. копии,Bola Wakppu extra,Bola Wakppu extra,Wakppu-Ball: Extra,Balle Wakppu supplémentaire
 자전거 추가 배치,Extra Bicycle,自転車追加配置,追加自行车,Велосипед: доп. копии,Bicicleta extra,Bicicleta extra,Fahrrad: Extra,Vélo supplémentaire
-야구 방망이 데미지,Baseball Bat Damage,バットダメージ,棒球棍伤害,Бита: урон,Bate: daño,Taco de beisebol: dano,Baseballschläger: Schaden,Batte : dégâts
+교통 표지판 데미지,Traffic Sign Damage,道路標識ダメージ,交通标志伤害,Дорожный знак: урон,Señal de tráfico: daño,Placa de trânsito: dano,Verkehrsschild: Schaden,Panneau routier : dégâts
 튜브 자동클릭 속도,Swim Ring Auto Click Speed,浮き輪オートクリック速度,游泳圈自动点击速度,Надувной круг: скорость автоклика,Flotador: velocidad de clic auto.,Boia inflável: velocidade do clique auto.,Schwimmring: Auto-Klick-Tempo,Bouée gonflable : vitesse du clic auto
 등대 자동클릭 속도,Lighthouse Auto Click Speed,灯台オートクリック速度,灯塔自动点击速度,Маяк: скорость автоклика,Faro: velocidad de clic auto.,Farol: velocidade do clique auto.,Leuchtturm: Auto-Klick-Tempo,Phare : vitesse du clic auto
+블랙홀 데미지,Black Hole Damage,ブラックホールダメージ,黑洞伤害,Чёрная дыра: урон,Agujero negro: daño,Buraco negro: dano,Schwarzes Loch: Schaden,Trou noir : dégâts
 버터 추가 배치,Extra Butter,バター追加配置,追加黄油,Масло: доп. копии,Mantequilla extra,Manteiga extra,Butter: Extra,Beurre supplémentaire
 UFO 드랍량,UFO Drops,UFOドロップ量,飞碟掉落量,НЛО: добыча,OVNI: botín,OVNI: saque,UFO: Ausbeute,OVNI : butin
 곡괭이 데미지,Pickaxe Damage,ツルハシダメージ,镐伤害,Кирка: урон,Pico: daño,Picareta: dano,Spitzhacke: Schaden,Pioche : dégâts
@@ -321,6 +327,7 @@ UFO 드랍량,UFO Drops,UFOドロップ量,飞碟掉落量,НЛО: добыча,
 더블클릭 확률 II,Double Click Chance II,ダブルクリック率 II,双击概率 II,Шанс двойного клика II,Prob. de doble clic II,Chance de clique duplo II,Doppelklick-Chance II,Chance de double clic II
 부표 드랍량,Buoy Drops,ブイドロップ量,浮标掉落量,Буй: добыча,Boya: botín,Boia marítima: saque,Boje: Ausbeute,Balise : butin
 달걀 추가 배치,Extra Egg,卵追加配置,追加鸡蛋,Яйцо: доп. копии,Huevo extra,Ovo extra,Ei: Extra,Œuf supplémentaire
+작살 데미지,Harpoon Damage,銛ダメージ,鱼叉伤害,Гарпун: урон,Arpón: daño,Arpão: dano,Harpune: Schaden,Harpon : dégâts
 치명타 확률 III,Crit Chance III,クリティカル率 III,暴击率 III,Шанс крита III,Prob. de crítico III,Chance de crítico III,Krit-Chance III,Chance de critique III
 달 드랍량,Moon Drops,月ドロップ量,月球掉落量,Луна: добыча,Luna: botín,Lua: saque,Mond: Ausbeute,Lune : butin
 달걀 자동클릭,Egg Auto Click,卵オートクリック,鸡蛋自动点击,Яйцо: автоклик,Huevo: clic automático,Ovo: clique automático,Ei: Auto-Klick,Œuf : clic auto
@@ -375,7 +382,7 @@ UFO 드랍량,UFO Drops,UFOドロップ量,飞碟掉落量,НЛО: добыча,
 트럭 자동클릭 횟수,Truck Auto Click Hits,トラックオートクリック回数,卡车自动点击次数,Грузовик: удары автоклика,Camión: golpes de clic auto.,Caminhão: golpes do clique auto.,Lastwagen: Auto-Klick-Treffer,Camion : coups du clic auto
 도로 자동클릭 속도,Road Auto Click Speed,道路オートクリック速度,道路自动点击速度,Дорога: скорость автоклика,Carretera: velocidad de clic auto.,Estrada: velocidade do clique auto.,Fahrbahn: Auto-Klick-Tempo,Route : vitesse du clic auto
 자전거 자동클릭,Bicycle Auto Click,自転車オートクリック,自行车自动点击,Велосипед: автоклик,Bicicleta: clic automático,Bicicleta: clique automático,Fahrrad: Auto-Klick,Vélo : clic auto
-망치 데미지,Hammer Damage,ハンマーダメージ,锤子伤害,Молоток: урон,Martillo: daño,Martelo: dano,Hammer: Schaden,Marteau : dégâts
+야구 방망이 데미지,Baseball Bat Damage,バットダメージ,棒球棍伤害,Бита: урон,Bate: daño,Taco de beisebol: dano,Baseballschläger: Schaden,Batte : dégâts
 책상 자동클릭 속도,Desk Auto Click Speed,机オートクリック速度,书桌自动点击速度,Стол: скорость автоклика,Escritorio: velocidad de clic auto.,Escrivaninha: velocidade do clique auto.,Schreibtisch: Auto-Klick-Tempo,Bureau : vitesse du clic auto
 자전거 자동클릭 횟수,Bicycle Auto Click Hits,自転車オートクリック回数,自行车自动点击次数,Велосипед: удары автоклика,Bicicleta: golpes de clic auto.,Bicicleta: golpes do clique auto.,Fahrrad: Auto-Klick-Treffer,Vélo : coups du clic auto
 식빵 자동클릭,Bread Auto Click,食パンオートクリック,吐司自动点击,Хлеб: автоклик,Pan de molde: clic automático,Pão de forma: clique automático,Toastbrot: Auto-Klick,Pain de mie : clic auto
@@ -405,5 +412,6 @@ UFO 드랍량,UFO Drops,UFOドロップ量,飞碟掉落量,НЛО: добыча,
 도로 드랍량,Road Drops,道路ドロップ量,道路掉落量,Дорога: добыча,Carretera: botín,Estrada: saque,Fahrbahn: Ausbeute,Route : butin
 조각 획득량,Piece Yield,かけら獲得量,碎片获取量,Добыча осколков,Botín de fragmentos,Ganho de fragmentos,Splitter-Ausbeute,Gain de fragments
 가로수 자동클릭 횟수,Street Tree Auto Click Hits,街路樹オートクリック回数,行道树自动点击次数,Дерево: удары автоклика,Árbol: golpes de clic auto.,Árvore: golpes do clique auto.,Straßenbaum: Auto-Klick-Treffer,Arbre : coups du clic auto
+미사일 데미지,Missile Damage,ミサイルダメージ,导弹伤害,Ракета: урон,Misil: daño,Míssil: dano,Rakete: Schaden,Missile : dégâts
 요트 드랍량,Yacht Drops,ヨットドロップ量,游艇掉落量,Яхта: добыча,Yate: botín,Iate: saque,Jacht: Ausbeute,Yacht : butin
 UFO,UFO,UFO,飞碟,НЛО,OVNI,OVNI,UFO,OVNI

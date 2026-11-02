@@ -54,18 +54,18 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(1, 3, "버터", new Color(1.00f, 0.86f, 0.42f)),
         new ObjectData(2, 1, "식빵", new Color(0.86f, 0.62f, 0.34f)),
         new ObjectData(2, 2, "책상", new Color(0.55f, 0.38f, 0.22f)) { hpMultiplier = 9f }, // ★ 존2 관문, 체력 = 식빵의 10배
-        // 존2: 길거리 (망치 / 야구 방망이)
+        // 존2: 길거리 (야구 방망이 / 교통 표지판)
         new ObjectData(3, 1, "가로등", new Color(0.23f, 0.24f, 0.35f)),
         new ObjectData(3, 2, "자전거", new Color(0.23f, 0.24f, 0.30f)),
         new ObjectData(3, 3, "가로수", new Color(0.24f, 0.59f, 0.32f)),
         new ObjectData(4, 1, "자동차", new Color(0.70f, 0.69f, 0.71f)),
         new ObjectData(4, 2, "도로", new Color(0.62f, 0.60f, 0.58f)) { hpMultiplier = 17600f / 1800f }, // ★ 존3 관문, 체력 = 자동차의 10배
-        // 존3: 왁스 회사 (곡괭이 / 철퇴) - 왁뿌볼은 존3이 열릴 때 공짜
+        // 존3: 왁스 회사 (곡괭이 / 다이너마이트) - 왁뿌볼은 존3이 열릴 때 공짜
         new ObjectData(5, 1, "왁뿌볼", new Color(0.45f, 0.75f, 0.25f)),
         new ObjectData(5, 2, "간판", new Color(0.92f, 0.92f, 0.90f)),
         new ObjectData(5, 3, "트럭", new Color(0.95f, 0.95f, 0.95f)),
         new ObjectData(6, 1, "컨베이어 벨트", new Color(0.35f, 0.38f, 0.45f)),
-        new ObjectData(6, 2, "회사", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 163500f / 37000f * 0.65f }, // ★ 데모 마지막 - 철퇴 풀업이면 초당 약 3클릭으로 30초 보스전 클리어
+        new ObjectData(6, 2, "회사", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 163500f / 37000f * 0.65f }, // ★ 데모 마지막 - 다이너마이트 풀업이면 초당 약 3클릭으로 30초 보스전 클리어
         // 존4: 바다 (풀버전) - 튜브는 존4가 열릴 때 공짜
         new ObjectData(7, 1, "튜브", new Color(1.00f, 0.55f, 0.70f)),
         new ObjectData(7, 2, "부표", new Color(0.90f, 0.30f, 0.30f)),

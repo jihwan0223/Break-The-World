@@ -6,15 +6,20 @@ public class WeaponManager : MonoBehaviour
 {
     public static WeaponManager Instance { get; private set; }
 
-    // 같은 티어 오브젝트를 4~8클릭에 부수도록 잡은 데미지
+    // 같은 티어 오브젝트를 4~8클릭에 부수도록 잡은 데미지 (다음 무기 = 이전 x2 + 4)
+    // 맵마다 2개: 책상 위 / 길거리 / 공사장 / 바다 / 우주
     private static readonly List<WeaponData> weapons = new List<WeaponData>
     {
         new WeaponData(1, "맨손", 1),
         new WeaponData(2, "프라이팬", 6),
-        new WeaponData(3, "망치", 16),
-        new WeaponData(4, "야구 방망이", 36),
+        new WeaponData(3, "야구 방망이", 16),
+        new WeaponData(4, "교통 표지판", 36),
         new WeaponData(5, "곡괭이", 76),
-        new WeaponData(6, "철퇴", 156),
+        new WeaponData(6, "다이너마이트", 156),
+        new WeaponData(7, "작살", 316),
+        new WeaponData(8, "닻", 636),
+        new WeaponData(9, "미사일", 1276),
+        new WeaponData(10, "블랙홀", 2556),
     };
 
     [SerializeField] private Sprite[] weaponIcons; // weapons와 같은 순서

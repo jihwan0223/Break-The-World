@@ -54,7 +54,7 @@ public static class GameSettings
     }
     public const int DemoZoneCount = 3;
     public const int DemoObjectCount = 15; // 데모는 회사(14)까지
-    public const int DemoWeaponCount = 6; // 데모는 철퇴(5)까지 - 나중에 추가하는 무기는 풀버전 전용
+    public const int DemoWeaponCount = 6; // 데모는 다이너마이트(5)까지 - 나중에 추가하는 무기는 풀버전 전용
     public static bool IsDemoLockedObject(int objectIndex) => IsDemo && objectIndex >= DemoObjectCount;
     public static bool IsDemoLockedWeapon(int weaponIndex) => IsDemo && weaponIndex >= DemoWeaponCount;
 
