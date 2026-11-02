@@ -55,7 +55,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
             var text = button.GetComponentInChildren<TMPro.TMP_Text>(true);
             if (text != null)
             {
-                text.text = label;
+                text.text = Loc.T(label);
                 text.enableAutoSizing = false;
                 text.fontSize = 32;
                 text.alignment = TMPro.TextAlignmentOptions.Center;

@@ -156,7 +156,7 @@ public partial class SidePanelUI : MonoBehaviour
         _objectContent = BuildSelectorSection(
             _objectBrowse,
             () => ObjectManager.Instance != null ? ObjectManager.Instance.VisibleObjectCount : 0,
-            index => ObjectManager.Instance != null ? ObjectManager.Instance.GetObjectAt(index).objectName : "",
+            index => ObjectManager.Instance != null ? Loc.T(ObjectManager.Instance.GetObjectAt(index).objectName) : "",
             index =>
             {
                 if (ObjectManager.Instance == null) return null;
@@ -453,7 +453,7 @@ public partial class SidePanelUI : MonoBehaviour
         previewImage.style.height = previewImageSize;
         previewImage.scaleMode = ScaleMode.ScaleToFit;
 
-        var selectButton = new Button() { text = "선택" };
+        var selectButton = new Button() { text = Loc.T("선택") };
         selectButton.style.width = 360;
         selectButton.style.height = 80;
         selectButton.style.marginTop = 24;
@@ -461,7 +461,7 @@ public partial class SidePanelUI : MonoBehaviour
         selectButton.style.unityFontStyleAndWeight = FontStyle.Bold;
         PixelStyle.Button(selectButton, PixelStyle.Mint);
 
-        var equippedLabel = new Label("장착됨");
+        var equippedLabel = new Label(Loc.T("장착됨"));
         equippedLabel.style.height = 80;
         equippedLabel.style.marginTop = 24;
         equippedLabel.style.fontSize = 36;
@@ -680,7 +680,7 @@ public partial class SidePanelUI : MonoBehaviour
 
         preview.sprite = data.icon;
         preview.tintColor = unlocked ? Color.white : Color.black;
-        nameLabel.text = hidden ? "???" : data.weaponName;
+        nameLabel.text = hidden ? "???" : Loc.T(data.weaponName);
 
         int bonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetClickDamageBonus(index) : 0;
         long cost = buyable ? weapons.GetUnlockCost(index) : 0;
@@ -691,26 +691,26 @@ public partial class SidePanelUI : MonoBehaviour
         card.Add(CreateInfoRow("강화 보너스", hidden ? "???" : $"+{NumberFormatUtil.Format(bonus)}", hidden ? HiddenColor : Color.white));
         card.Add(CreateInfoRow("클릭당 합계", hidden ? "???" : NumberFormatUtil.Format(data.clickDamage + bonus), hidden ? HiddenColor : Color.white));
         if (buyable)
-            card.Add(CreateInfoRow("해금 가격", $"{NumberFormatUtil.Format(cost)} 조각", Color.white));
+            card.Add(CreateInfoRow("해금 가격", Loc.T("{0} 조각", NumberFormatUtil.Format(cost)), Color.white));
         card.Add(CreateInfoRow("상태", equipped ? "장착 중" : unlocked ? "해금됨" : "잠김", equipped || unlocked ? GoodColor : BadColor));
 
         actionButton.style.display = hidden ? DisplayStyle.None : DisplayStyle.Flex;
         if (equipped)
         {
-            actionButton.text = "장착 중";
+            actionButton.text = Loc.T("장착 중");
             actionButton.SetEnabled(false);
             actionButton.style.opacity = 1f;
         }
         else if (unlocked)
         {
-            actionButton.text = "장착하기";
+            actionButton.text = Loc.T("장착하기");
             actionButton.SetEnabled(true);
             actionButton.style.opacity = StyleKeyword.Null;
         }
         else
         {
             long have = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetPieces() : 0;
-            actionButton.text = $"해금 ({NumberFormatUtil.Format(cost)} 조각)";
+            actionButton.text = Loc.T("해금 ({0} 조각)", NumberFormatUtil.Format(cost));
             actionButton.SetEnabled(have >= cost);
             actionButton.style.opacity = StyleKeyword.Null;
         }
@@ -731,12 +731,12 @@ public partial class SidePanelUI : MonoBehaviour
         row.style.justifyContent = Justify.SpaceBetween;
         row.style.marginBottom = 26;
 
-        var labelText = new Label(label);
+        var labelText = new Label(Loc.T(label));
         labelText.style.fontSize = 36;
         labelText.style.color = PixelStyle.MutedText.linear;
         row.Add(labelText);
 
-        var valueText = new Label(value);
+        var valueText = new Label(Loc.T(value));
         valueText.style.fontSize = 36;
         valueText.style.unityFontStyleAndWeight = FontStyle.Bold;
         valueText.style.color = (valueColor == GoodColor ? PixelStyle.Good : valueColor == BadColor ? PixelStyle.Bad
@@ -761,7 +761,7 @@ public partial class SidePanelUI : MonoBehaviour
         {
             ("지역", locked ? "???" : ObjectManager.ZoneNameOf(index), locked ? hidden : Color.white),
             ("체력", locked ? "???" : NumberFormatUtil.Format(ObjectManager.MaxHPOf(index)), locked ? hidden : Color.white),
-            ("획득 조각",locked ? "???" : $"{NumberFormatUtil.Format(manager.ExpectedPieces(index))}개", locked ? hidden : Color.white),
+            ("획득 조각",locked ? "???" : Loc.T("{0}개", NumberFormatUtil.Format(manager.ExpectedPieces(index))), locked ? hidden : Color.white),
             ("상태", locked ? "잠김" : "해금 완료", locked ? bad : good),
         };
 
@@ -801,7 +801,7 @@ public partial class SidePanelUI : MonoBehaviour
             return;
         }
 
-        selectButton.text = "선택";
+        selectButton.text = Loc.T("선택");
 
         bool isEquipped = getEquippedIndex() == index;
         selectButton.style.display = isEquipped ? DisplayStyle.None : DisplayStyle.Flex;
@@ -815,7 +815,7 @@ public partial class SidePanelUI : MonoBehaviour
     {
         // 펀치가 다 보인 뒤에 동작 실행 (먼저 하면 버튼이 바로 사라짐)
         // 이 패널에선 텍스트 color가 늘 흰색으로 고정되는 문제가 있어 원래 스타일 유지
-        var button = new Button { text = text };
+        var button = new Button { text = Loc.T(text) };
         button.clicked += () => StartCoroutine(PunchThenInvoke(button, NavButtonPunchDuration, NavButtonPunchAmount, onClick));
         button.style.width = 300;
         button.style.height = 110;
@@ -842,7 +842,7 @@ public partial class SidePanelUI : MonoBehaviour
 
     private void OpenPanel(string title, VisualElement contentToShow)
     {
-        _panelTitle.text = title;
+        _panelTitle.text = Loc.T(title);
         _currentlyOpenContent = contentToShow;
         _weaponContent.style.display = contentToShow == _weaponContent ? DisplayStyle.Flex : DisplayStyle.None;
         _objectContent.style.display = contentToShow == _objectContent ? DisplayStyle.Flex : DisplayStyle.None;

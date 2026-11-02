@@ -78,7 +78,7 @@ public class ZoneUnlockEffect : MonoBehaviour
 
     private static Label CreateLabel(string text, int fontSize)
     {
-        Label label = new Label(text);
+        Label label = new Label(Loc.T(text));
         label.pickingMode = PickingMode.Ignore;
         label.style.fontSize = fontSize;
         label.style.unityFontStyleAndWeight = FontStyle.Bold;

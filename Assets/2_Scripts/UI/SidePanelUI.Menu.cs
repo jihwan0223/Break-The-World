@@ -56,7 +56,7 @@ public partial class SidePanelUI
         PixelStyle.Frame(window, PixelStyle.Window, 6f);
         _demoBox.Add(window);
 
-        var title = new Label("데모 완료!"); // '클'은 테두리 폰트에서 뭉개져서 '완료'로
+        var title = new Label(Loc.T("데모 완료!")); // '클'은 테두리 폰트에서 뭉개져서 '완료'로
         title.style.fontSize = 56;
         title.style.paddingLeft = 56;
         title.style.paddingRight = 56;
@@ -76,7 +76,7 @@ public partial class SidePanelUI
         };
         foreach (string text in lines)
         {
-            var line = new Label(text);
+            var line = new Label(Loc.T(text));
             line.style.fontSize = 36;
             line.style.color = PixelStyle.Text.linear;
             line.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -84,7 +84,7 @@ public partial class SidePanelUI
             window.Add(line);
         }
 
-        var hint = new Label("계속하기를 누르면 지금 진행 그대로 이어서 할 수 있어요.");
+        var hint = new Label(Loc.T("계속하기를 누르면 지금 진행 그대로 이어서 할 수 있어요."));
         hint.style.fontSize = 28;
         hint.style.color = PixelStyle.MutedText.linear;
         hint.style.marginTop = 14;
@@ -109,7 +109,7 @@ public partial class SidePanelUI
     private void BuildSettingsPanel(VisualElement root)
     {
         _settingsPanel = CreatePopupFrame(CloseSettingsPanel, out Label title);
-        title.text = "설정";
+        title.text = Loc.T("설정");
 
         var body = new VisualElement();
         body.style.position = Position.Absolute;
@@ -227,9 +227,9 @@ public partial class SidePanelUI
 
     private void ShowLeaveConfirm(string question, string verb, System.Action leave)
     {
-        _confirmMessage.text = question;
-        _confirmSave.text = $"저장하고 {verb}";
-        _confirmNoSave.text = $"저장 안 하고 {verb}";
+        _confirmMessage.text = Loc.T(question);
+        _confirmSave.text = Loc.T("저장하고 {0}", verb);
+        _confirmNoSave.text = Loc.T("저장 안 하고 {0}", verb);
         _confirmLeave = leave;
         _confirmBox.style.display = DisplayStyle.Flex;
     }
@@ -250,7 +250,7 @@ public partial class SidePanelUI
         caption.style.marginBottom = 6;
         column.Add(caption);
 
-        var cylinder = new GlassCylinderSlider(get(), v => { set(v); caption.text = $"{label}  {Percent(v)}"; }, _ => { });
+        var cylinder = new GlassCylinderSlider(get(), v => { set(v); caption.text = $"{Loc.T(label)}  {Percent(v)}"; }, _ => { });
         var slot = new VisualElement();
         slot.style.paddingTop = 14;
         slot.style.paddingBottom = 18;
@@ -261,7 +261,7 @@ public partial class SidePanelUI
         slot.Add(cylinder);
         column.Add(slot);
 
-        _settingRefreshers.Add(() => { cylinder.SetValue(get()); caption.text = $"{label}  {Percent(get())}"; });
+        _settingRefreshers.Add(() => { cylinder.SetValue(get()); caption.text = $"{Loc.T(label)}  {Percent(get())}"; });
     }
 
     private void AddSettingRow(VisualElement column, string label, System.Func<string> getValue, System.Action<int> step)
@@ -277,7 +277,7 @@ public partial class SidePanelUI
         row.style.marginBottom = 12;
         PixelStyle.Frame(row, PixelStyle.Card);
 
-        var name = new Label(label);
+        var name = new Label(Loc.T(label));
         name.style.flexGrow = 1;
         name.style.fontSize = 36;
         name.style.color = PixelStyle.Text.linear;
@@ -288,11 +288,11 @@ public partial class SidePanelUI
         value.style.fontSize = 36;
         value.style.color = PixelStyle.Text.linear;
         value.style.unityTextAlign = TextAnchor.MiddleCenter;
-        System.Action<int> change = d => { step(d); value.text = getValue(); };
+        System.Action<int> change = d => { step(d); value.text = Loc.T(getValue()); };
         row.Add(ArrowButton("<", () => change(-1)));
         row.Add(value);
         row.Add(ArrowButton(">", () => change(1)));
-        _settingRefreshers.Add(() => value.text = getValue());
+        _settingRefreshers.Add(() => value.text = Loc.T(getValue()));
         column.Add(row);
     }
 
@@ -365,18 +365,18 @@ public partial class SidePanelUI
     private void BuildStatsPanel(VisualElement root)
     {
         _statsPanel = CreatePopupFrame(CloseStatsPanel, out Label title);
-        title.text = "통계";
+        title.text = Loc.T("통계");
 
         var columns = StatPage();
         var left = StatColumn(columns, "기록");
         left.style.marginRight = 48;
         UpgradeManager U() => UpgradeManager.Instance;
-        AddStat(left, "플레이 시간", () => { var t = System.TimeSpan.FromSeconds(GameStats.PlaySeconds); return $"{(int)t.TotalHours}시간 {t.Minutes}분"; });
-        AddStat(left, "부순 오브젝트", () => NumberFormatUtil.Format(GameStats.ObjectsBroken) + "개");
-        AddStat(left, "직접 클릭", () => NumberFormatUtil.Format(GameStats.Clicks) + "번");
-        AddStat(left, "치명타", () => NumberFormatUtil.Format(GameStats.Crits) + "번");
-        AddStat(left, "슈퍼 크리티컬", () => NumberFormatUtil.Format(GameStats.SuperCrits) + "번");
-        AddStat(left, "보스 처치", () => NumberFormatUtil.Format(GameStats.BossClears) + "번");
+        AddStat(left, "플레이 시간", () => { var t = System.TimeSpan.FromSeconds(GameStats.PlaySeconds); return Loc.T("{0}시간 {1}분", (int)t.TotalHours, t.Minutes); });
+        AddStat(left, "부순 오브젝트", () => Loc.T("{0}개", NumberFormatUtil.Format(GameStats.ObjectsBroken)));
+        AddStat(left, "직접 클릭", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.Clicks)));
+        AddStat(left, "치명타", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.Crits)));
+        AddStat(left, "슈퍼 크리티컬", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.SuperCrits)));
+        AddStat(left, "보스 처치", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.BossClears)));
         AddStat(left, "얻은 조각", () => NumberFormatUtil.Format(CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalPieces : 0));
         AddStat(left, "얻은 결정", () => NumberFormatUtil.Format(CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalCrystals : 0));
         AddStat(left, "해금한 오브젝트", () => UnlockedText(ObjectManager.Instance != null ? ObjectManager.Instance.VisibleObjectCount : 0, i => ObjectManager.Instance.IsUnlocked(i)));
@@ -395,7 +395,7 @@ public partial class SidePanelUI
         AddStat(right, "더블 클릭 확률", () => U() != null && U().DoubleClickIsUnlocked ? Chance(U().DoubleClickChanceValue) : "잠김");
         AddStat(right, "조각 획득 보너스", () => U() != null ? $"+{Mathf.RoundToInt((U().PieceGainMultiplier() - 1f) * 100f)}%" : "-");
         AddStat(right, "결정 확률", () => U() != null ? Chance(U().CrystalDropChance) : "-");
-        AddStat(right, "결정 개수", () => U() != null ? $"{NumberFormatUtil.Format(U().CrystalDropAmountIn(-1))}개" : "-");
+        AddStat(right, "결정 개수", () => U() != null ? Loc.T("{0}개", NumberFormatUtil.Format(U().CrystalDropAmountIn(-1))) : "-");
         AddStat(right, "커서 범위", () => U() != null && U().HoverPickupIsUnlocked ? $"{U().CursorRadius:0.##}" : "잠김");
 
         var objectsPage = StatPage();
@@ -409,7 +409,7 @@ public partial class SidePanelUI
             int index = i;
             AddStat(i < half ? objLeft : objRight, ObjectManager.StaticObjectNameAt(index),
                 () => ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(index) && GameStats.BrokenOf(index) == 0
-                    ? "???" : NumberFormatUtil.Format(GameStats.BrokenOf(index)) + "번");
+                    ? "???" : Loc.T("{0}번", NumberFormatUtil.Format(GameStats.BrokenOf(index))));
         }
 
         Button prev = StatArrow("<", -1);
@@ -493,7 +493,7 @@ public partial class SidePanelUI
         row.style.marginBottom = 8; // 한 칸에 10줄이 화면에 들어가게
         PixelStyle.Frame(row, PixelStyle.Card);
 
-        var name = new Label(label);
+        var name = new Label(Loc.T(label));
         name.style.flexGrow = 1;
         name.style.fontSize = 36;
         name.style.color = PixelStyle.MutedText.linear;
@@ -503,7 +503,7 @@ public partial class SidePanelUI
         value.style.fontSize = 36;
         value.style.color = PixelStyle.Text.linear;
         row.Add(value);
-        _statRows.Add((value, get));
+        _statRows.Add((value, () => Loc.T(get())));
         column.Add(row);
     }
 

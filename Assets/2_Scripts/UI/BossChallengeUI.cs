@@ -70,7 +70,7 @@ public class BossChallengeUI : MonoBehaviour
             root.style.unityFontDefinition = FontDefinition.FromSDFFont(GameFonts.UiColored);
         root.pickingMode = PickingMode.Ignore; // 빈 곳 클릭은 게임으로
 
-        _challengeButton = new Button(() => { if (_ready != null) _ready.StartBoss(); }) { text = "보스 도전!" };
+        _challengeButton = new Button(() => { if (_ready != null) _ready.StartBoss(); }) { text = Loc.T("보스 도전!") };
         Place(_challengeButton);
         _challengeButton.style.width = 300;
         _challengeButton.style.height = 80;
@@ -147,7 +147,7 @@ public class BossChallengeUI : MonoBehaviour
         bars.Add(timeRow);
         _fightPanel.Add(bars);
 
-        _giveUpButton = new Button(() => ZoneBreaker.ActiveBoss?.GiveUpBoss()) { text = "포기" };
+        _giveUpButton = new Button(() => ZoneBreaker.ActiveBoss?.GiveUpBoss()) { text = Loc.T("포기") };
         _giveUpButton.style.width = 130;
         _giveUpButton.style.height = 80;
         _giveUpButton.style.marginLeft = 18;
@@ -188,7 +188,7 @@ public class BossChallengeUI : MonoBehaviour
         window.style.paddingRight = 32;
         PixelStyle.Frame(window, PixelStyle.Window, 6f);
 
-        var title = new Label("보스전 실패");
+        var title = new Label(Loc.T("보스전 실패"));
         title.style.fontSize = 36;
         title.style.paddingLeft = 40;
         title.style.paddingRight = 40;
@@ -200,15 +200,15 @@ public class BossChallengeUI : MonoBehaviour
         window.Add(title);
 
         var message = MakeLabel(36, PixelStyle.Text.linear);
-        message.text = "시간 안에 부수지 못했어요";
+        message.text = Loc.T("시간 안에 부수지 못했어요");
         message.style.marginTop = 24;
         message.style.marginBottom = 28;
         window.Add(message);
 
         var buttons = new VisualElement();
         buttons.style.flexDirection = FlexDirection.Row;
-        var retry = new Button(() => CloseFailPopup(true)) { text = "재도전" };
-        var exit = new Button(() => CloseFailPopup(false)) { text = "나가기" };
+        var retry = new Button(() => CloseFailPopup(true)) { text = Loc.T("재도전") };
+        var exit = new Button(() => CloseFailPopup(false)) { text = Loc.T("나가기") };
         foreach (Button button in new[] { retry, exit })
         {
             button.style.width = 220;
@@ -269,7 +269,7 @@ public class BossChallengeUI : MonoBehaviour
             _hpFill.style.width = Length.Percent(active.BossHpRatio * 100f);
             _shieldFill.style.width = Length.Percent(active.BossHpRatio * active.ShieldFill * 100f);
             int shieldPercent = Mathf.RoundToInt(active.ShieldRatio * 100f);
-            _shieldLabel.text = $"보호막 -{shieldPercent}%";
+            _shieldLabel.text = Loc.T("보호막 -{0}%", shieldPercent);
             _shieldLabel.style.visibility = shieldPercent > 0 ? Visibility.Visible : Visibility.Hidden;
         }
 

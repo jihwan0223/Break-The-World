@@ -174,8 +174,8 @@ public class ObjectManager : MonoBehaviour
     {
         int next = NextRequiredUnlockIndex(index);
         if (OpensNextZone(next - 1))
-            return $"{GetObjectAt(next - 1).objectName}을(를) 부수면 열립니다";
-        return $"{GetObjectAt(next).objectName}을(를) 먼저 해금하세요";
+            return Loc.T("{0}을(를) 부수면 열립니다", GetObjectAt(next - 1).objectName);
+        return Loc.T("{0}을(를) 먼저 해금하세요", GetObjectAt(next).objectName);
     }
 
     public bool OpensNextZone(int index)
@@ -183,10 +183,10 @@ public class ObjectManager : MonoBehaviour
         return index >= 0 && ZoneManager.Instance != null && ZoneManager.Instance.IsZoneFirstObject(index + 1);
     }
 
-    private static readonly string[] zoneNames = { "책상 위", "길거리", "공사장" };
+    private static readonly string[] zoneNames = { "책상 위", "길거리", "공사장", "바다", "우주" };
 
     public static string ZoneNameOf(int index) =>
-        zoneNames[Mathf.Clamp((objects[index].tier - 1) / 2, 0, zoneNames.Length - 1)];
+        Loc.T(zoneNames[Mathf.Clamp((objects[index].tier - 1) / 2, 0, zoneNames.Length - 1)]);
 
     public static int FirstIndexOfTier(int tier) => objects.FindIndex(o => o.tier == tier);
 

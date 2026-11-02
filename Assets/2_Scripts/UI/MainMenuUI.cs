@@ -209,7 +209,7 @@ public class MainMenuUI : MonoBehaviour
 
     private Button CreateMenuButton(string text, PixelStyle.Tone tone, System.Action onClick)
     {
-        var button = new Button(onClick) { text = text };
+        var button = new Button(onClick) { text = Loc.T(text) };
         button.focusable = false; // 켜두면 Enter/방향키가 직접 폴링과 이중으로 처리됨
         button.style.width = 360;
         button.style.height = 88;
@@ -407,8 +407,8 @@ public class MainMenuUI : MonoBehaviour
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
 
-        _confirmYes = new Button(() => { PlayClick(); CloseConfirm(); _confirmPendingAction?.Invoke(); }) { text = "예" };
-        _confirmNo = new Button(() => { PlayClick(); CloseConfirm(); }) { text = "아니오" };
+        _confirmYes = new Button(() => { PlayClick(); CloseConfirm(); _confirmPendingAction?.Invoke(); }) { text = Loc.T("예") };
+        _confirmNo = new Button(() => { PlayClick(); CloseConfirm(); }) { text = Loc.T("아니오") };
         StyleDialogButton(_confirmYes, PixelStyle.Mint);
         StyleDialogButton(_confirmNo, PixelStyle.Pink);
         _confirmYes.style.marginRight = 20;
@@ -426,7 +426,7 @@ public class MainMenuUI : MonoBehaviour
 
     private void RequestConfirm(string message, System.Action onYes)
     {
-        _confirmMessage.text = message;
+        _confirmMessage.text = Loc.T(message);
         _confirmPendingAction = onYes;
         _confirmSelectedIndex = 1; // 기본은 아니오 - 엔터 연타로 되돌릴 수 없는 동작이 실행되지 않게
         UpdateConfirmSelectionVisual();
@@ -493,7 +493,7 @@ public class MainMenuUI : MonoBehaviour
         PixelStyle.Frame(window, PixelStyle.Window, 6f);
         panel.Add(window);
 
-        var title = new Label("설정");
+        var title = new Label(Loc.T("설정"));
         title.style.fontSize = 36;
         title.style.paddingLeft = 48;
         title.style.paddingRight = 48;
@@ -576,9 +576,9 @@ public class MainMenuUI : MonoBehaviour
         var cylinder = new GlassCylinderSlider(value, newValue =>
         {
             onChanged(newValue);
-            caption.text = label + "  " + Mathf.RoundToInt(newValue * 100f) + "%";
+            caption.text = Loc.T(label) + "  " + Mathf.RoundToInt(newValue * 100f) + "%";
         }, SpawnGlassChips);
-        caption.text = label + "  " + Mathf.RoundToInt(cylinder.Value * 100f) + "%";
+        caption.text = Loc.T(label) + "  " + Mathf.RoundToInt(cylinder.Value * 100f) + "%";
 
         var wrap = new VisualElement();
         wrap.style.paddingTop = 14;
@@ -612,14 +612,14 @@ public class MainMenuUI : MonoBehaviour
         row.style.marginBottom = 12;
         PixelStyle.Frame(row, PixelStyle.Card);
 
-        var name = new Label(label);
+        var name = new Label(Loc.T(label));
         name.style.flexGrow = 1;
         name.style.fontSize = 36;
         name.style.color = PixelStyle.Text.linear;
         row.Add(name);
 
-        var value = new Label(getValue());
-        System.Action<int> change = delta => { step(delta); value.text = getValue(); };
+        var value = new Label(Loc.T(getValue()));
+        System.Action<int> change = delta => { step(delta); value.text = Loc.T(getValue()); };
         Button left = CreateArrowButton("<", () => { PlayClick(); change(-1); });
         Button right = CreateArrowButton(">", () => { PlayClick(); change(1); });
         value.style.width = 230;
@@ -638,7 +638,7 @@ public class MainMenuUI : MonoBehaviour
 
     private Button CreateArrowButton(string text, System.Action onClick)
     {
-        var button = new Button(onClick) { text = text };
+        var button = new Button(onClick) { text = Loc.T(text) };
         button.focusable = false;
         button.style.width = 60;
         button.style.height = 60;

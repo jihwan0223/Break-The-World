@@ -144,8 +144,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         return new UpgradeTooltip.Content
         {
-            title = IsMasked() ? "???" : displayName,
-            description = IsMasked() ? UpgradeManager.Instance.LockedTargetHintText(Id) : AutoDescription(level) ?? description.Replace("{n}", CurrentSecondsText()),
+            title = IsMasked() ? "???" : Loc.T(displayName),
+            description = IsMasked() ? UpgradeManager.Instance.LockedTargetHintText(Id) : AutoDescription(level) ?? Loc.T(description).Replace("{n}", CurrentSecondsText()),
             level = $"{level} / {maxLevel}",
             price = IsMasked() ? "" : NextCostText(level),
         };
@@ -176,7 +176,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (valuePerLevel == null || valuePerLevel.Length == 0) return null;
         float value = valuePerLevel[Mathf.Clamp(level, 0, valuePerLevel.Length - 1)]; // UpgradeManager.ValueAtLevel(level + 1)과 같은 인덱싱
         string n = Round(value);
-        string obj = KoreanJosa.EulReul(targetObjectName);
+        string obj = targetObjectName;
         string weapon = targetWeaponName;
 
         switch (effect)
@@ -188,35 +188,35 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
                     weaponIndex = WeaponManager.Instance.EquippedIndex;
                 int scale = ObjectHealthCalculator.ScaleOfTier(weaponIndex + 1);
                 string amount = NumberFormatUtil.Format(Mathf.RoundToInt(value * scale));
-                return string.IsNullOrEmpty(weapon) ? $"모든 무기의 데미지가 +{amount} 증가합니다." : $"{weapon}의 데미지가 +{amount} 증가합니다.";
+                return string.IsNullOrEmpty(weapon) ? Loc.T("모든 무기의 데미지가 +{0} 증가합니다.", amount) : Loc.T("{0}의 데미지가 +{1} 증가합니다.", weapon, amount);
             }
-            case UpgradeManager.UpgradeEffect.CritChance: return $"치명타 확률이 +{n}% 증가합니다.";
-            case UpgradeManager.UpgradeEffect.CritDamage: return $"치명타 데미지가 +{n}% 증가합니다.";
-            case UpgradeManager.UpgradeEffect.LuckyClickChanceUp: return $"슈퍼 크리티컬 확률이 +{n}% 증가합니다.";
-            case UpgradeManager.UpgradeEffect.DoubleClickChanceUp: return $"더블 클릭 확률이 +{n}% 증가합니다.";
-            case UpgradeManager.UpgradeEffect.PieceGainGlobal: return $"모든 오브젝트를 부술 때 얻는 조각이 +{n}% 증가합니다.";
+            case UpgradeManager.UpgradeEffect.CritChance: return Loc.T("치명타 확률이 +{0}% 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.CritDamage: return Loc.T("치명타 데미지가 +{0}% 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.LuckyClickChanceUp: return Loc.T("슈퍼 크리티컬 확률이 +{0}% 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.DoubleClickChanceUp: return Loc.T("더블 클릭 확률이 +{0}% 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.PieceGainGlobal: return Loc.T("모든 오브젝트를 부술 때 얻는 조각이 +{0}% 증가합니다.", n);
             case UpgradeManager.UpgradeEffect.PieceGainObject:
             {
                 int objectIndex = ObjectManager.StaticIndexOfName(targetObjectName);
-                if (objectIndex < 0 || ObjectManager.Instance == null) return $"{obj} 부술 때 얻는 조각이 +{n}% 증가합니다.";
+                if (objectIndex < 0 || ObjectManager.Instance == null) return Loc.T("{0}을(를) 부술 때 얻는 조각이 +{1}% 증가합니다.", obj, n);
                 double pieces = UpgradeManager.ObjectPieceBonusPerLevel(ObjectManager.Instance.GetBaseReward(objectIndex), value);
-                return $"{obj} 부술 때 얻는 조각이 +{NumberFormatUtil.Format((long)Math.Round(pieces))}개 증가합니다.";
+                return Loc.T("{0}을(를) 부술 때 얻는 조각이 +{1}개 증가합니다.", obj, NumberFormatUtil.Format((long)Math.Round(pieces)));
             }
-            case UpgradeManager.UpgradeEffect.ObjectDoubleDrop: return $"{obj} 부술 때 조각이 2배로 나올 확률이 +{n}% 증가합니다.";
-            case UpgradeManager.UpgradeEffect.WeaponKillBonus: return $"{KoreanJosa.EuroRo(weapon)} 부술 때 조각을 +{n}개 더 얻습니다.";
-            case UpgradeManager.UpgradeEffect.CrystalChance: return $"오브젝트를 부술 때 결정이 나올 확률이 +{n}% 증가합니다.";
-            case UpgradeManager.UpgradeEffect.CrystalAmount: return $"결정이 나올 때 개수가 {1L << Mathf.Clamp(Mathf.RoundToInt(value), 0, 20)}배가 됩니다.";
-            case UpgradeManager.UpgradeEffect.GroundPieceCap: return $"바닥에 쌓일 수 있는 조각 개수가 +{n}개 증가합니다.";
-            case UpgradeManager.UpgradeEffect.AutoClickSpeed: return $"{targetObjectName} 자동 클릭 간격이 {n}초 줄어듭니다.";
-            case UpgradeManager.UpgradeEffect.AutoClickCount: return $"{targetObjectName} 자동 클릭 한 번에 때리는 횟수가 +{n}회 증가합니다.";
-            case UpgradeManager.UpgradeEffect.AutoMineSpeed: return $"자동 채굴 간격이 {n}초 줄어듭니다.";
-            case UpgradeManager.UpgradeEffect.AutoMineYield: return $"자동 채굴 한 번에 얻는 조각이 +{n}배 증가합니다.";
-            case UpgradeManager.UpgradeEffect.AutoSweepSpeed: return $"자동 줍기 간격이 {n}초 줄어듭니다.";
-            case UpgradeManager.UpgradeEffect.AutoSweepLayers: return $"자동 줍기가 한 번에 쓸어 담는 조각 층이 +{n}층 증가합니다.";
-            case UpgradeManager.UpgradeEffect.HoverPickupLayers: return $"커서 줍기가 한 번에 줍는 조각 층이 +{n}층 증가합니다.";
-            case UpgradeManager.UpgradeEffect.CursorRange: return "커서 범위가 더 증가합니다.";
+            case UpgradeManager.UpgradeEffect.ObjectDoubleDrop: return Loc.T("{0}을(를) 부술 때 조각이 2배로 나올 확률이 +{1}% 증가합니다.", obj, n);
+            case UpgradeManager.UpgradeEffect.WeaponKillBonus: return Loc.T("{0}(으)로 부술 때 조각을 +{1}개 더 얻습니다.", weapon, n);
+            case UpgradeManager.UpgradeEffect.CrystalChance: return Loc.T("오브젝트를 부술 때 결정이 나올 확률이 +{0}% 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.CrystalAmount: return Loc.T("결정이 나올 때 개수가 {0}배가 됩니다.", 1L << Mathf.Clamp(Mathf.RoundToInt(value), 0, 20));
+            case UpgradeManager.UpgradeEffect.GroundPieceCap: return Loc.T("바닥에 쌓일 수 있는 조각 개수가 +{0}개 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.AutoClickSpeed: return Loc.T("{0} 자동 클릭 간격이 {1}초 줄어듭니다.", targetObjectName, n);
+            case UpgradeManager.UpgradeEffect.AutoClickCount: return Loc.T("{0} 자동 클릭 한 번에 때리는 횟수가 +{1}회 증가합니다.", targetObjectName, n);
+            case UpgradeManager.UpgradeEffect.AutoMineSpeed: return Loc.T("자동 채굴 간격이 {0}초 줄어듭니다.", n);
+            case UpgradeManager.UpgradeEffect.AutoMineYield: return Loc.T("자동 채굴 한 번에 얻는 조각이 +{0}배 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.AutoSweepSpeed: return Loc.T("자동 줍기 간격이 {0}초 줄어듭니다.", n);
+            case UpgradeManager.UpgradeEffect.AutoSweepLayers: return Loc.T("자동 줍기가 한 번에 쓸어 담는 조각 층이 +{0}층 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.HoverPickupLayers: return Loc.T("커서 줍기가 한 번에 줍는 조각 층이 +{0}층 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.CursorRange: return Loc.T("커서 범위가 더 증가합니다.");
             case UpgradeManager.UpgradeEffect.ObjectExtraCopies:
-                return $"맵에 {KoreanJosa.IGa(targetObjectName)} +{n}개 더 놓입니다. 동시에 여러 개를 부술 수 있어 조각을 더 빨리 모읍니다.";
+                return Loc.T("맵에 {0}이(가) +{1}개 더 놓입니다. 동시에 여러 개를 부술 수 있어 조각을 더 빨리 모읍니다.", targetObjectName, n);
             default: return null;
         }
     }
@@ -231,7 +231,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     private string NextCostText(int level)
     {
-        if (level >= maxLevel) return "최대";
+        if (level >= maxLevel) return Loc.T("최대");
 
         PieceCost[] cost = UpgradeManager.Instance?.GetNextCost(Id);
         if (cost == null || cost.Length == 0) return "";
@@ -244,8 +244,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             else pieces += c.amount;
         }
 
-        string piecesText = pieces > 0 ? $"{NumberFormatUtil.Format(pieces)} 조각" : "";
-        string crystalsText = crystals > 0 ? $"{NumberFormatUtil.Format(crystals)} 결정" : "";
+        string piecesText = pieces > 0 ? Loc.T("{0} 조각", NumberFormatUtil.Format(pieces)) : "";
+        string crystalsText = crystals > 0 ? Loc.T("{0} 결정", NumberFormatUtil.Format(crystals)) : "";
         return pieces > 0 && crystals > 0 ? $"{piecesText} + {crystalsText}" : piecesText + crystalsText;
     }
 

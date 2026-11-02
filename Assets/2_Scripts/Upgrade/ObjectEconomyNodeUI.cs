@@ -217,16 +217,16 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
 
             if (unlocked)
             {
-                _tooltipText = $"해금\n{objectName}\n완료";
+                _tooltipText = Loc.T("해금\n{0}\n완료", objectName);
             }
             else if (!ObjectManager.Instance.IsUnlockOrderMet(objectIndex))
             {
-                _tooltipText = "해금\n???";
+                _tooltipText = Loc.T("해금\n???");
             }
             else
             {
                 long cost = ObjectManager.Instance.GetUnlockCost(objectIndex);
-                _tooltipText = $"해금\n{objectName}\n{NumberFormatUtil.Format(cost)} 조각";
+                _tooltipText = Loc.T("해금\n{0}\n{1} 조각", objectName, NumberFormatUtil.Format(cost));
             }
             if (label != null) label.text = _tooltipText;
 
@@ -238,8 +238,8 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             int level = ObjectManager.Instance.GetGainLevel(objectIndex);
             bool maxed = level >= 5;
 
-            string costLine = maxed ? "최대" : $"{NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))} 조각";
-            _tooltipText = $"{objectName} 획득량\n{level}/5\n{costLine}";
+            string costLine = maxed ? Loc.T("최대") : Loc.T("{0} 조각", NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex)));
+            _tooltipText = Loc.T("{0} 획득량", objectName) + $"\n{level}/5\n{costLine}";
             if (label != null) label.text = _tooltipText;
 
             if (doneOverlay != null)
@@ -261,9 +261,9 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         {
             bool unlocked = ObjectManager.Instance.IsUnlocked(objectIndex);
             string zoneHint = ObjectManager.Instance.OpensNextZone(objectIndex) && !ObjectManager.Instance.IsUnlocked(objectIndex + 1)
-                ? "부수면 다음 맵이 열립니다." : null;
+                ? Loc.T("부수면 다음 맵이 열립니다.") : null;
             if (unlocked)
-                return new UpgradeTooltip.Content { title = $"{objectName} 해금", description = zoneHint ?? "이미 해금했습니다.", level = "완료" };
+                return new UpgradeTooltip.Content { title = Loc.T("{0} 해금", objectName), description = zoneHint ?? Loc.T("이미 해금했습니다."), level = Loc.T("완료") };
 
             if (!ObjectManager.Instance.IsUnlockOrderMet(objectIndex))
                 return new UpgradeTooltip.Content { title = "???", description = ObjectManager.Instance.NextRequiredUnlockHintText(objectIndex), level = "0 / 1" };
@@ -271,10 +271,10 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
             long cost = ObjectManager.Instance.GetUnlockCost(objectIndex);
             return new UpgradeTooltip.Content
             {
-                title = $"{objectName} 해금",
-                description = zoneHint ?? "새 오브젝트가 등장합니다.",
+                title = Loc.T("{0} 해금", objectName),
+                description = zoneHint ?? Loc.T("새 오브젝트가 등장합니다."),
                 level = "0 / 1",
-                price = $"{NumberFormatUtil.Format(cost)} 조각",
+                price = Loc.T("{0} 조각", NumberFormatUtil.Format(cost)),
             };
         }
 
@@ -283,10 +283,10 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         string gain = NumberFormatUtil.Format(ObjectManager.Instance.GainBonusPerLevel(objectIndex));
         return new UpgradeTooltip.Content
         {
-            title = $"{objectName} 획득량",
-            description = $"{KoreanJosa.EulReul(objectName)} 부술 때 얻는 조각이 +{gain}개 증가합니다.",
+            title = Loc.T("{0} 획득량", objectName),
+            description = Loc.T("{0}을(를) 부술 때 얻는 조각이 +{1}개 증가합니다.", objectName, gain),
             level = $"{level} / 5",
-            price = maxed ? "최대" : $"{NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))} 조각",
+            price = maxed ? Loc.T("최대") : Loc.T("{0} 조각", NumberFormatUtil.Format(ObjectManager.Instance.GetNextGainCost(objectIndex))),
         };
     }
 

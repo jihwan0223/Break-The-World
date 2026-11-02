@@ -64,7 +64,7 @@ public class SceneFader : MonoBehaviour
         _cover.pickingMode = PickingMode.Position;
         root.Add(_cover);
 
-        _loading = new Label("로딩 중");
+        _loading = new Label(Loc.T("로딩 중"));
         _loading.style.fontSize = 48;
         _loading.style.width = 420;
         _loading.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -117,7 +117,7 @@ public class SceneFader : MonoBehaviour
         tipBox.Add(tipTitle);
 
         _tipIndex = Random.Range(0, Tips.Length);
-        var tip = _tip = new Label(Tips[_tipIndex]);
+        var tip = _tip = new Label(Loc.T(Tips[_tipIndex]));
         tip.style.fontSize = 36;
         tip.style.color = PixelStyle.Text.linear;
         tip.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -155,14 +155,14 @@ public class SceneFader : MonoBehaviour
     private void NextTip()
     {
         _tipIndex = (_tipIndex + 1) % Tips.Length;
-        _tip.text = Tips[_tipIndex];
+        _tip.text = Loc.T(Tips[_tipIndex]);
     }
 
     private IEnumerator AnimateDots()
     {
         for (int n = 0; ; n = (n + 1) % 4)
         {
-            _loading.text = "로딩 중" + new string('.', n);
+            _loading.text = Loc.T("로딩 중") + new string('.', n);
             yield return new WaitForSecondsRealtime(0.35f);
         }
     }

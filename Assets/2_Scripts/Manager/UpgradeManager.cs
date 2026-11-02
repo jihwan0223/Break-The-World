@@ -258,13 +258,13 @@ public class UpgradeManager : MonoBehaviour
     public string LockedTargetHintText(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId);
-        if (node == null) return "아직 해금할 수 없습니다";
+        if (node == null) return Loc.T("아직 해금할 수 없습니다");
         if (node.gateObjectIndex >= 0) return "???";
 
         if (IsTargetObjectLocked(node))
             return ObjectManager.Instance.NextRequiredUnlockHintText(node.targetObjectIndex);
 
-        return $"{WeaponManager.StaticWeaponNameAt(node.targetWeaponIndex)} 무기 해금이 필요합니다";
+        return Loc.T("{0} 무기 해금이 필요합니다", WeaponManager.StaticWeaponNameAt(node.targetWeaponIndex));
     }
 
     public bool CanUpgrade(string nodeId)
