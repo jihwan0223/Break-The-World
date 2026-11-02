@@ -418,7 +418,15 @@ public class DebrisPool : MonoBehaviour
 
     private static readonly List<RaycastResult> _uiHits = new List<RaycastResult>();
 
-    private static bool IsOverButton(Vector2 screenPos)
+    // 바닥에 떨어진 주울 수 있는 파편이 이 지점에 있는지 (손가락 커서용)
+    public bool IsPieceAt(Vector2 worldPos)
+    {
+        foreach (Collider2D hit in Physics2D.OverlapPointAll(worldPos))
+            if (_pieceByCollider.TryGetValue(hit, out Piece piece) && piece.collider.enabled) return true;
+        return false;
+    }
+
+    public static bool IsOverButton(Vector2 screenPos)
     {
         if (EventSystem.current != null)
         {

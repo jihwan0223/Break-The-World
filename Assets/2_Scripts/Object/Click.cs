@@ -17,7 +17,7 @@ public class Click : MonoBehaviour
     [SerializeField] private bool swingOnSurface;
     [SerializeField] private int fixedObjectIndex = -1; // -1 = 장착 중인 오브젝트
 
-    private bool IsZoneHidden => ZoneManager.Instance != null && ZoneManager.Instance.IsHidden(transform);
+    public bool IsZoneHidden => ZoneManager.Instance != null && ZoneManager.Instance.IsHidden(transform);
 
     private int ObjIndex => fixedObjectIndex >= 0 ? fixedObjectIndex
         : (ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : -1);
