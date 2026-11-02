@@ -7,7 +7,7 @@ public static class GameSettings
 {
     private const string MasterVolumeKey = "MasterVolume";
     private const string BgmVolumeKey = "BgmVolume";
-    private const float BgmLoudness = 0.2f; // 음량 100%에서도 원본의 20%
+    private const float BgmLoudness = 1f; // 음량 100% = 원본 그대로
     private const string FullscreenKey = "Fullscreen"; // 1 = 전체화면, 0 = 창
     private const string ResolutionKey = "Resolution"; // "가로x세로"
     private const string FpsKey = "FpsLimit";
