@@ -177,6 +177,7 @@ public partial class SidePanelUI
             b.style.height = 96;
             b.style.marginLeft = 10;
             b.style.marginRight = 10;
+            HoverGrow(b);
             buttons.Add(b);
         }
 
@@ -226,6 +227,7 @@ public partial class SidePanelUI
             b.style.height = 100;
             b.style.marginLeft = 8;
             b.style.marginRight = 8;
+            HoverGrow(b);
             row.Add(b);
         }
     }
@@ -264,6 +266,7 @@ public partial class SidePanelUI
         slot.style.marginBottom = 18;
         PixelStyle.Frame(slot, PixelStyle.GlassTrack);
         slot.Add(cylinder);
+        HoverGrow(slot);
         column.Add(slot);
 
         _settingRefreshers.Add(() => { cylinder.SetValue(get()); caption.text = $"{Loc.T(label)}  {Percent(get())}"; });
@@ -300,7 +303,16 @@ public partial class SidePanelUI
         row.Add(value);
         row.Add(ArrowButton(">", () => change(1)));
         _settingRefreshers.Add(() => value.text = Loc.T(getValue()));
+        HoverGrow(row);
         column.Add(row);
+    }
+
+    // 메인 메뉴 설정창처럼 마우스 올리면 살짝 커짐
+    private static void HoverGrow(VisualElement element)
+    {
+        const float hoverScale = 1.08f; // MainMenuUI.SelectedScale과 같은 값
+        element.RegisterCallback<PointerEnterEvent>(_ => element.style.scale = new Scale(new Vector3(hoverScale, hoverScale, 1f)));
+        element.RegisterCallback<PointerLeaveEvent>(_ => element.style.scale = StyleKeyword.Null);
     }
 
     private readonly List<System.Action> _settingRefreshers = new List<System.Action>();

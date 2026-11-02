@@ -689,9 +689,7 @@ public partial class SidePanelUI : MonoBehaviour
 
         card.Clear();
         card.Add(PixelStyle.CardHeader("능력치"));
-        card.Add(CreateInfoRow("공격력", hidden ? "???" : NumberFormatUtil.Format(data.clickDamage), hidden ? HiddenColor : Color.white));
-        card.Add(CreateInfoRow("강화 보너스", hidden ? "???" : $"+{NumberFormatUtil.Format(bonus)}", hidden ? HiddenColor : Color.white));
-        card.Add(CreateInfoRow("클릭당 합계", hidden ? "???" : NumberFormatUtil.Format(data.clickDamage + bonus), hidden ? HiddenColor : Color.white));
+        card.Add(CreateInfoRow("공격력", hidden ? "???" : NumberFormatUtil.Format(data.clickDamage + bonus), hidden ? HiddenColor : Color.white)); // 강화까지 더한 실제 공격력
         if (buyable)
             card.Add(CreateInfoRow("해금 가격", Loc.T("{0} 조각", NumberFormatUtil.Format(cost)), Color.white));
         card.Add(CreateInfoRow("상태", equipped ? "장착 중" : unlocked ? "해금됨" : "잠김", equipped || unlocked ? GoodColor : BadColor));
@@ -735,6 +733,7 @@ public partial class SidePanelUI : MonoBehaviour
 
         var labelText = new Label(Loc.T(label));
         PixelStyle.FitText(labelText, 36);
+        labelText.style.flexGrow = 1; // 남는 칸을 다 써야 글자를 괜히 줄이지 않음
         labelText.style.color = PixelStyle.MutedText.linear;
         row.Add(labelText);
 

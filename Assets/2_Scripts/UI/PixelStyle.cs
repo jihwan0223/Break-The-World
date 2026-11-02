@@ -99,7 +99,7 @@ public static class PixelStyle
         element.schedule.Execute(() =>
         {
             float width = element.contentRect.width; // 글이 들어갈 칸 너비
-            if (width <= 0f || string.IsNullOrEmpty(element.text)) return;
+            if (!(width > 0f) || string.IsNullOrEmpty(element.text)) return; // 배치 전엔 너비가 NaN이라 같이 거름
             if (maxSize <= 0f)
             {
                 maxSize = element.resolvedStyle.fontSize;
