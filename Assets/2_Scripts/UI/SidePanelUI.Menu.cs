@@ -285,13 +285,14 @@ public partial class SidePanelUI
         var name = new Label();
         Loc.Bind(name, label);
         name.style.flexGrow = 1;
-        name.style.fontSize = 36;
+        PixelStyle.FitText(name, 36);
         name.style.color = PixelStyle.Text.linear;
         row.Add(name);
 
         var value = new Label();
         value.style.width = 230;
-        value.style.fontSize = 36;
+        PixelStyle.FitText(value, 36);
+        value.style.flexShrink = 0;
         value.style.color = PixelStyle.Text.linear;
         value.style.unityTextAlign = TextAnchor.MiddleCenter;
         System.Action<int> change = d => { step(d); value.text = Loc.T(getValue()); };
@@ -310,6 +311,7 @@ public partial class SidePanelUI
         button.focusable = false;
         button.style.width = 60;
         button.style.height = 60;
+        button.style.flexShrink = 0; // 글이 길어도 화살표는 안 밀리게
         button.style.fontSize = 36;
         PixelStyle.Button(button, PixelStyle.Mint);
         return button;
@@ -502,12 +504,14 @@ public partial class SidePanelUI
         var name = new Label();
         Loc.Bind(name, label);
         name.style.flexGrow = 1;
-        name.style.fontSize = 36;
+        PixelStyle.FitText(name, 36);
         name.style.color = PixelStyle.MutedText.linear;
         row.Add(name);
 
         var value = new Label();
         value.style.fontSize = 36;
+        value.style.flexShrink = 0;
+        value.style.marginLeft = 12;
         value.style.color = PixelStyle.Text.linear;
         row.Add(value);
         _statRows.Add((value, () => Loc.T(get())));

@@ -734,12 +734,14 @@ public partial class SidePanelUI : MonoBehaviour
         row.style.marginBottom = 26;
 
         var labelText = new Label(Loc.T(label));
-        labelText.style.fontSize = 36;
+        PixelStyle.FitText(labelText, 36);
         labelText.style.color = PixelStyle.MutedText.linear;
         row.Add(labelText);
 
         var valueText = new Label(Loc.T(value));
         valueText.style.fontSize = 36;
+        valueText.style.flexShrink = 0;
+        valueText.style.marginLeft = 12;
         valueText.style.unityFontStyleAndWeight = FontStyle.Bold;
         valueText.style.color = (valueColor == GoodColor ? PixelStyle.Good : valueColor == BadColor ? PixelStyle.Bad
             : valueColor == HiddenColor ? PixelStyle.Hidden : PixelStyle.Text).linear;

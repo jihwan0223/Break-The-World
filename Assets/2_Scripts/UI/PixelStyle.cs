@@ -77,6 +77,64 @@ public static class PixelStyle
         element.style.backgroundColor = tone.outline.linear;
     }
 
+    // 번역하면 글이 길어져 칸을 밀어내니, 칸보다 길면 글자를 줄여서 한 줄에 맞춤
+    // (UI Toolkit 자동 크기는 가로 넘침엔 안 줄어서 직접 잼)
+    public static void FitText(TextElement element, float maxSize, float minSize = 16f)
+    {
+        element.style.fontSize = maxSize;
+        element.style.flexShrink = 1;
+        element.style.minWidth = 0;
+        element.style.overflow = Overflow.Hidden;
+        element.style.whiteSpace = WhiteSpace.NoWrap;
+        KeepFit(element, maxSize, minSize);
+    }
+
+    // 글이 칸보다 넓으면 글자 크기를 줄임. maxSize가 0이면 처음 잴 때의 글자 크기를 최대로 씀 (버튼용)
+    private static void KeepFit(TextElement element, float maxSize, float minSize)
+    {
+        string lastText = null; // 마지막으로 맞춘 글
+        float lastWidth = -1f; // 마지막으로 맞춘 칸 너비
+        float baseSpacing = float.NaN; // 원래 글자 간격 px (글자 줄일 때 같이 줄임)
+        // ponytail: 0.1초마다 확인 (글/칸 바뀐 이벤트가 따로 없음). 칸이 수백 개로 늘면 이벤트 방식으로
+        element.schedule.Execute(() =>
+        {
+            float width = element.contentRect.width; // 글이 들어갈 칸 너비
+            if (width <= 0f || string.IsNullOrEmpty(element.text)) return;
+            if (maxSize <= 0f)
+            {
+                maxSize = element.resolvedStyle.fontSize;
+                if (!(maxSize > 0f)) { maxSize = 0f; return; }
+            }
+            if (float.IsNaN(baseSpacing))
+            {
+                baseSpacing = element.resolvedStyle.letterSpacing;
+                if (float.IsNaN(baseSpacing)) baseSpacing = 0f;
+            }
+            if (element.text == lastText && Mathf.Approximately(width, lastWidth)) return;
+            lastText = element.text;
+            lastWidth = width;
+
+            // MeasureTextSize는 NaN을 줘서 못 씀. MonaS12는 반각 0.5칸, 전각(한글/한자/가나) 1칸이라 글자 수로 계산
+            // ponytail: 반각 0.55, 굵은 외곽선 글씨는 0.63 (화면에서 잼). 폰트 바꾸면 이 비율도 다시 봐야 함
+            float half = element.resolvedStyle.unityFontStyleAndWeight == FontStyle.Bold ? 0.63f : 0.55f; // 반각 글자 너비 (글자 크기 배수)
+            float ems = 0f; // 가장 긴 줄 너비 (글자 크기 배수)
+            int chars = 0; // 가장 긴 줄 글자 수
+            foreach (string line in element.text.Split('\n'))
+            {
+                float lineEms = 0f; // 이 줄 너비
+                foreach (char c in line)
+                    lineEms += c >= 0x1100 ? 1f : half;
+                if (lineEms > ems) { ems = lineEms; chars = line.Length; }
+            }
+            if (ems <= 0f) return;
+            float atMax = ems * maxSize + baseSpacing * chars; // 최대 크기일 때 글 너비
+            float size = atMax <= width ? maxSize : Mathf.Floor(maxSize * width / atMax / 2f) * 2f; // 짝수로 (도트 폰트 번짐 줄임)
+            size = Mathf.Clamp(size, minSize, maxSize);
+            element.style.fontSize = size;
+            if (baseSpacing > 0f) element.style.letterSpacing = baseSpacing * size / maxSize;
+        }).Every(100);
+    }
+
     public const float OutlinedLetterSpacing = 6f; // px
 
     public static void OutlinedText(VisualElement element, Color outline, float width = 0.35f)
@@ -106,6 +164,7 @@ public static class PixelStyle
     {
         OutlinedText(button, tone.text);
         Paint(button, Kind.Button, tone, dot);
+        KeepFit(button, 0f, 12f); // 번역 글이 버튼보다 길면 줄임 (12 = 폰트 원래 크기라 안 뭉개짐)
         button.RegisterCallback<PointerEnterEvent>(_ => Paint(button, Kind.Hover, tone, dot));
         button.RegisterCallback<PointerLeaveEvent>(_ => Paint(button, Kind.Button, tone, dot));
         button.RegisterCallback<PointerDownEvent>(_ => Paint(button, Kind.Pressed, tone, dot), TrickleDown.TrickleDown);
@@ -141,6 +200,12 @@ public static class PixelStyle
         text.outlineWidth = 0.3f;
         text.characterSpacing = 3f; // 1/100 em
         text.margin = new Vector4(0f, 0f, 0f, Depth * dot);
+        if (!text.enableAutoSizing) // 번역 글이 버튼보다 길면 줄임
+        {
+            text.fontSizeMax = text.fontSize;
+            text.fontSizeMin = Mathf.Min(16f, text.fontSize);
+            text.enableAutoSizing = true;
+        }
     }
 
     private static Sprite SpriteOf(Kind kind, Tone tone)
