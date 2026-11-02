@@ -55,7 +55,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
             var text = button.GetComponentInChildren<TMPro.TMP_Text>(true);
             if (text != null)
             {
-                text.text = Loc.T(label);
+                Loc.Bind(text, () => text.text = Loc.T(label));
                 text.enableAutoSizing = false;
                 text.fontSize = 32;
                 text.alignment = TMPro.TextAlignmentOptions.Center;
@@ -82,6 +82,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         }
 
         RefreshAll();
+        Loc.Changed += OnLanguageChanged;
 
         if (pauseGameWhileOpen)
             Time.timeScale = 0f;
@@ -89,8 +90,11 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         OnTreeToggled?.Invoke(true);
     }
 
+    private void OnLanguageChanged() => RefreshAll();
+
     void OnDisable()
     {
+        Loc.Changed -= OnLanguageChanged;
         // 이동 중 닫히면 코루틴이 멈춰서 바로 끝냄
         System.Action pending = _pendingReveals;
         _pendingReveals = null;

@@ -175,6 +175,7 @@ public partial class SidePanelUI : MonoBehaviour
         _panel.Add(_objectContent);
 
         root.Add(_panel);
+        Loc.Bind(root, () => { _refreshWeaponSelector?.Invoke(); _refreshObjectSelector?.Invoke(); });
         BuildDebugPanel(root);
         BuildStatsPanel(root);
         BuildSettingsPanel(root);
@@ -461,7 +462,8 @@ public partial class SidePanelUI : MonoBehaviour
         selectButton.style.unityFontStyleAndWeight = FontStyle.Bold;
         PixelStyle.Button(selectButton, PixelStyle.Mint);
 
-        var equippedLabel = new Label(Loc.T("장착됨"));
+        var equippedLabel = new Label();
+        Loc.Bind(equippedLabel, "장착됨");
         equippedLabel.style.height = 80;
         equippedLabel.style.marginTop = 24;
         equippedLabel.style.fontSize = 36;
@@ -815,7 +817,8 @@ public partial class SidePanelUI : MonoBehaviour
     {
         // 펀치가 다 보인 뒤에 동작 실행 (먼저 하면 버튼이 바로 사라짐)
         // 이 패널에선 텍스트 color가 늘 흰색으로 고정되는 문제가 있어 원래 스타일 유지
-        var button = new Button { text = Loc.T(text) };
+        var button = new Button();
+        Loc.Bind(button, text);
         button.clicked += () => StartCoroutine(PunchThenInvoke(button, NavButtonPunchDuration, NavButtonPunchAmount, onClick));
         button.style.width = 300;
         button.style.height = 110;

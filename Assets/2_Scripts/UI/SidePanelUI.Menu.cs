@@ -56,7 +56,8 @@ public partial class SidePanelUI
         PixelStyle.Frame(window, PixelStyle.Window, 6f);
         _demoBox.Add(window);
 
-        var title = new Label(Loc.T("데모 완료!")); // '클'은 테두리 폰트에서 뭉개져서 '완료'로
+        var title = new Label();
+        Loc.Bind(title, "데모 완료!"); // '클'은 테두리 폰트에서 뭉개져서 '완료'로
         title.style.fontSize = 56;
         title.style.paddingLeft = 56;
         title.style.paddingRight = 56;
@@ -76,7 +77,8 @@ public partial class SidePanelUI
         };
         foreach (string text in lines)
         {
-            var line = new Label(Loc.T(text));
+            var line = new Label();
+            Loc.Bind(line, text);
             line.style.fontSize = 36;
             line.style.color = PixelStyle.Text.linear;
             line.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -84,7 +86,8 @@ public partial class SidePanelUI
             window.Add(line);
         }
 
-        var hint = new Label(Loc.T("계속하기를 누르면 지금 진행 그대로 이어서 할 수 있어요."));
+        var hint = new Label();
+        Loc.Bind(hint, "계속하기를 누르면 지금 진행 그대로 이어서 할 수 있어요.");
         hint.style.fontSize = 28;
         hint.style.color = PixelStyle.MutedText.linear;
         hint.style.marginTop = 14;
@@ -109,7 +112,7 @@ public partial class SidePanelUI
     private void BuildSettingsPanel(VisualElement root)
     {
         _settingsPanel = CreatePopupFrame(CloseSettingsPanel, out Label title);
-        title.text = Loc.T("설정");
+        Loc.Bind(title, "설정");
 
         var body = new VisualElement();
         body.style.position = Position.Absolute;
@@ -138,7 +141,14 @@ public partial class SidePanelUI
         AddVolumeBar(left, "전체 음량", () => GameSettings.MasterVolume, v => GameSettings.MasterVolume = v);
         AddVolumeBar(left, "효과음", () => SfxPlayer.Volume, v => SfxPlayer.Volume = v);
 
-        right.Add(PixelStyle.CardHeader("화면"));
+        right.Add(PixelStyle.CardHeader("게임"));
+        AddSettingRow(right, "언어", () => Loc.NativeNames[Loc.Language], step => Loc.Language = (Loc.Language + step + Loc.Codes.Length) % Loc.Codes.Length);
+        AddSettingRow(right, "숫자 표시", () => GameSettings.NumberUnits ? "영어 단위" : "숫자", _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
+        AddSettingRow(right, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
+        AddSettingRow(right, "화면 흔들림", () => GameSettings.ScreenShake ? "켜기" : "끄기", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
+        var displayHeader = PixelStyle.CardHeader("화면");
+        displayHeader.style.marginTop = 10;
+        right.Add(displayHeader);
         AddSettingRow(right, "화면 모드", () => GameSettings.Fullscreen ? "전체화면" : "창 모드", _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
         AddSettingRow(right, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
         {
@@ -152,12 +162,6 @@ public partial class SidePanelUI
             int fps = GameSettings.FpsOptions[GameSettings.FpsIndex];
             return fps < 0 ? "무제한" : $"{fps} FPS";
         }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length);
-        var gameHeader = PixelStyle.CardHeader("게임");
-        gameHeader.style.marginTop = 10;
-        right.Add(gameHeader);
-        AddSettingRow(right, "화면 흔들림", () => GameSettings.ScreenShake ? "켜기" : "끄기", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
-        AddSettingRow(right, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
-        AddSettingRow(right, "숫자 표시", () => GameSettings.NumberUnits ? "영어 단위" : "숫자", _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
 
         var buttons = new VisualElement();
         buttons.style.flexDirection = FlexDirection.Row;
@@ -178,6 +182,7 @@ public partial class SidePanelUI
 
         BuildLeaveConfirm();
         root.Add(_settingsPanel);
+        Loc.Bind(_settingsPanel, () => { foreach (System.Action refresh in _settingRefreshers) refresh(); });
     }
 
     private void BuildLeaveConfirm()
@@ -277,7 +282,8 @@ public partial class SidePanelUI
         row.style.marginBottom = 12;
         PixelStyle.Frame(row, PixelStyle.Card);
 
-        var name = new Label(Loc.T(label));
+        var name = new Label();
+        Loc.Bind(name, label);
         name.style.flexGrow = 1;
         name.style.fontSize = 36;
         name.style.color = PixelStyle.Text.linear;
@@ -365,7 +371,7 @@ public partial class SidePanelUI
     private void BuildStatsPanel(VisualElement root)
     {
         _statsPanel = CreatePopupFrame(CloseStatsPanel, out Label title);
-        title.text = Loc.T("통계");
+        Loc.Bind(title, "통계");
 
         var columns = StatPage();
         var left = StatColumn(columns, "기록");
@@ -493,7 +499,8 @@ public partial class SidePanelUI
         row.style.marginBottom = 8; // 한 칸에 10줄이 화면에 들어가게
         PixelStyle.Frame(row, PixelStyle.Card);
 
-        var name = new Label(Loc.T(label));
+        var name = new Label();
+        Loc.Bind(name, label);
         name.style.flexGrow = 1;
         name.style.fontSize = 36;
         name.style.color = PixelStyle.MutedText.linear;

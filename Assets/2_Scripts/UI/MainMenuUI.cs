@@ -209,7 +209,8 @@ public class MainMenuUI : MonoBehaviour
 
     private Button CreateMenuButton(string text, PixelStyle.Tone tone, System.Action onClick)
     {
-        var button = new Button(onClick) { text = Loc.T(text) };
+        var button = new Button(onClick);
+        Loc.Bind(button, text);
         button.focusable = false; // 켜두면 Enter/방향키가 직접 폴링과 이중으로 처리됨
         button.style.width = 360;
         button.style.height = 88;
@@ -407,8 +408,10 @@ public class MainMenuUI : MonoBehaviour
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
 
-        _confirmYes = new Button(() => { PlayClick(); CloseConfirm(); _confirmPendingAction?.Invoke(); }) { text = Loc.T("예") };
-        _confirmNo = new Button(() => { PlayClick(); CloseConfirm(); }) { text = Loc.T("아니오") };
+        _confirmYes = new Button(() => { PlayClick(); CloseConfirm(); _confirmPendingAction?.Invoke(); }) ;
+        Loc.Bind(_confirmYes, "예");
+        _confirmNo = new Button(() => { PlayClick(); CloseConfirm(); }) ;
+        Loc.Bind(_confirmNo, "아니오");
         StyleDialogButton(_confirmYes, PixelStyle.Mint);
         StyleDialogButton(_confirmNo, PixelStyle.Pink);
         _confirmYes.style.marginRight = 20;
@@ -493,7 +496,8 @@ public class MainMenuUI : MonoBehaviour
         PixelStyle.Frame(window, PixelStyle.Window, 6f);
         panel.Add(window);
 
-        var title = new Label(Loc.T("설정"));
+        var title = new Label();
+        Loc.Bind(title, "설정");
         title.style.fontSize = 36;
         title.style.paddingLeft = 48;
         title.style.paddingRight = 48;
@@ -529,7 +533,19 @@ public class MainMenuUI : MonoBehaviour
         options.style.alignItems = Align.Center;
         columns.Add(options);
 
-        options.Add(PixelStyle.CardHeader("화면"));
+        options.Add(PixelStyle.CardHeader("게임"));
+        AddOptionRow(options, "언어", () => Loc.NativeNames[Loc.Language],
+            step => Loc.Language = (Loc.Language + step + Loc.Codes.Length) % Loc.Codes.Length);
+        AddOptionRow(options, "숫자 표시", () => GameSettings.NumberUnits ? "영어 단위" : "숫자",
+            _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
+        AddOptionRow(options, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기",
+            _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
+        AddOptionRow(options, "화면 흔들림", () => GameSettings.ScreenShake ? "켜기" : "끄기",
+            _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
+
+        var displayHeader = PixelStyle.CardHeader("화면");
+        displayHeader.style.marginTop = 10;
+        options.Add(displayHeader);
         AddOptionRow(options, "화면 모드", () => GameSettings.Fullscreen ? "전체화면" : "창 모드",
             _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
         AddOptionRow(options, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
@@ -544,16 +560,6 @@ public class MainMenuUI : MonoBehaviour
             int fps = GameSettings.FpsOptions[GameSettings.FpsIndex];
             return fps < 0 ? "무제한" : $"{fps} FPS";
         }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length);
-
-        var gameHeader = PixelStyle.CardHeader("게임");
-        gameHeader.style.marginTop = 10;
-        options.Add(gameHeader);
-        AddOptionRow(options, "화면 흔들림", () => GameSettings.ScreenShake ? "켜기" : "끄기",
-            _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
-        AddOptionRow(options, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기",
-            _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
-        AddOptionRow(options, "숫자 표시", () => GameSettings.NumberUnits ? "영어 단위" : "숫자",
-            _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
 
         Button back = CreateMenuButton("뒤로가기", PixelStyle.Pink, WithClick(CloseSettings));
         back.style.marginTop = 16;
@@ -578,7 +584,7 @@ public class MainMenuUI : MonoBehaviour
             onChanged(newValue);
             caption.text = Loc.T(label) + "  " + Mathf.RoundToInt(newValue * 100f) + "%";
         }, SpawnGlassChips);
-        caption.text = Loc.T(label) + "  " + Mathf.RoundToInt(cylinder.Value * 100f) + "%";
+        Loc.Bind(caption, () => caption.text = Loc.T(label) + "  " + Mathf.RoundToInt(cylinder.Value * 100f) + "%");
 
         var wrap = new VisualElement();
         wrap.style.paddingTop = 14;
@@ -612,13 +618,15 @@ public class MainMenuUI : MonoBehaviour
         row.style.marginBottom = 12;
         PixelStyle.Frame(row, PixelStyle.Card);
 
-        var name = new Label(Loc.T(label));
+        var name = new Label();
+        Loc.Bind(name, label);
         name.style.flexGrow = 1;
         name.style.fontSize = 36;
         name.style.color = PixelStyle.Text.linear;
         row.Add(name);
 
-        var value = new Label(Loc.T(getValue()));
+        var value = new Label();
+        Loc.Bind(value, () => value.text = Loc.T(getValue()));
         System.Action<int> change = delta => { step(delta); value.text = Loc.T(getValue()); };
         Button left = CreateArrowButton("<", () => { PlayClick(); change(-1); });
         Button right = CreateArrowButton(">", () => { PlayClick(); change(1); });

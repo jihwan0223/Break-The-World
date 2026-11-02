@@ -1,2 +1,412 @@
 ﻿ko,en,ja,zh,ru,es,pt,de,fr
+새로운 지역 해금!,New Area Unlocked!,新エリア解放！,新区域已解锁！,Новая зона открыта!,¡Nueva zona desbloqueada!,Nova área desbloqueada!,Neues Gebiet freigeschaltet!,Nouvelle zone débloquée !
+화살표로 이동할 수 있어요,Use the arrows to go there,矢印で移動できます,可以用箭头移动过去,Перейти можно стрелками,Usa las flechas para ir allí,Use as setas para ir até lá,Mit den Pfeilen kannst du wechseln,Utilise les flèches pour y aller
+달걀,Egg,卵,鸡蛋,Яйцо,Huevo,Ovo,Ei,Œuf
+사과,Apple,リンゴ,苹果,Яблоко,Manzana,Maçã,Apfel,Pomme
+버터,Butter,バター,黄油,Масло,Mantequilla,Manteiga,Butter,Beurre
+식빵,Bread,食パン,吐司,Хлеб,Pan de molde,Pão de forma,Toastbrot,Pain de mie
+책상,Desk,机,书桌,Стол,Escritorio,Escrivaninha,Schreibtisch,Bureau
+가로등,Streetlight,街灯,路灯,Фонарь,Farola,Poste de luz,Laterne,Lampadaire
+자전거,Bicycle,自転車,自行车,Велосипед,Bicicleta,Bicicleta,Fahrrad,Vélo
+가로수,Street Tree,街路樹,行道树,Дерево,Árbol,Árvore,Straßenbaum,Arbre
+자동차,Car,自動車,汽车,Машина,Coche,Carro,Auto,Voiture
+도로,Road,道路,道路,Дорога,Carretera,Estrada,Fahrbahn,Route
+왁뿌볼,Wakppu Ball,ワクップボール,瓦克普球,Вакпу-мяч,Bola Wakppu,Bola Wakppu,Wakppu-Ball,Balle Wakppu
+간판,Signboard,看板,招牌,Вывеска,Letrero,Placa,Schild,Enseigne
+트럭,Truck,トラック,卡车,Грузовик,Camión,Caminhão,Lastwagen,Camion
+컨베이어 벨트,Conveyor Belt,ベルトコンベア,传送带,Конвейер,Cinta transportadora,Esteira,Förderband,Tapis roulant
+회사,Company,会社,公司,Офис,Empresa,Empresa,Firma,Entreprise
+튜브,Swim Ring,浮き輪,游泳圈,Надувной круг,Flotador,Boia inflável,Schwimmring,Bouée gonflable
+부표,Buoy,ブイ,浮标,Буй,Boya,Boia marítima,Boje,Balise
+요트,Yacht,ヨット,游艇,Яхта,Yate,Iate,Jacht,Yacht
+등대,Lighthouse,灯台,灯塔,Маяк,Faro,Farol,Leuchtturm,Phare
+배,Ship,船,船,Корабль,Barco,Navio,Schiff,Navire
+인공위성,Satellite,人工衛星,人造卫星,Спутник,Satélite,Satélite,Satellit,Satellite
+로켓,Rocket,ロケット,火箭,Ракета,Cohete,Foguete,Rakete,Fusée
+달,Moon,月,月球,Луна,Luna,Lua,Mond,Lune
+지구,Earth,地球,地球,Земля,Tierra,Terra,Erde,Terre
+{0}을(를) 부수면 열립니다,Opens when you break: {0},{0}を壊すと解放されます,摧毁{0}后解锁,Откроется после разрушения: {0},Se abre al romper: {0},Abre ao quebrar: {0},Wird geöffnet durch Zerstören: {0},S'ouvre en détruisant : {0}
+{0}을(를) 먼저 해금하세요,Unlock first: {0},先に{0}を解放してください,请先解锁{0},Сначала откройте: {0},Primero desbloquea: {0},Desbloqueie primeiro: {0},Zuerst freischalten: {0},Débloque d'abord : {0}
+책상 위,On the Desk,机の上,桌面上,На столе,Escritorio,Escrivaninha,Schreibtisch,Bureau
+길거리,Street,街中,街道,Улица,Calle,Rua,Straße,Rue
+공사장,Construction Site,工事現場,工地,Стройка,Obra,Canteiro de obras,Baustelle,Chantier
+바다,Sea,海,大海,Море,Mar,Mar,Meer,Mer
+우주,Space,宇宙,太空,Космос,Espacio,Espaço,Weltraum,Espace
+아직 해금할 수 없습니다,Can't be unlocked yet,まだ解放できません,暂时无法解锁,Пока нельзя открыть,Aún no se puede desbloquear,Ainda não pode ser desbloqueado,Noch nicht freischaltbar,Pas encore déblocable
+{0} 무기 해금이 필요합니다,Requires weapon: {0},武器「{0}」の解放が必要です,需要解锁武器：{0},Требуется оружие: {0},Requiere el arma: {0},Requer a arma: {0},Benötigt die Waffe: {0},Nécessite l'arme : {0}
+맨손,Bare Hands,素手,徒手,Голые руки,Manos,Mãos,Fäuste,Mains nues
+프라이팬,Frying Pan,フライパン,平底锅,Сковорода,Sartén,Frigideira,Bratpfanne,Poêle
+망치,Hammer,ハンマー,锤子,Молоток,Martillo,Martelo,Hammer,Marteau
+야구 방망이,Baseball Bat,バット,棒球棍,Бита,Bate,Taco de beisebol,Baseballschläger,Batte
+곡괭이,Pickaxe,ツルハシ,镐,Кирка,Pico,Picareta,Spitzhacke,Pioche
+철퇴,Mace,メイス,狼牙棒,Булава,Maza,Maça,Streitkolben,Masse
+보스 도전!,Challenge Boss!,ボスに挑戦！,挑战首领！,Вызвать босса!,¡Desafiar al jefe!,Desafiar o chefe!,Boss herausfordern!,Défier le boss !
+포기,Give Up,あきらめる,放弃,Сдаться,Rendirse,Desistir,Aufgeben,Abandonner
+보스전 실패,Boss Failed,ボス戦失敗,首领战失败,Босс не побеждён,Jefe fallido,Falha no chefe,Bosskampf verloren,Boss raté
+시간 안에 부수지 못했어요,Couldn't break it in time,時間内に壊せませんでした,未能在时限内摧毁,Не успели разрушить вовремя,No lo rompiste a tiempo,Não deu para quebrar a tempo,Nicht rechtzeitig zerstört,Pas détruit à temps
+재도전,Retry,再挑戦,重试,Ещё раз,Reintentar,Tentar de novo,Nochmal,Réessayer
+나가기,Exit,退出,退出,Выйти,Salir,Sair,Verlassen,Quitter
+보호막 -{0}%,Shield -{0}%,シールド -{0}%,护盾 -{0}%,Щит -{0}%,Escudo -{0}%,Escudo -{0}%,Schild -{0}%,Bouclier -{0}%
+"새 게임을 시작하시겠습니까?
+기존 저장 데이터가 사라집니다.","Start a new game?
+Your existing save will be deleted.","新しいゲームを始めますか？
+既存のセーブデータは消えます。","要开始新游戏吗？
+现有存档将被删除。","Начать новую игру?
+Текущее сохранение будет удалено.","¿Empezar una nueva partida?
+Se borrarán los datos guardados.","Começar um novo jogo?
+O save atual será apagado.","Neues Spiel starten?
+Der bisherige Spielstand wird gelöscht.","Commencer une nouvelle partie ?
+La sauvegarde actuelle sera effacée."
+게임을 종료하시겠습니까?,Quit the game?,ゲームを終了しますか？,要退出游戏吗？,Выйти из игры?,¿Salir del juego?,Sair do jogo?,Spiel beenden?,Quitter le jeu ?
+새 게임,New Game,ニューゲーム,新游戏,Новая игра,Nueva partida,Novo jogo,Neues Spiel,Nouvelle partie
+불러오기,Load Game,ロード,读取存档,Загрузить,Cargar,Carregar,Laden,Charger
+설정,Settings,設定,设置,Настройки,Ajustes,Configurações,Einstellungen,Paramètres
+예,Yes,はい,是,Да,Sí,Sim,Ja,Oui
+아니오,No,いいえ,否,Нет,No,Não,Nein,Non
+소리,Sound,サウンド,声音,Звук,Sonido,Som,Ton,Son
+전체 음량,Master Volume,全体音量,总音量,Общая громкость,Volumen general,Volume geral,Gesamtlautstärke,Volume général
+효과음,Sound Effects,効果音,音效,Эффекты,Efectos,Efeitos,Effekte,Effets
+배경음악,Music,BGM,背景音乐,Музыка,Música,Música,Musik,Musique
+화면,Display,画面,画面,Экран,Pantalla,Tela,Anzeige,Affichage
+화면 모드,Display Mode,画面モード,显示模式,Режим экрана,Modo de pantalla,Modo de tela,Anzeigemodus,Mode d'affichage
+전체화면,Fullscreen,フルスクリーン,全屏,Полный экран,Completa,Tela cheia,Vollbild,Plein écran
+창 모드,Windowed,ウィンドウ,窗口,Окно,Ventana,Janela,Fenster,Fenêtré
+해상도,Resolution,解像度,分辨率,Разрешение,Resolución,Resolução,Auflösung,Résolution
+프레임 제한,Frame Limit,フレーム制限,帧率限制,Лимит кадров,Límite de FPS,Limite de FPS,FPS-Limit,Limite d'images
+무제한,Unlimited,無制限,无限制,Без лимита,Sin límite,Sem limite,Unbegrenzt,Illimité
+게임,Game,ゲーム,游戏,Игра,Juego,Jogo,Spiel,Jeu
+화면 흔들림,Screen Shake,画面の揺れ,屏幕震动,Тряска экрана,Temblor de pantalla,Tremor de tela,Bildwackeln,Tremblement
+켜기,On,オン,开,Вкл,Activado,Ligado,An,Activé
+끄기,Off,オフ,关,Выкл,Desactivado,Desligado,Aus,Désactivé
+데미지 숫자,Damage Numbers,ダメージ表示,伤害数字,Числа урона,Números de daño,Números de dano,Schadenszahlen,Chiffres de dégâts
+숫자 표시,Number Format,数字表示,数字显示,Формат чисел,Formato numérico,Formato numérico,Zahlenformat,Format des nombres
+영어 단위,K/M/B,K/M/B,K/M/B,K/M/B,K/M/B,K/M/B,K/M/B,K/M/B
+숫자,Full,全桁,完整数字,Полностью,Completo,Completo,Voll,Complet
+언어,Language,言語,语言,Язык,Idioma,Idioma,Sprache,Langue
+뒤로가기,Back,戻る,返回,Назад,Atrás,Voltar,Zurück,Retour
+업그레이드,Upgrades,アップグレード,升级,Улучшения,Mejoras,Melhorias,Upgrades,Améliorations
+무기,Weapons,武器,武器,Оружие,Armas,Armas,Waffen,Armes
+도감,Collection,図鑑,图录,Коллекция,Colección,Coleção,Sammlung,Collection
+통계,Stats,統計,统计,Статистика,Estadísticas,Estatísticas,Statistiken,Statistiques
+선택,Select,選択,选择,Выбрать,Elegir,Escolher,Wählen,Choisir
+장착됨,Equipped,装備中,已装备,Надето,Equipado,Equipado,Ausgerüstet,Équipé
+능력치,Attributes,能力値,属性,Характеристики,Atributos,Atributos,Werte,Attributs
+공격력,Attack,攻撃力,攻击力,Атака,Ataque,Ataque,Angriff,Attaque
+강화 보너스,Upgrade Bonus,強化ボーナス,强化加成,Бонус улучшений,Bonus de mejora,Bônus de melhoria,Upgrade-Bonus,Bonus d'amélioration
+클릭당 합계,Total per Click,クリック合計,每次点击总计,Итого за клик,Total por clic,Total por clique,Gesamt pro Klick,Total par clic
+해금 가격,Unlock Cost,解放コスト,解锁价格,Цена открытия,Coste,Custo,Freischaltkosten,Coût de déblocage
+{0} 조각,{0} Pieces,{0} かけら,{0} 碎片,{0} оск.,{0} fragmentos,{0} fragmentos,{0} Splitter,{0} fragments
+상태,Status,状態,状态,Статус,Estado,Status,Status,Statut
+장착 중,Equipped,装備中,已装备,Надето,Equipado,Equipado,Ausgerüstet,Équipé
+해금됨,Unlocked,解放済み,已解锁,Открыто,Desbloqueado,Desbloqueado,Freigeschaltet,Débloqué
+잠김,Locked,ロック中,未解锁,Закрыто,Bloqueado,Bloqueado,Gesperrt,Verrouillé
+장착하기,Equip,装備する,装备,Надеть,Equipar,Equipar,Ausrüsten,Équiper
+해금 ({0} 조각),Unlock ({0} Pieces),解放 ({0} かけら),解锁 ({0} 碎片),Открыть ({0} оск.),Desbloquear ({0} fragmentos),Desbloquear ({0} fragmentos),Freischalten ({0} Splitter),Débloquer ({0} fragments)
+지역,Area,エリア,区域,Зона,Zona,Área,Gebiet,Zone
+체력,HP,体力,生命值,Прочность,Vida,Vida,HP,PV
+획득 조각,Pieces,獲得かけら,获得碎片,Осколки,Fragmentos,Fragmentos,Splitter,Fragments
+{0}개,{0},{0}個,{0}个,{0},{0},{0},{0},{0}
+해금 완료,Unlocked,解放済み,已解锁,Открыто,Desbloqueado,Desbloqueado,Freigeschaltet,Débloqué
+도감 정보,Info,図鑑情報,图录信息,Сведения,Información,Informações,Info,Infos
+데모 완료!,Demo Complete!,デモ完了！,试玩版完成！,Демо пройдено!,¡Demo completada!,Demo concluída!,Demo abgeschlossen!,Démo terminée !
+데모를 끝까지 플레이해 주셔서 감사합니다!,Thanks for playing the demo to the end!,デモを最後まで遊んでいただきありがとうございます！,感谢你玩到试玩版的最后！,"Спасибо, что прошли демо до конца!",¡Gracias por jugar la demo hasta el final!,Obrigado por jogar a demo até o fim!,"Danke, dass du die Demo bis zum Ende gespielt hast!",Merci d'avoir joué à la démo jusqu'au bout !
+정식 버전에서는 더 많은 맵과 오브젝트가 기다리고 있어요.,The full version has more maps and objects waiting for you.,製品版ではさらに多くのマップとオブジェクトが待っています。,正式版中还有更多地图和物体等着你。,В полной версии вас ждут новые карты и объекты.,La versión completa tiene más mapas y objetos esperándote.,A versão completa tem mais mapas e objetos esperando por você.,In der Vollversion warten weitere Karten und Objekte auf dich.,La version complète te réserve plus de cartes et d'objets.
+정식 출시 때 다시 만나요!,See you at the full release!,正式リリースでまた会いましょう！,正式发售时再见！,До встречи в полной версии!,¡Nos vemos en el lanzamiento!,Até o lançamento oficial!,Bis zum offiziellen Release!,Rendez-vous à la sortie officielle !
+계속하기를 누르면 지금 진행 그대로 이어서 할 수 있어요.,Press Continue to keep playing from where you are.,「続ける」を押すと、今の進行のまま続けられます。,点击“继续”可以从当前进度接着玩。,"Нажмите «Продолжить», чтобы играть дальше.",Pulsa Continuar para seguir desde donde estás.,Clique em Continuar para seguir de onde parou.,"Drücke „Weiter“, um weiterzuspielen.",Appuie sur Continuer pour reprendre où tu en es.
+메인 메뉴로,Main Menu,メインメニューへ,主菜单,Главное меню,Menú principal,Menu principal,Hauptmenü,Menu principal
+계속하기,Continue,続ける,继续,Продолжить,Continuar,Continuar,Weiter,Continuer
+디버그,Debug,デバッグ,调试,Отладка,Depurar,Depurar,Debug,Débogage
+메인 메뉴로 나갈까요?,Return to the main menu?,メインメニューに戻りますか？,要返回主菜单吗？,Выйти в главное меню?,¿Volver al menú principal?,Voltar ao menu principal?,Zum Hauptmenü zurückkehren?,Retourner au menu principal ?
+게임 종료,Quit Game,ゲーム終了,退出游戏,Выйти из игры,Salir del juego,Sair do jogo,Spiel beenden,Quitter le jeu
+게임을 종료할까요?,Quit the game?,ゲームを終了しますか？,要退出游戏吗？,Выйти из игры?,¿Salir del juego?,Sair do jogo?,Spiel beenden?,Quitter le jeu ?
+종료,Quit,終了,退出,Выйти,Salir,Sair,Beenden,Quitter
+돌아가기,Back,戻る,返回,Назад,Atrás,Voltar,Zurück,Retour
+저장하고 {0},Save and {0},保存して{0},保存并{0},{0} и сохранить,{0} y guardar,{0} e salvar,{0} und speichern,{0} et sauvegarder
+저장 안 하고 {0},{0} Without Saving,保存せずに{0},不保存直接{0},{0} без сохранения,{0} sin guardar,{0} sem salvar,{0} ohne Speichern,{0} sans sauvegarder
+기록,Records,記録,记录,Рекорды,Registros,Registros,Rekorde,Records
+플레이 시간,Play Time,プレイ時間,游戏时长,Время игры,Tiempo de juego,Tempo de jogo,Spielzeit,Temps de jeu
+{0}시간 {1}분,{0}h {1}m,{0}時間{1}分,{0}小时{1}分钟,{0} ч {1} мин,{0} h {1} min,{0} h {1} min,{0} Std. {1} Min.,{0} h {1} min
+부순 오브젝트,Objects Broken,壊したオブジェクト,摧毁的物体,Разрушено объектов,Objetos rotos,Objetos quebrados,Zerstörte Objekte,Objets détruits
+직접 클릭,Manual Clicks,クリック数,手动点击,Клики,Clics manuales,Cliques manuais,Klicks,Clics manuels
+{0}번,{0},{0}回,{0}次,{0},{0},{0},{0},{0}
+치명타,Crits,クリティカル,暴击,Криты,Críticos,Críticos,Krits,Critiques
+슈퍼 크리티컬,Super Crits,スーパークリティカル,超级暴击,Суперкриты,Supercríticos,Supercríticos,Superkrits,Super critiques
+보스 처치,Bosses Defeated,ボス撃破,击败首领,Побеждено боссов,Jefes derrotados,Chefes derrotados,Besiegte Bosse,Boss vaincus
+얻은 조각,Pieces Earned,獲得したかけら,获得的碎片,Получено осколков,Fragmentos obtenidos,Fragmentos obtidos,Erhaltene Splitter,Fragments obtenus
+얻은 결정,Crystals Earned,獲得した結晶,获得的结晶,Получено кристаллов,Cristales obtenidos,Cristais obtidos,Erhaltene Kristalle,Cristaux obtenus
+해금한 오브젝트,Objects Unlocked,解放したオブジェクト,已解锁物体,Открыто объектов,Objetos desbloqueados,Objetos desbloqueados,Freigeschaltete Objekte,Objets débloqués
+해금한 무기,Weapons Unlocked,解放した武器,已解锁武器,Открыто оружия,Armas desbloqueadas,Armas desbloqueadas,Freigeschaltete Waffen,Armes débloquées
+클릭 데미지,Click Damage,クリックダメージ,点击伤害,Урон клика,Daño por clic,Dano por clique,Klickschaden,Dégâts par clic
+치명타 확률,Crit Chance,クリティカル率,暴击率,Шанс крита,Prob. de crítico,Chance de crítico,Krit-Chance,Chance de critique
+치명타 데미지,Crit Damage,クリティカルダメージ,暴击伤害,Урон крита,Daño crítico,Dano crítico,Krit-Schaden,Dégâts critiques
+슈퍼 크리티컬 확률,Super Crit Chance,スーパークリティカル率,超级暴击率,Шанс суперкрита,Prob. de supercrítico,Chance de supercrítico,Superkrit-Chance,Chance de super critique
+슈퍼 크리티컬 데미지,Super Crit Damage,スーパークリティカルダメージ,超级暴击伤害,Урон суперкрита,Daño supercrítico,Dano supercrítico,Superkrit-Schaden,Dégâts super critiques
+더블 클릭 확률,Double Click Chance,ダブルクリック率,双击概率,Шанс двойного клика,Prob. de doble clic,Chance de clique duplo,Doppelklick-Chance,Chance de double clic
+조각 획득 보너스,Piece Bonus,かけら獲得ボーナス,碎片获取加成,Бонус осколков,Bonus de fragmentos,Bônus de fragmentos,Splitter-Bonus,Bonus de fragments
+결정 확률,Crystal Chance,結晶確率,结晶概率,Шанс кристалла,Prob. de cristal,Chance de cristal,Kristall-Chance,Chance de cristal
+결정 개수,Crystal Amount,結晶の数,结晶数量,Кристаллов за раз,Cristales por vez,Cristais por vez,Kristalle pro Fund,Cristaux par drop
+커서 범위,Cursor Range,カーソル範囲,光标范围,Радиус курсора,Alcance del cursor,Alcance do cursor,Cursor-Reichweite,Portée du curseur
+부순 횟수,Times Broken,壊した回数,摧毁次数,Разрушено раз,Veces rotas,Vezes quebrado,Mal zerstört,Fois détruit
+"해금
+{0}
+완료","Unlock
+{0}
+Done","解放
+{0}
+完了","解锁
+{0}
+完成","Открыть
+{0}
+Готово","Desbloquear
+{0}
+Hecho","Desbloquear
+{0}
+Feito","Freischalten
+{0}
+Erledigt","Débloquer
+{0}
+Fait"
+"해금
+???","Unlock
+???","解放
+???","解锁
+???","Открыть
+???","Desbloquear
+???","Desbloquear
+???","Freischalten
+???","Débloquer
+???"
+"해금
+{0}
+{1} 조각","Unlock
+{0}
+{1} Pieces","解放
+{0}
+{1} かけら","解锁
+{0}
+{1} 碎片","Открыть
+{0}
+{1} оск.","Desbloquear
+{0}
+{1} fragmentos","Desbloquear
+{0}
+{1} fragmentos","Freischalten
+{0}
+{1} Splitter","Débloquer
+{0}
+{1} fragments"
 최대,MAX,最大,最大,МАКС,MÁX,MÁX,MAX,MAX
+{0} 획득량,{0} Yield,{0} 獲得量,{0}获取量,{0}: добыча,{0}: botín,{0}: ganho,{0}: Ausbeute,{0} : gain
+부수면 다음 맵이 열립니다.,Breaking it opens the next map.,壊すと次のマップが開きます。,摧毁后开启下一张地图。,"Разрушьте, чтобы открыть следующую карту.",Al romperlo se abre el siguiente mapa.,Quebre para abrir o próximo mapa.,"Zerstöre es, um die nächste Karte zu öffnen.",Détruis-le pour ouvrir la carte suivante.
+{0} 해금,Unlock {0},{0} 解放,解锁{0},Открыть: {0},Desbloquear: {0},Desbloquear: {0},{0} freischalten,Débloquer : {0}
+이미 해금했습니다.,Already unlocked.,解放済みです。,已解锁。,Уже открыто.,Ya desbloqueado.,Já desbloqueado.,Bereits freigeschaltet.,Déjà débloqué.
+완료,Done,完了,完成,Готово,Hecho,Feito,Erledigt,Fait
+새 오브젝트가 등장합니다.,A new object appears.,新しいオブジェクトが登場します。,新物体将会出现。,Появится новый объект.,Aparece un nuevo objeto.,Um novo objeto aparece.,Ein neues Objekt erscheint.,Un nouvel objet apparaît.
+{0}을(를) 부술 때 얻는 조각이 +{1}개 증가합니다.,+{1} pieces from breaking {0}.,{0}を壊したときのかけらが+{1}個増えます。,摧毁{0}时获得的碎片+{1}。,{0}: +{1} оск. за разрушение.,{0}: +{1} fragmentos al romperlo.,{0}: +{1} fragmentos ao quebrar.,{0}: +{1} Splitter pro Zerstörung.,{0} : +{1} fragments par destruction.
+모든 무기의 데미지가 +{0} 증가합니다.,All weapons deal +{0} damage.,全武器のダメージが+{0}増えます。,所有武器伤害+{0}。,Урон всего оружия +{0}.,Todas las armas: +{0} de daño.,Todas as armas: +{0} de dano.,Alle Waffen: +{0} Schaden.,Toutes les armes : +{0} dégâts.
+{0}의 데미지가 +{1} 증가합니다.,{0} damage +{1}.,{0}のダメージが+{1}増えます。,{0}伤害+{1}。,{0}: урон +{1}.,{0}: +{1} de daño.,{0}: +{1} de dano.,{0}: +{1} Schaden.,{0} : +{1} dégâts.
+치명타 확률이 +{0}% 증가합니다.,Crit chance +{0}%.,クリティカル率が+{0}%上がります。,暴击率+{0}%。,Шанс крита +{0}%.,Prob. de crítico +{0}%.,Chance de crítico +{0}%.,Krit-Chance +{0}%.,Chance de critique +{0}%.
+치명타 데미지가 +{0}% 증가합니다.,Crit damage +{0}%.,クリティカルダメージが+{0}%上がります。,暴击伤害+{0}%。,Урон крита +{0}%.,Daño crítico +{0}%.,Dano crítico +{0}%.,Krit-Schaden +{0}%.,Dégâts critiques +{0}%.
+슈퍼 크리티컬 확률이 +{0}% 증가합니다.,Super crit chance +{0}%.,スーパークリティカル率が+{0}%上がります。,超级暴击率+{0}%。,Шанс суперкрита +{0}%.,Prob. de supercrítico +{0}%.,Chance de supercrítico +{0}%.,Superkrit-Chance +{0}%.,Chance de super critique +{0}%.
+더블 클릭 확률이 +{0}% 증가합니다.,Double click chance +{0}%.,ダブルクリック率が+{0}%上がります。,双击概率+{0}%。,Шанс двойного клика +{0}%.,Prob. de doble clic +{0}%.,Chance de clique duplo +{0}%.,Doppelklick-Chance +{0}%.,Chance de double clic +{0}%.
+모든 오브젝트를 부술 때 얻는 조각이 +{0}% 증가합니다.,+{0}% pieces from all objects.,すべてのオブジェクトから得るかけらが+{0}%増えます。,摧毁所有物体获得的碎片+{0}%。,+{0}% осколков со всех объектов.,+{0}% de fragmentos de todos los objetos.,+{0}% de fragmentos de todos os objetos.,+{0}% Splitter von allen Objekten.,+{0}% de fragments sur tous les objets.
+{0}을(를) 부술 때 얻는 조각이 +{1}% 증가합니다.,+{1}% pieces from breaking {0}.,{0}を壊したときのかけらが+{1}%増えます。,摧毁{0}时获得的碎片+{1}%。,{0}: +{1}% осколков.,{0}: +{1}% de fragmentos.,{0}: +{1}% de fragmentos.,{0}: +{1}% Splitter.,{0} : +{1}% de fragments.
+{0}을(를) 부술 때 조각이 2배로 나올 확률이 +{1}% 증가합니다.,+{1}% chance of double pieces from {0}.,{0}を壊したときにかけらが2倍になる確率が+{1}%上がります。,摧毁{0}时碎片翻倍的概率+{1}%。,{0}: шанс двойных осколков +{1}%.,{0}: +{1}% de prob. de fragmentos dobles.,{0}: +{1}% de chance de fragmentos em dobro.,{0}: +{1}% Chance auf doppelte Splitter.,{0} : +{1}% de chance de fragments doublés.
+{0}(으)로 부술 때 조각을 +{1}개 더 얻습니다.,+{1} pieces when breaking with {0}.,{0}で壊すとかけらを+{1}個多く得ます。,用{0}摧毁时额外获得{1}个碎片。,{0}: +{1} оск. за разрушение.,{0}: +{1} fragmentos por objeto roto.,{0}: +{1} fragmentos por objeto quebrado.,{0}: +{1} Splitter pro Zerstörung.,{0} : +{1} fragments par destruction.
+오브젝트를 부술 때 결정이 나올 확률이 +{0}% 증가합니다.,Crystal drop chance +{0}%.,オブジェクトを壊したときに結晶が出る確率が+{0}%上がります。,摧毁物体时掉落结晶的概率+{0}%。,Шанс выпадения кристалла +{0}%.,Prob. de que caiga un cristal +{0}%.,Chance de cair um cristal +{0}%.,Kristall-Chance +{0}%.,Chance d'obtenir un cristal +{0}%.
+결정이 나올 때 개수가 {0}배가 됩니다.,Crystals drop x{0}.,結晶が出るときの数が{0}倍になります。,结晶掉落数量变为{0}倍。,Кристаллы выпадают x{0}.,Los cristales caen x{0}.,Cristais caem x{0}.,Kristalle fallen x{0}.,Les cristaux tombent x{0}.
+바닥에 쌓일 수 있는 조각 개수가 +{0}개 증가합니다.,Max pieces on the ground +{0}.,床に積もるかけらの上限が+{0}個増えます。,地面碎片上限+{0}。,Лимит осколков на земле +{0}.,Máx. de fragmentos en el suelo +{0}.,Máx. de fragmentos no chão +{0}.,Max. Splitter am Boden +{0}.,Fragments max au sol +{0}.
+{0} 자동 클릭 간격이 {1}초 줄어듭니다.,{0} auto click interval -{1}s.,{0}のオートクリック間隔が{1}秒短くなります。,{0}自动点击间隔缩短{1}秒。,{0}: интервал автоклика -{1} с.,{0}: intervalo de clic auto. -{1} s.,{0}: intervalo do clique auto. -{1} s.,{0}: Auto-Klick-Intervall -{1} s.,{0} : intervalle du clic auto -{1} s.
+{0} 자동 클릭 한 번에 때리는 횟수가 +{1}회 증가합니다.,{0} hits per auto click +{1}.,{0}のオートクリック1回の攻撃回数が+{1}回増えます。,{0}每次自动点击的打击次数+{1}。,{0}: удары за автоклик +{1}.,{0}: golpes por clic auto. +{1}.,{0}: golpes por clique auto. +{1}.,{0}: Treffer pro Auto-Klick +{1}.,{0} : coups par clic auto +{1}.
+자동 채굴 간격이 {0}초 줄어듭니다.,Auto mine interval -{0}s.,オート採掘の間隔が{0}秒短くなります。,自动采掘间隔缩短{0}秒。,Интервал автодобычи -{0} с.,Intervalo de minería auto. -{0} s.,Intervalo de mineração auto. -{0} s.,Auto-Abbau-Intervall -{0} s.,Intervalle du minage auto -{0} s.
+자동 채굴 한 번에 얻는 조각이 +{0}배 증가합니다.,Auto mine yield +{0}x.,オート採掘1回で得るかけらが+{0}倍増えます。,每次自动采掘获得的碎片+{0}倍。,Добыча автодобычи +{0}x.,Botín de minería auto. +{0}x.,Ganho da mineração auto. +{0}x.,Auto-Abbau-Ausbeute +{0}x.,Gain du minage auto +{0}x.
+자동 줍기 간격이 {0}초 줄어듭니다.,Auto sweep interval -{0}s.,オート回収の間隔が{0}秒短くなります。,自动拾取间隔缩短{0}秒。,Интервал автосбора -{0} с.,Intervalo de recogida auto. -{0} s.,Intervalo da coleta auto. -{0} s.,Auto-Sammeln-Intervall -{0} s.,Intervalle du ramassage auto -{0} s.
+자동 줍기가 한 번에 쓸어 담는 조각 층이 +{0}층 증가합니다.,Auto sweep layers +{0}.,オート回収で一度に回収する層が+{0}層増えます。,自动拾取每次清扫的层数+{0}。,Слои автосбора +{0}.,Capas de recogida auto. +{0}.,Camadas da coleta auto. +{0}.,Auto-Sammeln-Schichten +{0}.,Couches du ramassage auto +{0}.
+커서 줍기가 한 번에 줍는 조각 층이 +{0}층 증가합니다.,Cursor pickup layers +{0}.,カーソル回収で一度に拾う層が+{0}層増えます。,光标拾取每次拾取的层数+{0}。,Слои сбора курсором +{0}.,Capas al recoger con cursor +{0}.,Camadas da coleta com cursor +{0}.,Cursor-Sammeln-Schichten +{0}.,Couches ramassées au curseur +{0}.
+커서 범위가 더 증가합니다.,Cursor range increases further.,カーソル範囲がさらに広がります。,光标范围进一步扩大。,Радиус курсора увеличивается.,El alcance del cursor aumenta.,O alcance do cursor aumenta.,Cursor-Reichweite steigt weiter.,La portée du curseur augmente.
+맵에 {0}이(가) +{1}개 더 놓입니다. 동시에 여러 개를 부술 수 있어 조각을 더 빨리 모읍니다.,+{1} more {0} on the map. Break several at once to gather pieces faster.,マップに{0}が+{1}個多く置かれます。同時に複数壊せるので、かけらをより早く集められます。,地图上额外放置{1}个{0}。可同时摧毁多个，更快收集碎片。,{0}: +{1} на карте. Разрушайте несколько сразу и собирайте осколки быстрее.,{0}: +{1} en el mapa. Rompe varios a la vez para reunir fragmentos más rápido.,{0}: +{1} no mapa. Quebre vários ao mesmo tempo para juntar fragmentos mais rápido.,"{0}: +{1} auf der Karte. Zerstöre mehrere gleichzeitig, um schneller Splitter zu sammeln.",{0} : +{1} sur la carte. Détruis-en plusieurs à la fois pour récolter plus vite.
+{0} 결정,{0} Crystals,{0} 結晶,{0} 结晶,{0} крист.,{0} cristales,{0} cristais,{0} Kristalle,{0} cristaux
+카메라 리셋,Reset Camera,カメラリセット,重置镜头,Сброс камеры,Centrar cámara,Centralizar,Kamera-Reset,Recentrer
+빗자루는 안 보고 있는 맵의 파편도 같이 쓸어 담아요.,The broom also sweeps up shards on maps you aren't looking at.,ほうきは見ていないマップのかけらも一緒に回収します。,扫帚也会清扫你没在看的地图上的碎片。,"Метла собирает осколки и на картах, которые вы не видите.",La escoba también recoge fragmentos de los mapas que no estás viendo.,A vassoura também recolhe fragmentos dos mapas que você não está vendo.,"Der Besen fegt auch Splitter auf Karten, die du gerade nicht siehst.",Le balai ramasse aussi les fragments des cartes que tu ne regardes pas.
+자동클릭은 다른 맵을 보고 있어도 계속 부수고 있어요.,Auto click keeps breaking things even while you look at another map.,オートクリックは他のマップを見ていても壊し続けます。,即使在看其他地图，自动点击也会持续摧毁。,"Автоклик продолжает разрушать, даже когда вы на другой карте.",El clic automático sigue rompiendo aunque mires otro mapa.,O clique automático continua quebrando mesmo em outro mapa.,"Auto-Klick zerstört weiter, auch wenn du eine andere Karte ansiehst.",Le clic auto continue de détruire même si tu regardes une autre carte.
+맵의 보스를 잡으면 다음 맵이 열려요.,Defeat a map's boss to open the next map.,マップのボスを倒すと次のマップが開きます。,击败地图首领即可开启下一张地图。,"Победите босса карты, чтобы открыть следующую.",Derrota al jefe del mapa para abrir el siguiente.,Derrote o chefe do mapa para abrir o próximo.,"Besiege den Boss einer Karte, um die nächste zu öffnen.",Bats le boss d'une carte pour ouvrir la suivante.
+결정은 업그레이드 트리의 하늘색 노드에 쓸 수 있어요.,Crystals can be spent on the sky-blue nodes of the upgrade tree.,結晶はアップグレードツリーの水色のノードに使えます。,结晶可用于升级树中的天蓝色节点。,Кристаллы тратятся на голубые узлы дерева улучшений.,Los cristales se usan en los nodos celestes del árbol de mejoras.,Os cristais servem para os nós azul-claros da árvore de melhorias.,Kristalle kannst du für die hellblauen Knoten im Upgrade-Baum ausgeben.,Les cristaux servent aux nœuds bleu ciel de l'arbre d'améliorations.
+무기마다 따로 강화하는 업그레이드가 있어요.,Each weapon has its own upgrades.,武器ごとに専用の強化アップグレードがあります。,每种武器都有专属的强化升级。,У каждого оружия есть свои улучшения.,Cada arma tiene sus propias mejoras.,Cada arma tem suas próprias melhorias.,Jede Waffe hat eigene Upgrades.,Chaque arme a ses propres améliorations.
+ESC를 누르면 설정을 열 수 있어요.,Press ESC to open Settings.,ESCキーで設定を開けます。,按ESC可以打开设置。,"Нажмите ESC, чтобы открыть настройки.",Pulsa ESC para abrir los ajustes.,Pressione ESC para abrir as configurações.,"Drücke ESC, um die Einstellungen zu öffnen.",Appuie sur Échap pour ouvrir les paramètres.
+"숫자 표시는 설정에서 영어 단위(K, M, B)로 바꿀 수 있어요.","You can switch numbers to short units (K, M, B) in Settings.",設定で数字をK・M・B表記に切り替えられます。,可以在设置中将数字切换为K、M、B单位。,"В настройках можно сократить числа до K, M, B.","En Ajustes puedes abreviar los números (K, M, B).","Nas configurações você pode abreviar os números (K, M, B).","In den Einstellungen kannst du Zahlen abkürzen (K, M, B).","Dans les paramètres, tu peux abréger les nombres (K, M, B)."
+뒤쪽 맵일수록 결정이 더 많이 나와요.,Later maps drop more crystals.,後半のマップほど結晶が多く出ます。,越靠后的地图掉落的结晶越多。,На дальних картах выпадает больше кристаллов.,Los mapas posteriores dan más cristales.,Mapas mais avançados dão mais cristais.,Spätere Karten liefern mehr Kristalle.,Les cartes plus lointaines donnent plus de cristaux.
+로딩 중,Loading,ロード中,加载中,Загрузка,Cargando,Carregando,Lädt,Chargement
+배 자동클릭 횟수,Ship Auto Click Hits,船オートクリック回数,船自动点击次数,Корабль: удары автоклика,Barco: golpes de clic auto.,Navio: golpes do clique auto.,Schiff: Auto-Klick-Treffer,Navire : coups du clic auto
+자동클릭 한 번에 더 많이 때립니다.,Each auto click hits more times.,オートクリック1回でより多く叩きます。,每次自动点击打击更多次。,Больше ударов за один автоклик.,Más golpes por cada clic automático.,Mais golpes a cada clique automático.,Mehr Treffer pro Auto-Klick.,Plus de coups par clic auto.
+커서를 올려둔 오브젝트를 {n}초마다 때립니다.,Hits the object under your cursor every {n}s.,カーソルを合わせたオブジェクトを{n}秒ごとに叩きます。,每{n}秒打击光标所指的物体。,Бьёт объект под курсором каждые {n} с.,Golpea el objeto bajo el cursor cada {n} s.,Golpeia o objeto sob o cursor a cada {n} s.,Trifft das Objekt unter dem Cursor alle {n} s.,Frappe l'objet sous le curseur toutes les {n} s.
+커서 타격,Cursor Strike,カーソル攻撃,光标打击,Удар курсором,Golpe de cursor,Golpe do cursor,Cursor-Schlag,Frappe du curseur
+요트 자동클릭 속도,Yacht Auto Click Speed,ヨットオートクリック速度,游艇自动点击速度,Яхта: скорость автоклика,Yate: velocidad de clic auto.,Iate: velocidade do clique auto.,Jacht: Auto-Klick-Tempo,Yacht : vitesse du clic auto
+자동클릭 간격이 짧아집니다. (현재 {n}초),Shorter auto click interval. (Now {n}s),オートクリックの間隔が短くなります。(現在 {n}秒),自动点击间隔缩短。(当前 {n}秒),Интервал автоклика короче. (Сейчас {n} с),Intervalo de clic auto. más corto. (Ahora {n} s),Intervalo do clique auto. menor. (Agora {n} s),Kürzeres Auto-Klick-Intervall. (Aktuell {n} s),Intervalle du clic auto réduit. (Actuel {n} s)
+자동 줍기 층,Auto Sweep Layers,オート回収の層,自动拾取层数,Слои автосбора,Capas de recogida auto.,Camadas da coleta auto.,Auto-Sammeln-Schichten,Couches ramassage auto
+한 번에 쓸어 담는 층이 늘어납니다.,Sweeps more layers at once.,一度に回収する層が増えます。,每次清扫的层数增加。,За раз собирается больше слоёв.,Recoge más capas de una vez.,Recolhe mais camadas de uma vez.,Fegt mehr Schichten auf einmal.,Ramasse plus de couches à la fois.
+장착 시 클릭 데미지가 늘어납니다.,Increases click damage while equipped.,装備中のクリックダメージが増えます。,装备时点击伤害提高。,"Повышает урон клика, когда экипировано.",Aumenta el daño por clic al equiparla.,Aumenta o dano por clique quando equipada.,"Erhöht den Klickschaden, solange ausgerüstet.",Augmente les dégâts par clic une fois équipée.
+프라이팬 데미지,Frying Pan Damage,フライパンダメージ,平底锅伤害,Сковорода: урон,Sartén: daño,Frigideira: dano,Bratpfanne: Schaden,Poêle : dégâts
+등대 자동클릭 횟수,Lighthouse Auto Click Hits,灯台オートクリック回数,灯塔自动点击次数,Маяк: удары автоклика,Faro: golpes de clic auto.,Farol: golpes do clique auto.,Leuchtturm: Auto-Klick-Treffer,Phare : coups du clic auto
+자동 줍기,Auto Sweep,オート回収,自动拾取,Автосбор,Recogida automática,Coleta automática,Auto-Sammeln,Ramassage auto
+{n}초마다 바닥 파편을 쓸어 담습니다.,Sweeps up shards on the ground every {n}s.,{n}秒ごとに床のかけらを回収します。,每{n}秒清扫地面上的碎片。,Каждые {n} с собирает осколки с земли.,Recoge los fragmentos del suelo cada {n} s.,Recolhe os fragmentos do chão a cada {n} s.,Fegt alle {n} s die Splitter vom Boden.,Ramasse les fragments au sol toutes les {n} s.
+커서에 닿은 파편을 줍습니다.,Picks up shards your cursor touches.,カーソルに触れたかけらを拾います。,拾取光标碰到的碎片。,"Собирает осколки, которых касается курсор.",Recoge los fragmentos que toca el cursor.,Recolhe os fragmentos que o cursor toca.,"Sammelt Splitter auf, die der Cursor berührt.",Ramasse les fragments touchés par le curseur.
+커서 줍기,Cursor Pickup,カーソル回収,光标拾取,Сбор курсором,Recoger con cursor,Coleta com cursor,Cursor-Sammeln,Ramassage au curseur
+부표 자동클릭 횟수,Buoy Auto Click Hits,ブイオートクリック回数,浮标自动点击次数,Буй: удары автоклика,Boya: golpes de clic auto.,Boia marítima: golpes do clique auto.,Boje: Auto-Klick-Treffer,Balise : coups du clic auto
+요트 자동클릭,Yacht Auto Click,ヨットオートクリック,游艇自动点击,Яхта: автоклик,Yate: clic automático,Iate: clique automático,Jacht: Auto-Klick,Yacht : clic auto
+{n}초마다 자동으로 클릭합니다.,Clicks automatically every {n}s.,{n}秒ごとに自動でクリックします。,每{n}秒自动点击一次。,Кликает автоматически каждые {n} с.,Hace clic automáticamente cada {n} s.,Clica automaticamente a cada {n} s.,Klickt alle {n} s automatisch.,Clique automatiquement toutes les {n} s.
+가로등 자동클릭,Streetlight Auto Click,街灯オートクリック,路灯自动点击,Фонарь: автоклик,Farola: clic automático,Poste de luz: clique automático,Laterne: Auto-Klick,Lampadaire : clic auto
+UFO 자동클릭,UFO Auto Click,UFOオートクリック,飞碟自动点击,НЛО: автоклик,OVNI: clic automático,OVNI: clique automático,UFO: Auto-Klick,OVNI : clic auto
+부술 때 얻는 조각이 늘어납니다.,More pieces when broken.,壊したときに得るかけらが増えます。,摧毁时获得的碎片增加。,Больше осколков при разрушении.,Más fragmentos al romperlo.,Mais fragmentos ao quebrar.,Mehr Splitter beim Zerstören.,Plus de fragments à la destruction.
+간판 드랍량,Signboard Drops,看板ドロップ量,招牌掉落量,Вывеска: добыча,Letrero: botín,Placa: saque,Schild: Ausbeute,Enseigne : butin
+통계 해금,Unlock Stats,統計解放,解锁统计,Открыть статистику,Desbloquear estadísticas,Desbloquear estatísticas,Statistiken freischalten,Débloquer les stats
+지금까지의 기록과 능력치를 볼 수 있는 통계 창이 열립니다.,Opens the Stats window with your records and attributes so far.,これまでの記録と能力値を見られる統計ウィンドウが開きます。,开启统计窗口，可查看至今的记录与属性。,Открывает окно статистики с вашими рекордами и характеристиками.,Abre la ventana de estadísticas con tus registros y atributos.,Abre a janela de estatísticas com seus registros e atributos.,Öffnet das Statistikfenster mit deinen Rekorden und Werten.,Ouvre la fenêtre de statistiques avec tes records et attributs.
+더블클릭 확률이 올라갑니다.,Raises double click chance.,ダブルクリック率が上がります。,双击概率提高。,Повышает шанс двойного клика.,Aumenta la prob. de doble clic.,Aumenta a chance de clique duplo.,Erhöht die Doppelklick-Chance.,Augmente la chance de double clic.
+더블클릭 확률 III,Double Click Chance III,ダブルクリック率 III,双击概率 III,Шанс двойного клика III,Prob. de doble clic III,Chance de clique duplo III,Doppelklick-Chance III,Chance de double clic III
+달걀 드랍량,Egg Drops,卵ドロップ量,鸡蛋掉落量,Яйцо: добыча,Huevo: botín,Ovo: saque,Ei: Ausbeute,Œuf : butin
+가로등 드랍량,Streetlight Drops,街灯ドロップ量,路灯掉落量,Фонарь: добыча,Farola: botín,Poste de luz: saque,Laterne: Ausbeute,Lampadaire : butin
+치명타 확률이 올라갑니다.,Raises crit chance.,クリティカル率が上がります。,暴击率提高。,Повышает шанс крита.,Aumenta la prob. de crítico.,Aumenta a chance de crítico.,Erhöht die Krit-Chance.,Augmente la chance de critique.
+가끔 슈퍼 크리티컬이 터져 치명타의 2배 데미지를 줍니다.,Sometimes a super crit bursts for double crit damage.,ときどきスーパークリティカルが発生し、クリティカルの2倍のダメージを与えます。,偶尔触发超级暴击，造成暴击2倍的伤害。,Иногда срабатывает суперкрит с двойным уроном крита.,A veces estalla un supercrítico con el doble de daño crítico.,Às vezes sai um supercrítico com o dobro do dano crítico.,Manchmal löst ein Superkrit mit doppeltem Krit-Schaden aus.,"Parfois, un super critique inflige le double des dégâts critiques."
+슈퍼 크리티컬 해금,Unlock Super Crit,スーパークリティカル解放,解锁超级暴击,Открыть суперкрит,Desbloquear supercrítico,Desbloquear supercrítico,Superkrit freischalten,Débloquer super critique
+결정이 나올 확률이 올라갑니다.,Raises crystal drop chance.,結晶が出る確率が上がります。,结晶掉落概率提高。,Повышает шанс выпадения кристалла.,Aumenta la prob. de obtener cristales.,Aumenta a chance de obter cristais.,Erhöht die Kristall-Chance.,Augmente la chance d'obtenir des cristaux.
+부표 자동클릭 속도,Buoy Auto Click Speed,ブイオートクリック速度,浮标自动点击速度,Буй: скорость автоклика,Boya: velocidad de clic auto.,Boia marítima: velocidade do clique auto.,Boje: Auto-Klick-Tempo,Balise : vitesse du clic auto
+로켓 자동클릭,Rocket Auto Click,ロケットオートクリック,火箭自动点击,Ракета: автоклик,Cohete: clic automático,Foguete: clique automático,Rakete: Auto-Klick,Fusée : clic auto
+지구 자동클릭,Earth Auto Click,地球オートクリック,地球自动点击,Земля: автоклик,Tierra: clic automático,Terra: clique automático,Erde: Auto-Klick,Terre : clic auto
+등대 드랍량,Lighthouse Drops,灯台ドロップ量,灯塔掉落量,Маяк: добыча,Faro: botín,Farol: saque,Leuchtturm: Ausbeute,Phare : butin
+지구 자동클릭 횟수,Earth Auto Click Hits,地球オートクリック回数,地球自动点击次数,Земля: удары автоклика,Tierra: golpes de clic auto.,Terra: golpes do clique auto.,Erde: Auto-Klick-Treffer,Terre : coups du clic auto
+간판 추가 배치,Extra Signboard,看板追加配置,追加招牌,Вывеска: доп. копии,Letrero extra,Placa extra,Schild: Extra,Enseigne supplémentaire
+하나 더 놓입니다.,One more is placed on the map.,もう1つ置かれます。,再多放置一个。,На карте появится ещё один.,Se coloca uno más en el mapa.,Mais um é colocado no mapa.,Ein weiteres wird platziert.,Un exemplaire de plus est placé.
+UFO 자동클릭 횟수,UFO Auto Click Hits,UFOオートクリック回数,飞碟自动点击次数,НЛО: удары автоклика,OVNI: golpes de clic auto.,OVNI: golpes do clique auto.,UFO: Auto-Klick-Treffer,OVNI : coups du clic auto
+인공위성 자동클릭 횟수,Satellite Auto Click Hits,人工衛星オートクリック回数,人造卫星自动点击次数,Спутник: удары автоклика,Satélite: golpes de clic auto.,Satélite: golpes do clique auto.,Satellit: Auto-Klick-Treffer,Satellite : coups du clic auto
+부표 추가 배치,Extra Buoy,ブイ追加配置,追加浮标,Буй: доп. копии,Boya extra,Boia marítima extra,Boje: Extra,Balise supplémentaire
+로켓 자동클릭 횟수,Rocket Auto Click Hits,ロケットオートクリック回数,火箭自动点击次数,Ракета: удары автоклика,Cohete: golpes de clic auto.,Foguete: golpes do clique auto.,Rakete: Auto-Klick-Treffer,Fusée : coups du clic auto
+로켓 드랍량,Rocket Drops,ロケットドロップ量,火箭掉落量,Ракета: добыча,Cohete: botín,Foguete: saque,Rakete: Ausbeute,Fusée : butin
+인공위성 추가 지구치,Extra Satellite,人工衛星追加配置,追加人造卫星,Спутник: доп. копии,Satélite extra,Satélite extra,Satellit: Extra,Satellite supplémentaire
+일정 확률로 한 번 더 때립니다.,Chance to hit one more time.,一定確率でもう1回叩きます。,有一定概率多打击一次。,С некоторым шансом бьёт ещё раз.,Probabilidad de golpear una vez más.,Chance de golpear mais uma vez.,"Chance, ein weiteres Mal zu treffen.",Chance de frapper une fois de plus.
+더블클릭,Double Click,ダブルクリック,双击,Двойной клик,Doble clic,Clique duplo,Doppelklick,Double clic
+지구 자동클릭 속도,Earth Auto Click Speed,地球オートクリック速度,地球自动点击速度,Земля: скорость автоклика,Tierra: velocidad de clic auto.,Terra: velocidade do clique auto.,Erde: Auto-Klick-Tempo,Terre : vitesse du clic auto
+철퇴 데미지,Mace Damage,メイスダメージ,狼牙棒伤害,Булава: урон,Maza: daño,Maça: dano,Streitkolben: Schaden,Masse : dégâts
+커서 범위가 넓어집니다.,Widens cursor range.,カーソル範囲が広がります。,光标范围扩大。,Увеличивает радиус курсора.,Amplía el alcance del cursor.,Amplia o alcance do cursor.,Vergrößert die Cursor-Reichweite.,Élargit la portée du curseur.
+간판 자동클릭,Signboard Auto Click,看板オートクリック,招牌自动点击,Вывеска: автоклик,Letrero: clic automático,Placa: clique automático,Schild: Auto-Klick,Enseigne : clic auto
+배 자동클릭,Ship Auto Click,船オートクリック,船自动点击,Корабль: автоклик,Barco: clic automático,Navio: clique automático,Schiff: Auto-Klick,Navire : clic auto
+지구 드랍량,Earth Drops,地球ドロップ量,地球掉落量,Земля: добыча,Tierra: botín,Terra: saque,Erde: Ausbeute,Terre : butin
+요트 추가 배치,Extra Yacht,ヨット追加配置,追加游艇,Яхта: доп. копии,Yate extra,Iate extra,Jacht: Extra,Yacht supplémentaire
+달 추가 지구치,Extra Moon,月追加配置,追加月球,Луна: доп. копии,Luna extra,Lua extra,Mond: Extra,Lune supplémentaire
+배 자동클릭 속도,Ship Auto Click Speed,船オートクリック速度,船自动点击速度,Корабль: скорость автоклика,Barco: velocidad de clic auto.,Navio: velocidade do clique auto.,Schiff: Auto-Klick-Tempo,Navire : vitesse du clic auto
+인공위성 드랍량,Satellite Drops,人工衛星ドロップ量,人造卫星掉落量,Спутник: добыча,Satélite: botín,Satélite: saque,Satellit: Ausbeute,Satellite : butin
+배 드랍량,Ship Drops,船ドロップ量,船掉落量,Корабль: добыча,Barco: botín,Navio: saque,Schiff: Ausbeute,Navire : butin
+튜브 자동클릭,Swim Ring Auto Click,浮き輪オートクリック,游泳圈自动点击,Надувной круг: автоклик,Flotador: clic automático,Boia inflável: clique automático,Schwimmring: Auto-Klick,Bouée gonflable : clic auto
+달 자동클릭 횟수,Moon Auto Click Hits,月オートクリック回数,月球自动点击次数,Луна: удары автоклика,Luna: golpes de clic auto.,Lua: golpes do clique auto.,Mond: Auto-Klick-Treffer,Lune : coups du clic auto
+튜브 드랍량,Swim Ring Drops,浮き輪ドロップ量,游泳圈掉落量,Надувной круг: добыча,Flotador: botín,Boia inflável: saque,Schwimmring: Ausbeute,Bouée gonflable : butin
+인공위성 자동클릭 속도,Satellite Auto Click Speed,人工衛星オートクリック速度,人造卫星自动点击速度,Спутник: скорость автоклика,Satélite: velocidad de clic auto.,Satélite: velocidade do clique auto.,Satellit: Auto-Klick-Tempo,Satellite : vitesse du clic auto
+부표 자동클릭,Buoy Auto Click,ブイオートクリック,浮标自动点击,Буй: автоклик,Boya: clic automático,Boia marítima: clique automático,Boje: Auto-Klick,Balise : clic auto
+UFO 추가 지구치,Extra UFO,UFO追加配置,追加飞碟,НЛО: доп. копии,OVNI extra,OVNI extra,UFO: Extra,OVNI supplémentaire
+커서 줍기 층,Cursor Pickup Layers,カーソル回収の層,光标拾取层数,Слои сбора курсором,Capas con cursor,Camadas com cursor,Cursor-Sammeln-Schichten,Couches au curseur
+커서로 한 번에 줍는 파편 층이 늘어납니다.,Cursor picks up more shard layers at once.,カーソルで一度に拾うかけらの層が増えます。,光标每次拾取的碎片层数增加。,Курсор собирает больше слоёв осколков за раз.,El cursor recoge más capas de fragmentos a la vez.,O cursor recolhe mais camadas de fragmentos de uma vez.,Der Cursor sammelt mehr Splitter-Schichten auf einmal.,Le curseur ramasse plus de couches de fragments à la fois.
+가로등 추가 배치,Extra Streetlight,街灯追加配置,追加路灯,Фонарь: доп. копии,Farola extra,Poste de luz extra,Laterne: Extra,Lampadaire supplémentaire
+UFO 자동클릭 속도,UFO Auto Click Speed,UFOオートクリック速度,飞碟自动点击速度,НЛО: скорость автоклика,OVNI: velocidad de clic auto.,OVNI: velocidade do clique auto.,UFO: Auto-Klick-Tempo,OVNI : vitesse du clic auto
+로켓 추가 지구치,Extra Rocket,ロケット追加配置,追加火箭,Ракета: доп. копии,Cohete extra,Foguete extra,Rakete: Extra,Fusée supplémentaire
+달걀 자동클릭 속도,Egg Auto Click Speed,卵オートクリック速度,鸡蛋自动点击速度,Яйцо: скорость автоклика,Huevo: velocidad de clic auto.,Ovo: velocidade do clique auto.,Ei: Auto-Klick-Tempo,Œuf : vitesse du clic auto
+책상 자동클릭 횟수,Desk Auto Click Hits,机オートクリック回数,书桌自动点击次数,Стол: удары автоклика,Escritorio: golpes de clic auto.,Escrivaninha: golpes do clique auto.,Schreibtisch: Auto-Klick-Treffer,Bureau : coups du clic auto
+요트 자동클릭 횟수,Yacht Auto Click Hits,ヨットオートクリック回数,游艇自动点击次数,Яхта: удары автоклика,Yate: golpes de clic auto.,Iate: golpes do clique auto.,Jacht: Auto-Klick-Treffer,Yacht : coups du clic auto
+책상 자동클릭,Desk Auto Click,机オートクリック,书桌自动点击,Стол: автоклик,Escritorio: clic automático,Escrivaninha: clique automático,Schreibtisch: Auto-Klick,Bureau : clic auto
+튜브 자동클릭 횟수,Swim Ring Auto Click Hits,浮き輪オートクリック回数,游泳圈自动点击次数,Надувной круг: удары автоклика,Flotador: golpes de clic auto.,Boia inflável: golpes do clique auto.,Schwimmring: Auto-Klick-Treffer,Bouée gonflable : coups du clic auto
+왁뿌볼 추가 배치,Extra Wakppu Ball,ワクップボール追加配置,追加瓦克普球,Вакпу-мяч: доп. копии,Bola Wakppu extra,Bola Wakppu extra,Wakppu-Ball: Extra,Balle Wakppu supplémentaire
+자전거 추가 배치,Extra Bicycle,自転車追加配置,追加自行车,Велосипед: доп. копии,Bicicleta extra,Bicicleta extra,Fahrrad: Extra,Vélo supplémentaire
+야구 방망이 데미지,Baseball Bat Damage,バットダメージ,棒球棍伤害,Бита: урон,Bate: daño,Taco de beisebol: dano,Baseballschläger: Schaden,Batte : dégâts
+튜브 자동클릭 속도,Swim Ring Auto Click Speed,浮き輪オートクリック速度,游泳圈自动点击速度,Надувной круг: скорость автоклика,Flotador: velocidad de clic auto.,Boia inflável: velocidade do clique auto.,Schwimmring: Auto-Klick-Tempo,Bouée gonflable : vitesse du clic auto
+등대 자동클릭 속도,Lighthouse Auto Click Speed,灯台オートクリック速度,灯塔自动点击速度,Маяк: скорость автоклика,Faro: velocidad de clic auto.,Farol: velocidade do clique auto.,Leuchtturm: Auto-Klick-Tempo,Phare : vitesse du clic auto
+버터 추가 배치,Extra Butter,バター追加配置,追加黄油,Масло: доп. копии,Mantequilla extra,Manteiga extra,Butter: Extra,Beurre supplémentaire
+UFO 드랍량,UFO Drops,UFOドロップ量,飞碟掉落量,НЛО: добыча,OVNI: botín,OVNI: saque,UFO: Ausbeute,OVNI : butin
+곡괭이 데미지,Pickaxe Damage,ツルハシダメージ,镐伤害,Кирка: урон,Pico: daño,Picareta: dano,Spitzhacke: Schaden,Pioche : dégâts
+자동차 추가 배치,Extra Car,自動車追加配置,追加汽车,Машина: доп. копии,Coche extra,Carro extra,Auto: Extra,Voiture supplémentaire
+모든 무기의 클릭 데미지가 늘어납니다.,Raises click damage for all weapons.,全武器のクリックダメージが増えます。,所有武器的点击伤害提高。,Повышает урон клика для всего оружия.,Aumenta el daño por clic de todas las armas.,Aumenta o dano por clique de todas as armas.,Erhöht den Klickschaden aller Waffen.,Augmente les dégâts par clic de toutes les armes.
+간판 자동클릭 속도,Signboard Auto Click Speed,看板オートクリック速度,招牌自动点击速度,Вывеска: скорость автоклика,Letrero: velocidad de clic auto.,Placa: velocidade do clique auto.,Schild: Auto-Klick-Tempo,Enseigne : vitesse du clic auto
+더블클릭 확률 II,Double Click Chance II,ダブルクリック率 II,双击概率 II,Шанс двойного клика II,Prob. de doble clic II,Chance de clique duplo II,Doppelklick-Chance II,Chance de double clic II
+부표 드랍량,Buoy Drops,ブイドロップ量,浮标掉落量,Буй: добыча,Boya: botín,Boia marítima: saque,Boje: Ausbeute,Balise : butin
+달걀 추가 배치,Extra Egg,卵追加配置,追加鸡蛋,Яйцо: доп. копии,Huevo extra,Ovo extra,Ei: Extra,Œuf supplémentaire
+치명타 확률 III,Crit Chance III,クリティカル率 III,暴击率 III,Шанс крита III,Prob. de crítico III,Chance de crítico III,Krit-Chance III,Chance de critique III
+달 드랍량,Moon Drops,月ドロップ量,月球掉落量,Луна: добыча,Luna: botín,Lua: saque,Mond: Ausbeute,Lune : butin
+달걀 자동클릭,Egg Auto Click,卵オートクリック,鸡蛋自动点击,Яйцо: автоклик,Huevo: clic automático,Ovo: clique automático,Ei: Auto-Klick,Œuf : clic auto
+럭키클릭 확률이 올라갑니다.,Raises super crit chance.,スーパークリティカル率が上がります。,超级暴击率提高。,Повышает шанс суперкрита.,Aumenta la prob. de supercrítico.,Aumenta a chance de supercrítico.,Erhöht die Superkrit-Chance.,Augmente la chance de super critique.
+슈퍼 크리티컬 확률 강화 II,Super Crit Chance Up II,スーパークリティカル率強化 II,超级暴击率强化 II,Шанс суперкрита+ II,Prob. de supercrítico+ II,Chance de supercrítico+ II,Superkrit-Chance+ II,Chance de super critique+ II
+치명타 데미지가 올라갑니다.,Raises crit damage.,クリティカルダメージが上がります。,暴击伤害提高。,Повышает урон крита.,Aumenta el daño crítico.,Aumenta o dano crítico.,Erhöht den Krit-Schaden.,Augmente les dégâts critiques.
+치명타 데미지 III,Crit Damage III,クリティカルダメージ III,暴击伤害 III,Урон крита III,Daño crítico III,Dano crítico III,Krit-Schaden III,Dégâts critiques III
+달 자동클릭,Moon Auto Click,月オートクリック,月球自动点击,Луна: автоклик,Luna: clic automático,Lua: clique automático,Mond: Auto-Klick,Lune : clic auto
+식빵 추가 배치,Extra Bread,食パン追加配置,追加吐司,Хлеб: доп. копии,Pan de molde extra,Pão de forma extra,Toastbrot: Extra,Pain de mie supplémentaire
+인공위성 자동클릭,Satellite Auto Click,人工衛星オートクリック,人造卫星自动点击,Спутник: автоклик,Satélite: clic automático,Satélite: clique automático,Satellit: Auto-Klick,Satellite : clic auto
+치명타 확률 II,Crit Chance II,クリティカル率 II,暴击率 II,Шанс крита II,Prob. de crítico II,Chance de crítico II,Krit-Chance II,Chance de critique II
+맨손 데미지,Bare Hands Damage,素手ダメージ,徒手伤害,Голые руки: урон,Manos: daño,Mãos: dano,Fäuste: Schaden,Mains nues : dégâts
+클릭 데미지 III,Click Damage III,クリックダメージ III,点击伤害 III,Урон клика III,Daño por clic III,Dano por clique III,Klickschaden III,Dégâts par clic III
+모든 오브젝트에서 얻는 조각이 늘어납니다.,More pieces from all objects.,すべてのオブジェクトから得るかけらが増えます。,从所有物体获得的碎片增加。,Больше осколков со всех объектов.,Más fragmentos de todos los objetos.,Mais fragmentos de todos os objetos.,Mehr Splitter von allen Objekten.,Plus de fragments sur tous les objets.
+조각 획득량 II,Piece Yield II,かけら獲得量 II,碎片获取量 II,Добыча осколков II,Botín de fragmentos II,Ganho de fragmentos II,Splitter-Ausbeute II,Gain de fragments II
+등대 추가 배치,Extra Lighthouse,灯台追加配置,追加灯塔,Маяк: доп. копии,Faro extra,Farol extra,Leuchtturm: Extra,Phare supplémentaire
+치명타 데미지 II,Crit Damage II,クリティカルダメージ II,暴击伤害 II,Урон крита II,Daño crítico II,Dano crítico II,Krit-Schaden II,Dégâts critiques II
+조각 획득량 III,Piece Yield III,かけら獲得量 III,碎片获取量 III,Добыча осколков III,Botín de fragmentos III,Ganho de fragmentos III,Splitter-Ausbeute III,Gain de fragments III
+튜브 추가 배치,Extra Swim Ring,浮き輪追加配置,追加游泳圈,Надувной круг: доп. копии,Flotador extra,Boia inflável extra,Schwimmring: Extra,Bouée gonflable supplémentaire
+책상 드랍량,Desk Drops,机ドロップ量,书桌掉落量,Стол: добыча,Escritorio: botín,Escrivaninha: saque,Schreibtisch: Ausbeute,Bureau : butin
+사과 추가 배치,Extra Apple,リンゴ追加配置,追加苹果,Яблоко: доп. копии,Manzana extra,Maçã extra,Apfel: Extra,Pomme supplémentaire
+로켓 자동클릭 속도,Rocket Auto Click Speed,ロケットオートクリック速度,火箭自动点击速度,Ракета: скорость автоклика,Cohete: velocidad de clic auto.,Foguete: velocidade do clique auto.,Rakete: Auto-Klick-Tempo,Fusée : vitesse du clic auto
+클릭 데미지 II,Click Damage II,クリックダメージ II,点击伤害 II,Урон клика II,Daño por clic II,Dano por clique II,Klickschaden II,Dégâts par clic II
+가로등 자동클릭 속도,Streetlight Auto Click Speed,街灯オートクリック速度,路灯自动点击速度,Фонарь: скорость автоклика,Farola: velocidad de clic auto.,Poste de luz: velocidade do clique auto.,Laterne: Auto-Klick-Tempo,Lampadaire : vitesse du clic auto
+더블클릭 확률,Double Click Chance,ダブルクリック率,双击概率,Шанс двойного клика,Prob. de doble clic,Chance de clique duplo,Doppelklick-Chance,Chance de double clic
+슈퍼 크리티컬 확률 강화,Super Crit Chance Up,スーパークリティカル率強化,超级暴击率强化,Шанс суперкрита+,Prob. de supercrítico+,Chance de supercrítico+,Superkrit-Chance+,Chance de super critique+
+달걀 자동클릭 횟수,Egg Auto Click Hits,卵オートクリック回数,鸡蛋自动点击次数,Яйцо: удары автоклика,Huevo: golpes de clic auto.,Ovo: golpes do clique auto.,Ei: Auto-Klick-Treffer,Œuf : coups du clic auto
+슈퍼 크리티컬 확률 강화 III,Super Crit Chance Up III,スーパークリティカル率強化 III,超级暴击率强化 III,Шанс суперкрита+ III,Prob. de supercrítico+ III,Chance de supercrítico+ III,Superkrit-Chance+ III,Chance de super critique+ III
+달 자동클릭 속도,Moon Auto Click Speed,月オートクリック速度,月球自动点击速度,Луна: скорость автоклика,Luna: velocidad de clic auto.,Lua: velocidade do clique auto.,Mond: Auto-Klick-Tempo,Lune : vitesse du clic auto
+등대 자동클릭,Lighthouse Auto Click,灯台オートクリック,灯塔自动点击,Маяк: автоклик,Faro: clic automático,Farol: clique automático,Leuchtturm: Auto-Klick,Phare : clic auto
+자동 줍기 속도,Auto Sweep Speed,オート回収速度,自动拾取速度,Скорость автосбора,Velocidad de recogida auto.,Velocidade da coleta auto.,Auto-Sammeln-Tempo,Vitesse du ramassage auto
+자동 줍기 간격이 짧아집니다. (현재 {n}초),Shorter auto sweep interval. (Now {n}s),オート回収の間隔が短くなります。(現在 {n}秒),自动拾取间隔缩短。(当前 {n}秒),Интервал автосбора короче. (Сейчас {n} с),Intervalo de recogida auto. más corto. (Ahora {n} s),Intervalo da coleta auto. menor. (Agora {n} s),Kürzeres Auto-Sammeln-Intervall. (Aktuell {n} s),Intervalle du ramassage auto réduit. (Actuel {n} s)
+결정 드랍량,Crystal Drops,結晶ドロップ量,结晶掉落量,Добыча кристаллов,Botín de cristales,Ganho de cristais,Kristall-Ausbeute,Butin de cristaux
+결정이 한 번에 더 많이 나옵니다.,More crystals drop at once.,結晶が一度に多く出ます。,结晶一次掉落更多。,За раз выпадает больше кристаллов.,Caen más cristales de una vez.,Caem mais cristais de uma vez.,Es fallen mehr Kristalle auf einmal.,Plus de cristaux tombent à la fois.
+왁뿌볼 자동클릭 횟수,Wakppu Ball Auto Click Hits,ワクップボールオートクリック回数,瓦克普球自动点击次数,Вакпу-мяч: удары автоклика,Bola Wakppu: golpes de clic auto.,Bola Wakppu: golpes do clique auto.,Wakppu-Ball: Auto-Klick-Treffer,Balle Wakppu : coups du clic auto
+가로수 자동클릭,Street Tree Auto Click,街路樹オートクリック,行道树自动点击,Дерево: автоклик,Árbol: clic automático,Árvore: clique automático,Straßenbaum: Auto-Klick,Arbre : clic auto
+사과 드랍량,Apple Drops,リンゴドロップ量,苹果掉落量,Яблоко: добыча,Manzana: botín,Maçã: saque,Apfel: Ausbeute,Pomme : butin
+트럭 자동클릭,Truck Auto Click,トラックオートクリック,卡车自动点击,Грузовик: автоклик,Camión: clic automático,Caminhão: clique automático,Lastwagen: Auto-Klick,Camion : clic auto
+자동차 자동클릭 속도,Car Auto Click Speed,自動車オートクリック速度,汽车自动点击速度,Машина: скорость автоклика,Coche: velocidad de clic auto.,Carro: velocidade do clique auto.,Auto: Auto-Klick-Tempo,Voiture : vitesse du clic auto
+컨베이어 벨트 자동클릭,Conveyor Belt Auto Click,ベルトコンベアオートクリック,传送带自动点击,Конвейер: автоклик,Cinta transportadora: clic automático,Esteira: clique automático,Förderband: Auto-Klick,Tapis roulant : clic auto
+자동차 드랍량,Car Drops,自動車ドロップ量,汽车掉落量,Машина: добыча,Coche: botín,Carro: saque,Auto: Ausbeute,Voiture : butin
+왁뿌볼 자동클릭,Wakppu Ball Auto Click,ワクップボールオートクリック,瓦克普球自动点击,Вакпу-мяч: автоклик,Bola Wakppu: clic automático,Bola Wakppu: clique automático,Wakppu-Ball: Auto-Klick,Balle Wakppu : clic auto
+회사 자동클릭 속도,Company Auto Click Speed,会社オートクリック速度,公司自动点击速度,Офис: скорость автоклика,Empresa: velocidad de clic auto.,Empresa: velocidade do clique auto.,Firma: Auto-Klick-Tempo,Entreprise : vitesse du clic auto
+사과 자동클릭 횟수,Apple Auto Click Hits,リンゴオートクリック回数,苹果自动点击次数,Яблоко: удары автоклика,Manzana: golpes de clic auto.,Maçã: golpes do clique auto.,Apfel: Auto-Klick-Treffer,Pomme : coups du clic auto
+버터 자동클릭 횟수,Butter Auto Click Hits,バターオートクリック回数,黄油自动点击次数,Масло: удары автоклика,Mantequilla: golpes de clic auto.,Manteiga: golpes do clique auto.,Butter: Auto-Klick-Treffer,Beurre : coups du clic auto
+식빵 자동클릭 속도,Bread Auto Click Speed,食パンオートクリック速度,吐司自动点击速度,Хлеб: скорость автоклика,Pan de molde: velocidad de clic auto.,Pão de forma: velocidade do clique auto.,Toastbrot: Auto-Klick-Tempo,Pain de mie : vitesse du clic auto
+자동차 자동클릭 횟수,Car Auto Click Hits,自動車オートクリック回数,汽车自动点击次数,Машина: удары автоклика,Coche: golpes de clic auto.,Carro: golpes do clique auto.,Auto: Auto-Klick-Treffer,Voiture : coups du clic auto
+버터 자동클릭 속도,Butter Auto Click Speed,バターオートクリック速度,黄油自动点击速度,Масло: скорость автоклика,Mantequilla: velocidad de clic auto.,Manteiga: velocidade do clique auto.,Butter: Auto-Klick-Tempo,Beurre : vitesse du clic auto
+식빵 자동클릭 횟수,Bread Auto Click Hits,食パンオートクリック回数,吐司自动点击次数,Хлеб: удары автоклика,Pan de molde: golpes de clic auto.,Pão de forma: golpes do clique auto.,Toastbrot: Auto-Klick-Treffer,Pain de mie : coups du clic auto
+가로수 추가 배치,Extra Street Tree,街路樹追加配置,追加行道树,Дерево: доп. копии,Árbol extra,Árvore extra,Straßenbaum: Extra,Arbre supplémentaire
+컨베이어 벨트 자동클릭 속도,Conveyor Belt Auto Click Speed,ベルトコンベアオートクリック速度,传送带自动点击速度,Конвейер: скорость автоклика,Cinta transportadora: velocidad de clic auto.,Esteira: velocidade do clique auto.,Förderband: Auto-Klick-Tempo,Tapis roulant : vitesse du clic auto
+트럭 자동클릭 횟수,Truck Auto Click Hits,トラックオートクリック回数,卡车自动点击次数,Грузовик: удары автоклика,Camión: golpes de clic auto.,Caminhão: golpes do clique auto.,Lastwagen: Auto-Klick-Treffer,Camion : coups du clic auto
+도로 자동클릭 속도,Road Auto Click Speed,道路オートクリック速度,道路自动点击速度,Дорога: скорость автоклика,Carretera: velocidad de clic auto.,Estrada: velocidade do clique auto.,Fahrbahn: Auto-Klick-Tempo,Route : vitesse du clic auto
+자전거 자동클릭,Bicycle Auto Click,自転車オートクリック,自行车自动点击,Велосипед: автоклик,Bicicleta: clic automático,Bicicleta: clique automático,Fahrrad: Auto-Klick,Vélo : clic auto
+망치 데미지,Hammer Damage,ハンマーダメージ,锤子伤害,Молоток: урон,Martillo: daño,Martelo: dano,Hammer: Schaden,Marteau : dégâts
+책상 자동클릭 속도,Desk Auto Click Speed,机オートクリック速度,书桌自动点击速度,Стол: скорость автоклика,Escritorio: velocidad de clic auto.,Escrivaninha: velocidade do clique auto.,Schreibtisch: Auto-Klick-Tempo,Bureau : vitesse du clic auto
+자전거 자동클릭 횟수,Bicycle Auto Click Hits,自転車オートクリック回数,自行车自动点击次数,Велосипед: удары автоклика,Bicicleta: golpes de clic auto.,Bicicleta: golpes do clique auto.,Fahrrad: Auto-Klick-Treffer,Vélo : coups du clic auto
+식빵 자동클릭,Bread Auto Click,食パンオートクリック,吐司自动点击,Хлеб: автоклик,Pan de molde: clic automático,Pão de forma: clique automático,Toastbrot: Auto-Klick,Pain de mie : clic auto
+가로수 자동클릭 속도,Street Tree Auto Click Speed,街路樹オートクリック速度,行道树自动点击速度,Дерево: скорость автоклика,Árbol: velocidad de clic auto.,Árvore: velocidade do clique auto.,Straßenbaum: Auto-Klick-Tempo,Arbre : vitesse du clic auto
+컨베이어 벨트 자동클릭 횟수,Conveyor Belt Auto Click Hits,ベルトコンベアオートクリック回数,传送带自动点击次数,Конвейер: удары автоклика,Cinta transportadora: golpes de clic auto.,Esteira: golpes do clique auto.,Förderband: Auto-Klick-Treffer,Tapis roulant : coups du clic auto
+왁뿌볼 자동클릭 속도,Wakppu Ball Auto Click Speed,ワクップボールオートクリック速度,瓦克普球自动点击速度,Вакпу-мяч: скорость автоклика,Bola Wakppu: velocidad de clic auto.,Bola Wakppu: velocidade do clique auto.,Wakppu-Ball: Auto-Klick-Tempo,Balle Wakppu : vitesse du clic auto
+자동차 자동클릭,Car Auto Click,自動車オートクリック,汽车自动点击,Машина: автоклик,Coche: clic automático,Carro: clique automático,Auto: Auto-Klick,Voiture : clic auto
+버터 드랍량,Butter Drops,バタードロップ量,黄油掉落量,Масло: добыча,Mantequilla: botín,Manteiga: saque,Butter: Ausbeute,Beurre : butin
+도로 자동클릭 횟수,Road Auto Click Hits,道路オートクリック回数,道路自动点击次数,Дорога: удары автоклика,Carretera: golpes de clic auto.,Estrada: golpes do clique auto.,Fahrbahn: Auto-Klick-Treffer,Route : coups du clic auto
+버터 자동클릭,Butter Auto Click,バターオートクリック,黄油自动点击,Масло: автоклик,Mantequilla: clic automático,Manteiga: clique automático,Butter: Auto-Klick,Beurre : clic auto
+자전거 자동클릭 속도,Bicycle Auto Click Speed,自転車オートクリック速度,自行车自动点击速度,Велосипед: скорость автоклика,Bicicleta: velocidad de clic auto.,Bicicleta: velocidade do clique auto.,Fahrrad: Auto-Klick-Tempo,Vélo : vitesse du clic auto
+사과 자동클릭 속도,Apple Auto Click Speed,リンゴオートクリック速度,苹果自动点击速度,Яблоко: скорость автоклика,Manzana: velocidad de clic auto.,Maçã: velocidade do clique auto.,Apfel: Auto-Klick-Tempo,Pomme : vitesse du clic auto
+컨베이어 벨트 드랍량,Conveyor Belt Drops,ベルトコンベアドロップ量,传送带掉落量,Конвейер: добыча,Cinta transportadora: botín,Esteira: saque,Förderband: Ausbeute,Tapis roulant : butin
+사과 자동클릭,Apple Auto Click,リンゴオートクリック,苹果自动点击,Яблоко: автоклик,Manzana: clic automático,Maçã: clique automático,Apfel: Auto-Klick,Pomme : clic auto
+회사 자동클릭,Company Auto Click,会社オートクリック,公司自动点击,Офис: автоклик,Empresa: clic automático,Empresa: clique automático,Firma: Auto-Klick,Entreprise : clic auto
+왁뿌볼 드랍량,Wakppu Ball Drops,ワクップボールドロップ量,瓦克普球掉落量,Вакпу-мяч: добыча,Bola Wakppu: botín,Bola Wakppu: saque,Wakppu-Ball: Ausbeute,Balle Wakppu : butin
+트럭 드랍량,Truck Drops,トラックドロップ量,卡车掉落量,Грузовик: добыча,Camión: botín,Caminhão: saque,Lastwagen: Ausbeute,Camion : butin
+도로 자동클릭,Road Auto Click,道路オートクリック,道路自动点击,Дорога: автоклик,Carretera: clic automático,Estrada: clique automático,Fahrbahn: Auto-Klick,Route : clic auto
+자전거 드랍량,Bicycle Drops,自転車ドロップ量,自行车掉落量,Велосипед: добыча,Bicicleta: botín,Bicicleta: saque,Fahrrad: Ausbeute,Vélo : butin
+간판 자동클릭 횟수,Signboard Auto Click Hits,看板オートクリック回数,招牌自动点击次数,Вывеска: удары автоклика,Letrero: golpes de clic auto.,Placa: golpes do clique auto.,Schild: Auto-Klick-Treffer,Enseigne : coups du clic auto
+가로수 드랍량,Street Tree Drops,街路樹ドロップ量,行道树掉落量,Дерево: добыча,Árbol: botín,Árvore: saque,Straßenbaum: Ausbeute,Arbre : butin
+식빵 드랍량,Bread Drops,食パンドロップ量,吐司掉落量,Хлеб: добыча,Pan de molde: botín,Pão de forma: saque,Toastbrot: Ausbeute,Pain de mie : butin
+트럭 자동클릭 속도,Truck Auto Click Speed,トラックオートクリック速度,卡车自动点击速度,Грузовик: скорость автоклика,Camión: velocidad de clic auto.,Caminhão: velocidade do clique auto.,Lastwagen: Auto-Klick-Tempo,Camion : vitesse du clic auto
+회사 드랍량,Company Drops,会社ドロップ量,公司掉落量,Офис: добыча,Empresa: botín,Empresa: saque,Firma: Ausbeute,Entreprise : butin
+가로등 자동클릭 횟수,Streetlight Auto Click Hits,街灯オートクリック回数,路灯自动点击次数,Фонарь: удары автоклика,Farola: golpes de clic auto.,Poste de luz: golpes do clique auto.,Laterne: Auto-Klick-Treffer,Lampadaire : coups du clic auto
+회사 자동클릭 횟수,Company Auto Click Hits,会社オートクリック回数,公司自动点击次数,Офис: удары автоклика,Empresa: golpes de clic auto.,Empresa: golpes do clique auto.,Firma: Auto-Klick-Treffer,Entreprise : coups du clic auto
+도로 드랍량,Road Drops,道路ドロップ量,道路掉落量,Дорога: добыча,Carretera: botín,Estrada: saque,Fahrbahn: Ausbeute,Route : butin
+조각 획득량,Piece Yield,かけら獲得量,碎片获取量,Добыча осколков,Botín de fragmentos,Ganho de fragmentos,Splitter-Ausbeute,Gain de fragments
+가로수 자동클릭 횟수,Street Tree Auto Click Hits,街路樹オートクリック回数,行道树自动点击次数,Дерево: удары автоклика,Árbol: golpes de clic auto.,Árvore: golpes do clique auto.,Straßenbaum: Auto-Klick-Treffer,Arbre : coups du clic auto
+요트 드랍량,Yacht Drops,ヨットドロップ量,游艇掉落量,Яхта: добыча,Yate: botín,Iate: saque,Jacht: Ausbeute,Yacht : butin
+UFO,UFO,UFO,飞碟,НЛО,OVNI,OVNI,UFO,OVNI

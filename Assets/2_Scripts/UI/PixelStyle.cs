@@ -91,7 +91,8 @@ public static class PixelStyle
 
     public static Label CardHeader(string title)
     {
-        var header = new Label($"— {Loc.T(title)} —");
+        var header = new Label();
+        Loc.Bind(header, () => header.text = $"— {Loc.T(title)} —");
         header.pickingMode = PickingMode.Ignore;
         header.style.fontSize = 36;
         header.style.color = MutedText.linear;

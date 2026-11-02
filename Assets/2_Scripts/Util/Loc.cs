@@ -9,15 +9,33 @@ using UnityEngine;
 public static class Loc
 {
     public static readonly string[] Codes = { "ko", "en", "ja", "zh", "ru", "es", "pt", "de", "fr" }; // CSV 열 순서
-    public static readonly string[] NativeNames = { "한국어", "English", "日本語", "简体中文", "Русский", "Español", "Português (Brasil)", "Deutsch", "Français" }; // 언어 선택 버튼용
+    public static readonly string[] NativeNames = { "한국어", "English", "日本語", "简体中文", "Русский", "Español", "Português BR", "Deutsch", "Français" }; // 언어 선택 칸용 (칸 너비 230px에 맞춤)
 
     private const string LanguageKey = "Language"; // PlayerPrefs 키
     private const string TablePath = "Localization"; // Resources 안 경로
 
     private static Dictionary<string, string[]> _table; // 한국어 원문 -> 언어별 번역
     private static int _language = -1; // Codes 인덱스, -1 = 아직 안 읽음
+    private static readonly List<(object owner, Action apply)> _bindings = new List<(object, Action)>(); // 언어 바뀌면 다시 실행할 글자 설정
 
-    public static event Action Changed; // 언어 바뀌면 화면 글 다시 그리기
+    public static event Action Changed; // 언어 바뀌면 화면 글 다시 그리기 (매번 새로 계산하는 글자용)
+
+    // 한 번 만들고 끝나는 글자: 지금 적용하고, 언어 바뀌면 다시 적용
+    // owner가 파괴되면(UI 요소는 화면에서 떨어지면) 자동 해제
+    public static void Bind(object owner, Action apply)
+    {
+        apply();
+        _bindings.Add((owner, apply));
+    }
+
+    public static void Bind(UnityEngine.UIElements.TextElement element, string korean) => Bind(element, () => element.text = T(korean));
+
+    private static bool Alive(object owner) => owner switch
+    {
+        UnityEngine.Object o => o != null,
+        UnityEngine.UIElements.VisualElement e => e.panel != null,
+        _ => true,
+    };
 
     public static int Language
     {
@@ -32,6 +50,8 @@ public static class Loc
             if (clamped == Language) return;
             _language = clamped;
             PlayerPrefs.SetInt(LanguageKey, clamped);
+            _bindings.RemoveAll(b => !Alive(b.owner));
+            foreach (var (_, apply) in _bindings.ToArray()) apply();
             Changed?.Invoke();
         }
     }
