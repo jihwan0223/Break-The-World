@@ -34543,16 +34543,16 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c7a18632781949c4a94a0ff1d9f23635, type: 3}
   - {fileID: 21300000, guid: 0349e257c39a4a14b04f50096b3aa14d, type: 3}
   weaponSizeMultipliers:
-  - 0
-  - 0
-  - 0
-  - 1.5
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
+  - 1
+  - 1.05
+  - 1.05
+  - 1.07
+  - 1.15
+  - 1.2
+  - 1.05
+  - 1.18
+  - 1.15
+  - 1.15
   weaponRotationOffsets:
   - 0
   - 0
