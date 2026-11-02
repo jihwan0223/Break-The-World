@@ -143,7 +143,7 @@ public partial class SidePanelUI
 
         right.Add(PixelStyle.CardHeader("게임"));
         AddSettingRow(right, "언어", () => Loc.NativeNames[Loc.Language], step => Loc.Language = (Loc.Language + step + Loc.Codes.Length) % Loc.Codes.Length);
-        AddSettingRow(right, "숫자 단위", () => GameSettings.NumberUnits ? "1.2K" : "1,234", _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
+        AddSettingRow(right, "숫자 단위", () => GameSettings.NumberUnits ? "1K" : "1,000", _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
         AddSettingRow(right, "데미지 표시", () => GameSettings.DamageNumbers ? "켜짐" : "꺼짐", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
         AddSettingRow(right, "화면 흔들림", () => GameSettings.ScreenShake ? "켜짐" : "꺼짐", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
         var displayHeader = PixelStyle.CardHeader("화면");

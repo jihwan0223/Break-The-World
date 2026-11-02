@@ -541,7 +541,7 @@ public class MainMenuUI : MonoBehaviour
         options.Add(PixelStyle.CardHeader("게임"));
         AddOptionRow(options, "언어", () => Loc.NativeNames[Loc.Language],
             step => Loc.Language = (Loc.Language + step + Loc.Codes.Length) % Loc.Codes.Length);
-        AddOptionRow(options, "숫자 단위", () => GameSettings.NumberUnits ? "1.2K" : "1,234",
+        AddOptionRow(options, "숫자 단위", () => GameSettings.NumberUnits ? "1K" : "1,000",
             _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
         AddOptionRow(options, "데미지 표시", () => GameSettings.DamageNumbers ? "켜짐" : "꺼짐",
             _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);

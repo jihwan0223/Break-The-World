@@ -66,21 +66,11 @@ public static class GameSettings
 
     public static bool NumberUnits
     {
-        get => PlayerPrefs.GetInt(NumberUnitsKey, DefaultNumberUnits ? 1 : 0) == 1;
+        get => PlayerPrefs.GetInt(NumberUnitsKey, 1) == 1; // 기본은 언어 상관없이 K/M/B 단위
         set { PlayerPrefs.SetInt(NumberUnitsKey, value ? 1 : 0); OnNumberFormatChanged?.Invoke(); }
     }
 
     public static event System.Action OnNumberFormatChanged;
-
-    private static bool DefaultNumberUnits
-    {
-        get
-        {
-            SystemLanguage lang = Application.systemLanguage;
-            return lang != SystemLanguage.Korean && lang != SystemLanguage.Japanese && lang != SystemLanguage.Chinese
-                && lang != SystemLanguage.ChineseSimplified && lang != SystemLanguage.ChineseTraditional;
-        }
-    }
 
     public static bool Fullscreen
     {
