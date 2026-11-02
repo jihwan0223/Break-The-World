@@ -211,30 +211,31 @@ public class ObjectManager : MonoBehaviour
     private const long BaseRewardStart = 1;
     private const float BaseRewardGrowth = 4.5f; // 맵1에서 오브젝트마다 곱함
     private const int ObjectsPerMap = 5;
-    private const float LaterRewardGrowth = 2f; // 맵2부터 오브젝트마다 곱함
+    private const float LaterRewardGrowth = 2f; // 맵3부터 오브젝트마다 곱함
+    // 맵2는 책상에서 왁뿌볼까지 6칸에 x2^6 x10을 고르게 나눔 (예전엔 맵3 들어갈 때 x10이 한 번에 뛰었음)
+    private static readonly double Map2RewardGrowth = Math.Pow(Math.Pow(2, ObjectsPerMap + 1) * 10, 1.0 / (ObjectsPerMap + 1)); // 약 x2.94
 
-    public long GetBaseReward(int index) => Math.Max(1L, (long)(RawBaseReward(index) * (index >= ObjectsPerMap * 2 ? Map3DropMultiplier : 1.0)));
-
-    // 맵3 조각만 곱함 - 후반 노드 가격용
-    private const double Map3DropMultiplier = 10;
+    public long GetBaseReward(int index) => Math.Max(1L, (long)RawBaseReward(index));
 
     private static double RawBaseReward(int index)
     {
         int safeIndex = Mathf.Max(0, index);
-        int map1Steps = Math.Min(safeIndex, ObjectsPerMap - 1);
-        return BaseRewardStart * Math.Pow(BaseRewardGrowth, map1Steps) * Math.Pow(LaterRewardGrowth, safeIndex - map1Steps);
+        int map1Steps = Math.Min(safeIndex, ObjectsPerMap - 1); // 달걀 -> 책상
+        int map2Steps = Math.Min(Math.Max(safeIndex - map1Steps, 0), ObjectsPerMap + 1); // 책상 -> 왁뿌볼
+        int laterSteps = Math.Max(safeIndex - map1Steps - map2Steps, 0); // 왁뿌볼 -> 이후
+        return BaseRewardStart * Math.Pow(BaseRewardGrowth, map1Steps) * Math.Pow(Map2RewardGrowth, map2Steps) * Math.Pow(LaterRewardGrowth, laterSteps);
     }
 
     public long GetUnlockCost(int index)
     {
         if (index <= 0) return 0;
         double breaksNeeded = UnlockBreaksStart * Math.Pow(UnlockBreaksGrowth, index - 1);
-        if (index > ObjectsPerMap * 2) breaksNeeded *= Map3UnlockCostMultiplier;
+        if (index > ObjectsPerMap * 2) breaksNeeded *= Map3UnlockBreaksMultiplier;
         return NumberFormatUtil.RoundPrice((long)(breaksNeeded * RawBaseReward(index - 1)));
     }
 
-    // 맵3 조각이 x10이라 해금비도 올림
-    private const double Map3UnlockCostMultiplier = 3;
+    // 맵3부터는 필요 처치 수를 줄임 (1.15배씩 계속 늘면 후반이 너무 길어짐)
+    private const double Map3UnlockBreaksMultiplier = 0.3;
 
     public bool TryUnlock(int index)
     {

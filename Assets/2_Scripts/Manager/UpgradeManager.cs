@@ -449,8 +449,10 @@ public class UpgradeManager : MonoBehaviour
         baseAutoClickCount + Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoClickCount, objectIndex));
 
     public bool LuckyClickIsUnlocked => AnyUnlocked(UpgradeEffect.LuckyClick);
+    private const float MaxLuckyClickChance = 0.9f; // 슈퍼크리가 터지면 일반 치명타는 안 굴리니 10%는 남김
+    // 확률 노드만 사도 바로 적용 (해금 노드 없이 확률 노드끼리 트리 아무 데나 둘 수 있게)
     public float LuckyClickChance =>
-        LuckyClickIsUnlocked ? Mathf.Clamp01(luckyClickChanceValue + SumEffect(UpgradeEffect.LuckyClickChanceUp) / 100f) : 0f;
+        Mathf.Min(MaxLuckyClickChance, (LuckyClickIsUnlocked ? luckyClickChanceValue : 0f) + SumEffect(UpgradeEffect.LuckyClickChanceUp) / 100f);
 
     public bool DoubleClickIsUnlocked => AnyUnlocked(UpgradeEffect.DoubleClick);
     public float DoubleClickChanceValue =>
