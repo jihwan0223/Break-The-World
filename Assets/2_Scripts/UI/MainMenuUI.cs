@@ -541,17 +541,17 @@ public class MainMenuUI : MonoBehaviour
         options.Add(PixelStyle.CardHeader("게임"));
         AddOptionRow(options, "언어", () => Loc.NativeNames[Loc.Language],
             step => Loc.Language = (Loc.Language + step + Loc.Codes.Length) % Loc.Codes.Length);
-        AddOptionRow(options, "숫자 표시", () => GameSettings.NumberUnits ? "영어 단위" : "숫자",
+        AddOptionRow(options, "숫자 단위", () => GameSettings.NumberUnits ? "1.2K" : "1,234",
             _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
-        AddOptionRow(options, "데미지 숫자", () => GameSettings.DamageNumbers ? "켜기" : "끄기",
+        AddOptionRow(options, "데미지 표시", () => GameSettings.DamageNumbers ? "켜짐" : "꺼짐",
             _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
-        AddOptionRow(options, "화면 흔들림", () => GameSettings.ScreenShake ? "켜기" : "끄기",
+        AddOptionRow(options, "화면 흔들림", () => GameSettings.ScreenShake ? "켜짐" : "꺼짐",
             _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
 
         var displayHeader = PixelStyle.CardHeader("화면");
         displayHeader.style.marginTop = 10;
         options.Add(displayHeader);
-        AddOptionRow(options, "화면 모드", () => GameSettings.Fullscreen ? "전체화면" : "창 모드",
+        AddOptionRow(options, "화면 모드", () => GameSettings.Fullscreen ? "전체 화면" : "창 모드",
             _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
         AddOptionRow(options, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
         {
@@ -566,7 +566,7 @@ public class MainMenuUI : MonoBehaviour
             return fps < 0 ? "무제한" : $"{fps} FPS";
         }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length);
 
-        Button back = CreateMenuButton("뒤로가기", PixelStyle.Pink, WithClick(CloseSettings));
+        Button back = CreateMenuButton("돌아가기", PixelStyle.Pink, WithClick(CloseSettings));
         back.style.marginTop = 16;
         back.style.marginBottom = 0;
         window.Add(back);

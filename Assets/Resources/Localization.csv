@@ -67,23 +67,21 @@ La sauvegarde actuelle sera effacée."
 전체 음량,Master Volume,全体音量,总音量,Общая громкость,Volumen general,Volume geral,Gesamtlautstärke,Volume général
 효과음,Sound Effects,効果音,音效,Эффекты,Efectos,Efeitos,Effekte,Effets
 배경음악,Music,BGM,背景音乐,Музыка,Música,Música,Musik,Musique
+게임,Game,ゲーム,游戏,Игра,Juego,Jogo,Spiel,Jeu
+언어,Language,言語,语言,Язык,Idioma,Idioma,Sprache,Langue
+숫자 단위,Number Format,数字表示,数字格式,Формат чисел,Formato numérico,Formato numérico,Zahlenformat,Format des nombres
+데미지 표시,Damage Numbers,ダメージ表示,伤害数字,Числа урона,Números de daño,Números de dano,Schadenszahlen,Chiffres de dégâts
+켜짐,On,オン,开,Вкл,Activado,Ligado,An,Activé
+꺼짐,Off,オフ,关,Выкл,Desactivado,Desligado,Aus,Désactivé
+화면 흔들림,Screen Shake,画面の揺れ,屏幕震动,Тряска экрана,Temblor de pantalla,Tremor de tela,Bildwackeln,Tremblement
 화면,Display,画面,画面,Экран,Pantalla,Tela,Anzeige,Affichage
 화면 모드,Display Mode,画面モード,显示模式,Режим экрана,Modo de pantalla,Modo de tela,Anzeigemodus,Mode d'affichage
-전체화면,Fullscreen,フルスクリーン,全屏,Полный экран,Completa,Tela cheia,Vollbild,Plein écran
+전체 화면,Fullscreen,フルスクリーン,全屏,Полный экран,Completa,Tela cheia,Vollbild,Plein écran
 창 모드,Windowed,ウィンドウ,窗口,Окно,Ventana,Janela,Fenster,Fenêtré
 해상도,Resolution,解像度,分辨率,Разрешение,Resolución,Resolução,Auflösung,Résolution
 프레임 제한,Frame Limit,フレーム制限,帧率限制,Лимит кадров,Límite de FPS,Limite de FPS,FPS-Limit,Limite d'images
 무제한,Unlimited,無制限,无限制,Без лимита,Sin límite,Sem limite,Unbegrenzt,Illimité
-게임,Game,ゲーム,游戏,Игра,Juego,Jogo,Spiel,Jeu
-화면 흔들림,Screen Shake,画面の揺れ,屏幕震动,Тряска экрана,Temblor de pantalla,Tremor de tela,Bildwackeln,Tremblement
-켜기,On,オン,开,Вкл,Activado,Ligado,An,Activé
-끄기,Off,オフ,关,Выкл,Desactivado,Desligado,Aus,Désactivé
-데미지 숫자,Damage Numbers,ダメージ表示,伤害数字,Числа урона,Números de daño,Números de dano,Schadenszahlen,Chiffres de dégâts
-숫자 표시,Number Format,数字表示,数字显示,Формат чисел,Formato numérico,Formato numérico,Zahlenformat,Format des nombres
-영어 단위,K/M/B,K/M/B,K/M/B,K/M/B,K/M/B,K/M/B,K/M/B,K/M/B
-숫자,Full,全桁,完整数字,Полностью,Completo,Completo,Voll,Complet
-언어,Language,言語,语言,Язык,Idioma,Idioma,Sprache,Langue
-뒤로가기,Back,戻る,返回,Назад,Atrás,Voltar,Zurück,Retour
+돌아가기,Back,戻る,返回,Назад,Atrás,Voltar,Zurück,Retour
 업그레이드,Upgrades,アップグレード,升级,Улучшения,Mejoras,Melhorias,Upgrades,Améliorations
 무기,Weapons,武器,武器,Оружие,Armas,Armas,Waffen,Armes
 도감,Collection,図鑑,图录,Коллекция,Colección,Coleção,Sammlung,Collection
@@ -120,7 +118,6 @@ La sauvegarde actuelle sera effacée."
 게임 종료,Quit Game,ゲーム終了,退出游戏,Выйти из игры,Salir del juego,Sair do jogo,Spiel beenden,Quitter le jeu
 게임을 종료할까요?,Quit the game?,ゲームを終了しますか？,要退出游戏吗？,Выйти из игры?,¿Salir del juego?,Sair do jogo?,Spiel beenden?,Quitter le jeu ?
 종료,Quit,終了,退出,Выйти,Salir,Sair,Beenden,Quitter
-돌아가기,Back,戻る,返回,Назад,Atrás,Voltar,Zurück,Retour
 저장하고 {0},Save and {0},保存して{0},保存并{0},{0} и сохранить,{0} y guardar,{0} e salvar,{0} und speichern,{0} et sauvegarder
 저장 안 하고 {0},{0} Without Saving,保存せずに{0},不保存直接{0},{0} без сохранения,{0} sin guardar,{0} sem salvar,{0} ohne Speichern,{0} sans sauvegarder
 기록,Records,記録,记录,Рекорды,Registros,Registros,Rekorde,Records
@@ -233,7 +230,7 @@ Fait"
 결정은 업그레이드 트리의 하늘색 노드에 쓸 수 있어요.,Crystals can be spent on the sky-blue nodes of the upgrade tree.,結晶はアップグレードツリーの水色のノードに使えます。,结晶可用于升级树中的天蓝色节点。,Кристаллы тратятся на голубые узлы дерева улучшений.,Los cristales se usan en los nodos celestes del árbol de mejoras.,Os cristais servem para os nós azul-claros da árvore de melhorias.,Kristalle kannst du für die hellblauen Knoten im Upgrade-Baum ausgeben.,Les cristaux servent aux nœuds bleu ciel de l'arbre d'améliorations.
 무기마다 따로 강화하는 업그레이드가 있어요.,Each weapon has its own upgrades.,武器ごとに専用の強化アップグレードがあります。,每种武器都有专属的强化升级。,У каждого оружия есть свои улучшения.,Cada arma tiene sus propias mejoras.,Cada arma tem suas próprias melhorias.,Jede Waffe hat eigene Upgrades.,Chaque arme a ses propres améliorations.
 ESC를 누르면 설정을 열 수 있어요.,Press ESC to open Settings.,ESCキーで設定を開けます。,按ESC可以打开设置。,"Нажмите ESC, чтобы открыть настройки.",Pulsa ESC para abrir los ajustes.,Pressione ESC para abrir as configurações.,"Drücke ESC, um die Einstellungen zu öffnen.",Appuie sur Échap pour ouvrir les paramètres.
-"숫자 표시는 설정에서 영어 단위(K, M, B)로 바꿀 수 있어요.","You can switch numbers to short units (K, M, B) in Settings.",設定で数字をK・M・B表記に切り替えられます。,可以在设置中将数字切换为K、M、B单位。,"В настройках можно сократить числа до K, M, B.","En Ajustes puedes abreviar los números (K, M, B).","Nas configurações você pode abreviar os números (K, M, B).","In den Einstellungen kannst du Zahlen abkürzen (K, M, B).","Dans les paramètres, tu peux abréger les nombres (K, M, B)."
+"설정의 숫자 단위에서 큰 숫자를 K, M, B로 줄여 볼 수 있어요.","Shorten big numbers to K, M, B under Number Format in Settings.",設定の「数字表示」で大きな数字をK・M・B表記にできます。,可在设置的“数字格式”中将大数字缩写为K、M、B。,"В настройках («Формат чисел») можно сокращать числа до K, M, B.","En Ajustes > Formato numérico puedes abreviar con K, M, B.","Em Configurações > Formato numérico você pode abreviar com K, M, B.","Unter Einstellungen > Zahlenformat kannst du große Zahlen mit K, M, B abkürzen.","Dans Paramètres > Format des nombres, abrège les grands nombres en K, M, B."
 뒤쪽 맵일수록 결정이 더 많이 나와요.,Later maps drop more crystals.,後半のマップほど結晶が多く出ます。,越靠后的地图掉落的结晶越多。,На дальних картах выпадает больше кристаллов.,Los mapas posteriores dan más cristales.,Mapas mais avançados dão mais cristais.,Spätere Karten liefern mehr Kristalle.,Les cartes plus lointaines donnent plus de cristaux.
 로딩 중,Loading,ロード中,加载中,Загрузка,Cargando,Carregando,Lädt,Chargement
 배 자동클릭 횟수,Ship Auto Click Hits,船オートクリック回数,船自动点击次数,Корабль: удары автоклика,Barco: golpes de clic auto.,Navio: golpes do clique auto.,Schiff: Auto-Klick-Treffer,Navire : coups du clic auto
