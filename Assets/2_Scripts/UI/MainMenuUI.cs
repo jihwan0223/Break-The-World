@@ -160,12 +160,6 @@ public class MainMenuUI : MonoBehaviour
         Button settingsButton = CreateMenuButton("설정", PixelStyle.Butter, settingsAction);
         Button quitButton = CreateMenuButton("나가기", PixelStyle.Pink, quitAction);
 
-        if (!hasSave)
-        {
-            loadButton.SetEnabled(false);
-            loadButton.style.opacity = 0.4f;
-        }
-
         if (hasSave)
         {
             menuColumn.Add(loadButton);
@@ -177,8 +171,7 @@ public class MainMenuUI : MonoBehaviour
         }
         else
         {
-            menuColumn.Add(newGameButton);
-            menuColumn.Add(loadButton);
+            menuColumn.Add(newGameButton); // 저장 없으면 불러오기 버튼은 안 붙임
             _menuButtons.Add(newGameButton);
             _menuActions.Add(newGameAction);
         }
