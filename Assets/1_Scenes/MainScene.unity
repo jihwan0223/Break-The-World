@@ -29266,6 +29266,7 @@ GameObject:
   - component: {fileID: 709640840}
   - component: {fileID: 715198004}
   - component: {fileID: 785374507}
+  - component: {fileID: 884515107}
   m_Layer: 0
   m_Name: "Map2_\uC790\uB3D9\uCC28"
   m_TagString: Untagged
@@ -29273,6 +29274,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &884515107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884515106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2f88d98cd5f2a42bbf481764d9ee85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoadRider
+  speed: 1.2
 --- !u!114 &885762484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47571,6 +47585,7 @@ GameObject:
   - component: {fileID: 1410246374}
   - component: {fileID: 1410246373}
   - component: {fileID: 1410246372}
+  - component: {fileID: 1410246382}
   m_Layer: 0
   m_Name: "Map2_\uC790\uB3D9\uCC28_3"
   m_TagString: Untagged
@@ -48036,6 +48051,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1410246382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1410246370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2f88d98cd5f2a42bbf481764d9ee85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoadRider
+  speed: 1.2
 --- !u!1 &1413005559
 GameObject:
   m_ObjectHideFlags: 0
@@ -58095,6 +58123,7 @@ GameObject:
   - component: {fileID: 1750351296}
   - component: {fileID: 1750351295}
   - component: {fileID: 1750351294}
+  - component: {fileID: 1750351304}
   m_Layer: 0
   m_Name: "Map2_\uC790\uB3D9\uCC28_4"
   m_TagString: Untagged
@@ -58560,6 +58589,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1750351304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1750351292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2f88d98cd5f2a42bbf481764d9ee85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoadRider
+  speed: 1.2
 --- !u!1001 &1751182978
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -61116,6 +61158,7 @@ GameObject:
   - component: {fileID: 1829127144}
   - component: {fileID: 1829127143}
   - component: {fileID: 1829127142}
+  - component: {fileID: 1829127152}
   m_Layer: 0
   m_Name: "Map2_\uC790\uB3D9\uCC28_2"
   m_TagString: Untagged
@@ -61581,6 +61624,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1829127152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1829127140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2f88d98cd5f2a42bbf481764d9ee85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoadRider
+  speed: 1.2
 --- !u!1 &1829441035
 GameObject:
   m_ObjectHideFlags: 0

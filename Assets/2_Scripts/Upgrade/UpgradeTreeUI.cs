@@ -10,6 +10,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
     public static event System.Action<bool> OnTreeToggled;
 
     [SerializeField] private RectTransform content;
+    public RectTransform Content => content; // 노드가 들어있는 판 (환생 연출용)
 
     [Header("줌")]
     [SerializeField] private float minZoom = 0.15f;
@@ -214,7 +215,15 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         return _fitAllZoom;
     }
 
-    private Vector2 CenteredAnchoredPosition(RectTransform node, float zoom)
+    // 카메라 배율을 바로 바꿈 (부드러운 줌 보간이 되돌리지 않게 목표도 같이)
+    public void SetZoom(float zoom)
+    {
+        if (content == null) return;
+        content.localScale = new Vector3(zoom, zoom, 1f);
+        _zoomTarget = zoom;
+    }
+
+    public Vector2 CenteredAnchoredPosition(RectTransform node, float zoom)
     {
         RectTransform viewport = content.parent as RectTransform;
         if (viewport == null) return content.anchoredPosition;
