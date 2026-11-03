@@ -9,11 +9,15 @@ public class SaveManager : MonoBehaviour
 
     [SerializeField] private string saveFileName = "savedata.json";
     [SerializeField] private float saveDebounceDelay = 1f; // 초
+    [SerializeField] private float periodicSaveInterval = 30f; // 초 - 통계(플레이 시간 등)만 바뀌어도 이 간격으로 저장
 
     private string SavePath => Path.Combine(Application.persistentDataPath, saveFileName);
 
     private bool _isDirty;
     private Coroutine _saveRoutine;
+    private bool _saveThisFrame; // 이번 프레임 끝에 저장 (같은 프레임에 여러 번 불려도 한 번만 씀)
+    private float _periodicTimer; // 다음 주기 저장까지 남은 시간 (초)
+    private bool _loaded; // 불러오기 전에 저장하면 빈 상태로 덮어써서 막음
 
     void Awake()
     {
@@ -38,36 +42,61 @@ public class SaveManager : MonoBehaviour
 
         if (WeaponManager.Instance != null)
         {
-            WeaponManager.Instance.OnWeaponChanged += _ => MarkDirty();
-            WeaponManager.Instance.OnUnlockChanged += _ => MarkDirty();
+            WeaponManager.Instance.OnWeaponChanged += _ => SaveSoon();
+            WeaponManager.Instance.OnUnlockChanged += _ => SaveSoon();
         }
 
         if (ObjectManager.Instance != null)
         {
-            ObjectManager.Instance.OnObjectChanged += _ => MarkDirty();
-            ObjectManager.Instance.OnUnlockChanged += _ => MarkDirty();
-            ObjectManager.Instance.OnGainLevelChanged += (_, __) => MarkDirty();
+            ObjectManager.Instance.OnObjectChanged += _ => SaveSoon();
+            ObjectManager.Instance.OnUnlockChanged += _ => SaveSoon();
+            ObjectManager.Instance.OnGainLevelChanged += (_, __) => SaveSoon();
         }
 
         if (UpgradeManager.Instance != null)
-            UpgradeManager.Instance.OnUpgradeChanged += (_, __) => MarkDirty();
+            UpgradeManager.Instance.OnUpgradeChanged += (_, __) => SaveSoon();
 
         if (ZoneManager.Instance != null)
-            ZoneManager.Instance.OnZoneChanged += MarkDirty;
+            ZoneManager.Instance.OnZoneChanged += SaveSoon;
+
+        _periodicTimer = periodicSaveInterval;
+        _loaded = true;
+    }
+
+    void Update()
+    {
+        _periodicTimer -= Time.unscaledDeltaTime;
+        if (_periodicTimer <= 0f) SaveSoon();
+    }
+
+    void LateUpdate()
+    {
+        if (_saveThisFrame) SaveNow();
     }
 
     void OnApplicationQuit()
     {
-        if (_isDirty)
+        if (_isDirty || _saveThisFrame)
             SaveNow();
     }
 
-    public void DiscardPending()
+    // 다른 창으로 가거나 최소화할 때 (그대로 꺼져도 안 날아가게)
+    void OnApplicationFocus(bool focused)
     {
-        if (_saveRoutine != null) StopCoroutine(_saveRoutine);
-        _saveRoutine = null;
-        _isDirty = false;
+        if (focused) return;
+        SaveNow();
+        PlayerPrefs.Save();
     }
+
+    void OnApplicationPause(bool paused)
+    {
+        if (!paused) return;
+        SaveNow();
+        PlayerPrefs.Save();
+    }
+
+    // 무기 변경, 업그레이드 구매 같은 중요한 변화: 1초 기다리지 않고 이번 프레임 끝에 저장
+    public void SaveSoon() => _saveThisFrame = true;
 
     public void MarkDirty()
     {
@@ -79,13 +108,15 @@ public class SaveManager : MonoBehaviour
 
     private IEnumerator DebouncedSave()
     {
-        yield return new WaitForSeconds(saveDebounceDelay);
+        yield return new WaitForSecondsRealtime(saveDebounceDelay); // 게임이 멈춰 있어도 저장
         SaveNow();
         _saveRoutine = null;
     }
 
     public void SaveNow()
     {
+        // 불러오기 전이나 플레이 중 스크립트 리로드 뒤(매니저가 비어 있음)에 쓰면 세이브가 0으로 덮임
+        if (!_loaded || CurrencyManager.Instance == null) return;
         var upgrades = new List<SavedUpgrade>();
         if (UpgradeManager.Instance != null)
         {
@@ -146,6 +177,8 @@ public class SaveManager : MonoBehaviour
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(SavePath, json);
         _isDirty = false;
+        _saveThisFrame = false;
+        _periodicTimer = periodicSaveInterval;
     }
 
     public void Load()

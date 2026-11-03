@@ -15,6 +15,8 @@ public static class GameSettings
     private const string DamageNumbersKey = "DamageNumbers";
     private const string HoverClickKey = "HoverClick"; // 커서 타격 켜기/끄기
     private const string NumberUnitsKey = "NumberUnits";
+    private const string RunInBackgroundKey = "RunInBackground"; // 1 = 다른 창으로 가거나 최소화해도 게임 진행
+    private const string VSyncKey = "VSync"; // 1 = 모니터 주사율에 맞춤 (프레임 제한 무시)
 
     public static readonly int[] FpsOptions = { 30, 60, 120, 144, -1 }; // -1 = 무제한
 
@@ -86,6 +88,18 @@ public static class GameSettings
         set { PlayerPrefs.SetInt(FullscreenKey, value ? 1 : 0); ApplyDisplay(); }
     }
 
+    public static bool RunInBackground
+    {
+        get => PlayerPrefs.GetInt(RunInBackgroundKey, 1) == 1;
+        set { PlayerPrefs.SetInt(RunInBackgroundKey, value ? 1 : 0); Application.runInBackground = value; }
+    }
+
+    public static bool VSync
+    {
+        get => PlayerPrefs.GetInt(VSyncKey, 0) == 1;
+        set { PlayerPrefs.SetInt(VSyncKey, value ? 1 : 0); ApplyFrameRate(); }
+    }
+
     public static int FpsIndex
     {
         get => Mathf.Clamp(PlayerPrefs.GetInt(FpsKey, DefaultFpsIndex), 0, FpsOptions.Length - 1);
@@ -127,6 +141,7 @@ public static class GameSettings
         Debug.unityLogger.filterLogType = LogType.Warning; // 출시 빌드는 경고/에러만 기록
 #endif
         AudioListener.volume = MasterVolume;
+        Application.runInBackground = RunInBackground;
         ApplyFrameRate();
 #if !UNITY_EDITOR
         ApplyDisplay();
@@ -155,17 +170,54 @@ public static class GameSettings
     {
         void Update()
         {
+            LockWindowFrame();
             if (Fullscreen || Time.unscaledTime - _displayAppliedAt < DisplaySettleTime) return;
             Vector2Int size = Resolution; // 설정한 창 크기
             if (Screen.fullScreen || Screen.width > size.x || Screen.height > size.y) Fullscreen = true;
         }
+
+#if UNITY_STANDALONE_WIN
+        // 창 모드: 최대화(ㅁ) 버튼과 테두리 끌어서 크기 조절을 막음 (Unity가 화면 모드를 바꿀 때마다 되살려서 매 프레임 확인)
+        private const int GwlStyle = -16; // 창 스타일 번호
+        private const long WsMaximizeBox = 0x00010000L; // 최대화 버튼
+        private const long WsThickFrame = 0x00040000L; // 끌어서 크기 조절되는 테두리
+        private const int GwlExStyle = -20; // 확장 창 스타일 번호
+        private const uint SwpFrameChanged = 0x0020, SwpNoMove = 0x0002, SwpNoZOrder = 0x0004, SwpNoActivate = 0x0010; // 테두리 다시 그리기 (위치는 그대로)
+
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct Rect { public int left, top, right, bottom; } // Win32 사각형
+        private System.IntPtr _window; // 게임 창 핸들
+
+        [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] private static extern System.IntPtr GetWindowLongPtr(System.IntPtr hWnd, int index);
+        [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")] private static extern System.IntPtr SetWindowLongPtr(System.IntPtr hWnd, int index, System.IntPtr value);
+        [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern bool SetWindowPos(System.IntPtr hWnd, System.IntPtr after, int x, int y, int w, int h, uint flags);
+        [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern bool GetClientRect(System.IntPtr hWnd, out Rect rect);
+        [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern bool AdjustWindowRectEx(ref Rect rect, uint style, bool menu, uint exStyle);
+
+        private void LockWindowFrame()
+        {
+            if (Screen.fullScreen) return;
+            if (_window == System.IntPtr.Zero) _window = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
+            if (_window == System.IntPtr.Zero) return;
+            long style = GetWindowLongPtr(_window, GwlStyle).ToInt64(); // 지금 창 스타일
+            if ((style & (WsMaximizeBox | WsThickFrame)) == 0) return;
+            GetClientRect(_window, out Rect client); // 게임 화면 크기 (테두리가 얇아져도 이대로 유지)
+            long locked = style & ~(WsMaximizeBox | WsThickFrame); // 바꿀 스타일
+            SetWindowLongPtr(_window, GwlStyle, new System.IntPtr(locked));
+            Rect outer = client; // 같은 게임 화면 크기에 맞는 바깥 창 크기
+            AdjustWindowRectEx(ref outer, (uint)locked, false, (uint)GetWindowLongPtr(_window, GwlExStyle).ToInt64());
+            SetWindowPos(_window, System.IntPtr.Zero, 0, 0, outer.right - outer.left, outer.bottom - outer.top, SwpFrameChanged | SwpNoMove | SwpNoZOrder | SwpNoActivate);
+        }
+#else
+        private void LockWindowFrame() { }
+#endif
     }
 
     private static void ApplyFrameRate()
     {
-        int fps = FpsOptions[FpsIndex];
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = fps;
+        int fps = FpsOptions[FpsIndex]; // 프레임 제한 값 (-1 = 무제한)
+        QualitySettings.vSyncCount = VSync ? 1 : 0;
+        Application.targetFrameRate = VSync ? -1 : fps; // 수직 동기화 중엔 제한 무시
     }
 
     private static void UpdateBgm()

@@ -30,8 +30,6 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
     [SerializeField] private Vector2 defaultAnchoredPosition = new Vector2(1500f, -2200f);
     [SerializeField] private float defaultZoom = 0.5f;
 
-    [SerializeField] private bool pauseGameWhileOpen = true;
-
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -85,8 +83,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         RefreshAll();
         Loc.Changed += OnLanguageChanged;
 
-        if (pauseGameWhileOpen)
-            Time.timeScale = 0f;
+        UIPointerGuard.SetPopup("UpgradeTree", true); // 게임은 계속 돌고 월드 클릭만 막음
 
         OnTreeToggled?.Invoke(true);
     }
@@ -102,8 +99,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         pending?.Invoke();
         _revealRunning = false;
 
-        if (pauseGameWhileOpen)
-            Time.timeScale = 1f;
+        UIPointerGuard.SetPopup("UpgradeTree", false);
 
         UIPointerGuard.IsPointerOverUI = false;
 
@@ -142,7 +138,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         float currentScale = content.localScale.x;
         if (Mathf.Approximately(currentScale, _zoomTarget)) return;
 
-        // timeScale 0이라 unscaled
+        // timeScale과 무관하게 unscaled
         // 프레임레이트와 무관한 보간 계수
         float t = 1f - Mathf.Exp(-zoomSmoothSpeed * Time.unscaledDeltaTime);
         float newScale = Mathf.Lerp(currentScale, _zoomTarget, t);

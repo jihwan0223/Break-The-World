@@ -14,8 +14,7 @@ public partial class SidePanelUI
     private VisualElement _settingsPanel;
     private VisualElement _confirmBox;
     private Label _confirmMessage;
-    private Button _confirmSave;
-    private Button _confirmNoSave;
+    private Button _confirmLeaveButton; // 나가기/종료 버튼 (누르면 저장하고 나감)
     private System.Action _confirmLeave;
     private VisualElement _demoBox;
     private static SidePanelUI _instance;
@@ -137,7 +136,7 @@ public partial class SidePanelUI
         body.Add(columns);
 
         var left = new VisualElement();
-        left.style.marginRight = 56;
+        left.style.marginRight = 96; // 창이 넓어서 두 칸 사이도 넉넉히
         left.style.alignItems = Align.Center;
         columns.Add(left);
         var right = new VisualElement();
@@ -154,23 +153,26 @@ public partial class SidePanelUI
         AddSettingRow(right, "데미지 표시", () => GameSettings.DamageNumbers ? "켜짐" : "꺼짐", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
         AddSettingRow(right, "화면 흔들림", () => GameSettings.ScreenShake ? "켜짐" : "꺼짐", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
         VisualElement hoverClickRow = AddSettingRow(right, "커서 타격", () => GameSettings.HoverClick ? "켜짐" : "꺼짐", _ => GameSettings.HoverClick = !GameSettings.HoverClick); // 커서 타격 켜기/끄기 줄
+        AddSettingRow(right, "백그라운드 실행", () => GameSettings.RunInBackground ? "켜짐" : "꺼짐", _ => GameSettings.RunInBackground = !GameSettings.RunInBackground);
         _settingRefreshers.Add(() => hoverClickRow.style.display = UpgradeManager.Instance != null && UpgradeManager.Instance.HoverClickIsUnlocked ? DisplayStyle.Flex : DisplayStyle.None); // 산 뒤에만 보임
         var displayHeader = PixelStyle.CardHeader("화면");
         displayHeader.style.marginTop = 10;
-        right.Add(displayHeader);
-        AddSettingRow(right, "화면 모드", () => GameSettings.Fullscreen ? "전체 화면" : "창 모드", _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
-        AddSettingRow(right, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
+        left.Add(displayHeader); // 오른쪽 칸이 넘쳐서 화면 설정은 소리 아래로
+        AddSettingRow(left, "화면 모드", () => GameSettings.Fullscreen ? "전체 화면" : "창 모드", _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
+        AddSettingRow(left, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
         {
             List<Vector2Int> list = GameSettings.Resolutions;
             if (list.Count == 0) return;
             int index = Mathf.Max(0, list.IndexOf(GameSettings.Resolution));
             GameSettings.Resolution = list[(index + step + list.Count) % list.Count];
         });
-        AddSettingRow(right, "프레임 제한", () =>
+        AddSettingRow(left, "수직 동기화", () => GameSettings.VSync ? "켜짐" : "꺼짐", _ => GameSettings.VSync = !GameSettings.VSync);
+        VisualElement fpsRow = AddSettingRow(left, "프레임 제한", () =>
         {
             int fps = GameSettings.FpsOptions[GameSettings.FpsIndex];
             return fps < 0 ? "무제한" : $"{fps} FPS";
-        }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length);
+        }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length); // 프레임 제한 줄
+        _settingRefreshers.Add(() => fpsRow.style.display = GameSettings.VSync ? DisplayStyle.None : DisplayStyle.Flex); // 수직 동기화 중엔 의미 없어서 숨김
 
         var buttons = new VisualElement();
         buttons.style.flexDirection = FlexDirection.Row;
@@ -221,18 +223,24 @@ public partial class SidePanelUI
         _confirmMessage = new Label();
         _confirmMessage.style.fontSize = 36;
         _confirmMessage.style.color = PixelStyle.Text.linear;
-        _confirmMessage.style.marginBottom = 30;
+        _confirmMessage.style.marginBottom = 10;
         window.Add(_confirmMessage);
+
+        var autoSaveHint = new Label(); // 나가도 진행이 남는다는 안내
+        Loc.Bind(autoSaveHint, "진행 상황은 자동으로 저장돼요.");
+        autoSaveHint.style.fontSize = 28;
+        autoSaveHint.style.color = PixelStyle.MutedText.linear;
+        autoSaveHint.style.marginBottom = 30;
+        window.Add(autoSaveHint);
 
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
         window.Add(row);
-        _confirmSave = CreateButton("", PixelStyle.Mint, () => Leave(true));
-        _confirmNoSave = CreateButton("", PixelStyle.Pink, () => Leave(false));
+        _confirmLeaveButton = CreateButton("", PixelStyle.Pink, Leave);
         Button back = CreateButton("돌아가기", PixelStyle.Sky, () => _confirmBox.style.display = DisplayStyle.None);
-        foreach (Button b in new[] { _confirmSave, _confirmNoSave, back })
+        foreach (Button b in new[] { _confirmLeaveButton, back })
         {
-            b.style.width = 460;
+            b.style.width = 340;
             b.style.height = 100;
             b.style.marginLeft = 8;
             b.style.marginRight = 8;
@@ -244,17 +252,15 @@ public partial class SidePanelUI
     private void ShowLeaveConfirm(string question, string verb, System.Action leave)
     {
         _confirmMessage.text = Loc.T(question);
-        _confirmSave.text = Loc.T("저장하고 {0}", verb);
-        _confirmNoSave.text = Loc.T("저장 안 하고 {0}", verb);
+        _confirmLeaveButton.text = Loc.T(verb);
         _confirmLeave = leave;
         _confirmBox.style.display = DisplayStyle.Flex;
     }
 
-    private void Leave(bool save)
+    private void Leave()
     {
-        if (save) SaveManager.Instance?.SaveNow();
-        else SaveManager.Instance?.DiscardPending();
-        PlayerPrefs.Save(); // 설정 값은 저장 여부와 상관없이 유지
+        SaveManager.Instance?.SaveNow(); // 나갈 때는 항상 자동 저장
+        PlayerPrefs.Save();
         _confirmLeave?.Invoke();
     }
 
@@ -286,28 +292,33 @@ public partial class SidePanelUI
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
         row.style.alignItems = Align.Center;
-        row.style.width = 640;
+        row.style.width = 780; // 창 너비에 맞춰 넓게
         row.style.paddingLeft = 20;
         row.style.paddingRight = 12;
-        row.style.paddingTop = 6; // 줄 간격 - 아래 버튼이 화면 밖으로 밀리지 않게 촘촘히
-        row.style.paddingBottom = 8;
-        row.style.marginBottom = 4;
+        row.style.paddingTop = 10; // 줄 간격
+        row.style.paddingBottom = 12;
+        row.style.marginBottom = 8;
         PixelStyle.Frame(row, PixelStyle.Card);
 
         var name = new Label();
         Loc.Bind(name, label);
         name.style.flexGrow = 1;
-        PixelStyle.FitText(name, 36);
+        PixelStyle.FitText(name, 40);
         name.style.color = PixelStyle.Text.linear;
         row.Add(name);
 
         var value = new Label();
-        value.style.width = 230;
-        PixelStyle.FitText(value, 36);
+        value.style.width = 290;
+        PixelStyle.FitText(value, 40);
         value.style.flexShrink = 0;
         value.style.color = PixelStyle.Text.linear;
         value.style.unityTextAlign = TextAnchor.MiddleCenter;
-        System.Action<int> change = d => { step(d); value.text = Loc.T(getValue()); };
+        System.Action<int> change = d =>
+        {
+            step(d);
+            PlayerPrefs.Save(); // 설정 바꾸면 바로 저장
+            foreach (System.Action refresh in _settingRefreshers) refresh(); // 다른 줄 표시/숨김도 같이 (수직 동기화 - 프레임 제한)
+        };
         row.Add(ArrowButton("<", () => change(-1)));
         row.Add(value);
         row.Add(ArrowButton(">", () => change(1)));
@@ -331,8 +342,8 @@ public partial class SidePanelUI
     {
         var button = new Button(onClick) { text = text };
         button.focusable = false;
-        button.style.width = 60;
-        button.style.height = 60;
+        button.style.width = 68;
+        button.style.height = 68;
         button.style.flexShrink = 0; // 글이 길어도 화살표는 안 밀리게
         button.style.fontSize = 36;
         PixelStyle.Button(button, PixelStyle.Mint);
@@ -347,7 +358,7 @@ public partial class SidePanelUI
         _confirmBox.style.display = DisplayStyle.None;
         _settingsPanel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility();
-        Time.timeScale = 0f;
+        Time.timeScale = 0f; // 열려 있는 동안 게임 정지 (통계·업그레이드만 계속 진행)
         OnSelectorPanelToggled?.Invoke(true);
     }
 
@@ -404,14 +415,14 @@ public partial class SidePanelUI
         bool CritOn() => U() != null && U().CritChanceValue > 0f; // 치명타 데미지를 한 번이라도 샀는지
         bool SuperCritOn() => U() != null && U().LuckyClickIsUnlocked; // 슈퍼 크리티컬 해금
         AddStat(left, "플레이 시간", () => { var t = System.TimeSpan.FromSeconds(GameStats.PlaySeconds); return Loc.T("{0}시간 {1}분", (int)t.TotalHours, t.Minutes); });
-        AddStat(left, "부순 오브젝트", () => Loc.T("{0}개", NumberFormatUtil.Format(GameStats.ObjectsBroken)));
-        AddStat(left, "총 데미지", () => NumberFormatUtil.Format(GameStats.TotalDamage));
-        AddStat(left, "최고 데미지", () => NumberFormatUtil.Format(GameStats.BestHit));
-        AddStat(left, "치명타", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.Crits)), CritOn);
-        AddStat(left, "슈퍼 크리티컬", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.SuperCrits)), SuperCritOn);
-        AddStat(left, "보스 처치", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.BossClears)));
-        AddStat(left, "얻은 조각", () => NumberFormatUtil.Format(CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalPieces : 0));
-        AddStat(left, "얻은 결정", () => NumberFormatUtil.Format(CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalCrystals : 0));
+        AddCountStat(left, "부순 오브젝트", () => GameStats.ObjectsBroken, n => Loc.T("{0}개", NumberFormatUtil.Format(n)));
+        AddCountStat(left, "총 데미지", () => GameStats.TotalDamage, NumberFormatUtil.Format);
+        AddCountStat(left, "최고 데미지", () => GameStats.BestHit, NumberFormatUtil.Format);
+        AddCountStat(left, "치명타", () => GameStats.Crits, Times, CritOn);
+        AddCountStat(left, "슈퍼 크리티컬", () => GameStats.SuperCrits, Times, SuperCritOn);
+        AddCountStat(left, "보스 처치", () => GameStats.BossClears, Times);
+        AddCountStat(left, "얻은 조각", () => CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalPieces : 0, NumberFormatUtil.Format);
+        AddCountStat(left, "얻은 결정", () => CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalCrystals : 0, NumberFormatUtil.Format);
         AddStat(left, "해금한 오브젝트", () => UnlockedText(ObjectManager.Instance != null ? ObjectManager.Instance.VisibleObjectCount : 0, i => ObjectManager.Instance.IsUnlocked(i)));
         AddStat(left, "해금한 무기", () => UnlockedText(WeaponManager.Instance != null ? WeaponManager.Instance.VisibleWeaponCount : 0, i => WeaponManager.Instance.IsUnlocked(i)));
         AddStat(left, "구매한 업그레이드", () => UnlockedText(U() != null ? U().Nodes.Count : 0, i => U().GetLevel(U().Nodes[i].id) >= 1));
@@ -432,20 +443,36 @@ public partial class SidePanelUI
         AddStat(right, "결정 개수", () => U() != null ? Loc.T("{0}개", NumberFormatUtil.Format(U().CrystalDropAmountIn(-1))) : "-");
         AddStat(right, "커서 범위", () => U() != null ? $"{U().CursorRadius:0.##}" : "-", () => U() != null && U().HoverPickupIsUnlocked);
 
-        var objectsPage = StatPage();
+        // 부순 횟수: 한 쪽에 맵 2개씩 (맵1,2 / 맵3,4 / 맵5), 칸 제목 = 맵 이름
         int count = GameSettings.IsDemo ? Mathf.Min(GameSettings.DemoObjectCount, ObjectManager.StaticObjectCount) : ObjectManager.StaticObjectCount; // 데모는 풀버전 오브젝트 빼고
-        int half = (count + 1) / 2;
-        var objLeft = StatColumn(objectsPage, "부순 횟수");
-        objLeft.style.marginRight = 48;
-        var objRight = StatColumn(objectsPage, "부순 횟수");
-        // 오른쪽 칸 줄이 다 숨으면 빈 제목만 남아서 칸째로 숨김 (오브젝트는 순서대로 해금)
-        _statGates.Add((objRight, () => half < count && ObjectManager.Instance != null && ObjectManager.Instance.IsUnlocked(half)));
-        for (int i = 0; i < count; i++)
+        int zones = count > 0 ? ObjectManager.ZoneOfObject(count - 1) + 1 : 0; // 오브젝트가 있는 맵 수
+        bool ZoneSeen(int zone) // 그 맵 첫 오브젝트를 해금했는지 (오브젝트는 순서대로 해금)
         {
-            int index = i;
-            AddStat(i < half ? objLeft : objRight, ObjectManager.StaticObjectNameAt(index),
-                () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.BrokenOf(index))),
-                () => ObjectManager.Instance != null && ObjectManager.Instance.IsUnlocked(index)); // 해금 전 오브젝트는 숨김
+            if (ObjectManager.Instance == null) return false;
+            for (int i = 0; i < count; i++)
+                if (ObjectManager.ZoneOfObject(i) == zone) return ObjectManager.Instance.IsUnlocked(i);
+            return false;
+        }
+        for (int firstZone = 0; firstZone < zones; firstZone += 2)
+        {
+            var page = StatPage();
+            int pageZone = firstZone; // 이 쪽의 첫 맵
+            _statPageGates[page] = () => ZoneSeen(pageZone); // 아직 못 간 맵 쪽은 건너뜀
+            for (int zone = firstZone; zone < Mathf.Min(firstZone + 2, zones); zone++)
+            {
+                int columnZone = zone; // 이 칸의 맵
+                var column = StatColumn(page, ObjectManager.ZoneNameKey(zone));
+                if (zone > firstZone) column.style.marginLeft = 48;
+                _statGates.Add((column, () => ZoneSeen(columnZone))); // 줄이 다 숨으면 빈 제목만 남아서 칸째로 숨김
+                for (int i = 0; i < count; i++)
+                {
+                    if (ObjectManager.ZoneOfObject(i) != zone) continue;
+                    int index = i; // 이 줄의 오브젝트
+                    AddCountStat(column, ObjectManager.StaticObjectNameAt(index),
+                        () => GameStats.BrokenOf(index), Times,
+                        () => ObjectManager.Instance != null && ObjectManager.Instance.IsUnlocked(index)); // 해금 전 오브젝트는 숨김
+                }
+            }
         }
 
         Button prev = StatArrow("<", -1);
@@ -467,6 +494,7 @@ public partial class SidePanelUI
     }
 
     private readonly List<VisualElement> _statPages = new List<VisualElement>();
+    private readonly Dictionary<VisualElement, System.Func<bool>> _statPageGates = new Dictionary<VisualElement, System.Func<bool>>(); // 조건이 있는 쪽 (false면 넘길 때 건너뜀)
     private int _statPage;
     private Label _statPageLabel;
 
@@ -501,10 +529,11 @@ public partial class SidePanelUI
 
     private void ShowStatPage(int page)
     {
-        _statPage = (page % _statPages.Count + _statPages.Count) % _statPages.Count;
-        for (int i = 0; i < _statPages.Count; i++)
-            _statPages[i].style.display = i == _statPage ? DisplayStyle.Flex : DisplayStyle.None;
-        _statPageLabel.text = $"{_statPage + 1} / {_statPages.Count}";
+        var open = _statPages.FindAll(p => !_statPageGates.TryGetValue(p, out var gate) || gate()); // 지금 볼 수 있는 쪽
+        _statPage = (page % open.Count + open.Count) % open.Count;
+        foreach (var p in _statPages)
+            p.style.display = p == open[_statPage] ? DisplayStyle.Flex : DisplayStyle.None;
+        _statPageLabel.text = $"{_statPage + 1} / {open.Count}";
     }
 
     private static VisualElement StatColumn(VisualElement parent, string header)
@@ -517,6 +546,20 @@ public partial class SidePanelUI
     }
 
     private void AddStat(VisualElement column, string label, System.Func<string> get, System.Func<bool> visible = null)
+    {
+        Label value = AddStatRow(column, label, visible); // 값 칸
+        _statRows.Add((value, () => Loc.T(get())));
+    }
+
+    // 개수 줄: 돈처럼 숫자가 굴러 올라감
+    private void AddCountStat(VisualElement column, string label, System.Func<long> number, System.Func<long, string> format, System.Func<bool> visible = null)
+    {
+        _statCounters.Add(new StatCounter { label = AddStatRow(column, label, visible), target = number, format = format });
+    }
+
+    private static string Times(long n) => Loc.T("{0}번", NumberFormatUtil.Format(n));
+
+    private Label AddStatRow(VisualElement column, string label, System.Func<bool> visible)
     {
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
@@ -541,10 +584,68 @@ public partial class SidePanelUI
         value.style.flexShrink = 0;
         value.style.marginLeft = 12;
         value.style.color = PixelStyle.Text.linear;
+        value.style.transformOrigin = new TransformOrigin(Length.Percent(100), Length.Percent(50)); // 오른쪽 끝 기준으로 커져서 칸 밖으로 안 나감
         row.Add(value);
-        _statRows.Add((value, () => Loc.T(get())));
         if (visible != null) _statGates.Add((row, visible));
         column.Add(row);
+        return value;
+    }
+
+    private class StatCounter
+    {
+        public Label label; // 숫자 칸
+        public System.Func<long> target; // 실제 값
+        public System.Func<long, string> format; // 표시 문자열
+        public double shown; // 지금 보이는 값 (굴러 올라가는 중)
+        public double rate; // 초당 최소 증가량 (CountUpSeconds 안에 따라붙게)
+    }
+    private readonly List<StatCounter> _statCounters = new List<StatCounter>(); // 굴러 올라가는 줄들
+    private readonly Dictionary<Label, float> _statPulses = new Dictionary<Label, float>(); // 커졌다 작아지는 중인 칸, 남은 시간 (초)
+    private const float StatCountUpSpeed = 8f; // 남은 차이를 따라붙는 속도 (돈 표시와 같음)
+    private const float StatCountUpSeconds = 0.35f; // 얼마가 늘든 이 안에 다 따라붙음 (초)
+    private const float StatCountUpMinPerSecond = 30f; // 작은 값도 너무 느리지 않게 (초당)
+    private const float StatPulseDuration = 0.25f; // 커졌다 작아지는 시간 (초, 돈 표시와 같음)
+    private const float StatPulseScale = 0.15f; // 가장 클 때 늘어나는 비율
+
+    private void PulseStat(Label label)
+    {
+        if (!_statPulses.ContainsKey(label)) _statPulses[label] = StatPulseDuration; // 진행 중이면 이어서, 계속 오르면 계속 뜀
+    }
+
+    // 매 프레임: 숫자 굴리기 + 커졌다 작아지기
+    private void TickStatEffects(float dt)
+    {
+        foreach (var c in _statCounters)
+        {
+            long target = c.target(); // 실제 값
+            if (c.shown >= target)
+            {
+                c.rate = 0;
+                if (c.shown > target) { c.shown = target; c.label.text = Loc.T(c.format(target)); } // 초기화 등으로 줄었을 때
+                continue;
+            }
+            double gap = target - c.shown; // 남은 차이
+            c.rate = System.Math.Max(c.rate, gap / StatCountUpSeconds);
+            double step = System.Math.Max(gap * (1 - Mathf.Exp(-StatCountUpSpeed * dt)), System.Math.Max(StatCountUpMinPerSecond, c.rate) * dt); // 이번 프레임 증가량
+            c.shown = System.Math.Min(target, c.shown + step);
+            c.label.text = Loc.T(c.format((long)c.shown));
+            PulseStat(c.label);
+        }
+
+        if (_statPulses.Count == 0) return;
+        var labels = new List<Label>(_statPulses.Keys); // 도는 중에 지우려고 복사
+        foreach (var label in labels)
+        {
+            float left = _statPulses[label] - dt; // 남은 시간
+            float scale = 1f; // 이번 프레임 크기
+            if (left <= 0f) _statPulses.Remove(label);
+            else
+            {
+                _statPulses[label] = left;
+                scale += StatPulseScale * Mathf.Sin(Mathf.PI * (1f - left / StatPulseDuration));
+            }
+            label.style.scale = new Scale(new Vector3(scale, scale, 1f));
+        }
     }
 
     private static string Chance(float chance) => $"{chance * 100f:0.##}%";
@@ -556,14 +657,47 @@ public partial class SidePanelUI
         return $"{n} / {count}";
     }
 
+    private float _statsRefreshTimer; // 다음 통계 갱신까지 남은 시간 (초)
+    private const float StatsRefreshInterval = 0.2f; // 열려 있는 동안 갱신 간격 (초)
+
+    // pulse: 열린 뒤 바뀐 값만 뜀 (처음 열 때는 조용히)
+    private void RefreshStatValues(bool pulse)
+    {
+        foreach (var (value, get) in _statRows)
+        {
+            string text = get(); // 새 값
+            if (pulse && text != value.text) PulseStat(value);
+            value.text = text;
+        }
+        foreach (var c in _statCounters)
+        {
+            if (!pulse) c.shown = c.target(); // 열 때는 굴리지 않고 바로 맞춤
+            c.label.text = Loc.T(c.format((long)c.shown)); // 언어/숫자 표기 바뀐 것도 반영
+        }
+        foreach (var (row, visible) in _statGates) row.style.display = visible() ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    // 열려 있는 동안 게임이 계속 돌아서 값도 실시간으로 갱신
+    private void RefreshStatsLive()
+    {
+        if (_statsPanel == null || _statsPanel.style.display != DisplayStyle.Flex) return;
+        TickStatEffects(Time.unscaledDeltaTime);
+        _statsRefreshTimer -= Time.unscaledDeltaTime;
+        if (_statsRefreshTimer > 0f) return;
+        _statsRefreshTimer = StatsRefreshInterval;
+        RefreshStatValues(true);
+        ShowStatPage(_statPage); // 새 맵이 열리면 쪽 수도 갱신
+    }
+
     private void OpenStatsPanel()
     {
-        foreach (var (value, get) in _statRows) value.text = get();
-        foreach (var (row, visible) in _statGates) row.style.display = visible() ? DisplayStyle.Flex : DisplayStyle.None;
+        foreach (var label in _statPulses.Keys) label.style.scale = new Scale(Vector3.one); // 닫힐 때 뛰던 칸 원래 크기로
+        _statPulses.Clear();
+        RefreshStatValues(false);
         ShowStatPage(0);
         _statsPanel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility();
-        Time.timeScale = 0f;
+        UIPointerGuard.SetPopup("Stats", true); // 게임은 계속 돌고 월드 클릭만 막음
         OnSelectorPanelToggled?.Invoke(true);
     }
 
@@ -571,7 +705,7 @@ public partial class SidePanelUI
     {
         _statsPanel.style.display = DisplayStyle.None;
         RefreshButtonRowVisibility();
-        Time.timeScale = 1f;
+        UIPointerGuard.SetPopup("Stats", false); // 게임은 계속 돌고 월드 클릭만 막음
         OnSelectorPanelToggled?.Invoke(false);
     }
 }

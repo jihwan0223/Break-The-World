@@ -69,6 +69,7 @@ public partial class SidePanelUI : MonoBehaviour
     void Update()
     {
         RefreshBadges();
+        RefreshStatsLive();
         GameStats.PlaySeconds += Time.deltaTime; // timeScale 0 동안은 안 늘어남
 
         if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;

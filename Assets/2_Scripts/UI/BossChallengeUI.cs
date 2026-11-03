@@ -254,7 +254,7 @@ public class BossChallengeUI : MonoBehaviour
         if (_challengeButton == null) return;
 
         ZoneBreaker active = ZoneBreaker.ActiveBoss;
-        _ready = active == null && Time.timeScale > 0f ? ZoneBreaker.ChallengeableBoss() : null; // 게임이 멈춰 있으면 버튼 숨김
+        _ready = active == null && Time.timeScale > 0f && !UIPointerGuard.PopupOpen ? ZoneBreaker.ChallengeableBoss() : null; // 게임이 멈췄거나 창이 열려 있으면 버튼 숨김
 
         SetShown(_challengeButton, _ready != null);
         if (_ready != null)

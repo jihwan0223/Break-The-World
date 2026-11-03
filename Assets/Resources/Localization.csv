@@ -120,8 +120,6 @@ La sauvegarde actuelle sera effacée."
 게임 종료,Quit Game,ゲーム終了,退出游戏,Выйти из игры,Salir del juego,Sair do jogo,Spiel beenden,Quitter le jeu
 게임을 종료할까요?,Quit the game?,ゲームを終了しますか？,要退出游戏吗？,Выйти из игры?,¿Salir del juego?,Sair do jogo?,Spiel beenden?,Quitter le jeu ?
 종료,Quit,終了,退出,Выйти,Salir,Sair,Beenden,Quitter
-저장하고 {0},Save and {0},保存して{0},保存并{0},{0} и сохранить,{0} y guardar,{0} e salvar,{0} und speichern,{0} et sauvegarder
-저장 안 하고 {0},{0} Without Saving,保存せずに{0},不保存直接{0},{0} без сохранения,{0} sin guardar,{0} sem salvar,{0} ohne Speichern,{0} sans sauvegarder
 기록,Records,記録,记录,Рекорды,Registros,Registros,Rekorde,Records
 플레이 시간,Play Time,プレイ時間,游戏时长,Время игры,Tiempo de juego,Tempo de jogo,Spielzeit,Temps de jeu
 {0}시간 {1}분,{0}h {1}m,{0}時間{1}分,{0}小时{1}分钟,{0} ч {1} мин,{0} h {1} min,{0} h {1} min,{0} Std. {1} Min.,{0} h {1} min
@@ -422,3 +420,6 @@ UFO,UFO,UFO,飞碟,НЛО,OVNI,OVNI,UFO,OVNI
 환생,Rebirth,転生,转生,Перерождение,Renacer,Renascer,Wiedergeburt,Renaissance
 업그레이드 {0}/{1},Upgrades {0}/{1},アップグレード {0}/{1},升级 {0}/{1},Улучшения {0}/{1},Mejoras {0}/{1},Melhorias {0}/{1},Upgrades {0}/{1},Améliorations {0}/{1}
 모든 업그레이드를 해금해야 합니다.,Unlock every upgrade first.,すべてのアップグレードを解放してください。,需要解锁所有升级。,Откройте все улучшения.,Desbloquea todas las mejoras.,Desbloqueie todas as melhorias.,Schalte alle Upgrades frei.,Débloquez toutes les améliorations.
+백그라운드 실행,Run in Background,バックグラウンド実行,后台运行,Работа в фоне,Ejecutar en segundo plano,Executar em segundo plano,Im Hintergrund ausführen,Exécution en arrière-plan
+수직 동기화,VSync,垂直同期,垂直同步,Верт. синхронизация,Sincronización vertical,Sincronização vertical,VSync,Synchro verticale
+진행 상황은 자동으로 저장돼요.,Your progress is saved automatically.,進行状況は自動で保存されます。,进度会自动保存。,Прогресс сохраняется автоматически.,Tu progreso se guarda automáticamente.,Seu progresso é salvo automaticamente.,Dein Fortschritt wird automatisch gespeichert.,Ta progression est sauvegardée automatiquement.
