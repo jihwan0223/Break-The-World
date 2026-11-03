@@ -32,6 +32,8 @@ public class Health : MonoBehaviour
 
     public float RespawnRemaining { get; private set; }
 
+    public bool AutoRespawn { get; set; } = true; // false면 죽은 채로 있다가 ResetToFull로만 부활 (컨베이어 위 오브젝트)
+
     public event Action<int, int> OnDamaged;
 
     public event Action OnDied;
@@ -162,6 +164,8 @@ public class Health : MonoBehaviour
 
             if (_spriteRenderer != null) _spriteRenderer.enabled = false;
         }
+
+        if (!AutoRespawn) yield break;
 
         RespawnRemaining = respawnDelay;
 
