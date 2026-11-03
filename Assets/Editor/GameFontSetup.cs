@@ -2,12 +2,12 @@ using UnityEditor;
 using UnityEngine;
 using TMPro;
 
-// Tools ▸ Break The World ▸ 폰트 세팅
+// Tools ▸ Break The Wax World ▸ 폰트 세팅
 public static class GameFontSetup
 {
     private const string SdfPath = "Assets/8_Font/Resources/MonaS12 SDF.asset";
 
-    [MenuItem("Tools/Break The World/폰트 세팅 (MonaS12)")]
+    [MenuItem("Tools/Break The Wax World/폰트 세팅 (MonaS12)")]
     public static void Setup()
     {
         var font = Resources.Load<Font>("MonaS12");

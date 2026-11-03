@@ -112,7 +112,7 @@ public class MainMenuUI : MonoBehaviour
         root.style.flexGrow = 1;
         PixelStyle.ScreenFrame(root, PixelStyle.Window, 8f);
 
-        var title = new Label("BREAK THE WORLD");
+        var title = new Label("BREAK THE WAX WORLD");
         title.style.position = Position.Absolute;
         title.style.top = Length.Percent(16);
         title.style.left = Length.Percent(50);
@@ -156,7 +156,7 @@ public class MainMenuUI : MonoBehaviour
         settingsAction = WithClick(settingsAction);
         quitAction = WithClick(quitAction);
         newGameButton = CreateMenuButton("새 게임", PixelStyle.Mint, newGameAction);
-        loadButton = CreateMenuButton("불러오기", PixelStyle.Sky, loadAction);
+        loadButton = CreateMenuButton("불러오기", hasSave ? PixelStyle.Sky : NoSaveGray, loadAction);
         Button settingsButton = CreateMenuButton("설정", PixelStyle.Butter, settingsAction);
         Button quitButton = CreateMenuButton("나가기", PixelStyle.Pink, quitAction);
 
@@ -171,7 +171,9 @@ public class MainMenuUI : MonoBehaviour
         }
         else
         {
-            menuColumn.Add(newGameButton); // 저장 없으면 불러오기 버튼은 안 붙임
+            loadButton.SetEnabled(false); // 저장 없으면 회색으로 보여만 주고 클릭/키보드 선택 안 됨
+            menuColumn.Add(newGameButton);
+            menuColumn.Add(loadButton);
             _menuButtons.Add(newGameButton);
             _menuActions.Add(newGameAction);
         }
@@ -199,6 +201,9 @@ public class MainMenuUI : MonoBehaviour
         _shardLayer.pickingMode = PickingMode.Ignore;
         root.Add(_shardLayer);
     }
+
+    private static readonly PixelStyle.Tone NoSaveGray = new PixelStyle.Tone(
+        new Color(0.62f, 0.62f, 0.62f), new Color(0.74f, 0.74f, 0.74f), new Color(0.48f, 0.48f, 0.48f), new Color(0.30f, 0.30f, 0.30f), new Color(0.38f, 0.38f, 0.38f)); // 저장 없을 때 불러오기 버튼 색 (회색)
 
     private Button CreateMenuButton(string text, PixelStyle.Tone tone, System.Action onClick)
     {
@@ -485,13 +490,15 @@ public class MainMenuUI : MonoBehaviour
         panel.style.display = DisplayStyle.None;
         panel.RegisterCallback<ClickEvent>(evt => { if (evt.target == panel) CloseSettings(); });
 
-        var window = new VisualElement();
-        window.style.paddingTop = 30;
-        window.style.paddingBottom = 26;
-        window.style.paddingLeft = 48;
-        window.style.paddingRight = 48;
+        var window = new VisualElement(); // 화면 전체를 덮는 설정 창 (게임 안 설정창과 같은 방식)
+        window.style.position = Position.Absolute;
+        window.style.left = 0;
+        window.style.right = 0;
+        window.style.top = 0;
+        window.style.bottom = 0;
         window.style.alignItems = Align.Center;
-        PixelStyle.Frame(window, PixelStyle.Window, 6f);
+        window.style.justifyContent = Justify.Center;
+        PixelStyle.ScreenFrame(window, PixelStyle.Window, 6f);
         panel.Add(window);
 
         var title = new Label();

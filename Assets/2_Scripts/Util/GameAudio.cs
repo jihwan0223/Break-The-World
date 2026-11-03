@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Break The World/Game Audio", fileName = "GameAudio")]
+[CreateAssetMenu(menuName = "Break The Wax World/Game Audio", fileName = "GameAudio")]
 public class GameAudio : ScriptableObject
 {
     public AudioClip bgm;
