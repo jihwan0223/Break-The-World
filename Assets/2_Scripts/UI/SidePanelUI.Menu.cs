@@ -126,7 +126,7 @@ public partial class SidePanelUI
         body.style.left = 0;
         body.style.right = 0;
         body.style.top = 100;
-        body.style.bottom = 0;
+        body.style.bottom = 30; // 아래 창 테두리와 버튼 사이 여백
         body.style.alignItems = Align.Center;
         body.style.justifyContent = Justify.Center;
         _settingsPanel.Add(body);
@@ -174,7 +174,7 @@ public partial class SidePanelUI
 
         var buttons = new VisualElement();
         buttons.style.flexDirection = FlexDirection.Row;
-        buttons.style.marginTop = 36;
+        buttons.style.marginTop = 24;
         body.Add(buttons);
 
         Button debug = CreateButton("디버그", PixelStyle.Butter, () => { CloseSettingsPanel(); OpenDebugPanel(); });
@@ -289,9 +289,9 @@ public partial class SidePanelUI
         row.style.width = 640;
         row.style.paddingLeft = 20;
         row.style.paddingRight = 12;
-        row.style.paddingTop = 8;
-        row.style.paddingBottom = 12;
-        row.style.marginBottom = 12;
+        row.style.paddingTop = 6; // 줄 간격 - 아래 버튼이 화면 밖으로 밀리지 않게 촘촘히
+        row.style.paddingBottom = 8;
+        row.style.marginBottom = 4;
         PixelStyle.Frame(row, PixelStyle.Card);
 
         var name = new Label();
