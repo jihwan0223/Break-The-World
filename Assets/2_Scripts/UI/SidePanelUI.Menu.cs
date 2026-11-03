@@ -23,14 +23,14 @@ public partial class SidePanelUI
     private const float DemoButtonLock = 2f; // 초 - 창이 뜬 뒤 실수로 바로 넘기지 않게 버튼을 막는 시간
     private VisualElement _demoButtons; // 데모 완료 창의 버튼 줄
 
-    public static void ShowDemoComplete()
+    public static void ShowDemoComplete(float delay = DemoBoxDelay)
     {
-        if (_instance != null) _instance.StartCoroutine(_instance.ShowDemoBoxLater());
+        if (_instance != null) _instance.StartCoroutine(_instance.ShowDemoBoxLater(delay));
     }
 
-    private System.Collections.IEnumerator ShowDemoBoxLater()
+    private System.Collections.IEnumerator ShowDemoBoxLater(float delay)
     {
-        yield return new WaitForSecondsRealtime(DemoBoxDelay);
+        yield return new WaitForSecondsRealtime(delay);
         _demoBox.style.display = DisplayStyle.Flex;
         _demoButtons.SetEnabled(false);
         yield return new WaitForSecondsRealtime(DemoButtonLock);

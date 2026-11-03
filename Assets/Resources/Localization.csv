@@ -417,3 +417,7 @@ UFO,UFO,UFO,飞碟,НЛО,OVNI,OVNI,UFO,OVNI
 오브젝트,Objects,オブジェクト,物体,Объекты,Objetos,Objetos,Objekte,Objets
 맵,Maps,マップ,地图,Карты,Mapas,Mapas,Karten,Cartes
 결정 배율,Crystal Multiplier,結晶倍率,结晶倍率,Множитель кристаллов,Multiplicador de cristales,Multiplicador de cristais,Kristallmultiplikator,Multiplicateur de cristaux
+환생,Rebirth,転生,转生,Перерождение,Renacer,Renascer,Wiedergeburt,Renaissance
+업그레이드 {0}/{1},Upgrades {0}/{1},アップグレード {0}/{1},升级 {0}/{1},Улучшения {0}/{1},Mejoras {0}/{1},Melhorias {0}/{1},Upgrades {0}/{1},Améliorations {0}/{1}
+조각 {0},Pieces {0},かけら {0},碎片 {0},Осколки {0},Fragmentos {0},Fragmentos {0},Splitter {0},Fragments {0}
+결정 {0},Crystals {0},結晶 {0},结晶 {0},Кристаллы {0},Cristales {0},Cristais {0},Kristalle {0},Cristaux {0}

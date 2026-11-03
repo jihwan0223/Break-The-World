@@ -40,6 +40,8 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
 
     public RectTransform Rect => _rect != null ? _rect : (_rect = (RectTransform)transform);
 
+    public bool IsInThisVersion => !(GameSettings.IsDemo && fullVersionOnly) && !GameSettings.IsDemoLockedObject(objectIndex); // 데모에선 풀버전 노드 제외
+
     public bool IsLeveled() => ObjectManager.Instance != null &&
         (isGain ? ObjectManager.Instance.GetGainLevel(objectIndex) >= 1 : ObjectManager.Instance.IsUnlocked(objectIndex));
 

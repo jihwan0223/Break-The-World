@@ -233,12 +233,21 @@ public class UpgradeManager : MonoBehaviour
         return node?.CostForLevel(GetLevel(nodeId));
     }
 
+    private static bool IsDemoHidden(UpgradeNode node) =>
+        GameSettings.IsDemo && (node.fullVersionOnly || GameSettings.IsDemoLockedObject(node.targetObjectIndex) || GameSettings.IsDemoLockedWeapon(node.targetWeaponIndex));
+
+    // 이번 버전(데모/풀)에 나오는 노드인지 (환생 조건 셀 때)
+    public bool IsInThisVersion(string nodeId)
+    {
+        UpgradeNode node = GetNode(nodeId);
+        return node != null && !IsDemoHidden(node);
+    }
+
     public bool IsRevealed(string nodeId)
     {
         UpgradeNode node = GetNode(nodeId);
         if (node == null) return false;
-        if (GameSettings.IsDemo && (node.fullVersionOnly || GameSettings.IsDemoLockedObject(node.targetObjectIndex) || GameSettings.IsDemoLockedWeapon(node.targetWeaponIndex)))
-            return false; // 데모에선 풀버전 내용 숨김
+        if (IsDemoHidden(node)) return false; // 데모에선 풀버전 내용 숨김
         if (node.prerequisiteSatisfied == null) return true;
 
         return node.prerequisiteSatisfied();
