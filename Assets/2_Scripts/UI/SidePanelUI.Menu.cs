@@ -147,6 +147,8 @@ public partial class SidePanelUI
         AddSettingRow(right, "숫자 단위", () => GameSettings.NumberUnits ? "1K" : "1,000", _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
         AddSettingRow(right, "데미지 표시", () => GameSettings.DamageNumbers ? "켜짐" : "꺼짐", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
         AddSettingRow(right, "화면 흔들림", () => GameSettings.ScreenShake ? "켜짐" : "꺼짐", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
+        VisualElement hoverClickRow = AddSettingRow(right, "커서 타격", () => GameSettings.HoverClick ? "켜짐" : "꺼짐", _ => GameSettings.HoverClick = !GameSettings.HoverClick); // 커서 타격 켜기/끄기 줄
+        _settingRefreshers.Add(() => hoverClickRow.style.display = UpgradeManager.Instance != null && UpgradeManager.Instance.HoverClickIsUnlocked ? DisplayStyle.Flex : DisplayStyle.None); // 산 뒤에만 보임
         var displayHeader = PixelStyle.CardHeader("화면");
         displayHeader.style.marginTop = 10;
         right.Add(displayHeader);
@@ -273,7 +275,7 @@ public partial class SidePanelUI
         _settingRefreshers.Add(() => { cylinder.SetValue(get()); caption.text = $"{Loc.T(label)}  {Percent(get())}"; });
     }
 
-    private void AddSettingRow(VisualElement column, string label, System.Func<string> getValue, System.Action<int> step)
+    private VisualElement AddSettingRow(VisualElement column, string label, System.Func<string> getValue, System.Action<int> step)
     {
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
@@ -306,6 +308,7 @@ public partial class SidePanelUI
         _settingRefreshers.Add(() => value.text = Loc.T(getValue()));
         HoverGrow(row);
         column.Add(row);
+        return row;
     }
 
     // 메인 메뉴 설정창처럼 마우스 올리면 살짝 커짐

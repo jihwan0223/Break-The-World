@@ -13,6 +13,7 @@ public static class GameSettings
     private const string FpsKey = "FpsLimit";
     private const string ShakeKey = "ScreenShake";
     private const string DamageNumbersKey = "DamageNumbers";
+    private const string HoverClickKey = "HoverClick"; // 커서 타격 켜기/끄기
     private const string NumberUnitsKey = "NumberUnits";
 
     public static readonly int[] FpsOptions = { 30, 60, 120, 144, -1 }; // -1 = 무제한
@@ -57,6 +58,13 @@ public static class GameSettings
     public const int DemoWeaponCount = 6; // 데모는 다이너마이트(5)까지 - 나중에 추가하는 무기는 풀버전 전용
     public static bool IsDemoLockedObject(int objectIndex) => IsDemo && objectIndex >= DemoObjectCount;
     public static bool IsDemoLockedWeapon(int weaponIndex) => IsDemo && weaponIndex >= DemoWeaponCount;
+
+    // 커서 타격(커서만 올려도 자동으로 때림) 켜기/끄기 - 업그레이드를 산 뒤에만 설정에 보임
+    public static bool HoverClick
+    {
+        get => PlayerPrefs.GetInt(HoverClickKey, 1) == 1;
+        set => PlayerPrefs.SetInt(HoverClickKey, value ? 1 : 0);
+    }
 
     public static bool DamageNumbers
     {

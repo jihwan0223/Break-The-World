@@ -383,7 +383,7 @@ public class Click : MonoBehaviour
         _hoverHitCooldown -= Time.deltaTime;
         bool hover = !pressed && _hoverHitCooldown <= 0f && !_isTerrain && !IsZoneHidden
             && ZoneBreaker.ActiveBoss == null
-            && UpgradeManager.Instance != null && UpgradeManager.Instance.HoverClickIsUnlocked;
+            && UpgradeManager.Instance != null && UpgradeManager.Instance.HoverClickIsUnlocked && GameSettings.HoverClick;
         if (!pressed && !hover)
             return;
 

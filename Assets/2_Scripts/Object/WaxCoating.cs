@@ -84,7 +84,10 @@ public class WaxCoating : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetCache() => _shapes.Clear();
 
-    public bool Covers => enabled && (_forceCover || (!NoWax && (!_isTerrain || TerrainUnlocked)));
+    public bool Covers => enabled && (_forceCover || (!NoWax && (_isTerrain ? TerrainUnlocked : ObjectUnlocked)));
+
+    // 해금 전에도 보이는 배경 오브젝트(컨베이어 등)는 해금되기 전엔 왁스 없음
+    private bool ObjectUnlocked => ObjectManager.Instance == null || ObjectIndex < 0 || ObjectManager.Instance.IsUnlocked(ObjectIndex);
 
     public bool ForceCover
     {
