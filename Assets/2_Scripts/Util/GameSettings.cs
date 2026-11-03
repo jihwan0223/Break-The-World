@@ -88,9 +88,13 @@ public static class GameSettings
 
     public static int FpsIndex
     {
-        get => Mathf.Clamp(PlayerPrefs.GetInt(FpsKey, 1), 0, FpsOptions.Length - 1);
+        get => Mathf.Clamp(PlayerPrefs.GetInt(FpsKey, DefaultFpsIndex), 0, FpsOptions.Length - 1);
         set { PlayerPrefs.SetInt(FpsKey, Mathf.Clamp(value, 0, FpsOptions.Length - 1)); ApplyFrameRate(); }
     }
+
+    // 기본 프레임: 모니터가 144Hz 이상이면 144, 아니면 60
+    private static int DefaultFpsIndex =>
+        System.Array.IndexOf(FpsOptions, Screen.currentResolution.refreshRateRatio.value >= 143.5 ? 144 : 60);
 
     // 고를 수 있는 해상도: 16:9 표준 크기 전부 (작은 것부터)
     private static readonly Vector2Int[] StandardResolutions =
@@ -126,17 +130,35 @@ public static class GameSettings
         ApplyFrameRate();
 #if !UNITY_EDITOR
         ApplyDisplay();
+        var watcher = new GameObject("DisplayWatcher"); // 창 모드에서 유저가 창을 키우는지 봄
+        Object.DontDestroyOnLoad(watcher);
+        watcher.AddComponent<DisplayWatcher>();
 #endif
         UpdateBgm();
         SceneManager.sceneLoaded += (_, __) => UpdateBgm();
     }
 
+    private static float _displayAppliedAt; // 마지막으로 화면 모드를 바꾼 시각 (바뀌는 동안은 감시 안 함)
+    private const float DisplaySettleTime = 1f; // 초
+
     private static void ApplyDisplay()
     {
+        _displayAppliedAt = Time.unscaledTime;
 #if !UNITY_EDITOR
         Vector2Int size = Resolution;
         Screen.SetResolution(size.x, size.y, Fullscreen ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed);
 #endif
+    }
+
+    // 창 모드인데 유저가 창을 직접 키우거나(최대화) Alt+Enter로 전체 화면을 만들면 설정도 전체 화면으로
+    private class DisplayWatcher : MonoBehaviour
+    {
+        void Update()
+        {
+            if (Fullscreen || Time.unscaledTime - _displayAppliedAt < DisplaySettleTime) return;
+            Vector2Int size = Resolution; // 설정한 창 크기
+            if (Screen.fullScreen || Screen.width > size.x || Screen.height > size.y) Fullscreen = true;
+        }
     }
 
     private static void ApplyFrameRate()
