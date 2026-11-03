@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 // 업그레이드 트리의 환생 칸 (임시: 누르면 노드가 소용돌이로 빨려 들어간 뒤 데모 감사창)
 [RequireComponent(typeof(Image), typeof(Button))]
-public class RebirthNodeUI : MonoBehaviour
+public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private long pieceCost = 100_000_000; // 조각 100M
     [SerializeField] private long crystalCost = 1_000_000; // 결정 1M
@@ -16,23 +16,22 @@ public class RebirthNodeUI : MonoBehaviour
     [SerializeField] private float vortexZoom = 0.22f; // 연출 동안 카메라 배율
     [SerializeField] private Vector2 vortexTurns = new Vector2(1.2f, 2.8f); // 노드마다 도는 바퀴 수 (최소, 최대) - 서로 달라서 섞임
     [SerializeField] private int sparkleCount = 140; // 같이 빨려 드는 반짝이 개수
-    [SerializeField] private Color holeReadyColor = new Color(0.02f, 0.02f, 0.03f); // 누를 수 있을 때 (검정)
-    [SerializeField] private Color holeLockedColor = new Color(0.16f, 0.16f, 0.18f); // 조건이 모자랄 때 (짙은 회색)
+    [SerializeField] private Color readyTint = Color.white; // 누를 수 있을 때 그림 색
+    [SerializeField] private Color lockedTint = new Color(0.45f, 0.45f, 0.45f); // 조건이 모자랄 때 그림 색 (어둡게)
 
     private static readonly Color[] SparkleColors =
     {
         new Color(0.75f, 0.45f, 1f), new Color(0.45f, 0.9f, 1f), new Color(1f, 1f, 1f), new Color(1f, 0.55f, 0.85f),
     }; // 반짝이 색
-    private const string MetColor = "8CF5A8"; // 채운 조건 (밝은 초록)
-    private const string UnmetColor = "FF8A8A"; // 모자란 조건 (밝은 빨강)
+    private const string MetColor = "8CF5A8"; // 채운 조건 (초록)
+    private const string UnmetColor = "FF8A8A"; // 모자란 조건 (빨강)
 
-    private Image _image; // 네모 배경
-    private TextMeshProUGUI _title; // "환생"
-    private TextMeshProUGUI _conditions; // 조건 줄
+    private Image _image; // 환생 그림
     private UpgradeNodeUI[] _upgradeNodes; // 트리의 업그레이드 노드
     private ObjectEconomyNodeUI[] _economyNodes; // 트리의 오브젝트 해금 노드
     private float _nextRefresh; // 다음 조건 갱신 시각 (unscaled)
     private bool _busy; // 빨아들이는 중
+    private bool _hovered; // 마우스가 올라와 있음 (툴팁 갱신용)
     private readonly List<(RectTransform rect, Vector3 position, Vector3 scale, Quaternion rotation)> _saved =
         new List<(RectTransform, Vector3, Vector3, Quaternion)>(); // 원래 자리
     private readonly List<GameObject> _effects = new List<GameObject>(); // 연출용으로 만든 것 (끝나면 지움)
@@ -48,25 +47,6 @@ public class RebirthNodeUI : MonoBehaviour
         Transform root = tree != null ? tree.transform : transform.parent;
         _upgradeNodes = root.GetComponentsInChildren<UpgradeNodeUI>(true);
         _economyNodes = root.GetComponentsInChildren<ObjectEconomyNodeUI>(true);
-        _title = MakeText("Title", 96f, new Vector2(0f, 0.55f), new Vector2(1f, 1f));
-        _conditions = MakeText("Conditions", 44f, new Vector2(0f, 0f), new Vector2(1f, 0.55f));
-    }
-
-    private TextMeshProUGUI MakeText(string objectName, float size, Vector2 anchorMin, Vector2 anchorMax)
-    {
-        var go = new GameObject(objectName, typeof(RectTransform)); // 글자 오브젝트
-        go.transform.SetParent(transform, false);
-        var rect = (RectTransform)go.transform; // 글자 칸
-        rect.anchorMin = anchorMin;
-        rect.anchorMax = anchorMax;
-        rect.offsetMin = new Vector2(24f, 24f);
-        rect.offsetMax = new Vector2(-24f, -24f);
-        var text = go.AddComponent<TextMeshProUGUI>(); // 글자
-        text.fontSize = size;
-        text.alignment = TextAlignmentOptions.Center;
-        text.color = Color.white;
-        text.raycastTarget = false;
-        return text;
     }
 
     void OnEnable() => Refresh();
@@ -76,6 +56,7 @@ public class RebirthNodeUI : MonoBehaviour
         // 트리가 중간에 닫히면 노드를 제자리로
         if (_busy) Restore();
         _busy = false;
+        _hovered = false;
     }
 
     void Update()
@@ -87,18 +68,40 @@ public class RebirthNodeUI : MonoBehaviour
     private void Refresh()
     {
         _nextRefresh = Time.unscaledTime + 0.25f;
+        _image.color = IsReady() ? readyTint : lockedTint;
+        if (_hovered) UpgradeTooltip.Instance?.UpdateContent(BuildTooltipContent());
+    }
+
+    // 일반 노드와 같은 툴팁: 이름 / 설명(조건) / 가격
+    private UpgradeTooltip.Content BuildTooltipContent()
+    {
         CountNodes(out int done, out int total);
         long pieces = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetPieces() : 0; // 가진 조각
         long crystals = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetCrystals() : 0; // 가진 결정
-        _title.text = Loc.T("환생");
-        _conditions.text =
-            Line(Loc.T("업그레이드 {0}/{1}", done, total), done >= total) + "\n" +
-            Line(Loc.T("조각 {0}", NumberFormatUtil.Format(pieceCost)), pieces >= pieceCost) + "\n" +
-            Line(Loc.T("결정 {0}", NumberFormatUtil.Format(crystalCost)), crystals >= crystalCost);
-        _image.color = IsReady() ? holeReadyColor : holeLockedColor;
+        string piecesText = Line(Loc.T("{0} 조각", NumberFormatUtil.Format(pieceCost)), pieces >= pieceCost); // 조각 가격
+        string crystalsText = Line(Loc.T("{0} 결정", NumberFormatUtil.Format(crystalCost)), crystals >= crystalCost); // 결정 가격
+        return new UpgradeTooltip.Content
+        {
+            title = Loc.T("환생"),
+            description = Loc.T("모든 업그레이드를 해금해야 합니다.") + "\n" + Line(Loc.T("업그레이드 {0}/{1}", done, total), done >= total),
+            price = $"{piecesText} + {crystalsText}",
+        };
     }
 
     private static string Line(string text, bool met) => $"<color=#{(met ? MetColor : UnmetColor)}>{text}</color>";
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (_busy) return;
+        _hovered = true;
+        UpgradeTooltip.Instance?.Show(BuildTooltipContent(), (RectTransform)transform);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        _hovered = false;
+        UpgradeTooltip.Instance?.Hide();
+    }
 
     // 이번 버전(데모/풀)에 나오는 노드만 셈
     private void CountNodes(out int done, out int total)
@@ -129,9 +132,15 @@ public class RebirthNodeUI : MonoBehaviour
 
     private void HandleClicked()
     {
-        if (_busy || !IsReady()) return;
+        if (_busy) return;
         var cost = new[] { new PieceCost(pieceCost), new PieceCost(crystalCost, true) }; // 환생 비용
-        if (!CurrencyManager.Instance.TrySpendPieces(cost)) return;
+        if (!IsReady() || !CurrencyManager.Instance.TrySpendPieces(cost))
+        {
+            UpgradeTooltip.Instance?.PlayShake(); // 일반 노드처럼 못 사면 툴팁이 흔들림
+            return;
+        }
+        _hovered = false;
+        UpgradeTooltip.Instance?.Hide();
         StartCoroutine(VortexRoutine());
     }
 

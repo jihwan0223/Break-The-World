@@ -11805,9 +11805,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RebirthNodeUI
   pieceCost: 100000000
   crystalCost: 1000000
-  suckSeconds: 1.4
-  readyColor: {r: 1, g: 0.82, b: 0.35, a: 1}
-  lockedColor: {r: 0.55, g: 0.55, b: 0.55, a: 1}
+  vortexSeconds: 2.6
+  vortexZoom: 0.22
+  vortexTurns: {x: 1.2, y: 2.8}
+  sparkleCount: 140
+  readyTint: {r: 1, g: 1, b: 1, a: 1}
+  lockedTint: {r: 0.45, g: 0.45, b: 0.45, a: 1}
 --- !u!114 &307325131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11872,7 +11875,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 4cdd1a6d6f5e23943bdb82f2bc4016ca, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
