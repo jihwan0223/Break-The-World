@@ -15,10 +15,7 @@ public static class NumberFormatUtil
         while (tier < Units.Length - 1 && value / unit >= 1000) { unit *= 1000; tier++; }
         long whole = value / unit;
         // 반올림 대신 버림 - 못 사는 가격이 살 수 있어 보이지 않게
-        string number = whole < 10 ? $"{whole}.{value / (unit / 100) % 100:00}"
-                      : whole < 100 ? $"{whole}.{value / (unit / 10) % 10}"
-                      : whole.ToString(Invariant);
-        return number + Units[tier];
+        return $"{whole}.{value / (unit / 10) % 10}{Units[tier]}"; // 항상 소수점 한 자리 (1.2K, 12.3K, 123.4K)
     }
 
     private static double Floor(double v, double scale) => System.Math.Floor(v * scale) / scale;
