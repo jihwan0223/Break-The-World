@@ -20,6 +20,8 @@ public partial class SidePanelUI
     private VisualElement _demoBox;
     private static SidePanelUI _instance;
     private const float DemoBoxDelay = 2.5f; // 초
+    private const float DemoButtonLock = 2f; // 초 - 창이 뜬 뒤 실수로 바로 넘기지 않게 버튼을 막는 시간
+    private VisualElement _demoButtons; // 데모 완료 창의 버튼 줄
 
     public static void ShowDemoComplete()
     {
@@ -30,6 +32,9 @@ public partial class SidePanelUI
     {
         yield return new WaitForSecondsRealtime(DemoBoxDelay);
         _demoBox.style.display = DisplayStyle.Flex;
+        _demoButtons.SetEnabled(false);
+        yield return new WaitForSecondsRealtime(DemoButtonLock);
+        _demoButtons.SetEnabled(true);
     }
 
     private void CloseDemoBox() => _demoBox.style.display = DisplayStyle.None;
@@ -98,6 +103,7 @@ public partial class SidePanelUI
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
         window.Add(row);
+        _demoButtons = row;
         Button menu = CreateButton("메인 메뉴로", PixelStyle.Sky, () => { SaveManager.Instance?.SaveNow(); GoToMainMenu(); });
         Button resume = CreateButton("계속하기", PixelStyle.Mint, CloseDemoBox);
         foreach (Button b in new[] { menu, resume })
