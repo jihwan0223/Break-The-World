@@ -8692,11 +8692,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 2811
+      value: 2694.1
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 2811
+      value: 1908.6
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -16822,7 +16822,7 @@ GameObject:
   - component: {fileID: 512069070}
   - component: {fileID: 512069071}
   m_Layer: 5
-  m_Name: "Link_15_\uAC00\uB85C\uB4F1_\uB4DC\uB78D\uB7C9_\uAC15\uD654_to_146_\uC790\uC804\uAC70_\uD574\uAE08"
+  m_Name: "Link_145_\uAC00\uB85C\uB4F1_\uD574\uAE08_to_146_\uC790\uC804\uAC70_\uD574\uAE08"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16859,7 +16859,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6760eb25c92123649be66727efa77b94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeTreeLink
-  fromNode: {fileID: 211267656}
+  fromNode: {fileID: 850804813}
   extraFromNodes: []
   toNode: {fileID: 1596566612}
   routing: 0
@@ -23610,7 +23610,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ConveyorRider
   belt: {fileID: 123007892}
   speed: 1.2
-  startPhase: 0.25
+  startPhase: 0.5
 --- !u!1 &690885624
 GameObject:
   m_ObjectHideFlags: 0
@@ -29827,8 +29827,8 @@ MonoBehaviour:
     baseAmount: 5
     levelGrowth: 2
     firstLevelAmount: 0
-    levelAmounts: 0500000000000000c800000000000000983a000000000000804f120000000000
-  fullVersionCostMultiplier: 1
+    levelAmounts: 0500000000000000c800000000000000983a00000000000060e3160000000000
+  fullVersionCostMultiplier: 3
   upgradedSprite: {fileID: 21300000, guid: a14972812d92f8f48b01f03cb81ea5d1, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -30001,11 +30001,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 3671.9
+      value: 3555.1
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 2886.3
+      value: 1983.9
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
