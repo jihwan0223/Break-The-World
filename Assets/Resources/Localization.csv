@@ -126,7 +126,9 @@ La sauvegarde actuelle sera effacée."
 플레이 시간,Play Time,プレイ時間,游戏时长,Время игры,Tiempo de juego,Tempo de jogo,Spielzeit,Temps de jeu
 {0}시간 {1}분,{0}h {1}m,{0}時間{1}分,{0}小时{1}分钟,{0} ч {1} мин,{0} h {1} min,{0} h {1} min,{0} Std. {1} Min.,{0} h {1} min
 부순 오브젝트,Objects Broken,壊したオブジェクト,摧毁的物体,Разрушено объектов,Objetos rotos,Objetos quebrados,Zerstörte Objekte,Objets détruits
-직접 클릭,Manual Clicks,クリック数,手动点击,Клики,Clics manuales,Cliques manuais,Klicks,Clics manuels
+총 데미지,Total Damage,総ダメージ,总伤害,Общий урон,Daño total,Dano total,Gesamtschaden,Dégâts totaux
+최고 데미지,Best Hit,最高ダメージ,最高伤害,Лучший удар,Mejor golpe,Melhor golpe,Bester Treffer,Meilleur coup
+구매한 업그레이드,Upgrades Bought,購入したアップグレード,已购买升级,Куплено улучшений,Mejoras compradas,Melhorias compradas,Gekaufte Upgrades,Améliorations achetées
 {0}번,{0},{0}回,{0}次,{0},{0},{0},{0},{0}
 치명타,Crits,クリティカル,暴击,Криты,Críticos,Críticos,Krits,Critiques
 슈퍼 크리티컬,Super Crits,スーパークリティカル,超级暴击,Суперкриты,Supercríticos,Supercríticos,Superkrits,Super critiques
@@ -220,8 +222,8 @@ Fait"
 자동 채굴 간격이 {0}초 줄어듭니다.,Auto mine interval -{0}s.,オート採掘の間隔が{0}秒短くなります。,自动采掘间隔缩短{0}秒。,Интервал автодобычи -{0} с.,Intervalo de minería auto. -{0} s.,Intervalo de mineração auto. -{0} s.,Auto-Abbau-Intervall -{0} s.,Intervalle du minage auto -{0} s.
 자동 채굴 한 번에 얻는 조각이 +{0}배 증가합니다.,Auto mine yield +{0}x.,オート採掘1回で得るかけらが+{0}倍増えます。,每次自动采掘获得的碎片+{0}倍。,Добыча автодобычи +{0}x.,Botín de minería auto. +{0}x.,Ganho da mineração auto. +{0}x.,Auto-Abbau-Ausbeute +{0}x.,Gain du minage auto +{0}x.
 자동 줍기 간격이 {0}초 줄어듭니다.,Auto sweep interval -{0}s.,オート回収の間隔が{0}秒短くなります。,自动拾取间隔缩短{0}秒。,Интервал автосбора -{0} с.,Intervalo de recogida auto. -{0} s.,Intervalo da coleta auto. -{0} s.,Auto-Sammeln-Intervall -{0} s.,Intervalle du ramassage auto -{0} s.
-자동 줍기가 한 번에 쓸어 담는 조각 층이 +{0}층 증가합니다.,Auto sweep layers +{0}.,オート回収で一度に回収する層が+{0}層増えます。,自动拾取每次清扫的层数+{0}。,Слои автосбора +{0}.,Capas de recogida auto. +{0}.,Camadas da coleta auto. +{0}.,Auto-Sammeln-Schichten +{0}.,Couches du ramassage auto +{0}.
-커서 줍기가 한 번에 줍는 조각 층이 +{0}층 증가합니다.,Cursor pickup layers +{0}.,カーソル回収で一度に拾う層が+{0}層増えます。,光标拾取每次拾取的层数+{0}。,Слои сбора курсором +{0}.,Capas al recoger con cursor +{0}.,Camadas da coleta com cursor +{0}.,Cursor-Sammeln-Schichten +{0}.,Couches ramassées au curseur +{0}.
+자동 줍기가 한 번에 쓸어 담는 양이 +{0} 늘어납니다.,Auto sweep amount +{0}.,オート回収で一度に回収する量が+{0}増えます。,自动拾取每次清扫的量+{0}。,Объём автосбора +{0}.,Cantidad de recogida auto. +{0}.,Quantidade da coleta auto +{0}.,Auto-Sammelmenge +{0}.,Quantité de ramassage auto +{0}.
+커서 줍기가 한 번에 줍는 양이 +{0} 늘어납니다.,Cursor pickup amount +{0}.,カーソル回収で一度に拾う量が+{0}増えます。,光标拾取每次拾取的量+{0}。,Объём сбора курсором +{0}.,Cantidad con cursor +{0}.,Quantidade com cursor +{0}.,Cursor-Sammelmenge +{0}.,Quantité au curseur +{0}.
 커서 범위가 더 증가합니다.,Cursor range increases further.,カーソル範囲がさらに広がります。,光标范围进一步扩大。,Радиус курсора увеличивается.,El alcance del cursor aumenta.,O alcance do cursor aumenta.,Cursor-Reichweite steigt weiter.,La portée du curseur augmente.
 맵에 {0}이(가) +{1}개 더 놓입니다.,+{1} more {0} on the map.,マップに{0}が+{1}個多く置かれます。,地图上额外放置{1}个{0}。,{0}: +{1} на карте.,{0}: +{1} en el mapa.,{0}: +{1} no mapa.,{0}: +{1} auf der Karte.,{0} : +{1} sur la carte.
 {0} 결정,{0} Crystals,{0} 結晶,{0} 结晶,{0} крист.,{0} cristales,{0} cristais,{0} Kristalle,{0} cristaux
@@ -241,8 +243,8 @@ ESC를 누르면 설정을 열 수 있어요.,Press ESC to open Settings.,ESCキ
 커서 타격,Cursor Strike,カーソル攻撃,光标打击,Удар курсором,Golpe de cursor,Golpe do cursor,Cursor-Schlag,Frappe du curseur
 요트 자동클릭 속도,Yacht Auto Click Speed,ヨットオートクリック速度,游艇自动点击速度,Яхта: скорость автоклика,Yate: velocidad de clic auto.,Iate: velocidade do clique auto.,Jacht: Auto-Klick-Tempo,Yacht : vitesse du clic auto
 자동클릭 간격이 짧아집니다. (현재 {n}초),Shorter auto click interval. (Now {n}s),オートクリックの間隔が短くなります。(現在 {n}秒),自动点击间隔缩短。(当前 {n}秒),Интервал автоклика короче. (Сейчас {n} с),Intervalo de clic auto. más corto. (Ahora {n} s),Intervalo do clique auto. menor. (Agora {n} s),Kürzeres Auto-Klick-Intervall. (Aktuell {n} s),Intervalle du clic auto réduit. (Actuel {n} s)
-자동 줍기 층,Auto Sweep Layers,オート回収の層,自动拾取层数,Слои автосбора,Capas de recogida auto.,Camadas da coleta auto.,Auto-Sammeln-Schichten,Couches ramassage auto
-한 번에 쓸어 담는 층이 늘어납니다.,Sweeps more layers at once.,一度に回収する層が増えます。,每次清扫的层数增加。,За раз собирается больше слоёв.,Recoge más capas de una vez.,Recolhe mais camadas de uma vez.,Fegt mehr Schichten auf einmal.,Ramasse plus de couches à la fois.
+자동 줍기 양,Auto Sweep Amount,オート回収の量,自动拾取量,Объём автосбора,Cantidad de recogida auto.,Quantidade da coleta auto,Auto-Sammelmenge,Quantité ramassage auto
+한 번에 쓸어 담는 양이 늘어납니다.,Sweeps up more at once.,一度に回収する量が増えます。,每次清扫的量增加。,За раз собирается больше.,Recoge más de una vez.,Recolhe mais de uma vez.,Fegt mehr auf einmal.,Ramasse plus à la fois.
 장착 시 클릭 데미지가 늘어납니다.,Increases click damage while equipped.,装備中のクリックダメージが増えます。,装备时点击伤害提高。,"Повышает урон клика, когда экипировано.",Aumenta el daño por clic al equiparla.,Aumenta o dano por clique quando equipada.,"Erhöht den Klickschaden, solange ausgerüstet.",Augmente les dégâts par clic une fois équipée.
 프라이팬 데미지,Frying Pan Damage,フライパンダメージ,平底锅伤害,Сковорода: урон,Sartén: daño,Frigideira: dano,Bratpfanne: Schaden,Poêle : dégâts
 등대 자동클릭 횟수,Lighthouse Auto Click Hits,灯台オートクリック回数,灯塔自动点击次数,Маяк: удары автоклика,Faro: golpes de clic auto.,Farol: golpes do clique auto.,Leuchtturm: Auto-Klick-Treffer,Phare : coups du clic auto
@@ -299,7 +301,7 @@ UFO 자동클릭 횟수,UFO Auto Click Hits,UFOオートクリック回数,飞�
 인공위성 자동클릭 속도,Satellite Auto Click Speed,人工衛星オートクリック速度,人造卫星自动点击速度,Спутник: скорость автоклика,Satélite: velocidad de clic auto.,Satélite: velocidade do clique auto.,Satellit: Auto-Klick-Tempo,Satellite : vitesse du clic auto
 부표 자동클릭,Buoy Auto Click,ブイオートクリック,浮标自动点击,Буй: автоклик,Boya: clic automático,Boia marítima: clique automático,Boje: Auto-Klick,Balise : clic auto
 UFO 추가 지구치,Extra UFO,UFO追加配置,追加飞碟,НЛО: доп. копии,OVNI extra,OVNI extra,UFO: Extra,OVNI supplémentaire
-커서 줍기 층,Cursor Pickup Layers,カーソル回収の層,光标拾取层数,Слои сбора курсором,Capas con cursor,Camadas com cursor,Cursor-Sammeln-Schichten,Couches au curseur
+커서 줍기 양,Cursor Pickup Amount,カーソル回収の量,光标拾取量,Объём сбора курсором,Cantidad con cursor,Quantidade com cursor,Cursor-Sammelmenge,Quantité au curseur
 커서로 한 번에 줍는 파편 층이 늘어납니다.,Cursor picks up more shard layers at once.,カーソルで一度に拾うかけらの層が増えます。,光标每次拾取的碎片层数增加。,Курсор собирает больше слоёв осколков за раз.,El cursor recoge más capas de fragmentos a la vez.,O cursor recolhe mais camadas de fragmentos de uma vez.,Der Cursor sammelt mehr Splitter-Schichten auf einmal.,Le curseur ramasse plus de couches de fragments à la fois.
 가로등 추가 배치,Extra Streetlight,街灯追加配置,追加路灯,Фонарь: доп. копии,Farola extra,Poste de luz extra,Laterne: Extra,Lampadaire supplémentaire
 UFO 자동클릭 속도,UFO Auto Click Speed,UFOオートクリック速度,飞碟自动点击速度,НЛО: скорость автоклика,OVNI: velocidad de clic auto.,OVNI: velocidade do clique auto.,UFO: Auto-Klick-Tempo,OVNI : vitesse du clic auto
@@ -412,3 +414,6 @@ UFO 드랍량,UFO Drops,UFOドロップ量,飞碟掉落量,НЛО: добыча,
 미사일 데미지,Missile Damage,ミサイルダメージ,导弹伤害,Ракета: урон,Misil: daño,Míssil: dano,Rakete: Schaden,Missile : dégâts
 요트 드랍량,Yacht Drops,ヨットドロップ量,游艇掉落量,Яхта: добыча,Yate: botín,Iate: saque,Jacht: Ausbeute,Yacht : butin
 UFO,UFO,UFO,飞碟,НЛО,OVNI,OVNI,UFO,OVNI
+오브젝트,Objects,オブジェクト,物体,Объекты,Objetos,Objetos,Objekte,Objets
+맵,Maps,マップ,地图,Карты,Mapas,Mapas,Karten,Cartes
+결정 배율,Crystal Multiplier,結晶倍率,结晶倍率,Множитель кристаллов,Multiplicador de cristales,Multiplicador de cristais,Kristallmultiplikator,Multiplicateur de cristaux

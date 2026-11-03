@@ -185,8 +185,11 @@ public class ObjectManager : MonoBehaviour
 
     private static readonly string[] zoneNames = { "책상 위", "길거리", "공사장", "바다", "우주" };
 
-    public static string ZoneNameOf(int index) =>
-        Loc.T(zoneNames[Mathf.Clamp((objects[index].tier - 1) / 2, 0, zoneNames.Length - 1)]);
+    public static string ZoneNameOf(int index) => ZoneName(ZoneOfObject(index));
+
+    public static int ZoneOfObject(int index) => Mathf.Clamp((objects[index].tier - 1) / 2, 0, zoneNames.Length - 1); // 티어 2개 = 맵 1개
+
+    public static string ZoneName(int zone) => Loc.T(zoneNames[Mathf.Clamp(zone, 0, zoneNames.Length - 1)]);
 
     public static int FirstIndexOfTier(int tier) => objects.FindIndex(o => o.tier == tier);
 

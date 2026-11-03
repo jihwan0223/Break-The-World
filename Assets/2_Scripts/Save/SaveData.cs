@@ -18,7 +18,8 @@ public class SaveData
     public int killsSinceCrystal; // 결정 천장용
     public long totalCrystals; // 누적
     public long statObjectsBroken;
-    public long statClicks;
+    public long statTotalDamage;
+    public long statBestHit;
     public long statCrits;
     public long statSuperCrits;
     public long statBossClears;

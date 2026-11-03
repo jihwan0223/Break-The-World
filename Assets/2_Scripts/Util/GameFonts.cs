@@ -32,6 +32,9 @@ public static class GameFonts
         }
     }
 
+    private const string BoldFontName = "MonaS12Bold"; // ㅐ ㅔ 같은 1칸 세로 틈만 2칸으로 넓힌 MonaS12 (굵게 해도 안 붙음)
+    private static Font _uiBold; // Resources/MonaS12Bold.ttf
+
     private static UnityEngine.TextCore.Text.FontAsset _uiOutlined;
 
     // 테두리가 필요한 글자용 (UiColored는 비트맵이라 테두리 불가)
@@ -39,8 +42,10 @@ public static class GameFonts
     {
         get
         {
-            if (_uiOutlined == null && Ui != null)
-                _uiOutlined = UnityEngine.TextCore.Text.FontAsset.CreateFontAsset(Ui, UiColoredPixelSize, 8,
+            if (_uiBold == null) _uiBold = Resources.Load<Font>(BoldFontName);
+            Font source = _uiBold != null ? _uiBold : Ui; // 테두리 글자는 늘 굵게라 틈 넓힌 폰트를 씀
+            if (_uiOutlined == null && source != null)
+                _uiOutlined = UnityEngine.TextCore.Text.FontAsset.CreateFontAsset(source, UiColoredPixelSize, 8,
                     UnityEngine.TextCore.LowLevel.GlyphRenderMode.SDFAA, 1024, 1024);
             return _uiOutlined;
         }

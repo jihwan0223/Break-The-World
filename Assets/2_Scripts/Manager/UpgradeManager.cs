@@ -35,7 +35,7 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("결정 드랍량 증가")] CrystalAmount, // x2^값
         [InspectorName("자동 줍기 해금")] AutoSweepUnlock,
         [InspectorName("자동 줍기 주기 단축")] AutoSweepSpeed, // -값 초
-        [InspectorName("자동 줍기 층 증가")] AutoSweepLayers, // +값 층
+        [InspectorName("자동 줍기 양 증가")] AutoSweepLayers, // +값 층 (화면엔 "양")
         [InspectorName("호버 줍기 해금")] HoverPickupUnlock,
         [InspectorName("존 자동 파괴 해금")] ZoneAutoBreakUnlock,
         [InspectorName("오브젝트 추가 배치")] ObjectExtraCopies, // +값 개, 대상을 비우면 전체
@@ -43,7 +43,7 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("커서 타격 해금")] HoverClickUnlock,
         [InspectorName("조각 합치기 (표시용)")] PieceMergeDecoy, // 효과 없음 (표시용)
         [InspectorName("왁스 코팅 해금")] WaxCoatUnlock,
-        [InspectorName("커서 줍기 층 증가")] HoverPickupLayers, // +값 층
+        [InspectorName("커서 줍기 양 증가")] HoverPickupLayers, // +값 층 (화면엔 "양")
         [InspectorName("통계 창 해금")] StatsUnlock,
     }
 
@@ -91,6 +91,7 @@ public class UpgradeManager : MonoBehaviour
         public System.Func<bool> prerequisiteSatisfied; // null = 루트
         public float[] valuePerLevel;
         public (bool isCrystal, long baseAmount, float levelGrowth, long firstLevelAmount, long[] levelAmounts)[] costs;
+        public float fullVersionCostMultiplier = 1f; // 풀버전에서만 비용에 곱함
 
         public float ValueAtLevel(int level)
         {
@@ -114,6 +115,7 @@ public class UpgradeManager : MonoBehaviour
                     : currentLevel == 0 && costs[i].firstLevelAmount > 0
                     ? costs[i].firstLevelAmount
                     : costs[i].baseAmount * System.Math.Pow(costs[i].levelGrowth, currentLevel);
+                if (!GameSettings.IsDemo) raw *= fullVersionCostMultiplier;
                 long amount = raw >= long.MaxValue ? long.MaxValue : (long)System.Math.Max(1d, raw);
                 if (!costs[i].isCrystal) amount = NumberFormatUtil.RoundPrice(amount); // 결정은 그대로
                 result[i] = new PieceCost(amount, costs[i].isCrystal);
@@ -199,6 +201,7 @@ public class UpgradeManager : MonoBehaviour
                     : null,
                 valuePerLevel = ui.ValuePerLevel,
                 costs = ResolveCosts(ui.Costs),
+                fullVersionCostMultiplier = ui.FullVersionCostMultiplier,
             };
 
             _nodes.Add(node);
@@ -496,6 +499,7 @@ public class UpgradeManager : MonoBehaviour
     public long CrystalDropAmount => (long)baseCrystalAmount << Mathf.Clamp(Mathf.RoundToInt(SumEffect(UpgradeEffect.CrystalAmount)), 0, 20); // 레벨마다 2배
 
     private static readonly int[] CrystalZoneMultipliers = { 1, 10, 100, 1000, 10000 }; // 맵1 x1 ~ 맵5 x10000
+    public static int CrystalZoneMultiplier(int zone) => CrystalZoneMultipliers[Mathf.Clamp(zone, 0, CrystalZoneMultipliers.Length - 1)];
 
     // zone -1 = 지금 보는 존
     public long CrystalDropAmountIn(int zone)

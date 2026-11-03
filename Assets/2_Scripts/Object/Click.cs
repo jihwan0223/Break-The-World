@@ -196,7 +196,6 @@ public class Click : MonoBehaviour
             damage = Mathf.RoundToInt(damage * UpgradeManager.Instance.CritMultiplierValue * SuperCritMultiplier);
         else if (isCrit)
             damage = Mathf.RoundToInt(damage * UpgradeManager.Instance.CritMultiplierValue);
-        if (playerClick) GameStats.Clicks++;
         if (isSuper) GameStats.SuperCrits++;
         else if (isCrit) GameStats.Crits++;
         if (autoClick)
@@ -205,6 +204,8 @@ public class Click : MonoBehaviour
         bool bossFight = _boss != null && _boss.BossActive;
         bool shielded = bossFight && _boss.ShieldRatio > 0f;
         if (shielded) damage = Mathf.Max(1, Mathf.FloorToInt(damage * _boss.BossDamageMultiplier)); // 내림이라 작은 데미지도 줄어든 게 보임
+        GameStats.TotalDamage += damage;
+        if (damage > GameStats.BestHit) GameStats.BestHit = damage;
 
         bool willDie = damage >= _health.CurrentHP;
         bool hasBreakSound = ObjectManager.Instance != null && ObjIndex >= 0 && ObjIndex < ObjectManager.StaticObjectCount

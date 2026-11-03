@@ -22,6 +22,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     [Tooltip("이 업그레이드 한 번 올리는 데 드는 비용들. 조각과 결정을 동시에 요구할 수 있음 (전부 있어야 구매됨)")]
     [SerializeField] private NodeCost[] costs = { new NodeCost() };
+    [Tooltip("풀버전에서만 위 비용에 곱함 (데모는 그대로). 1이면 안 바뀜")]
+    [Min(1f)] [SerializeField] private float fullVersionCostMultiplier = 1f; // 풀버전 비용 배수
 
     [Tooltip("1레벨 이상 찍으면 바뀔 스프라이트 (비워두면 기본 이미지 그대로 유지)")]
     [SerializeField] private Sprite upgradedSprite;
@@ -64,6 +66,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public int MaxLevel => maxLevel;
     public float[] ValuePerLevel => valuePerLevel;
     public NodeCost[] Costs => costs;
+    public float FullVersionCostMultiplier => fullVersionCostMultiplier;
     public RectTransform Rect => _rect != null ? _rect : (_rect = (RectTransform)transform);
 
     public bool IsLeveled() => UpgradeManager.Instance != null && UpgradeManager.Instance.GetLevel(Id) >= 1;
@@ -212,8 +215,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.AutoMineSpeed: return Loc.T("자동 채굴 간격이 {0}초 줄어듭니다.", n);
             case UpgradeManager.UpgradeEffect.AutoMineYield: return Loc.T("자동 채굴 한 번에 얻는 조각이 +{0}배 증가합니다.", n);
             case UpgradeManager.UpgradeEffect.AutoSweepSpeed: return Loc.T("자동 줍기 간격이 {0}초 줄어듭니다.", n);
-            case UpgradeManager.UpgradeEffect.AutoSweepLayers: return Loc.T("자동 줍기가 한 번에 쓸어 담는 조각 층이 +{0}층 증가합니다.", n);
-            case UpgradeManager.UpgradeEffect.HoverPickupLayers: return Loc.T("커서 줍기가 한 번에 줍는 조각 층이 +{0}층 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.AutoSweepLayers: return Loc.T("자동 줍기가 한 번에 쓸어 담는 양이 +{0} 늘어납니다.", n);
+            case UpgradeManager.UpgradeEffect.HoverPickupLayers: return Loc.T("커서 줍기가 한 번에 줍는 양이 +{0} 늘어납니다.", n);
             case UpgradeManager.UpgradeEffect.CursorRange: return Loc.T("커서 범위가 더 증가합니다.");
             case UpgradeManager.UpgradeEffect.ObjectExtraCopies:
                 return Loc.T("맵에 {0}이(가) +{1}개 더 놓입니다.", targetObjectName, n);

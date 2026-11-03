@@ -124,7 +124,8 @@ public class SaveManager : MonoBehaviour
             killsSinceCrystal = CurrencyManager.Instance != null ? CurrencyManager.Instance.KillsSinceCrystal : 0,
             totalCrystals = CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalCrystals : 0,
             statObjectsBroken = GameStats.ObjectsBroken,
-            statClicks = GameStats.Clicks,
+            statTotalDamage = GameStats.TotalDamage,
+            statBestHit = GameStats.BestHit,
             statCrits = GameStats.Crits,
             statSuperCrits = GameStats.SuperCrits,
             statBossClears = GameStats.BossClears,
@@ -157,7 +158,8 @@ public class SaveManager : MonoBehaviour
         string json = File.ReadAllText(SavePath);
         SaveData data = JsonUtility.FromJson<SaveData>(json);
         GameStats.ObjectsBroken = data.statObjectsBroken;
-        GameStats.Clicks = data.statClicks;
+        GameStats.TotalDamage = data.statTotalDamage;
+        GameStats.BestHit = data.statBestHit;
         GameStats.Crits = data.statCrits;
         GameStats.SuperCrits = data.statSuperCrits;
         GameStats.BossClears = data.statBossClears;

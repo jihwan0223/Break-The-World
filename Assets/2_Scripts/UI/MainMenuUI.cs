@@ -203,7 +203,7 @@ public class MainMenuUI : MonoBehaviour
     }
 
     private static readonly PixelStyle.Tone NoSaveGray = new PixelStyle.Tone(
-        new Color(0.62f, 0.62f, 0.62f), new Color(0.74f, 0.74f, 0.74f), new Color(0.48f, 0.48f, 0.48f), new Color(0.30f, 0.30f, 0.30f), new Color(0.38f, 0.38f, 0.38f)); // 저장 없을 때 불러오기 버튼 색 (회색)
+        new Color(0.78f, 0.78f, 0.78f), new Color(0.88f, 0.88f, 0.88f), new Color(0.62f, 0.62f, 0.62f), new Color(0.40f, 0.40f, 0.40f), new Color(0.50f, 0.50f, 0.50f)); // 저장 없을 때 불러오기 버튼 색 (회색)
 
     private Button CreateMenuButton(string text, PixelStyle.Tone tone, System.Action onClick)
     {
@@ -215,6 +215,7 @@ public class MainMenuUI : MonoBehaviour
         button.style.marginBottom = 18;
         button.style.fontSize = 36;
         PixelStyle.Button(button, tone);
+        button.style.letterSpacing = 10; // px, 기본 6px보다 살짝 띄움
         _buttonTones[button] = tone;
 
         button.RegisterCallback<PointerEnterEvent>(_ =>

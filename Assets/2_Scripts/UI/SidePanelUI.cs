@@ -15,6 +15,7 @@ public partial class SidePanelUI : MonoBehaviour
     // 비활성으로 시작해서 Instance 대신 직접 SetActive로 켬
     [SerializeField] private GameObject upgradeTreePanel;
     [SerializeField] private Sprite settingsIcon;
+    [Tooltip("도감 맵 탭 그림, 0 = 책상 위")] [SerializeField] private Sprite[] zoneImages;
 
     private VisualElement _panel;
     private Label _panelTitle;
@@ -24,6 +25,15 @@ public partial class SidePanelUI : MonoBehaviour
     private BrowseState _objectBrowse = new BrowseState();
     private System.Action _refreshWeaponSelector;
     private System.Action _refreshObjectSelector;
+    private VisualElement _weaponDexContent; // 도감 무기 탭 (보기 전용)
+    private VisualElement _mapDexContent; // 도감 맵 탭
+    private BrowseState _weaponDexBrowse = new BrowseState(); // 도감 무기 탭에서 보고 있는 무기
+    private BrowseState _mapDexBrowse = new BrowseState(); // 도감 맵 탭에서 보고 있는 맵
+    private System.Action _refreshWeaponDex; // 도감 무기 탭 다시 그리기
+    private System.Action _refreshMapDex; // 도감 맵 탭 다시 그리기
+    private VisualElement _dexTabRow; // 도감 탭 버튼 줄
+    private readonly List<(Button button, VisualElement content)> _dexTabs = new List<(Button, VisualElement)>(); // 탭 버튼과 그 내용
+    private VisualElement _lastDexContent; // 도감을 다시 열면 이 탭으로
     private VisualElement _currentlyOpenContent;
     private ObjectData _objectAtPanelOpen;
 
@@ -173,9 +183,10 @@ public partial class SidePanelUI : MonoBehaviour
             index => ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(index),
             GetObjectInfoRows);
         _panel.Add(_objectContent);
+        BuildDexTabs();
 
         root.Add(_panel);
-        Loc.Bind(root, () => { _refreshWeaponSelector?.Invoke(); _refreshObjectSelector?.Invoke(); });
+        Loc.Bind(root, () => { _refreshWeaponSelector?.Invoke(); _refreshObjectSelector?.Invoke(); _refreshWeaponDex?.Invoke(); _refreshMapDex?.Invoke(); });
         BuildDebugPanel(root);
         BuildStatsPanel(root);
         BuildSettingsPanel(root);
@@ -206,7 +217,7 @@ public partial class SidePanelUI : MonoBehaviour
         var objectButton = CreateButton("도감", PixelStyle.Sky, () =>
         {
             Debug.Log("도감 버튼 눌림");
-            OpenPanel("도감", _objectContent);
+            OpenPanel("도감", _lastDexContent ?? _objectContent);
         });
 
         _statsButton = CreateButton("통계", PixelStyle.Butter, OpenStatsPanel);
@@ -849,7 +860,16 @@ public partial class SidePanelUI : MonoBehaviour
         _panelTitle.text = Loc.T(title);
         _currentlyOpenContent = contentToShow;
         _weaponContent.style.display = contentToShow == _weaponContent ? DisplayStyle.Flex : DisplayStyle.None;
-        _objectContent.style.display = contentToShow == _objectContent ? DisplayStyle.Flex : DisplayStyle.None;
+        bool dex = false; // 도감 탭 중 하나를 여는지
+        foreach (var (button, content) in _dexTabs)
+        {
+            bool on = content == contentToShow;
+            content.style.display = on ? DisplayStyle.Flex : DisplayStyle.None;
+            button.style.opacity = on ? 1f : 0.55f; // 고른 탭만 진하게
+            dex |= on;
+        }
+        _dexTabRow.style.display = dex ? DisplayStyle.Flex : DisplayStyle.None;
+        if (dex) _lastDexContent = contentToShow;
         _panel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility();
 
@@ -859,10 +879,99 @@ public partial class SidePanelUI : MonoBehaviour
 
         _refreshWeaponSelector?.Invoke();
         _refreshObjectSelector?.Invoke();
+        _refreshWeaponDex?.Invoke();
+        _refreshMapDex?.Invoke();
 
         // 팝업이 화면을 가려서 전환 연출은 닫을 때 재생
         if (contentToShow == _objectContent && ObjectManager.Instance != null)
             _objectAtPanelOpen = ObjectManager.Instance.CurrentObject;
+    }
+
+    // 도감: 무기 / 오브젝트 / 맵 탭 (셋 다 보기 전용)
+    private void BuildDexTabs()
+    {
+        _weaponDexContent = BuildSelectorSection(
+            _weaponDexBrowse,
+            WeaponCount,
+            index => Loc.T(WeaponManager.Instance.GetWeaponAt(index).weaponName),
+            index => WeaponManager.Instance != null ? WeaponManager.Instance.GetWeaponAt(index).icon : null,
+            () => -1,
+            _ => { },
+            out _refreshWeaponDex,
+            index => WeaponManager.Instance != null && !WeaponManager.Instance.IsUnlocked(index),
+            GetWeaponDexRows);
+        _panel.Add(_weaponDexContent);
+
+        _mapDexContent = BuildSelectorSection(
+            _mapDexBrowse,
+            () => ZoneManager.Instance != null ? ZoneManager.Instance.ZoneCount : 0,
+            ObjectManager.ZoneName,
+            zone => zoneImages != null && zone < zoneImages.Length ? zoneImages[zone] : null,
+            () => -1,
+            _ => { },
+            out _refreshMapDex,
+            zone => ZoneManager.Instance != null && zone > ZoneManager.Instance.UnlockedMaxZone,
+            GetMapDexRows);
+        _panel.Add(_mapDexContent);
+
+        _dexTabRow = new VisualElement();
+        _dexTabRow.style.position = Position.Absolute;
+        _dexTabRow.style.top = 100; // 제목 리본 바로 아래
+        _dexTabRow.style.left = 0;
+        _dexTabRow.style.right = 0;
+        _dexTabRow.style.flexDirection = FlexDirection.Row;
+        _dexTabRow.style.justifyContent = Justify.Center;
+        _panel.Add(_dexTabRow);
+
+        foreach (var (label, tone, content) in new[] {
+            ("무기", PixelStyle.Pink, _weaponDexContent),
+            ("오브젝트", PixelStyle.Sky, _objectContent),
+            ("맵", PixelStyle.Mint, _mapDexContent) })
+        {
+            content.style.top = 196; // 탭 줄 밑으로 내림
+            var tab = new Button(() => OpenPanel("도감", content));
+            Loc.Bind(tab, label);
+            tab.focusable = false;
+            tab.style.width = 260;
+            tab.style.height = 80;
+            tab.style.marginLeft = 10;
+            tab.style.marginRight = 10;
+            tab.style.fontSize = 32;
+            PixelStyle.Button(tab, tone);
+            _dexTabRow.Add(tab);
+            _dexTabs.Add((tab, content));
+        }
+    }
+
+    private (string label, string value, Color color)[] GetWeaponDexRows(int index)
+    {
+        WeaponManager weapons = WeaponManager.Instance;
+        if (weapons == null) return null;
+        bool locked = !weapons.IsUnlocked(index); // 아직 안 산 무기
+        int bonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetClickDamageBonus(index) : 0; // 강화 보너스
+        return new[]
+        {
+            ("공격력", locked ? "???" : NumberFormatUtil.Format(weapons.GetWeaponAt(index).clickDamage + bonus), locked ? HiddenColor : Color.white),
+            ("상태", weapons.EquippedIndex == index ? "장착 중" : locked ? "잠김" : "해금됨", locked ? BadColor : GoodColor),
+        };
+    }
+
+    private (string label, string value, Color color)[] GetMapDexRows(int zone)
+    {
+        bool locked = ZoneManager.Instance != null && zone > ZoneManager.Instance.UnlockedMaxZone; // 아직 못 간 맵
+        var rows = new List<(string label, string value, Color color)>
+        {
+            ("결정 배율", locked ? "???" : $"x{NumberFormatUtil.Format(UpgradeManager.CrystalZoneMultiplier(zone))}", locked ? HiddenColor : Color.white),
+        };
+        int count = ObjectManager.Instance != null ? ObjectManager.Instance.VisibleObjectCount : 0; // 데모는 풀버전 오브젝트 빼고
+        for (int i = 0; i < count; i++)
+        {
+            if (ObjectManager.ZoneOfObject(i) != zone) continue;
+            bool unlocked = ObjectManager.Instance.IsUnlocked(i); // 이 오브젝트 해금했는지
+            rows.Add((unlocked ? ObjectManager.Instance.GetObjectAt(i).objectName : "???", unlocked ? "해금됨" : "잠김", unlocked ? GoodColor : BadColor));
+        }
+        rows.Add(("상태", locked ? "잠김" : "해금됨", locked ? BadColor : GoodColor));
+        return rows.ToArray();
     }
 
     private void ClosePanel()

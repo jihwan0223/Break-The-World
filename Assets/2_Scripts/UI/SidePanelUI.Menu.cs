@@ -10,6 +10,7 @@ public partial class SidePanelUI
     private Button _statsButton;
     private VisualElement _statsPanel;
     private readonly List<(Label value, System.Func<string> get)> _statRows = new List<(Label, System.Func<string>)>();
+    private readonly List<(VisualElement row, System.Func<bool> visible)> _statGates = new List<(VisualElement, System.Func<bool>)>(); // 해금 전엔 숨길 통계 줄
     private VisualElement _settingsPanel;
     private VisualElement _confirmBox;
     private Label _confirmMessage;
@@ -391,16 +392,20 @@ public partial class SidePanelUI
         var left = StatColumn(columns, "기록");
         left.style.marginRight = 48;
         UpgradeManager U() => UpgradeManager.Instance;
+        bool CritOn() => U() != null && U().CritChanceValue > 0f; // 치명타 데미지를 한 번이라도 샀는지
+        bool SuperCritOn() => U() != null && U().LuckyClickIsUnlocked; // 슈퍼 크리티컬 해금
         AddStat(left, "플레이 시간", () => { var t = System.TimeSpan.FromSeconds(GameStats.PlaySeconds); return Loc.T("{0}시간 {1}분", (int)t.TotalHours, t.Minutes); });
         AddStat(left, "부순 오브젝트", () => Loc.T("{0}개", NumberFormatUtil.Format(GameStats.ObjectsBroken)));
-        AddStat(left, "직접 클릭", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.Clicks)));
-        AddStat(left, "치명타", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.Crits)));
-        AddStat(left, "슈퍼 크리티컬", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.SuperCrits)));
+        AddStat(left, "총 데미지", () => NumberFormatUtil.Format(GameStats.TotalDamage));
+        AddStat(left, "최고 데미지", () => NumberFormatUtil.Format(GameStats.BestHit));
+        AddStat(left, "치명타", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.Crits)), CritOn);
+        AddStat(left, "슈퍼 크리티컬", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.SuperCrits)), SuperCritOn);
         AddStat(left, "보스 처치", () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.BossClears)));
         AddStat(left, "얻은 조각", () => NumberFormatUtil.Format(CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalPieces : 0));
         AddStat(left, "얻은 결정", () => NumberFormatUtil.Format(CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalCrystals : 0));
         AddStat(left, "해금한 오브젝트", () => UnlockedText(ObjectManager.Instance != null ? ObjectManager.Instance.VisibleObjectCount : 0, i => ObjectManager.Instance.IsUnlocked(i)));
         AddStat(left, "해금한 무기", () => UnlockedText(WeaponManager.Instance != null ? WeaponManager.Instance.VisibleWeaponCount : 0, i => WeaponManager.Instance.IsUnlocked(i)));
+        AddStat(left, "구매한 업그레이드", () => UnlockedText(U() != null ? U().Nodes.Count : 0, i => U().GetLevel(U().Nodes[i].id) >= 1));
 
         var right = StatColumn(columns, "능력치");
         AddStat(right, "클릭 데미지", () =>
@@ -408,15 +413,15 @@ public partial class SidePanelUI
             if (WeaponManager.Instance == null || U() == null) return "-";
             return NumberFormatUtil.Format(WeaponManager.Instance.CurrentClickDamage + U().GetClickDamageBonus(WeaponManager.Instance.EquippedIndex));
         });
-        AddStat(right, "치명타 확률", () => U() != null ? Chance(U().CritChanceValue) : "-");
-        AddStat(right, "치명타 데미지", () => U() != null ? $"x{U().CritMultiplierValue:0.##}" : "-");
-        AddStat(right, "슈퍼 크리티컬 확률", () => U() != null ? Chance(U().LuckyClickChance) : "-");
-        AddStat(right, "슈퍼 크리티컬 데미지", () => U() != null ? $"x{U().CritMultiplierValue * 2f:0.##}" : "-");
-        AddStat(right, "더블 클릭 확률", () => U() != null && U().DoubleClickIsUnlocked ? Chance(U().DoubleClickChanceValue) : "잠김");
+        AddStat(right, "치명타 확률", () => U() != null ? Chance(U().CritChanceValue) : "-", CritOn);
+        AddStat(right, "치명타 데미지", () => U() != null ? $"x{U().CritMultiplierValue:0.##}" : "-", CritOn);
+        AddStat(right, "슈퍼 크리티컬 확률", () => U() != null ? Chance(U().LuckyClickChance) : "-", SuperCritOn);
+        AddStat(right, "슈퍼 크리티컬 데미지", () => U() != null ? $"x{U().CritMultiplierValue * 2f:0.##}" : "-", SuperCritOn);
+        AddStat(right, "더블 클릭 확률", () => U() != null ? Chance(U().DoubleClickChanceValue) : "-", () => U() != null && U().DoubleClickIsUnlocked);
         AddStat(right, "조각 획득 보너스", () => U() != null ? $"+{Mathf.RoundToInt((U().PieceGainMultiplier() - 1f) * 100f)}%" : "-");
         AddStat(right, "결정 확률", () => U() != null ? Chance(U().CrystalDropChance) : "-");
         AddStat(right, "결정 개수", () => U() != null ? Loc.T("{0}개", NumberFormatUtil.Format(U().CrystalDropAmountIn(-1))) : "-");
-        AddStat(right, "커서 범위", () => U() != null && U().HoverPickupIsUnlocked ? $"{U().CursorRadius:0.##}" : "잠김");
+        AddStat(right, "커서 범위", () => U() != null ? $"{U().CursorRadius:0.##}" : "-", () => U() != null && U().HoverPickupIsUnlocked);
 
         var objectsPage = StatPage();
         int count = GameSettings.IsDemo ? Mathf.Min(GameSettings.DemoObjectCount, ObjectManager.StaticObjectCount) : ObjectManager.StaticObjectCount; // 데모는 풀버전 오브젝트 빼고
@@ -424,12 +429,14 @@ public partial class SidePanelUI
         var objLeft = StatColumn(objectsPage, "부순 횟수");
         objLeft.style.marginRight = 48;
         var objRight = StatColumn(objectsPage, "부순 횟수");
+        // 오른쪽 칸 줄이 다 숨으면 빈 제목만 남아서 칸째로 숨김 (오브젝트는 순서대로 해금)
+        _statGates.Add((objRight, () => half < count && ObjectManager.Instance != null && ObjectManager.Instance.IsUnlocked(half)));
         for (int i = 0; i < count; i++)
         {
             int index = i;
             AddStat(i < half ? objLeft : objRight, ObjectManager.StaticObjectNameAt(index),
-                () => ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(index) && GameStats.BrokenOf(index) == 0
-                    ? "???" : Loc.T("{0}번", NumberFormatUtil.Format(GameStats.BrokenOf(index))));
+                () => Loc.T("{0}번", NumberFormatUtil.Format(GameStats.BrokenOf(index))),
+                () => ObjectManager.Instance != null && ObjectManager.Instance.IsUnlocked(index)); // 해금 전 오브젝트는 숨김
         }
 
         Button prev = StatArrow("<", -1);
@@ -500,7 +507,7 @@ public partial class SidePanelUI
         return column;
     }
 
-    private void AddStat(VisualElement column, string label, System.Func<string> get)
+    private void AddStat(VisualElement column, string label, System.Func<string> get, System.Func<bool> visible = null)
     {
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
@@ -527,6 +534,7 @@ public partial class SidePanelUI
         value.style.color = PixelStyle.Text.linear;
         row.Add(value);
         _statRows.Add((value, () => Loc.T(get())));
+        if (visible != null) _statGates.Add((row, visible));
         column.Add(row);
     }
 
@@ -542,6 +550,7 @@ public partial class SidePanelUI
     private void OpenStatsPanel()
     {
         foreach (var (value, get) in _statRows) value.text = get();
+        foreach (var (row, visible) in _statGates) row.style.display = visible() ? DisplayStyle.Flex : DisplayStyle.None;
         ShowStatPage(0);
         _statsPanel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility();

@@ -1,7 +1,8 @@
 public static class GameStats
 {
     public static long ObjectsBroken;
-    public static long Clicks;
+    public static long TotalDamage; // 지금까지 넣은 데미지 합
+    public static long BestHit; // 한 방 최고 데미지
     public static long Crits;
     public static long SuperCrits;
     public static long BossClears;
@@ -21,7 +22,7 @@ public static class GameStats
 
     public static void Reset()
     {
-        ObjectsBroken = Clicks = Crits = SuperCrits = BossClears = 0;
+        ObjectsBroken = TotalDamage = BestHit = Crits = SuperCrits = BossClears = 0;
         PlaySeconds = 0;
         BrokenPerObject = new long[0];
     }

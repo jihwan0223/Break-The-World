@@ -189,6 +189,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 0b965735cac9dcc4abac72b766d00dc1, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -458,6 +459,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: c85324f1e46798b4584297f432d11b5e, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: fullVersionCostMultiplier
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costs.Array.data[0].baseAmount
       value: 600
       objectReference: {fileID: 0}
@@ -628,6 +633,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 8d3042f6055d304479abaa6cf218cafa, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -765,8 +771,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49ec5c72bee8aec4da8558ac1ac58c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeNodeUI
-  displayName: "\uC790\uB3D9 \uC90D\uAE30 \uCE35"
-  description: "\uD55C \uBC88\uC5D0 \uC4F8\uC5B4 \uB2F4\uB294 \uCE35\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
+  displayName: "\uC790\uB3D9 \uC90D\uAE30 \uC591"
+  description: "\uD55C \uBC88\uC5D0 \uC4F8\uC5B4 \uB2F4\uB294 \uC591\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
   effect: 26
   targetWeaponName: 
   targetObjectName: 
@@ -779,6 +785,7 @@ MonoBehaviour:
     levelGrowth: 1.5
     firstLevelAmount: 0
     levelAmounts: 02000000000000006e00000000000000f82a000000000000804f120000000000
+  fullVersionCostMultiplier: 3
   upgradedSprite: {fileID: 21300000, guid: 6422f1e284d9a234b887b824df81d42b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -876,7 +883,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 213d1fe7cc1c5e94382ec6b4b73da0b9, type: 3}
+      objectReference: {fileID: 21300000, guid: 33d05b3e6c144473bab108c929f5c936, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -988,7 +995,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 21300000, guid: 07d9b6f1650788149ab85180b372f9e8, type: 3}
+      objectReference: {fileID: 21300000, guid: 0896e0ad8482448e8d2fd6a3bda8a342, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetWeaponName
       value: "\uD504\uB77C\uC774\uD32C"
@@ -1070,7 +1077,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 6353.2, y: -8968.2}
+  m_AnchoredPosition: {x: 8968.2, y: -6353.2}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &29914940
@@ -1104,6 +1111,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 64a00e52d39dc044695122eca63061a6, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -2644,6 +2652,7 @@ MonoBehaviour:
     levelGrowth: 1
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 9dff22c8891cb794188ca12381a59efc, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -3443,7 +3452,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3641, y: -6256}
+  m_AnchoredPosition: {x: 6256, y: -3641}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &93732249
@@ -3477,6 +3486,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1c426fc1cd12e2a408926b1392f60050, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -3628,6 +3638,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: d34658b5228748a43bc01e6f04b615d9, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -4775,6 +4786,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -4951,7 +4963,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 616.4
+      value: -616.4
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -6543,6 +6555,7 @@ MonoBehaviour:
     levelGrowth: 1
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: a9cc66647b1af7b4bbcece224405f0c1, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -11495,6 +11508,7 @@ MonoBehaviour:
     levelGrowth: 2
     firstLevelAmount: 1
     levelAmounts: 010000000000000006000000000000001b0000000000000078000000000000004c04000000000000c012000000000000f055000000000000d07e010000000000806d0d000000000000093d0000000000
+  fullVersionCostMultiplier: 10
   upgradedSprite: {fileID: 21300000, guid: 512ade04cedb5554fac763d35645f2cc, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -11617,7 +11631,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3557.4, y: -5300.7}
+  m_AnchoredPosition: {x: 5300.7, y: -3557.4}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &304738728
@@ -11651,6 +11665,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 638217a95794da64bab91dee13e67fb7, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -11773,7 +11788,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -4345.5, y: -3473.8}
+  m_AnchoredPosition: {x: -3473.8, y: -4345.5}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &313083370
@@ -11802,6 +11817,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -12010,6 +12026,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -12132,7 +12149,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 7057.7, y: -6186}
+  m_AnchoredPosition: {x: 6186, y: -7057.7}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &333021772
@@ -12165,6 +12182,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: b7a976cf8676399419e55b47e2e1bd8e, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -12945,6 +12963,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -13454,7 +13473,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 6263.6, y: 1232.7}
+  m_AnchoredPosition: {x: 6263.6, y: -1232.7}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &390975576
@@ -13483,6 +13502,7 @@ MonoBehaviour:
     levelGrowth: 3
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: d408d3f49ef3c024bae520606d51a30d, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -13660,6 +13680,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -14357,6 +14378,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -14608,7 +14630,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 5300.7, y: -3557.4}
+  m_AnchoredPosition: {x: 3557.4, y: -5300.7}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &438204125
@@ -14637,6 +14659,7 @@ MonoBehaviour:
     levelGrowth: 3
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 9b213b74c7efccb46a250e677c786c0d, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -16995,7 +17018,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -6256, y: -3641}
+  m_AnchoredPosition: {x: -3641, y: -6256}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &519545720
@@ -17029,6 +17052,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -17168,7 +17192,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -3473.8, y: -4345.5}
+  m_AnchoredPosition: {x: -4345.5, y: -3473.8}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &522860639
@@ -17201,6 +17225,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -17352,6 +17377,7 @@ MonoBehaviour:
     levelGrowth: 3
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -17662,6 +17688,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -18448,7 +18475,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 621457e3dcc54314697e8a7ca0aaccbc, type: 3}
+      objectReference: {fileID: 21300000, guid: eff8383407f84f1cb36c5506982d8c87, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -18560,7 +18587,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 21300000, guid: 07f73e711978bdc4b85783f68733f9ff, type: 3}
+      objectReference: {fileID: 21300000, guid: 33efd046f92942d681204e859c79efc6, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetWeaponName
       value: "\uB2E4\uC774\uB108\uB9C8\uC774\uD2B8"
@@ -20000,6 +20027,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 958c5634dda7d054f8a49c71dc9c9bdf, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
+      propertyPath: fullVersionCostMultiplier
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: 'valuePerLevel.Array.data[0]'
       value: 0.4
       objectReference: {fileID: 0}
@@ -21107,7 +21138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -616.4
+      value: 616.4
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -21530,6 +21561,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: b2196c8a3c687ba49b725f0e0c194537, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -21825,7 +21857,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -7542.1, y: -8413.8}
+  m_AnchoredPosition: {x: -8413.8, y: -7542.1}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &655703840
@@ -21858,6 +21890,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -22521,6 +22554,7 @@ MonoBehaviour:
     levelGrowth: 3
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d1b86d726621124e84a607af0b65bba, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -23720,7 +23754,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -6269.6, y: -8012.9}
+  m_AnchoredPosition: {x: -8012.9, y: -6269.6}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &692275815
@@ -23749,6 +23783,7 @@ MonoBehaviour:
     levelGrowth: 3
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -23923,7 +23958,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 621457e3dcc54314697e8a7ca0aaccbc, type: 3}
+      objectReference: {fileID: 21300000, guid: 848dcfc561a7474bbf2bb69154843a2c, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -24027,7 +24062,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 21300000, guid: 07f73e711978bdc4b85783f68733f9ff, type: 3}
+      objectReference: {fileID: 21300000, guid: c3d8d740fca14ff9a544c9f1c42a8a5a, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: fullVersionOnly
       value: 1
@@ -24197,6 +24232,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 24dd9d826cd40e94d80878e785271d78, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -24438,6 +24474,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -24674,7 +24711,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8413.8, y: -7542.1}
+  m_AnchoredPosition: {x: 7542.1, y: -8413.8}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &744547469
@@ -24707,6 +24744,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: bec8d30214ea7d4488ac37af5ab128cd, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -25768,6 +25806,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: efdafcf730ba6aa4183254ac2508e297, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -26500,7 +26539,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8968.2, y: -6353.2}
+  m_AnchoredPosition: {x: -6353.2, y: -8968.2}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &830660293
@@ -26534,6 +26573,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -27004,6 +27044,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 62ff687c22b97464aa8d14669c6ad591, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -28019,6 +28060,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -29171,7 +29213,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3473.8, y: -4345.5}
+  m_AnchoredPosition: {x: 4345.5, y: -3473.8}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &887472937
@@ -29200,6 +29242,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1ae6176701923274c89e129610ec8a23, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -29575,6 +29618,7 @@ MonoBehaviour:
     levelGrowth: 3
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -29769,7 +29813,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49ec5c72bee8aec4da8558ac1ac58c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeNodeUI
-  displayName: "\uCEE4\uC11C \uC90D\uAE30 \uCE35"
+  displayName: "\uCEE4\uC11C \uC90D\uAE30 \uC591"
   description: "\uCEE4\uC11C\uB85C \uD55C \uBC88\uC5D0 \uC90D\uB294 \uD30C\uD3B8
     \uCE35\uC774 \uB298\uC5B4\uB0A9\uB2C8\uB2E4."
   effect: 34
@@ -29784,6 +29828,7 @@ MonoBehaviour:
     levelGrowth: 2
     firstLevelAmount: 0
     levelAmounts: 0500000000000000c800000000000000983a000000000000804f120000000000
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: a14972812d92f8f48b01f03cb81ea5d1, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -31825,6 +31870,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -32061,7 +32107,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -3557.4, y: -5300.7}
+  m_AnchoredPosition: {x: -5300.7, y: -3557.4}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &986114307
@@ -32090,6 +32136,7 @@ MonoBehaviour:
     levelGrowth: 3
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -35749,6 +35796,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: c48b3981955846042837409e3e98efff, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -37650,6 +37698,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: f489bf623ef57a14798d4cc50f221328, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -39581,7 +39630,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 82ee056209dc9144c906637ef36e973e, type: 3}
+      objectReference: {fileID: 21300000, guid: d3dc462075274815917e4ee34857e619, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -39693,7 +39742,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 21300000, guid: 39a01c8984f95fe4d9bebbc98cccb936, type: 3}
+      objectReference: {fileID: 21300000, guid: e1361f83c40c4d53800de09fc4bbb5e9, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetWeaponName
       value: "\uAD50\uD1B5 \uD45C\uC9C0\uD310"
@@ -39813,6 +39862,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 3d86cb2616369d647b65e3b77509f48f, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -39935,7 +39985,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 6269.6, y: -8012.9}
+  m_AnchoredPosition: {x: 8012.9, y: -6269.6}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1207850172
@@ -39969,6 +40019,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: a0745b65e4851204981fe5efe7c1dd3b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -40869,7 +40920,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 621457e3dcc54314697e8a7ca0aaccbc, type: 3}
+      objectReference: {fileID: 21300000, guid: 22819316e66e46179b8bcaa8b29541b7, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -40973,7 +41024,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 21300000, guid: 07f73e711978bdc4b85783f68733f9ff, type: 3}
+      objectReference: {fileID: 21300000, guid: 40c9b3d6bddb4f1ba659c95ef42521de, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: fullVersionOnly
       value: 1
@@ -41773,7 +41824,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -1428.4
+      value: 1428.4
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -43115,6 +43166,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -44496,7 +44548,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: ab7af39cfd93bc840ba21a88b5fed3c0, type: 3}
+      objectReference: {fileID: 21300000, guid: c090db95a9c8492788eff3a64b6002c5, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -44608,7 +44660,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 21300000, guid: 13421c6652fa1b2449f8eafb74074ca6, type: 3}
+      objectReference: {fileID: 21300000, guid: 9f8939958adf473d83fb1677572d3e0e, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetWeaponName
       value: "\uACE1\uAD2D\uC774"
@@ -48618,6 +48670,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SidePanelUI
   upgradeTreePanel: {fileID: 552736140}
   settingsIcon: {fileID: 21300000, guid: 4aa8caad013964b7f927cf5cc9d7fcd3, type: 3}
+  zoneImages:
+  - {fileID: 21300000, guid: 65c36fbc70848cd4aaf2d6f68a583249, type: 3}
+  - {fileID: 21300000, guid: e8a8922688f340943ade0e66d35fa121, type: 3}
+  - {fileID: 21300000, guid: cd0b6e46993caab46bb9b2dbdc0bf9be, type: 3}
+  - {fileID: 21300000, guid: 61d68808623437d4fa3e4488a3951706, type: 3}
+  - {fileID: 21300000, guid: a1178458333fa22468663507af435e68, type: 3}
 --- !u!114 &1469551037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49981,7 +50039,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -1232.7
+      value: 1232.7
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -50805,7 +50863,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 4345.5, y: -3473.8}
+  m_AnchoredPosition: {x: 3473.8, y: -4345.5}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1571079120
@@ -50838,6 +50896,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: c78c292dd083b7f4abc7538e7ef3d33d, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -52726,7 +52785,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 621457e3dcc54314697e8a7ca0aaccbc, type: 3}
+      objectReference: {fileID: 21300000, guid: f89201e6a4924082b45661854fc32513, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -52830,7 +52889,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 21300000, guid: 07f73e711978bdc4b85783f68733f9ff, type: 3}
+      objectReference: {fileID: 21300000, guid: a755919aedcf4fc6967af93d93260898, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: fullVersionOnly
       value: 1
@@ -54177,7 +54236,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -6186, y: -7057.7}
+  m_AnchoredPosition: {x: -7057.7, y: -6186}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1659216831
@@ -54210,6 +54269,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -55264,7 +55324,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -7057.7, y: -6186}
+  m_AnchoredPosition: {x: -6186, y: -7057.7}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1685494268
@@ -55293,6 +55353,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -57008,6 +57069,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -58370,7 +58432,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: cda0aba13f790434aa6f4c904dafe489, type: 3}
+      objectReference: {fileID: 21300000, guid: 5180c9b248714664b5496b49ffba59fb, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -58482,7 +58544,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 21300000, guid: 66782e53cb59dd14592c7471931b33de, type: 3}
+      objectReference: {fileID: 21300000, guid: 770fa084f73c4e9a9c01bad6da8d238e, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: costs.Array.size
       value: 1
@@ -59740,7 +59802,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8012.9, y: -6269.6}
+  m_AnchoredPosition: {x: 6269.6, y: -8012.9}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1793915540
@@ -59769,6 +59831,7 @@ MonoBehaviour:
     levelGrowth: 3
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 59bdb66efb41ef94e9d733e246a7e420, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -61563,6 +61626,7 @@ MonoBehaviour:
     levelGrowth: 3
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 501cfe434064b764db2acee5552207b1, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -62706,7 +62770,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -5300.7, y: -3557.4}
+  m_AnchoredPosition: {x: -3557.4, y: -5300.7}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1850288909
@@ -62740,6 +62804,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -66397,7 +66462,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8012.9, y: -6269.6}
+  m_AnchoredPosition: {x: -6269.6, y: -8012.9}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1968718447
@@ -66431,6 +66496,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -66697,7 +66763,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 6186, y: -7057.7}
+  m_AnchoredPosition: {x: 7057.7, y: -6186}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1973519359
@@ -66726,6 +66792,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 1bf0e3dbba8e2fa41a14cb28f52f5c89, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -66878,6 +66945,7 @@ MonoBehaviour:
     levelGrowth: 1.5
     firstLevelAmount: 0
     levelAmounts: 020000000000000024000000000000001405000000000000f05500000000000000350c0000000000
+  fullVersionCostMultiplier: 3
   upgradedSprite: {fileID: 21300000, guid: 764d38dd92ae35a40be3efe489ddd502, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -67765,6 +67833,7 @@ MonoBehaviour:
     levelGrowth: 2
     firstLevelAmount: 2
     levelAmounts: 02000000000000000c0000000000000039000000000000000e01000000000000280a000000000000e02e000000000000c0da00000000000040ef070000000000a025260000000000001bb70000000000
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: bd125e900a79f914ca53ce1f0305393d, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
@@ -68178,11 +68247,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 6116.2
+      value: 5330.6
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 5330.6
+      value: 6116.2
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -69125,7 +69194,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -616.4
+      value: 616.4
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -69957,7 +70026,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 2142.6
+      value: -2142.6
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -70590,7 +70659,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1428.4
+      value: -1428.4
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -71001,11 +71070,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 5405.9
+      value: 6977.1
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 6977.1
+      value: 5405.9
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -71216,7 +71285,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -1232.7
+      value: 1232.7
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -71820,7 +71889,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 424af140d8fef0445987b161d6227a4d, type: 3}
+      objectReference: {fileID: 21300000, guid: 53cb8f66233747f28931973dda8d2199, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -71932,7 +72001,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 21300000, guid: a7f13e8890566bf498465ecf007a7fe6, type: 3}
+      objectReference: {fileID: 21300000, guid: 42f7163eb14b423c97e126b0e0fe369f, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: targetWeaponName
       value: "\uC57C\uAD6C \uBC29\uB9DD\uC774"
@@ -72892,11 +72961,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 6977.1
+      value: 5405.9
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 5405.9
+      value: 6977.1
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -73071,7 +73140,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -1849.1
+      value: 1849.1
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -73700,7 +73769,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -714.2
+      value: 714.2
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -74038,7 +74107,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 714.2
+      value: -714.2
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -74863,7 +74932,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 616.4
+      value: -616.4
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -76133,7 +76202,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -1849.1
+      value: 1849.1
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -76436,11 +76505,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 5330.6
+      value: 6116.2
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 6116.2
+      value: 5330.6
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -77010,7 +77079,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 616.4
+      value: -616.4
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -77931,11 +78000,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 7838
+      value: 5481.2
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 5481.2
+      value: 7838
       objectReference: {fileID: 0}
     - target: {fileID: 2091875725614723980, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -78132,7 +78201,7 @@ PrefabInstance:
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 621457e3dcc54314697e8a7ca0aaccbc, type: 3}
+      objectReference: {fileID: 21300000, guid: 27fb9666c9ef431f991ea85fee4f465d, type: 3}
     - target: {fileID: 1556740884150353402, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -78236,7 +78305,7 @@ PrefabInstance:
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: upgradedSprite
       value: 
-      objectReference: {fileID: 21300000, guid: 07f73e711978bdc4b85783f68733f9ff, type: 3}
+      objectReference: {fileID: 21300000, guid: c10a8f50c58b450ab1e51b927511a4e1, type: 3}
     - target: {fileID: 4400922678588336558, guid: 602d26c07b6beb2479b3b084ceed1a20, type: 3}
       propertyPath: fullVersionOnly
       value: 1
@@ -78542,6 +78611,7 @@ MonoBehaviour:
     levelGrowth: 1.8
     firstLevelAmount: 0
     levelAmounts: 
+  fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 21300000, guid: 8b6399fef352d4242ac8f18f920957e3, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
