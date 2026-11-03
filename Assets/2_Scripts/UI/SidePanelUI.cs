@@ -499,7 +499,7 @@ public partial class SidePanelUI : MonoBehaviour
         {
             int count = getCount();
             if (count <= 0) return;
-            browse.index = Mathf.Max(0, browse.index - 1);
+            browse.index = (browse.index - 1 + count) % count; // 처음에서 누르면 끝으로
             redraw();
         })
         { text = "<" };
@@ -508,7 +508,7 @@ public partial class SidePanelUI : MonoBehaviour
         {
             int count = getCount();
             if (count <= 0) return;
-            browse.index = Mathf.Min(count - 1, browse.index + 1);
+            browse.index = (browse.index + 1) % count; // 끝에서 누르면 처음으로
             redraw();
         })
         { text = ">" };
@@ -602,8 +602,8 @@ public partial class SidePanelUI : MonoBehaviour
 
         System.Action redraw = null;
 
-        var prevButton = new Button(() => { _weaponBrowse.index = Mathf.Max(0, _weaponBrowse.index - 1); redraw(); }) { text = "<" };
-        var nextButton = new Button(() => { _weaponBrowse.index = Mathf.Min(WeaponCount() - 1, _weaponBrowse.index + 1); redraw(); }) { text = ">" };
+        var prevButton = new Button(() => { int count = WeaponCount(); if (count <= 0) return; _weaponBrowse.index = (_weaponBrowse.index - 1 + count) % count; redraw(); }) { text = "<" };
+        var nextButton = new Button(() => { int count = WeaponCount(); if (count <= 0) return; _weaponBrowse.index = (_weaponBrowse.index + 1) % count; redraw(); }) { text = ">" };
 
         var nameLabel = new Label();
         nameLabel.style.fontSize = 36;
@@ -689,8 +689,8 @@ public partial class SidePanelUI : MonoBehaviour
         bool buyable = !unlocked && weapons.IsUnlockOrderMet(index);
         bool hidden = !unlocked && !buyable;
 
-        prevButton.SetEnabled(index > 0);
-        nextButton.SetEnabled(index < weapons.VisibleWeaponCount - 1);
+        prevButton.SetEnabled(weapons.VisibleWeaponCount > 1); // 끝에서 처음으로 돌아가서 항상 누를 수 있음
+        nextButton.SetEnabled(weapons.VisibleWeaponCount > 1);
 
         preview.sprite = data.icon;
         preview.tintColor = unlocked ? Color.white : Color.black;
