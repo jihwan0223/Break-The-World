@@ -14,7 +14,7 @@
 왁뿌볼,Wakppu Ball,ワクップボール,瓦克普球,Вакпу-мяч,Bola Wakppu,Bola Wakppu,Wakppu-Ball,Balle Wakppu
 간판,Signboard,看板,招牌,Вывеска,Letrero,Placa,Schild,Enseigne
 트럭,Truck,トラック,卡车,Грузовик,Camión,Caminhão,Lastwagen,Camion
-컨베이어 벨트,Conveyor Belt,ベルトコンベア,传送带,Конвейер,Cinta transportadora,Esteira,Förderband,Tapis roulant
+택배상자,Parcel Box,宅配便の箱,快递箱,Посылка,Caja de paquete,Caixa de encomenda,Paket,Colis
 회사,Company,会社,公司,Офис,Empresa,Empresa,Firma,Entreprise
 튜브,Swim Ring,浮き輪,游泳圈,Надувной круг,Flotador,Boia inflável,Schwimmring,Bouée gonflable
 부표,Buoy,ブイ,浮标,Буй,Boya,Boia marítima,Boje,Balise
@@ -274,6 +274,8 @@ UFO 자동클릭,UFO Auto Click,UFOオートクリック,飞碟自动点击,НЛ
 등대 드랍량,Lighthouse Drops,灯台ドロップ量,灯塔掉落量,Маяк: добыча,Faro: botín,Farol: saque,Leuchtturm: Ausbeute,Phare : butin
 지구 자동클릭 횟수,Earth Auto Click Hits,地球オートクリック回数,地球自动点击次数,Земля: удары автоклика,Tierra: golpes de clic auto.,Terra: golpes do clique auto.,Erde: Auto-Klick-Treffer,Terre : coups du clic auto
 간판 추가 배치,Extra Signboard,看板追加配置,追加招牌,Вывеска: доп. копии,Letrero extra,Placa extra,Schild: Extra,Enseigne supplémentaire
+트럭 추가 배치,Extra Truck,トラック追加配置,追加卡车,Грузовик: доп. копии,Camión extra,Caminhão extra,Lastwagen: Extra,Camion supplémentaire
+택배상자 추가 배치,Extra Parcel Box,宅配便の箱追加配置,追加快递箱,Посылка: доп. копии,Caja de paquete extra,Caixa de encomenda extra,Paket: Extra,Colis supplémentaire
 하나 더 놓입니다.,One more is placed on the map.,もう1つ置かれます。,再多放置一个。,На карте появится ещё один.,Se coloca uno más en el mapa.,Mais um é colocado no mapa.,Ein weiteres wird platziert.,Un exemplaire de plus est placé.
 UFO 자동클릭 횟수,UFO Auto Click Hits,UFOオートクリック回数,飞碟自动点击次数,НЛО: удары автоклика,OVNI: golpes de clic auto.,OVNI: golpes do clique auto.,UFO: Auto-Klick-Treffer,OVNI : coups du clic auto
 인공위성 자동클릭 횟수,Satellite Auto Click Hits,人工衛星オートクリック回数,人造卫星自动点击次数,Спутник: удары автоклика,Satélite: golpes de clic auto.,Satélite: golpes do clique auto.,Satellit: Auto-Klick-Treffer,Satellite : coups du clic auto
@@ -366,7 +368,7 @@ UFO 드랍량,UFO Drops,UFOドロップ量,飞碟掉落量,НЛО: добыча,
 사과 드랍량,Apple Drops,リンゴドロップ量,苹果掉落量,Яблоко: добыча,Manzana: botín,Maçã: saque,Apfel: Ausbeute,Pomme : butin
 트럭 자동클릭,Truck Auto Click,トラックオートクリック,卡车自动点击,Грузовик: автоклик,Camión: clic automático,Caminhão: clique automático,Lastwagen: Auto-Klick,Camion : clic auto
 자동차 자동클릭 속도,Car Auto Click Speed,自動車オートクリック速度,汽车自动点击速度,Машина: скорость автоклика,Coche: velocidad de clic auto.,Carro: velocidade do clique auto.,Auto: Auto-Klick-Tempo,Voiture : vitesse du clic auto
-컨베이어 벨트 자동클릭,Conveyor Belt Auto Click,ベルトコンベアオートクリック,传送带自动点击,Конвейер: автоклик,Cinta transportadora: clic automático,Esteira: clique automático,Förderband: Auto-Klick,Tapis roulant : clic auto
+택배상자 자동클릭,Parcel Box Auto Click,宅配便の箱オートクリック,快递箱自动点击,Посылка: автоклик,Caja de paquete: clic automático,Caixa de encomenda: clique automático,Paket: Auto-Klick,Colis : clic auto
 자동차 드랍량,Car Drops,自動車ドロップ量,汽车掉落量,Машина: добыча,Coche: botín,Carro: saque,Auto: Ausbeute,Voiture : butin
 왁뿌볼 자동클릭,Wakppu Ball Auto Click,ワクップボールオートクリック,瓦克普球自动点击,Вакпу-мяч: автоклик,Bola Wakppu: clic automático,Bola Wakppu: clique automático,Wakppu-Ball: Auto-Klick,Balle Wakppu : clic auto
 회사 자동클릭 속도,Company Auto Click Speed,会社オートクリック速度,公司自动点击速度,Офис: скорость автоклика,Empresa: velocidad de clic auto.,Empresa: velocidade do clique auto.,Firma: Auto-Klick-Tempo,Entreprise : vitesse du clic auto
@@ -377,7 +379,7 @@ UFO 드랍량,UFO Drops,UFOドロップ量,飞碟掉落量,НЛО: добыча,
 버터 자동클릭 속도,Butter Auto Click Speed,バターオートクリック速度,黄油自动点击速度,Масло: скорость автоклика,Mantequilla: velocidad de clic auto.,Manteiga: velocidade do clique auto.,Butter: Auto-Klick-Tempo,Beurre : vitesse du clic auto
 식빵 자동클릭 횟수,Bread Auto Click Hits,食パンオートクリック回数,吐司自动点击次数,Хлеб: удары автоклика,Pan de molde: golpes de clic auto.,Pão de forma: golpes do clique auto.,Toastbrot: Auto-Klick-Treffer,Pain de mie : coups du clic auto
 가로수 추가 배치,Extra Street Tree,街路樹追加配置,追加行道树,Дерево: доп. копии,Árbol extra,Árvore extra,Straßenbaum: Extra,Arbre supplémentaire
-컨베이어 벨트 자동클릭 속도,Conveyor Belt Auto Click Speed,ベルトコンベアオートクリック速度,传送带自动点击速度,Конвейер: скорость автоклика,Cinta transportadora: velocidad de clic auto.,Esteira: velocidade do clique auto.,Förderband: Auto-Klick-Tempo,Tapis roulant : vitesse du clic auto
+택배상자 자동클릭 속도,Parcel Box Auto Click Speed,宅配便の箱オートクリック速度,快递箱自动点击速度,Посылка: скорость автоклика,Caja de paquete: velocidad de clic auto.,Caixa de encomenda: velocidade do clique auto.,Paket: Auto-Klick-Tempo,Colis : vitesse du clic auto
 트럭 자동클릭 횟수,Truck Auto Click Hits,トラックオートクリック回数,卡车自动点击次数,Грузовик: удары автоклика,Camión: golpes de clic auto.,Caminhão: golpes do clique auto.,Lastwagen: Auto-Klick-Treffer,Camion : coups du clic auto
 도로 자동클릭 속도,Road Auto Click Speed,道路オートクリック速度,道路自动点击速度,Дорога: скорость автоклика,Carretera: velocidad de clic auto.,Estrada: velocidade do clique auto.,Fahrbahn: Auto-Klick-Tempo,Route : vitesse du clic auto
 자전거 자동클릭,Bicycle Auto Click,自転車オートクリック,自行车自动点击,Велосипед: автоклик,Bicicleta: clic automático,Bicicleta: clique automático,Fahrrad: Auto-Klick,Vélo : clic auto
@@ -386,7 +388,7 @@ UFO 드랍량,UFO Drops,UFOドロップ量,飞碟掉落量,НЛО: добыча,
 자전거 자동클릭 횟수,Bicycle Auto Click Hits,自転車オートクリック回数,自行车自动点击次数,Велосипед: удары автоклика,Bicicleta: golpes de clic auto.,Bicicleta: golpes do clique auto.,Fahrrad: Auto-Klick-Treffer,Vélo : coups du clic auto
 식빵 자동클릭,Bread Auto Click,食パンオートクリック,吐司自动点击,Хлеб: автоклик,Pan de molde: clic automático,Pão de forma: clique automático,Toastbrot: Auto-Klick,Pain de mie : clic auto
 가로수 자동클릭 속도,Street Tree Auto Click Speed,街路樹オートクリック速度,行道树自动点击速度,Дерево: скорость автоклика,Árbol: velocidad de clic auto.,Árvore: velocidade do clique auto.,Straßenbaum: Auto-Klick-Tempo,Arbre : vitesse du clic auto
-컨베이어 벨트 자동클릭 횟수,Conveyor Belt Auto Click Hits,ベルトコンベアオートクリック回数,传送带自动点击次数,Конвейер: удары автоклика,Cinta transportadora: golpes de clic auto.,Esteira: golpes do clique auto.,Förderband: Auto-Klick-Treffer,Tapis roulant : coups du clic auto
+택배상자 자동클릭 횟수,Parcel Box Auto Click Hits,宅配便の箱オートクリック回数,快递箱自动点击次数,Посылка: удары автоклика,Caja de paquete: golpes de clic auto.,Caixa de encomenda: golpes do clique auto.,Paket: Auto-Klick-Treffer,Colis : coups du clic auto
 왁뿌볼 자동클릭 속도,Wakppu Ball Auto Click Speed,ワクップボールオートクリック速度,瓦克普球自动点击速度,Вакпу-мяч: скорость автоклика,Bola Wakppu: velocidad de clic auto.,Bola Wakppu: velocidade do clique auto.,Wakppu-Ball: Auto-Klick-Tempo,Balle Wakppu : vitesse du clic auto
 자동차 자동클릭,Car Auto Click,自動車オートクリック,汽车自动点击,Машина: автоклик,Coche: clic automático,Carro: clique automático,Auto: Auto-Klick,Voiture : clic auto
 버터 드랍량,Butter Drops,バタードロップ量,黄油掉落量,Масло: добыча,Mantequilla: botín,Manteiga: saque,Butter: Ausbeute,Beurre : butin
@@ -394,7 +396,7 @@ UFO 드랍량,UFO Drops,UFOドロップ量,飞碟掉落量,НЛО: добыча,
 버터 자동클릭,Butter Auto Click,バターオートクリック,黄油自动点击,Масло: автоклик,Mantequilla: clic automático,Manteiga: clique automático,Butter: Auto-Klick,Beurre : clic auto
 자전거 자동클릭 속도,Bicycle Auto Click Speed,自転車オートクリック速度,自行车自动点击速度,Велосипед: скорость автоклика,Bicicleta: velocidad de clic auto.,Bicicleta: velocidade do clique auto.,Fahrrad: Auto-Klick-Tempo,Vélo : vitesse du clic auto
 사과 자동클릭 속도,Apple Auto Click Speed,リンゴオートクリック速度,苹果自动点击速度,Яблоко: скорость автоклика,Manzana: velocidad de clic auto.,Maçã: velocidade do clique auto.,Apfel: Auto-Klick-Tempo,Pomme : vitesse du clic auto
-컨베이어 벨트 드랍량,Conveyor Belt Drops,ベルトコンベアドロップ量,传送带掉落量,Конвейер: добыча,Cinta transportadora: botín,Esteira: saque,Förderband: Ausbeute,Tapis roulant : butin
+택배상자 드랍량,Parcel Box Drops,宅配便の箱ドロップ量,快递箱掉落量,Посылка: добыча,Caja de paquete: botín,Caixa de encomenda: saque,Paket: Ausbeute,Colis : butin
 사과 자동클릭,Apple Auto Click,リンゴオートクリック,苹果自动点击,Яблоко: автоклик,Manzana: clic automático,Maçã: clique automático,Apfel: Auto-Klick,Pomme : clic auto
 회사 자동클릭,Company Auto Click,会社オートクリック,公司自动点击,Офис: автоклик,Empresa: clic automático,Empresa: clique automático,Firma: Auto-Klick,Entreprise : clic auto
 왁뿌볼 드랍량,Wakppu Ball Drops,ワクップボールドロップ量,瓦克普球掉落量,Вакпу-мяч: добыча,Bola Wakppu: botín,Bola Wakppu: saque,Wakppu-Ball: Ausbeute,Balle Wakppu : butin

@@ -13,7 +13,6 @@ public static class NodeIconGenerator
     static readonly RectInt BadgeArea = new RectInt(18, 2, 13, 14); // 위에서부터 센 좌표
     static readonly RectInt ObjectBox = new RectInt(2, 10, 20, 20); // 위에서부터 센 좌표
     static readonly RectInt WideBox = new RectInt(2, 16, 28, 14);
-    static readonly RectInt RiderBox = new RectInt(4, 6, 10, 10);
     const float StripAspect = 2f;
     static readonly string[] KeepOriginal = { };
     static readonly Dictionary<string, string[]> OnlyBadges = new Dictionary<string, string[]> { { "자동차", new[] { "AutoClick", "AutoSpeed", "AutoCount", "PlusOne" } } };
@@ -25,10 +24,8 @@ public static class NodeIconGenerator
     static readonly string[] CrispObjects = { "자전거" };
     static readonly RectInt CrispBox = new RectInt(2, 15, 26, 15);
     const int CrispScale = 2;
-    static readonly string[] StripObjects = { "도로", "컨베이어 벨트" };
+    static readonly string[] StripObjects = { "도로" };
     static readonly string[] SternObjects = { "배" }; // 너무 긴 그림이라 오른쪽(선교) 부분만
-    const string BeltName = "컨베이어 벨트";
-    const string BeltRider = "왁뿌볼";
     static readonly Color32 BorderX = new Color32(255, 255, 255, 255);
     static readonly Color32 BorderO = new Color32(0, 255, 0, 255);
     static readonly Color32 Inside = new Color32(0, 0, 0, 255);
@@ -103,11 +100,6 @@ public static class NodeIconGenerator
                 RectInt box = strip || stern ? WideBox : crisp ? CrispBox : ObjectBox;
                 if (crisp) { scale = CrispScale; box = new RectInt(box.x * scale, box.y * scale, box.width * scale, box.height * scale); }
                 layers.Add((FitObject(source, box, strip || stern ? StripAspect : 0f, crisp, stern), box));
-            }
-            if (name == BeltName)
-            {
-                Sprite rider = SourceSprite(visuals, ObjectManager.StaticIndexOfName(BeltRider));
-                if (rider != null) layers.Add((FitObject(rider, RiderBox, 0f, false), RiderBox));
             }
             Color32[] badgePixels = t.badge != null ? badges[t.badge] : null;
             paths.Add(WritePng($"{OutDir}/{key}_X.png", Compose(BorderX, layers, badgePixels, scale), Size * scale));
