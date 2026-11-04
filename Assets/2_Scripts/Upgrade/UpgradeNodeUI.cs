@@ -38,6 +38,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         [Tooltip("체크하면 조각 대신 결정으로 결제")]
         public bool useCrystals;
+        [Tooltip("체크하면 별조각으로 결제 (환생 창 노드). 결정 체크보다 우선")]
+        public bool useStarShards;
         [Min(1)] public long baseAmount = 10;
         public float levelGrowth = 2f;
         [Tooltip("0보다 크면 0->1레벨 비용만 이 값으로 (1레벨만 싸게). 2레벨부터는 위 공식 그대로")]
@@ -46,6 +48,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         public long[] levelAmounts = System.Array.Empty<long>(); // 있으면 공식 대신 레벨별 값
     }
 
+    private UpgradeTreeUI _tree; // 이 노드가 들어있는 트리 (업그레이드 / 환생)
+    private UpgradeTreeUI Tree => _tree != null ? _tree : (_tree = GetComponentInParent<UpgradeTreeUI>(true));
     private Button _button;
     private Image _icon;
     private Sprite _baseSprite;
@@ -106,7 +110,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     private void CheckGateOpened()
     {
         if (string.IsNullOrEmpty(gateObjectName) || IsGateClosed) return;
-        UpgradeTreeUI tree = UpgradeTreeUI.Instance;
+        UpgradeTreeUI tree = Tree;
         if (tree == null || !tree.isActiveAndEnabled || !GateReveals.TryMarkSeen(name)) return;
         if (SaveManager.Instance != null) SaveManager.Instance.MarkDirty(); // 본 연출을 세이브에 남김
         _gateRevealPending = true;
@@ -134,11 +138,11 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         }
         UpgradeTooltip.Instance?.UpdateContent(BuildTooltipContent());
         PlayShake();
-        bool crystal = Array.Exists(costs, cost => cost.useCrystals);
+        bool crystal = Array.Exists(costs, cost => cost.useCrystals || cost.useStarShards);
         bool maxed = UpgradeManager.Instance.GetLevel(Id) >= maxLevel;
         NodePurchaseEffect.Play(_rect, crystal ? NodePurchaseEffect.CrystalColor : NodePurchaseEffect.NormalColor, maxed);
         UpgradeTooltip.Instance?.PlayShake();
-        UpgradeTreeUI.Instance?.RefreshAll(animateReveals: true);
+        Tree?.RefreshAll(animateReveals: true);
     }
 
     private UpgradeTooltip.Content BuildTooltipContent()
@@ -218,6 +222,10 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.AutoSweepLayers: return Loc.T("자동 줍기가 한 번에 쓸어 담는 양이 +{0} 늘어납니다.", n);
             case UpgradeManager.UpgradeEffect.HoverPickupLayers: return Loc.T("커서 줍기가 한 번에 줍는 양이 +{0} 늘어납니다.", n);
             case UpgradeManager.UpgradeEffect.CursorRange: return Loc.T("커서 범위가 더 증가합니다.");
+            case UpgradeManager.UpgradeEffect.UpgradeDiscount: return Loc.T("업그레이드 가격이 {0}% 줄어듭니다.", n);
+            case UpgradeManager.UpgradeEffect.StarShardGain: return Loc.T("환생할 때 얻는 별조각이 +{0}% 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.RebirthKeepPiecePercent: return Loc.T("환생할 때 가진 조각의 {0}%를 더 가지고 시작합니다.", n);
+            case UpgradeManager.UpgradeEffect.CrystalGainPercent: return Loc.T("결정을 얻을 때 개수가 +{0}% 증가합니다.", n);
             case UpgradeManager.UpgradeEffect.ObjectExtraCopies:
                 return Loc.T("맵에 {0}이(가) +{1}개 더 놓입니다.", targetObjectName, n);
             default: return null;
@@ -241,11 +249,14 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         long pieces = 0;
         long crystals = 0;
+        long stars = 0; // 별조각
         foreach (PieceCost c in cost)
         {
-            if (c.isCrystal) crystals += c.amount;
+            if (c.isStarShard) stars += c.amount;
+            else if (c.isCrystal) crystals += c.amount;
             else pieces += c.amount;
         }
+        if (stars > 0) return Loc.T("{0} 별조각", NumberFormatUtil.Format(stars));
 
         string piecesText = pieces > 0 ? Loc.T("{0} 조각", NumberFormatUtil.Format(pieces)) : "";
         string crystalsText = crystals > 0 ? Loc.T("{0} 결정", NumberFormatUtil.Format(crystals)) : "";
@@ -271,7 +282,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         CheckGateOpened();
         UpdateIcon(UpgradeManager.Instance.GetLevel(Id));
-        NoticeBadge.Set(ref _badge, Rect, UpgradeManager.Instance.CanUpgrade(Id), UpgradeManager.Instance.UsesCrystals(Id));
+        NoticeBadge.Set(ref _badge, Rect, UpgradeManager.Instance.CanUpgrade(Id), UpgradeManager.Instance.UsesCrystals(Id) || UpgradeManager.Instance.UsesStarShards(Id));
         if (justRevealed)
         {
             PlayShake();

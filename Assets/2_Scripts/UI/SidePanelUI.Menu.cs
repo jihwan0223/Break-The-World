@@ -425,7 +425,18 @@ public partial class SidePanelUI
         AddCountStat(left, "얻은 결정", () => CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalCrystals : 0, NumberFormatUtil.Format);
         AddStat(left, "해금한 오브젝트", () => UnlockedText(ObjectManager.Instance != null ? ObjectManager.Instance.VisibleObjectCount : 0, i => ObjectManager.Instance.IsUnlocked(i)));
         AddStat(left, "해금한 무기", () => UnlockedText(WeaponManager.Instance != null ? WeaponManager.Instance.VisibleWeaponCount : 0, i => WeaponManager.Instance.IsUnlocked(i)));
-        AddStat(left, "구매한 업그레이드", () => UnlockedText(U() != null ? U().Nodes.Count : 0, i => U().GetLevel(U().Nodes[i].id) >= 1));
+        AddStat(left, "구매한 업그레이드", () =>
+        {
+            int bought = 0, total = 0; // 환생 창 노드는 빼고 셈
+            if (U() != null)
+                foreach (var node in U().Nodes)
+                {
+                    if (U().UsesStarShards(node.id)) continue;
+                    total++;
+                    if (U().GetLevel(node.id) >= 1) bought++;
+                }
+            return $"{bought} / {total}";
+        });
 
         var right = StatColumn(columns, "능력치");
         AddStat(right, "클릭 데미지", () =>

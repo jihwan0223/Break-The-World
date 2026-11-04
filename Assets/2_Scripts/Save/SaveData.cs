@@ -17,6 +17,8 @@ public class SaveData
     public bool everHadCrystal;
     public int killsSinceCrystal; // 결정 천장용
     public long totalCrystals; // 누적
+    public long starShards; // 별조각 (환생 재화)
+    public long totalStarShards; // 지금까지 얻은 별조각
     public long statObjectsBroken;
     public long statTotalDamage;
     public long statBestHit;

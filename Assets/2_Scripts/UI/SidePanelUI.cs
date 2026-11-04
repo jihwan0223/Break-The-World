@@ -14,6 +14,7 @@ public partial class SidePanelUI : MonoBehaviour
 
     // 비활성으로 시작해서 Instance 대신 직접 SetActive로 켬
     [SerializeField] private GameObject upgradeTreePanel;
+    [SerializeField] private GameObject rebirthTreePanel; // 환생 창 (지금은 디버그에서만 엶)
     [SerializeField] private Sprite settingsIcon;
     [Tooltip("도감 맵 탭 그림, 0 = 책상 위")] [SerializeField] private Sprite[] zoneImages;
 
@@ -80,7 +81,7 @@ public partial class SidePanelUI : MonoBehaviour
         else if (_statsPanel.style.display == DisplayStyle.Flex) CloseStatsPanel();
         else if (_confirmBox.style.display == DisplayStyle.Flex) _confirmBox.style.display = DisplayStyle.None;
         else if (_settingsPanel.style.display == DisplayStyle.Flex) CloseSettingsPanel();
-        else if (_upgradeTreeOpen) UpgradeTreeUI.Instance?.Close();
+        else if (_upgradeTreeOpen) UpgradeTreeUI.Current?.Close();
         else OpenSettingsPanel();
     }
 
@@ -305,13 +306,23 @@ public partial class SidePanelUI : MonoBehaviour
         list.style.left = 0;
         list.style.right = 0;
         list.style.top = 110;
-        list.style.alignItems = Align.Center;
+        list.style.flexDirection = FlexDirection.Row; // 버튼이 많아 여러 줄로
+        list.style.flexWrap = Wrap.Wrap;
+        list.style.justifyContent = Justify.Center;
+        list.style.paddingLeft = list.style.paddingRight = 160;
 
         AddDebugButton(list, "돈 최대", () =>
         {
             CurrencyManager.Instance?.AddPieces(10_000_000_000L);
             CurrencyManager.Instance?.AddCrystals(1000);
-            return "조각 100억 개와 결정 1,000개를 지급했습니다";
+            CurrencyManager.Instance?.AddStarShards(100);
+            return "조각 100억 개, 결정 1,000개, 별조각 100개를 지급했습니다";
+        });
+        AddDebugButton(list, "환생 창 열기", () =>
+        {
+            CloseDebugPanel();
+            if (rebirthTreePanel != null) rebirthTreePanel.SetActive(true);
+            return "";
         });
         AddDebugButton(list, "돈 초기화", () =>
         {
@@ -410,6 +421,7 @@ public partial class SidePanelUI : MonoBehaviour
         button.style.width = 460;
         button.style.height = 90;
         button.style.marginBottom = 14;
+        button.style.marginLeft = button.style.marginRight = 10;
         list.Add(button);
     }
 

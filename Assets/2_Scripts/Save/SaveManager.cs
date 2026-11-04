@@ -38,6 +38,7 @@ public class SaveManager : MonoBehaviour
         {
             CurrencyManager.Instance.OnPiecesChanged += _ => MarkDirty();
             CurrencyManager.Instance.OnCrystalsChanged += _ => MarkDirty();
+            CurrencyManager.Instance.OnStarShardsChanged += _ => SaveSoon();
         }
 
         if (WeaponManager.Instance != null)
@@ -154,6 +155,8 @@ public class SaveManager : MonoBehaviour
             everHadCrystal = CurrencyManager.Instance != null && CurrencyManager.Instance.EverHadCrystal,
             killsSinceCrystal = CurrencyManager.Instance != null ? CurrencyManager.Instance.KillsSinceCrystal : 0,
             totalCrystals = CurrencyManager.Instance != null ? CurrencyManager.Instance.TotalCrystals : 0,
+            starShards = CurrencyManager.Instance.GetStarShards(),
+            totalStarShards = CurrencyManager.Instance.TotalStarShards,
             statObjectsBroken = GameStats.ObjectsBroken,
             statTotalDamage = GameStats.TotalDamage,
             statBestHit = GameStats.BestHit,
@@ -245,6 +248,8 @@ public class SaveManager : MonoBehaviour
             CurrencyManager.Instance.SetProgress(System.Math.Max(data.totalPieces, data.pieces), hadCrystal, data.killsSinceCrystal,
                 System.Math.Max(data.totalCrystals, data.crystals)); // 옛 세이브는 보유량으로
             CurrencyManager.Instance.SetCrystals(data.crystals);
+            CurrencyManager.Instance.SetStarShardProgress(System.Math.Max(data.totalStarShards, data.starShards));
+            CurrencyManager.Instance.SetStarShards(data.starShards);
         }
     }
 }

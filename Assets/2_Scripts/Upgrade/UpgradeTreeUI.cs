@@ -5,7 +5,11 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(RectTransform))]
 public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    public static UpgradeTreeUI Instance { get; private set; }
+    public static UpgradeTreeUI Instance { get; private set; } // 업그레이드 트리 (환생 창은 아님)
+    public static UpgradeTreeUI Current { get; private set; } // 지금 열려 있는 트리 창 (업그레이드 / 환생)
+
+    [Tooltip("환생 창이면 체크 (업그레이드 트리 Instance로 안 잡힘)")]
+    [SerializeField] private bool isRebirthTree; // 환생 창
 
     public static event System.Action<bool> OnTreeToggled;
 
@@ -32,13 +36,15 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
 
     void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (!isRebirthTree)
         {
-            Destroy(gameObject);
-            return;
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
         }
-
-        Instance = this;
         CacheNodes();
         StyleButton("CloseButton", PixelStyle.Pink, "X", new Vector2(84f, 84f));
         StyleButton("CameraResetButton", PixelStyle.Mint, "카메라 리셋", new Vector2(300f, 90f));
@@ -83,7 +89,9 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         RefreshAll();
         Loc.Changed += OnLanguageChanged;
 
-        UIPointerGuard.SetPopup("UpgradeTree", true); // 게임은 계속 돌고 월드 클릭만 막음
+        UIPointerGuard.SetPopup(name, true); // 게임은 계속 돌고 월드 클릭만 막음
+        Current = this;
+        UpgradeTooltip.Use(GetComponentInChildren<UpgradeTooltip>(true));
 
         OnTreeToggled?.Invoke(true);
     }
@@ -99,7 +107,8 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         pending?.Invoke();
         _revealRunning = false;
 
-        UIPointerGuard.SetPopup("UpgradeTree", false);
+        UIPointerGuard.SetPopup(name, false);
+        if (Current == this) Current = null;
 
         UIPointerGuard.IsPointerOverUI = false;
 

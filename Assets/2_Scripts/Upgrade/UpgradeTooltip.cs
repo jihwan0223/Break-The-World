@@ -46,6 +46,9 @@ public class UpgradeTooltip : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    // 트리 창이 둘(업그레이드 / 환생)이라 열린 창의 툴팁을 씀
+    public static void Use(UpgradeTooltip tooltip) { if (tooltip != null) Instance = tooltip; }
+
     void OnDestroy()
     {
         if (Instance == this) Instance = null;

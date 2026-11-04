@@ -22,6 +22,9 @@ public class PieceUI : MonoBehaviour
     private Label _crystalLabel;
     private VisualElement _crystalRow;
     private long _lastCrystals;
+    private Label _starLabel; // 별조각 개수
+    private VisualElement _starRow; // 별조각 줄 (처음 얻기 전엔 숨김)
+    private long _lastStars; // 늘었는지 비교용
 
     private class PulseState
     {
@@ -58,10 +61,12 @@ public class PieceUI : MonoBehaviour
         {
             CurrencyManager.Instance.OnPiecesChanged += UpdatePieceLabel;
             CurrencyManager.Instance.OnCrystalsChanged += UpdateCrystalLabel;
+            CurrencyManager.Instance.OnStarShardsChanged += UpdateStarLabel;
             GameSettings.OnNumberFormatChanged += RedrawNumbers;
 
             UpdatePieceLabel(CurrencyManager.Instance.GetPieces());
             UpdateCrystalLabel(CurrencyManager.Instance.GetCrystals());
+            UpdateStarLabel(CurrencyManager.Instance.GetStarShards());
         }
     }
 
@@ -71,6 +76,7 @@ public class PieceUI : MonoBehaviour
         {
             CurrencyManager.Instance.OnPiecesChanged -= UpdatePieceLabel;
             CurrencyManager.Instance.OnCrystalsChanged -= UpdateCrystalLabel;
+            CurrencyManager.Instance.OnStarShardsChanged -= UpdateStarLabel;
         }
         GameSettings.OnNumberFormatChanged -= RedrawNumbers;
     }
@@ -96,6 +102,7 @@ public class PieceUI : MonoBehaviour
 
         _pieceLabel = AddRow(background, ShardTexture(WarmShard), PixelStyle.Text.linear, out _);
         _crystalLabel = AddRow(background, ShardTexture(SkyShard), new Color(0.23f, 0.53f, 0.66f).linear, out _crystalRow);
+        _starLabel = AddRow(background, ShardTexture(StarShard), new Color(0.55f, 0.3f, 0.78f).linear, out _starRow);
 
         root.Add(background);
     }
@@ -146,6 +153,7 @@ public class PieceUI : MonoBehaviour
     };
     private static readonly Color32[] WarmShard = { new Color32(60, 36, 24, 255), new Color32(255, 214, 120, 255), new Color32(235, 160, 70, 255), new Color32(180, 100, 40, 255), new Color32(255, 255, 230, 255) };
     private static readonly Color32[] SkyShard = { new Color32(20, 40, 70, 255), new Color32(170, 230, 255, 255), new Color32(90, 180, 240, 255), new Color32(40, 110, 200, 255), new Color32(255, 255, 255, 255) };
+    private static readonly Color32[] StarShard = { new Color32(45, 18, 70, 255), new Color32(235, 190, 255, 255), new Color32(180, 110, 245, 255), new Color32(115, 55, 195, 255), new Color32(255, 250, 210, 255) }; // 별조각 (보라)
 
     private static Texture2D ShardTexture(Color32[] palette)
     {
@@ -172,6 +180,15 @@ public class PieceUI : MonoBehaviour
 
         if (increased)
             QueuePulse(_crystalLabel);
+    }
+
+    private void UpdateStarLabel(long amount)
+    {
+        _starLabel.text = NumberFormatUtil.Format(amount);
+        bool shown = amount > 0 || (CurrencyManager.Instance != null && CurrencyManager.Instance.TotalStarShards > 0); // 한 번이라도 얻었으면 보임
+        _starRow.style.display = shown ? DisplayStyle.Flex : DisplayStyle.None;
+        if (amount > _lastStars) QueuePulse(_starLabel);
+        _lastStars = amount;
     }
 
     private void QueuePulse(Label label)
@@ -239,6 +256,7 @@ public class PieceUI : MonoBehaviour
     {
         SetPieceText();
         if (CurrencyManager.Instance != null) _crystalLabel.text = NumberFormatUtil.Format(CurrencyManager.Instance.GetCrystals());
+        if (CurrencyManager.Instance != null) _starLabel.text = NumberFormatUtil.Format(CurrencyManager.Instance.GetStarShards());
     }
 
     private void SetPieceText() => _pieceLabel.text = NumberFormatUtil.Format((long)_shownPieces);

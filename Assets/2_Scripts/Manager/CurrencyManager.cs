@@ -17,6 +17,26 @@ public class CurrencyManager : MonoBehaviour
 
     public event Action<long> OnCrystalsChanged;
 
+    private long _starShards; // 별조각 (환생 재화)
+    private long _totalStarShards; // 지금까지 얻은 별조각 (표시 여부용)
+    public event Action<long> OnStarShardsChanged;
+    public long TotalStarShards => _totalStarShards;
+    public long GetStarShards() => _starShards;
+
+    public void AddStarShards(long amount)
+    {
+        if (amount > 0) _totalStarShards += amount;
+        SetStarShards(_starShards + amount);
+    }
+
+    public void SetStarShards(long amount)
+    {
+        _starShards = amount;
+        OnStarShardsChanged?.Invoke(_starShards);
+    }
+
+    public void SetStarShardProgress(long total) => _totalStarShards = total;
+
     [SerializeField] private long starterCrystalPieces = 50; // 누적 이만큼 얻으면 첫 결정 확정 드랍
 
     private long _totalPieces;
@@ -99,15 +119,16 @@ public class CurrencyManager : MonoBehaviour
     public bool CanAfford(IReadOnlyList<PieceCost> costs)
     {
         if (costs == null) return true;
-        var (pieces, crystals) = Sum(costs);
-        return (debugAlwaysMaxPieces || _pieces >= pieces) && _crystals >= crystals;
+        var (pieces, crystals, stars) = Sum(costs);
+        return (debugAlwaysMaxPieces || _pieces >= pieces) && _crystals >= crystals && _starShards >= stars;
     }
 
     // 하나라도 부족하면 아무것도 차감하지 않음
     public bool TrySpendPieces(IReadOnlyList<PieceCost> costs)
     {
-        var (pieces, crystals) = Sum(costs);
+        var (pieces, crystals, stars) = Sum(costs);
 
+        if (_starShards < stars) return false;
         if (!debugAlwaysMaxPieces && _pieces < pieces)
         {
             Debug.Log($"조각 부족: {pieces}개 필요, 현재 {_pieces}개 보유 (부족분 {pieces - _pieces}개)");
@@ -127,18 +148,21 @@ public class CurrencyManager : MonoBehaviour
         }
         if (crystals > 0)
             SetCrystals(_crystals - crystals);
+        if (stars > 0)
+            SetStarShards(_starShards - stars);
         return true;
     }
 
-    private static (long pieces, long crystals) Sum(IReadOnlyList<PieceCost> costs)
+    private static (long pieces, long crystals, long stars) Sum(IReadOnlyList<PieceCost> costs)
     {
-        long pieces = 0, crystals = 0;
+        long pieces = 0, crystals = 0, stars = 0; // 재화별 합
         foreach (PieceCost cost in costs)
         {
-            if (cost.isCrystal) crystals += cost.amount;
+            if (cost.isStarShard) stars += cost.amount;
+            else if (cost.isCrystal) crystals += cost.amount;
             else pieces += cost.amount;
         }
-        return (pieces, crystals);
+        return (pieces, crystals, stars);
     }
 
     public void ResetAll()
@@ -151,5 +175,7 @@ public class CurrencyManager : MonoBehaviour
         _killsSinceCrystal = 0;
         _totalCrystals = 0;
         SetCrystals(0);
+        _totalStarShards = 0;
+        SetStarShards(0);
     }
 }
