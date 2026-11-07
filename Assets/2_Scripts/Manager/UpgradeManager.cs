@@ -55,6 +55,7 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("환생: 조각/결정 유지")] RebirthKeepCurrency,
         [InspectorName("결정 획득량 증가 (%)")] CrystalGainPercent, // +값 %
         [InspectorName("한 번에 최대 레벨 구매 해금")] BulkBuyUnlock,
+        [InspectorName("환생: 창 열어도 게임 진행")] WindowsKeepRunning,
     }
 
     public enum LinkRouting
@@ -547,6 +548,7 @@ public class UpgradeManager : MonoBehaviour
     public float CursorRadius => SumEffect(UpgradeEffect.CursorRange) + (HoverPickupIsUnlocked ? hoverPickupBaseRadius : 0f);
     public bool HoverClickIsUnlocked => AnyUnlocked(UpgradeEffect.HoverClickUnlock);
     public bool StatsIsUnlocked => AnyUnlocked(UpgradeEffect.StatsUnlock);
+    public bool WindowsKeepRunningIsUnlocked => AnyUnlocked(UpgradeEffect.WindowsKeepRunning); // 설정·도감·무기 창을 열어도 안 멈춤
     public float HoverClickIntervalSeconds => Mathf.Max(0.02f, hoverClickInterval); // 0 이하로 넣어도 매 프레임은 안 때리게
 
     public float AutoSweepIntervalSeconds =>

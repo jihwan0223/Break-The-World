@@ -26,6 +26,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     private const string MetColor = "8CF5A8"; // 채운 조건 (초록)
     private const string UnmetColor = "FF8A8A"; // 모자란 조건 (빨강)
 
+    public static bool Hovered { get; private set; } // 마우스가 환생 칸 위 (재화 칸에 별조각 보여줌)
     private Image _image; // 환생 그림
     private UpgradeNodeUI[] _upgradeNodes; // 트리의 업그레이드 노드
     private ObjectEconomyNodeUI[] _economyNodes; // 트리의 오브젝트 해금 노드
@@ -56,7 +57,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         // 트리가 중간에 닫히면 노드를 제자리로
         if (_busy) Restore();
         _busy = false;
-        _hovered = false;
+        _hovered = Hovered = false;
     }
 
     void Update()
@@ -92,6 +93,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        Hovered = true;
         if (_busy) return;
         _hovered = true;
         UpgradeTooltip.Instance?.Show(BuildTooltipContent(), (RectTransform)transform);
@@ -99,7 +101,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        _hovered = false;
+        _hovered = Hovered = false;
         UpgradeTooltip.Instance?.Hide();
     }
 

@@ -358,7 +358,7 @@ public partial class SidePanelUI
         _confirmBox.style.display = DisplayStyle.None;
         _settingsPanel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility();
-        Time.timeScale = 0f; // 열려 있는 동안 게임 정지 (통계·업그레이드만 계속 진행)
+        PauseForWindow("Settings", true); // 열려 있는 동안 게임 정지 (환생 노드가 있으면 계속 진행)
         OnSelectorPanelToggled?.Invoke(true);
     }
 
@@ -367,7 +367,7 @@ public partial class SidePanelUI
         _settingsPanel.style.display = DisplayStyle.None;
         PlayerPrefs.Save();
         RefreshButtonRowVisibility();
-        Time.timeScale = 1f;
+        PauseForWindow("Settings", false);
         OnSelectorPanelToggled?.Invoke(false);
     }
 

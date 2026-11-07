@@ -12,6 +12,7 @@ public class PieceUI : MonoBehaviour
     [SerializeField] private float fontSize = GameFonts.UiColoredPixelSize; // px - 폰트를 찍어낸 크기와 같아야 또렷함
 
     private Label _pieceLabel;
+    private VisualElement _pieceRow; // 조각 줄 (환생 창에선 숨김)
     private long _lastAmount;
     private double _shownPieces;
     private bool _shownInitialized;
@@ -23,7 +24,7 @@ public class PieceUI : MonoBehaviour
     private VisualElement _crystalRow;
     private long _lastCrystals;
     private Label _starLabel; // 별조각 개수
-    private VisualElement _starRow; // 별조각 줄 (처음 얻기 전엔 숨김)
+    private VisualElement _starRow; // 별조각 줄 (환생 창이나 환생 칸에 마우스를 올렸을 때만 보임)
     private long _lastStars; // 늘었는지 비교용
 
     private class PulseState
@@ -100,7 +101,7 @@ public class PieceUI : MonoBehaviour
         background.style.alignItems = Align.Stretch;
         PixelStyle.Frame(background, PixelStyle.Box);
 
-        _pieceLabel = AddRow(background, ShardTexture(WarmShard), PixelStyle.Text.linear, out _);
+        _pieceLabel = AddRow(background, ShardTexture(WarmShard), PixelStyle.Text.linear, out _pieceRow);
         _crystalLabel = AddRow(background, ShardTexture(SkyShard), new Color(0.23f, 0.53f, 0.66f).linear, out _crystalRow);
         _starLabel = AddRow(background, ShardTexture(StarShard), new Color(0.55f, 0.3f, 0.78f).linear, out _starRow);
 
@@ -169,11 +170,28 @@ public class PieceUI : MonoBehaviour
         return tex;
     }
 
+    // 환생 창에선 별조각만, 평소엔 조각·결정만 (업글 트리의 환생 칸에 마우스를 올리면 별조각도)
+    private void UpdateRowVisibility()
+    {
+        if (_starRow == null) return;
+        UpgradeTreeUI tree = UpgradeTreeUI.Current; // 열려 있는 트리 창
+        bool rebirth = tree != null && tree.IsRebirthTree; // 환생 창이 열려 있음
+        CurrencyManager currency = CurrencyManager.Instance;
+        bool hasCrystal = currency != null && (currency.GetCrystals() > 0 || currency.EverHadCrystal); // 결정을 얻은 적 있음
+        SetShown(_pieceRow, !rebirth);
+        SetShown(_crystalRow, !rebirth && hasCrystal);
+        SetShown(_starRow, rebirth || RebirthNodeUI.Hovered);
+    }
+
+    private static void SetShown(VisualElement row, bool shown)
+    {
+        DisplayStyle display = shown ? DisplayStyle.Flex : DisplayStyle.None; // 보일지
+        if (row.style.display != display) row.style.display = display;
+    }
+
     private void UpdateCrystalLabel(long amount)
     {
         _crystalLabel.text = NumberFormatUtil.Format(amount);
-        bool shown = amount > 0 || (CurrencyManager.Instance != null && CurrencyManager.Instance.EverHadCrystal);
-        _crystalRow.style.display = shown ? DisplayStyle.Flex : DisplayStyle.None;
 
         bool increased = amount > _lastCrystals;
         _lastCrystals = amount;
@@ -185,8 +203,6 @@ public class PieceUI : MonoBehaviour
     private void UpdateStarLabel(long amount)
     {
         _starLabel.text = NumberFormatUtil.Format(amount);
-        bool shown = amount > 0 || (CurrencyManager.Instance != null && CurrencyManager.Instance.TotalStarShards > 0); // 한 번이라도 얻었으면 보임
-        _starRow.style.display = shown ? DisplayStyle.Flex : DisplayStyle.None;
         if (amount > _lastStars) QueuePulse(_starLabel);
         _lastStars = amount;
     }
@@ -237,6 +253,7 @@ public class PieceUI : MonoBehaviour
 
     void Update()
     {
+        UpdateRowVisibility();
         if (_shownPieces >= _lastAmount)
         {
             _countUpFloor = 0;

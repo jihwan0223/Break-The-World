@@ -12,6 +12,7 @@ public static class SfxPlayer
     private const float MinBusyVolume = 0.45f;
     private const float PitchJitter = 0.06f;
     private const float BaseVolume = 0.9f;
+    private const float WindowOpenVolume = 0.3f; // 창이 열려 있는 동안 게임 소리 배율
 
     public const string VolumeKey = "SfxVolume";
 
@@ -89,7 +90,7 @@ public static class SfxPlayer
 
         float busy = Mathf.InverseLerp(QuietStart, QuietFull, _recentPlayTimes.Count); // 0 = 한가, 1 = 심한 연타
         source.pitch = pitch + Random.Range(-PitchJitter, PitchJitter);
-        source.PlayOneShot(Trimmed(clip), BaseVolume * Volume * Mathf.Lerp(1f, MinBusyVolume, busy));
+        source.PlayOneShot(Trimmed(clip), BaseVolume * Volume * Mathf.Lerp(1f, MinBusyVolume, busy) * (UIPointerGuard.PopupOpen ? WindowOpenVolume : 1f));
 
         _lastPlayTime[clip] = now;
         _voiceEndTimes.Add(now + Mathf.Min(clip.length / source.pitch, VoiceHoldSeconds));

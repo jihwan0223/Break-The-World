@@ -10,6 +10,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
 
     [Tooltip("환생 창이면 체크 (업그레이드 트리 Instance로 안 잡힘)")]
     [SerializeField] private bool isRebirthTree; // 환생 창
+    public bool IsRebirthTree => isRebirthTree; // 재화 표시 바꿀 때 씀
 
     public static event System.Action<bool> OnTreeToggled;
 

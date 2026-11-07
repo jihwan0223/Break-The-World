@@ -425,6 +425,14 @@ public partial class SidePanelUI : MonoBehaviour
         list.Add(button);
     }
 
+    // 창 열고 닫기: 환생 노드(창 열어도 진행)가 없으면 게임 정지, 있으면 계속 돌고 월드 클릭만 막음
+    private static void PauseForWindow(string key, bool open)
+    {
+        bool keepRunning = UpgradeManager.Instance != null && UpgradeManager.Instance.WindowsKeepRunningIsUnlocked; // 창 열어도 진행 해금
+        UIPointerGuard.SetPopup(key, open && keepRunning);
+        Time.timeScale = open && !keepRunning ? 0f : 1f;
+    }
+
     private void OpenDebugPanel()
     {
         _debugStatus.text = "";
@@ -886,7 +894,7 @@ public partial class SidePanelUI : MonoBehaviour
         _panel.style.display = DisplayStyle.Flex;
         RefreshButtonRowVisibility();
 
-        Time.timeScale = 0f; // 열려 있는 동안 게임 정지
+        PauseForWindow("Panel", true); // 열려 있는 동안 게임 정지 (환생 노드가 있으면 계속 진행)
 
         OnSelectorPanelToggled?.Invoke(true);
 
@@ -992,7 +1000,7 @@ public partial class SidePanelUI : MonoBehaviour
         _panel.style.display = DisplayStyle.None;
         RefreshButtonRowVisibility();
 
-        Time.timeScale = 1f;
+        PauseForWindow("Panel", false);
 
         OnSelectorPanelToggled?.Invoke(false);
 
