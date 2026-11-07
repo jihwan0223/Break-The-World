@@ -8,8 +8,10 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Image), typeof(Button))]
 public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private long pieceCost = 100_000_000; // 조각 100M
-    [SerializeField] private long crystalCost = 1_000_000; // 결정 1M
+    [SerializeField] private long pieceCost = 100_000_000; // 첫 환생 조각 가격 (100M)
+    [SerializeField] private long crystalCost = 1_000_000; // 첫 환생 결정 가격 (1M)
+    [SerializeField] private float costGrowth = 5f; // 환생할 때마다 가격 배율
+    [SerializeField] private long starShardReward = 1; // 환생할 때 받는 별조각
 
     [Header("소용돌이 연출")]
     [SerializeField] private float vortexSeconds = 2.6f; // 노드가 다 빨려 들어가는 시간 (초)
@@ -76,7 +78,8 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     // 일반 노드와 같은 툴팁: 이름 / 설명(조건) / 가격
     private UpgradeTooltip.Content BuildTooltipContent()
     {
-        CountNodes(out int done, out int total);
+        long pieceCost = CurrentCost(this.pieceCost); // 이번 환생 조각 가격
+        long crystalCost = CurrentCost(this.crystalCost); // 이번 환생 결정 가격
         long pieces = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetPieces() : 0; // 가진 조각
         long crystals = CurrencyManager.Instance != null ? CurrencyManager.Instance.GetCrystals() : 0; // 가진 결정
         string piecesText = Line(Loc.T("{0} 조각", NumberFormatUtil.Format(pieceCost)), pieces >= pieceCost); // 조각 가격
@@ -84,7 +87,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         return new UpgradeTooltip.Content
         {
             title = Loc.T("환생"),
-            description = Loc.T("모든 업그레이드를 해금해야 합니다.") + "\n" + Line(Loc.T("업그레이드 {0}/{1}", done, total), done >= total),
+            description = Loc.T("환생 시 별조각 +{0}", NumberFormatUtil.Format(starShardReward)),
             price = $"{piecesText} + {crystalsText}",
         };
     }
@@ -105,42 +108,27 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         UpgradeTooltip.Instance?.Hide();
     }
 
-    // 이번 버전(데모/풀)에 나오는 노드만 셈
-    private void CountNodes(out int done, out int total)
-    {
-        done = total = 0;
-        UpgradeManager upgrades = UpgradeManager.Instance;
-        if (upgrades != null)
-            foreach (UpgradeNodeUI node in _upgradeNodes)
-            {
-                if (node == null || !upgrades.IsInThisVersion(node.Id)) continue;
-                total++;
-                if (upgrades.GetLevel(node.Id) >= 1) done++;
-            }
-        foreach (ObjectEconomyNodeUI node in _economyNodes)
-        {
-            if (node == null || !node.IsInThisVersion) continue;
-            total++;
-            if (node.IsLeveled()) done++;
-        }
-    }
+    // 환생할 때마다 costGrowth배 (long 넘치지 않게 막음)
+    private long CurrentCost(long baseCost) =>
+        (long)System.Math.Min(baseCost * System.Math.Pow(costGrowth, GameStats.Rebirths), long.MaxValue / 2);
 
     private bool IsReady()
     {
-        CountNodes(out int done, out int total);
         CurrencyManager currency = CurrencyManager.Instance;
-        return done >= total && currency != null && currency.GetPieces() >= pieceCost && currency.GetCrystals() >= crystalCost;
+        return currency != null && currency.GetPieces() >= CurrentCost(pieceCost) && currency.GetCrystals() >= CurrentCost(crystalCost);
     }
 
     private void HandleClicked()
     {
         if (_busy) return;
-        var cost = new[] { new PieceCost(pieceCost), new PieceCost(crystalCost, true) }; // 환생 비용
+        var cost = new[] { new PieceCost(CurrentCost(pieceCost)), new PieceCost(CurrentCost(crystalCost), true) }; // 이번 환생 비용
         if (!IsReady() || !CurrencyManager.Instance.TrySpendPieces(cost))
         {
             UpgradeTooltip.Instance?.PlayShake(); // 일반 노드처럼 못 사면 툴팁이 흔들림
             return;
         }
+        CurrencyManager.Instance.AddStarShards(starShardReward);
+        GameStats.Rebirths++;
         _hovered = false;
         UpgradeTooltip.Instance?.Hide();
         StartCoroutine(VortexRoutine());

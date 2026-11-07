@@ -163,6 +163,7 @@ public class SaveManager : MonoBehaviour
             statCrits = GameStats.Crits,
             statSuperCrits = GameStats.SuperCrits,
             statBossClears = GameStats.BossClears,
+            statRebirths = GameStats.Rebirths,
             statPlaySeconds = GameStats.PlaySeconds,
             statBrokenPerObject = GameStats.BrokenPerObject,
             pieceTutorialDone = PieceTutorial.Instance != null && PieceTutorial.Instance.Done,
@@ -199,6 +200,7 @@ public class SaveManager : MonoBehaviour
         GameStats.Crits = data.statCrits;
         GameStats.SuperCrits = data.statSuperCrits;
         GameStats.BossClears = data.statBossClears;
+        GameStats.Rebirths = data.statRebirths;
         GameStats.PlaySeconds = data.statPlaySeconds;
         GameStats.BrokenPerObject = data.statBrokenPerObject ?? new long[0];
 

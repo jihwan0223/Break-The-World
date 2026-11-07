@@ -424,6 +424,7 @@ UFO,UFO,UFO,飞碟,НЛО,OVNI,OVNI,UFO,OVNI
 수직 동기화,VSync,垂直同期,垂直同步,Верт. синхронизация,Sincronización vertical,Sincronização vertical,VSync,Synchro verticale
 진행 상황은 자동으로 저장돼요.,Your progress is saved automatically.,進行状況は自動で保存されます。,进度会自动保存。,Прогресс сохраняется автоматически.,Tu progreso se guarda automáticamente.,Seu progresso é salvo automaticamente.,Dein Fortschritt wird automatisch gespeichert.,Ta progression est sauvegardée automatiquement.
 {0} 별조각,{0} Star Shards,{0} 星のかけら,{0} 星之碎片,{0} зв. осколков,{0} fragmentos estelares,{0} fragmentos estelares,{0} Sternsplitter,{0} éclats d'étoile
+환생 시 별조각 +{0},Star Shards on rebirth +{0},転生時の星のかけら +{0},转生时星之碎片 +{0},Звёздных осколков за перерождение +{0},Fragmentos estelares al renacer +{0},Fragmentos estelares ao renascer +{0},Sternsplitter bei Wiedergeburt +{0},Éclats d'étoile à la renaissance +{0}
 업그레이드 유지,Keep Upgrades,アップグレード維持,保留升级,Сохранить улучшения,Conservar mejoras,Manter melhorias,Upgrades behalten,Garder les améliorations
 보스 클리어 유지,Keep Boss Clears,ボス撃破を維持,保留首领击败,Сохранить победы над боссами,Conservar jefes derrotados,Manter chefes derrotados,Bosssiege behalten,Garder les boss vaincus
 무기 유지,Keep Weapons,武器維持,保留武器,Сохранить оружие,Conservar armas,Manter armas,Waffen behalten,Garder les armes

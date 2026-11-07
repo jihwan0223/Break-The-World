@@ -11977,7 +11977,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -16000}
+  m_AnchoredPosition: {x: 0, y: 10850}
   m_SizeDelta: {x: 700, y: 700}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &307325130
@@ -11994,6 +11994,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RebirthNodeUI
   pieceCost: 100000000
   crystalCost: 1000000
+  costGrowth: 5
+  starShardReward: 1
   vortexSeconds: 2.6
   vortexZoom: 0.22
   vortexTurns: {x: 1.2, y: 2.8}

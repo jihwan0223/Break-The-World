@@ -25,6 +25,7 @@ public class SaveData
     public long statCrits;
     public long statSuperCrits;
     public long statBossClears;
+    public long statRebirths; // 환생한 횟수
     public double statPlaySeconds; // 초
     public long[] statBrokenPerObject;
     public bool pieceTutorialDone;
