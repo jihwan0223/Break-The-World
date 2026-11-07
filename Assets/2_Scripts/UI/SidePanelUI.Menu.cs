@@ -19,7 +19,7 @@ public partial class SidePanelUI
     private VisualElement _demoBox;
     private static SidePanelUI _instance;
     private const float DemoBoxDelay = 2.5f; // 초
-    private const float DemoButtonLock = 2f; // 초 - 창이 뜬 뒤 실수로 바로 넘기지 않게 버튼을 막는 시간
+    private const float DemoButtonLock = 0.7f; // 초 - 창이 뜬 뒤 실수로 바로 넘기지 않게 버튼을 막는 시간 (보스전 실패 창과 같음)
     private VisualElement _demoButtons; // 데모 완료 창의 버튼 줄
 
     public static void ShowDemoComplete(float delay = DemoBoxDelay)

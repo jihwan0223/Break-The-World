@@ -8694,8 +8694,10 @@ MonoBehaviour:
   shieldPerLink: 0.15
   maxShield: 0.75
   shieldSpawnTimes:
-  - 25
-  - 10
+  - 27
+  - 20
+  - 13
+  - 6
   repeatBossForTest: 0
   shieldFadeSeconds: 0.8
   zoneRoot: {fileID: 1610872450}
@@ -21442,8 +21444,10 @@ MonoBehaviour:
   shieldPerLink: 0.15
   maxShield: 0.75
   shieldSpawnTimes:
-  - 25
-  - 10
+  - 27
+  - 20
+  - 13
+  - 6
   repeatBossForTest: 0
   shieldFadeSeconds: 0.8
   zoneRoot: {fileID: 1807296575}
@@ -25832,8 +25836,10 @@ MonoBehaviour:
   shieldPerLink: 0.15
   maxShield: 0.75
   shieldSpawnTimes:
-  - 25
-  - 10
+  - 27
+  - 20
+  - 13
+  - 6
   repeatBossForTest: 0
   shieldFadeSeconds: 0.8
   zoneRoot: {fileID: 938947940}
@@ -61364,8 +61370,10 @@ MonoBehaviour:
   shieldPerLink: 0.15
   maxShield: 0.75
   shieldSpawnTimes:
-  - 25
-  - 10
+  - 27
+  - 20
+  - 13
+  - 6
   repeatBossForTest: 0
   shieldFadeSeconds: 0.8
   zoneRoot: {fileID: 558599200}
@@ -65850,8 +65858,10 @@ MonoBehaviour:
   shieldPerLink: 0.15
   maxShield: 0.75
   shieldSpawnTimes:
-  - 25
-  - 10
+  - 27
+  - 20
+  - 13
+  - 6
   repeatBossForTest: 0
   shieldFadeSeconds: 0.8
   zoneRoot: {fileID: 1630271656}

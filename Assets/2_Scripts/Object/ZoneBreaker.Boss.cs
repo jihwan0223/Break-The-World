@@ -55,7 +55,6 @@ public partial class ZoneBreaker
     public float BossTimeRatio => bossTimeLimit > 0f ? Mathf.Clamp01(_bossTimeLeft / bossTimeLimit) : 0f;
     public float BossHpRatio => _health != null && _health.MaxHP > 0 ? (float)_health.CurrentHP / _health.MaxHP : 0f;
     public float ShieldRatio { get; private set; }
-    public float ShieldFill { get; private set; }
     public float BossDamageMultiplier => 1f - ShieldRatio;
 
     public static ZoneBreaker ChallengeableBoss()
@@ -135,7 +134,6 @@ public partial class ZoneBreaker
             if (_linkOn[i] && link.MaxHP > 0) strength += (float)link.CurrentHP / link.MaxHP;
         }
         ShieldRatio = Mathf.Min(maxShield, strength * shieldPerLink);
-        ShieldFill = Mathf.Clamp01(strength / Mathf.Max(1, shieldSpawnTimes != null ? shieldSpawnTimes.Length : 1));
         if (_wax != null) _wax.SetShield(_linkColors, _linkOn);
     }
 
@@ -154,7 +152,7 @@ public partial class ZoneBreaker
 
         while (candidates.Count > 0)
         {
-            int pick = Random.Range(0, candidates.Count);
+            int pick = FarthestCandidate(candidates);
             Health chosen = candidates[pick];
             candidates.RemoveAt(pick);
             chosen.gameObject.SetActive(true);
@@ -166,6 +164,23 @@ public partial class ZoneBreaker
             RebuildLinkColors();
             return;
         }
+    }
+
+    // 이미 떠 있는 보호막 오브젝트들과 가장 멀리 떨어진 후보 (첫 번째는 무작위)
+    private int FarthestCandidate(List<Health> candidates)
+    {
+        int best = Random.Range(0, candidates.Count); // 고른 후보
+        float bestDistance = -1f; // 고른 후보에서 가장 가까운 보호막까지 거리 (제곱)
+        for (int i = 0; i < candidates.Count; i++)
+        {
+            float nearest = float.MaxValue; // 이 후보에서 가장 가까운 보호막까지 거리 (제곱)
+            foreach (Health link in _links)
+                if (link != null && link.gameObject.activeInHierarchy && !link.IsDead)
+                    nearest = Mathf.Min(nearest, (candidates[i].transform.position - link.transform.position).sqrMagnitude);
+            if (nearest == float.MaxValue) return best; // 떠 있는 보호막이 없으면 무작위
+            if (nearest > bestDistance) { bestDistance = nearest; best = i; }
+        }
+        return best;
     }
 
     private void PlaceAtRandomSpot(Health h)
@@ -253,7 +268,6 @@ public partial class ZoneBreaker
         foreach (Health link in _links) ShieldGlow.Detach(link);
         _links.Clear();
         ShieldRatio = 0f;
-        ShieldFill = 0f;
         if (_wax != null)
         {
             _wax.SetShield(null, null);

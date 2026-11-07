@@ -17,6 +17,8 @@ public class BossChallengeUI : MonoBehaviour
     private Button _giveUpButton;
     private VisualElement _failPopup;
     private ZoneBreaker _failedBoss;
+    private Button[] _failButtons; // 실패 창 버튼 (뜨자마자 연타로 눌리지 않게 잠깐 막음)
+    private const long FailButtonDelayMs = 700; // 실패 창 버튼이 눌리기 시작하는 시간 (밀리초, 실제 시간)
 
     private static readonly Color HpColor = new Color(0.91f, 0.38f, 0.35f);
     private static readonly Color HpBack = new Color(0.45f, 0.32f, 0.24f);
@@ -226,6 +228,7 @@ public class BossChallengeUI : MonoBehaviour
         PixelStyle.Button(exit, PixelStyle.Pink);
         buttons.Add(retry);
         buttons.Add(exit);
+        _failButtons = new[] { retry, exit };
         window.Add(buttons);
 
         _failPopup.Add(window);
@@ -236,6 +239,8 @@ public class BossChallengeUI : MonoBehaviour
     {
         _failedBoss = boss;
         _failPopup.style.display = DisplayStyle.Flex;
+        foreach (Button button in _failButtons) button.SetEnabled(false);
+        _failPopup.schedule.Execute(() => { foreach (Button button in _failButtons) button.SetEnabled(true); }).StartingIn(FailButtonDelayMs);
         if (_slowElapsed >= 0f) StopSlow();
         Time.timeScale = 0f;
     }
@@ -272,7 +277,7 @@ public class BossChallengeUI : MonoBehaviour
             _timeLabel.text = $"{Mathf.Max(0f, active.BossTimeLeft):0.0}";
             _timeFill.style.width = Length.Percent(active.BossTimeRatio * 100f);
             _hpFill.style.width = Length.Percent(active.BossHpRatio * 100f);
-            _shieldFill.style.width = Length.Percent(active.BossHpRatio * active.ShieldFill * 100f);
+            _shieldFill.style.width = Length.Percent(active.BossHpRatio * active.ShieldRatio * 100f); // 남은 체력 중 보호막 % 만큼 흰색
             int shieldPercent = Mathf.RoundToInt(active.ShieldRatio * 100f);
             _shieldLabel.text = Loc.T("보호막 -{0}%", shieldPercent);
             _shieldLabel.style.visibility = shieldPercent > 0 ? Visibility.Visible : Visibility.Hidden;
