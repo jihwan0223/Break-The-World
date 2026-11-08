@@ -105,7 +105,7 @@ public class WaxCoating : MonoBehaviour
 
     private int ObjectIndex => _click != null ? _click.ObjectIndex : -1;
 
-    private static readonly int[] WaxOnUnlockTerrain = { 4, 9, 14, 19 }; // 해금되면 바로 왁스가 덮이는 지형 (책상, 도로, 회사, 배)
+    private static readonly int[] WaxOnUnlockTerrain = { 4, 9, 14, 19, 24 }; // 해금되면 바로 왁스가 덮이는 지형 (책상, 도로, 회사, 배, 지구)
     private bool TerrainUnlocked =>
         (UpgradeManager.Instance != null && UpgradeManager.Instance.WaxIsUnlockedFor(ObjectIndex))
         || (System.Array.IndexOf(WaxOnUnlockTerrain, ObjectIndex) >= 0 && ObjectManager.Instance != null && ObjectManager.Instance.IsUnlocked(ObjectIndex));

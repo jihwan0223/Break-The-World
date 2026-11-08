@@ -11,6 +11,7 @@ public class ObjectData
     public Color pileColor;
     public AudioClip[] clickSounds;
     public AudioClip breakSound;
+    public float soundPitch = 1f; // 클릭/부서짐 소리 높낮이 배율
     public Sprite[] healthStages;
 
     public ObjectData(int tier, int indexInTier, string objectName, Color pileColor)

@@ -120,15 +120,15 @@ public class Health : MonoBehaviour
         IsDead = true;
         OnDied?.Invoke();
 
-        AudioClip breakSound = null;
+        ObjectData data = null;
         if (ObjectManager.Instance != null)
         {
-            breakSound = (fixedObjectIndex >= 0 && fixedObjectIndex < ObjectManager.StaticObjectCount)
-                ? ObjectManager.Instance.GetObjectAt(fixedObjectIndex).breakSound
-                : ObjectManager.Instance.CurrentObject.breakSound;
+            data = (fixedObjectIndex >= 0 && fixedObjectIndex < ObjectManager.StaticObjectCount)
+                ? ObjectManager.Instance.GetObjectAt(fixedObjectIndex)
+                : ObjectManager.Instance.CurrentObject;
         }
-        if (breakSound != null && !(ZoneManager.Instance != null && ZoneManager.Instance.IsHidden(transform)))
-            SfxPlayer.Play(_audioSource, breakSound, priority: true);
+        if (data != null && data.breakSound != null && !(ZoneManager.Instance != null && ZoneManager.Instance.IsHidden(transform)))
+            SfxPlayer.Play(_audioSource, data.breakSound, priority: true, pitch: data.soundPitch);
 
         // 바로 부활형은 콜라이더를 켜둬서 페이드 중 클릭도 맞게
         if (_collider != null && HasRespawnDelay) _collider.enabled = false;

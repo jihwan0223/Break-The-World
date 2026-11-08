@@ -159,7 +159,8 @@ public class Click : MonoBehaviour
 
         int idx = ObjIndex;
         if (idx < 0 || idx >= ObjectManager.StaticObjectCount) return;
-        AudioClip[] clickSounds = ObjectManager.Instance.GetObjectAt(idx).clickSounds;
+        ObjectData data = ObjectManager.Instance.GetObjectAt(idx);
+        AudioClip[] clickSounds = data.clickSounds;
 
         if (clickSounds == null || clickSounds.Length == 0)
             return;
@@ -170,7 +171,7 @@ public class Click : MonoBehaviour
             index = (index + 1) % clickSounds.Length;
 
         _lastClickSoundIndex = index;
-        SfxPlayer.Play(_audioSource, clickSounds[index], pitch: pitch);
+        SfxPlayer.Play(_audioSource, clickSounds[index], pitch: pitch * data.soundPitch);
     }
 
     private void PerformClickHit(bool playWeaponSwing = true, Vector2? swingPoint = null, bool playerClick = false, bool autoClick = false)

@@ -49,7 +49,7 @@ public class ObjectSwapController : MonoBehaviour
         yield return MoveOverTime(transform.position, flyOutTarget, flyOutDuration);
 
         if (oldObject != null && oldObject.breakSound != null)
-            SfxPlayer.Play(_audioSource, oldObject.breakSound, priority: true);
+            SfxPlayer.Play(_audioSource, oldObject.breakSound, priority: true, pitch: oldObject.soundPitch);
 
         transform.position = GetScreenCenterWorldPosition();
 

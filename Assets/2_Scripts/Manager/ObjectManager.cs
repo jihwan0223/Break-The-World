@@ -11,6 +11,7 @@ public class ObjectManager : MonoBehaviour
     {
         public AudioClip[] clickSounds;
         public AudioClip breakSound;
+        [Range(0f, 2f)] public float pitch; // 소리 높낮이 배율 - 0이면 1 (기존 칸은 0으로 들어와서)
     }
 
     [SerializeField] private ObjectSoundSet[] objectSounds; // objects와 같은 순서/개수
@@ -118,6 +119,7 @@ public class ObjectManager : MonoBehaviour
         {
             objects[i].clickSounds = objectSounds[i].clickSounds;
             objects[i].breakSound = objectSounds[i].breakSound;
+            objects[i].soundPitch = objectSounds[i].pitch > 0f ? objectSounds[i].pitch : 1f;
         }
 
         for (int i = 0; i < objects.Count && objectVisuals != null && i < objectVisuals.Length; i++)

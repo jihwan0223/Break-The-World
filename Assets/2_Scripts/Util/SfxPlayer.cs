@@ -35,6 +35,9 @@ public static class SfxPlayer
         foreach (var pair in _trimmed)
             if (pair.Value != pair.Key && pair.Value != null) Object.Destroy(pair.Value);
         _trimmed.Clear();
+        foreach (var pair in _tailCut)
+            if (pair.Value != pair.Key && pair.Value != null) Object.Destroy(pair.Value);
+        _tailCut.Clear();
     }
 
     private static AudioClip Trimmed(AudioClip clip)
@@ -65,6 +68,45 @@ public static class SfxPlayer
         return trimmed;
     }
 
+    private static readonly Dictionary<AudioClip, AudioClip> _tailCut = new Dictionary<AudioClip, AudioClip>();
+    private const float TailLevel = 0.2f; // 최대 음량 대비 - 큰 타격 뒤 이보다 작아지면 거기서 자름
+    private const float TailWindow = 0.01f; // 초 - 음량을 재는 칸
+    private const float TailFade = 0.03f; // 초 - 자른 끝을 부드럽게 줄임
+
+    // 피치를 낮추면 소리가 늘어나 뒤쪽 잔소리가 두 번째 타격처럼 들려서, 첫 타격만 남김
+    private static AudioClip TailCut(AudioClip clip)
+    {
+        if (_tailCut.TryGetValue(clip, out AudioClip cut)) return cut;
+        cut = clip;
+        var data = new float[clip.samples * clip.channels];
+        if (clip.GetData(data, 0))
+        {
+            int peakIndex = 0;
+            for (int i = 1; i < data.Length; i++) if (Mathf.Abs(data[i]) > Mathf.Abs(data[peakIndex])) peakIndex = i;
+            float peak = Mathf.Abs(data[peakIndex]);
+            int window = Mathf.Max(1, Mathf.RoundToInt(TailWindow * clip.frequency)) * clip.channels; // 칸 크기 (샘플)
+            int end = data.Length;
+            for (int start = peakIndex; start < data.Length; start += window)
+            {
+                float loud = 0f;
+                for (int i = start; i < Mathf.Min(start + window, data.Length); i++) loud = Mathf.Max(loud, Mathf.Abs(data[i]));
+                if (loud < peak * TailLevel) { end = start; break; }
+            }
+            int fade = Mathf.RoundToInt(TailFade * clip.frequency) * clip.channels; // 페이드 길이 (샘플)
+            int length = Mathf.Min(data.Length, end + fade) / clip.channels * clip.channels;
+            if (length < data.Length)
+            {
+                var kept = new float[length];
+                System.Array.Copy(data, kept, length);
+                for (int i = Mathf.Max(0, length - fade); i < length; i++) kept[i] *= (length - i) / (float)fade;
+                cut = AudioClip.Create(clip.name, length / clip.channels, clip.channels, clip.frequency, false);
+                cut.SetData(kept, 0);
+            }
+        }
+        _tailCut[clip] = cut;
+        return cut;
+    }
+
     public static float Volume
     {
         get => _volume ??= PlayerPrefs.GetFloat(VolumeKey, 1f);
@@ -90,7 +132,9 @@ public static class SfxPlayer
 
         float busy = Mathf.InverseLerp(QuietStart, QuietFull, _recentPlayTimes.Count); // 0 = 한가, 1 = 심한 연타
         source.pitch = pitch + Random.Range(-PitchJitter, PitchJitter);
-        source.PlayOneShot(Trimmed(clip), BaseVolume * Volume * Mathf.Lerp(1f, MinBusyVolume, busy) * (UIPointerGuard.PopupOpen ? WindowOpenVolume : 1f));
+        AudioClip played = Trimmed(clip);
+        if (pitch < 0.95f) played = TailCut(played); // 연타 피치(1 이상)는 그대로
+        source.PlayOneShot(played,BaseVolume * Volume * Mathf.Lerp(1f, MinBusyVolume, busy) * (UIPointerGuard.PopupOpen ? WindowOpenVolume : 1f));
 
         _lastPlayTime[clip] = now;
         _voiceEndTimes.Add(now + Mathf.Min(clip.length / source.pitch, VoiceHoldSeconds));
