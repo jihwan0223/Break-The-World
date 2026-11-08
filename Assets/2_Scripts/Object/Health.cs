@@ -18,7 +18,7 @@ public class Health : MonoBehaviour
 
     private const float GlobalHpScale = 3f;
 
-    private static readonly float[] MapHpScale = { 1f, 2f, 4f };
+    private static readonly float[] MapHpScale = { 1f, 2f, 4f, 8f, 16f }; // 맵1~5 체력 배율
 
     public static int ComputeMaxHP(int tier, int indexInTier, float multiplier) =>
         Mathf.Max(1, Mathf.RoundToInt(ObjectHealthCalculator.Calculate(tier, indexInTier) * multiplier
