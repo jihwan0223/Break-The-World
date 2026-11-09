@@ -31,6 +31,12 @@ public class BossChallengeUI : MonoBehaviour
     private VisualElement _shieldFill;
     private Label _shieldLabel;
     private ZoneBreaker _ready;
+    private ZoneBreaker _announcedBoss; // 가운데 등장 연출을 이미 보여준 보스 (새 보스일 때만 다시 보여줌)
+    private float _introElapsed = -1f; // 등장 연출 진행 시간 (실제 시간, 초) - 음수면 연출 없음
+    private const float IntroPopSeconds = 0.25f; // 가운데에서 튀어나오는 시간
+    private const float IntroHoldSeconds = 1f; // 가운데에 머무는 시간
+    private const float IntroMoveSeconds = 0.5f; // 원래 자리로 날아가는 시간
+    private const float IntroScale = 1.4f; // 가운데에 있을 때 크기 배율
     private bool _wasFighting;
     private readonly List<(VisualElement root, DisplayStyle display)> _hidden = new List<(VisualElement, DisplayStyle)>();
     private float _slowElapsed = -1f;
@@ -264,8 +270,15 @@ public class BossChallengeUI : MonoBehaviour
         SetShown(_challengeButton, _ready != null);
         if (_ready != null)
         {
+            if (_ready != _announcedBoss) { _announcedBoss = _ready; _introElapsed = 0f; } // 새 보스: 가운데에서 등장
             float pulse = 1f + Mathf.Sin(Time.unscaledTime * 4f) * 0.04f;
-            _challengeButton.style.scale = new Scale(new Vector3(pulse, pulse, 1f));
+            float scale = _introElapsed >= 0f ? UpdateIntro() : 1f; // 등장 연출 크기
+            _challengeButton.style.scale = new Scale(new Vector3(pulse * scale, pulse * scale, 1f));
+        }
+        else if (_introElapsed >= 0f)
+        {
+            _introElapsed = -1f; // 연출 중에 숨으면 원래 자리로
+            Place(_challengeButton);
         }
 
         bool fighting = active != null;
@@ -343,6 +356,46 @@ public class BossChallengeUI : MonoBehaviour
         if (Mathf.Approximately(Time.timeScale, _slowSetScale)) Time.timeScale = 1f;
         Time.fixedDeltaTime = _baseFixedDelta;
         _slowElapsed = -1f;
+    }
+
+    // 가운데에서 튀어나와 잠깐 머문 뒤 원래 자리(돈 아래)로 날아감. 지금 크기 배율을 돌려줌
+    private float UpdateIntro()
+    {
+        _introElapsed += Time.unscaledDeltaTime;
+        VisualElement root = _document.rootVisualElement; // 화면 크기 기준
+        float width = _challengeButton.resolvedStyle.width, height = _challengeButton.resolvedStyle.height; // 버튼 크기
+        Vector2 center = new Vector2((root.layout.width - width) / 2f, (root.layout.height - height) / 2f); // 화면 가운데 자리
+        float t = _introElapsed; // 경과 시간
+
+        if (t < IntroPopSeconds)
+        {
+            SetPosition(center);
+            float x = t / IntroPopSeconds - 1f; // ease-out-back
+            const float overshoot = 1.70158f; // 살짝 넘쳤다 돌아오는 정도
+            return IntroScale * (1f + (overshoot + 1f) * x * x * x + overshoot * x * x);
+        }
+        t -= IntroPopSeconds;
+        if (t < IntroHoldSeconds)
+        {
+            SetPosition(center);
+            return IntroScale;
+        }
+        t -= IntroHoldSeconds;
+        if (t < IntroMoveSeconds)
+        {
+            float k = Mathf.SmoothStep(0f, 1f, t / IntroMoveSeconds); // 이동 진행도
+            SetPosition(Vector2.Lerp(center, new Vector2(Left, Top), k));
+            return Mathf.Lerp(IntroScale, 1f, k);
+        }
+        _introElapsed = -1f;
+        Place(_challengeButton);
+        return 1f;
+    }
+
+    private void SetPosition(Vector2 position)
+    {
+        _challengeButton.style.left = position.x;
+        _challengeButton.style.top = position.y;
     }
 
     private static void Place(VisualElement element)
