@@ -56,7 +56,7 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(2, 1, "식빵", new Color(0.86f, 0.62f, 0.34f)),
         new ObjectData(2, 2, "책상", new Color(0.55f, 0.38f, 0.22f)) { hpMultiplier = 9f }, // ★ 존2 관문, 체력 = 식빵의 10배
         // 존2: 길거리 (야구 방망이 / 교통 표지판)
-        new ObjectData(3, 1, "가로등", new Color(0.23f, 0.24f, 0.35f)),
+        new ObjectData(3, 1, "가로등", new Color(0.23f, 0.24f, 0.35f)) { hpMultiplier = 0.8f }, // 맵2 첫 오브젝트 - 진입 벽 완화
         new ObjectData(3, 2, "자전거", new Color(0.23f, 0.24f, 0.30f)),
         new ObjectData(3, 3, "가로수", new Color(0.24f, 0.59f, 0.32f)),
         new ObjectData(4, 1, "자동차", new Color(0.70f, 0.69f, 0.71f)),

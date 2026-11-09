@@ -47,6 +47,30 @@ public class Click : MonoBehaviour
     private static float _lastStreakTime = -1f; // unscaled
     private static int _lastStreakFrame = -1; // 커서 범위로 여러 개를 때려도 한 번만 셈
 
+    private const int MaxClicksPerSecond = 20; // 초당 직접 클릭 상한 - 넘는 클릭은 조용히 무시 (오토마우스 대비)
+    private static readonly Queue<float> _recentPresses = new Queue<float>(); // 최근 1초 안에 받아준 클릭 시각 (unscaled)
+    private static int _pressCheckFrame = -1; // 이번 프레임 클릭을 이미 판정했는지
+    private static bool _pressAccepted; // 이번 프레임 판정 결과 - 커서 범위로 여러 오브젝트가 같은 클릭을 공유
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetPressLimit()
+    {
+        _recentPresses.Clear();
+        _pressCheckFrame = -1;
+    }
+
+    // 한 클릭을 프레임당 한 번만 판정 - 최근 1초 클릭이 상한 미만이면 받아줌
+    private static bool AcceptPress()
+    {
+        if (_pressCheckFrame == Time.frameCount) return _pressAccepted;
+        _pressCheckFrame = Time.frameCount;
+        float now = Time.unscaledTime; // 현재 시각
+        while (_recentPresses.Count > 0 && now - _recentPresses.Peek() >= 1f) _recentPresses.Dequeue();
+        _pressAccepted = _recentPresses.Count < MaxClicksPerSecond;
+        if (_pressAccepted) _recentPresses.Enqueue(now);
+        return _pressAccepted;
+    }
+
     void Start()
     {
         _health = GetComponent<Health>();
@@ -389,6 +413,8 @@ public class Click : MonoBehaviour
             return;
 
         if (UIPointerGuard.IsPointerOverUI || PieceTutorial.Active)
+            return;
+        if (pressed && !AcceptPress())
             return;
 
         Vector2 screenPos = Mouse.current.position.ReadValue();

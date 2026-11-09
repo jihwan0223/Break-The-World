@@ -39939,7 +39939,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   weaponTier: 3
   objectIndexInTier: 1
-  hpMultiplier: 1
+  hpMultiplier: 0.8
   fixedObjectIndex: 5
   respawnDelay: 0
   dieFadeDuration: 0.25
@@ -43681,7 +43681,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   weaponTier: 3
   objectIndexInTier: 1
-  hpMultiplier: 1
+  hpMultiplier: 0.8
   fixedObjectIndex: 5
   respawnDelay: 0
   dieFadeDuration: 0.25
@@ -57893,7 +57893,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   weaponTier: 3
   objectIndexInTier: 1
-  hpMultiplier: 1
+  hpMultiplier: 0.8
   fixedObjectIndex: 5
   respawnDelay: 0
   dieFadeDuration: 0.25
@@ -67023,7 +67023,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   weaponTier: 3
   objectIndexInTier: 1
-  hpMultiplier: 1
+  hpMultiplier: 0.8
   fixedObjectIndex: 5
   respawnDelay: 0
   dieFadeDuration: 0.25
