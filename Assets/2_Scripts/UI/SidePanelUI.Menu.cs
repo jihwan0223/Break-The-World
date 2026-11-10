@@ -130,44 +130,38 @@ public partial class SidePanelUI
         body.style.justifyContent = Justify.Center;
         _settingsPanel.Add(body);
 
-        var columns = new VisualElement();
+        var columns = new VisualElement(); // 소리 / 게임 / 비디오 세 칸을 한 줄로
         columns.style.flexDirection = FlexDirection.Row;
         columns.style.alignItems = Align.FlexStart;
         body.Add(columns);
 
-        var left = new VisualElement();
-        left.style.marginRight = 96; // 창이 넓어서 두 칸 사이도 넉넉히
-        left.style.alignItems = Align.Center;
-        columns.Add(left);
-        var right = new VisualElement();
-        right.style.alignItems = Align.Center;
-        columns.Add(right);
+        VisualElement sound = StatColumn(columns, "소리"); // 왼쪽 칸: 소리
+        AddVolumeBar(sound, "전체 음량", () => GameSettings.MasterVolume, v => GameSettings.MasterVolume = v);
+        AddVolumeBar(sound, "효과음", () => SfxPlayer.Volume, v => SfxPlayer.Volume = v);
+        AddVolumeBar(sound, "배경음악", () => GameSettings.BgmVolume, v => GameSettings.BgmVolume = v);
 
-        left.Add(PixelStyle.CardHeader("소리"));
-        AddVolumeBar(left, "전체 음량", () => GameSettings.MasterVolume, v => GameSettings.MasterVolume = v);
-        AddVolumeBar(left, "효과음", () => SfxPlayer.Volume, v => SfxPlayer.Volume = v);
-
-        right.Add(PixelStyle.CardHeader("게임"));
-        AddSettingRow(right, "언어", () => Loc.NativeNames[Loc.Language], step => Loc.Language = (Loc.Language + step + Loc.Codes.Length) % Loc.Codes.Length);
-        AddSettingRow(right, "숫자 단위", () => GameSettings.NumberUnits ? "1K" : "1,000", _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
-        AddSettingRow(right, "데미지 표시", () => GameSettings.DamageNumbers ? "켜짐" : "꺼짐", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
-        AddSettingRow(right, "화면 흔들림", () => GameSettings.ScreenShake ? "켜짐" : "꺼짐", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
-        VisualElement hoverClickRow = AddSettingRow(right, "커서 타격", () => GameSettings.HoverClick ? "켜짐" : "꺼짐", _ => GameSettings.HoverClick = !GameSettings.HoverClick); // 커서 타격 켜기/끄기 줄
-        AddSettingRow(right, "백그라운드 실행", () => GameSettings.RunInBackground ? "켜짐" : "꺼짐", _ => GameSettings.RunInBackground = !GameSettings.RunInBackground);
+        VisualElement game = StatColumn(columns, "게임"); // 가운데 칸: 게임
+        game.style.marginLeft = 32;
+        AddSettingRow(game, "언어", () => Loc.NativeNames[Loc.Language], step => Loc.Language = (Loc.Language + step + Loc.Codes.Length) % Loc.Codes.Length);
+        AddSettingRow(game, "숫자 단위", () => GameSettings.NumberUnits ? "1K" : "1,000", _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
+        AddSettingRow(game, "데미지 표시", () => GameSettings.DamageNumbers ? "켜짐" : "꺼짐", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
+        AddSettingRow(game, "화면 흔들림", () => GameSettings.ScreenShake ? "켜짐" : "꺼짐", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
+        VisualElement hoverClickRow = AddSettingRow(game, "커서 타격", () => GameSettings.HoverClick ? "켜짐" : "꺼짐", _ => GameSettings.HoverClick = !GameSettings.HoverClick); // 커서 타격 켜기/끄기 줄
+        AddSettingRow(game, "백그라운드 실행", () => GameSettings.RunInBackground ? "켜짐" : "꺼짐", _ => GameSettings.RunInBackground = !GameSettings.RunInBackground);
         _settingRefreshers.Add(() => hoverClickRow.style.display = UpgradeManager.Instance != null && UpgradeManager.Instance.HoverClickIsUnlocked ? DisplayStyle.Flex : DisplayStyle.None); // 산 뒤에만 보임
-        var displayHeader = PixelStyle.CardHeader("화면");
-        displayHeader.style.marginTop = 10;
-        left.Add(displayHeader); // 오른쪽 칸이 넘쳐서 화면 설정은 소리 아래로
-        AddSettingRow(left, "화면 모드", () => GameSettings.Fullscreen ? "전체 화면" : "창 모드", _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
-        AddSettingRow(left, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
+
+        VisualElement video = StatColumn(columns, "비디오"); // 오른쪽 칸: 비디오
+        video.style.marginLeft = 32;
+        AddSettingRow(video, "화면 모드", () => GameSettings.Fullscreen ? "전체 화면" : "창 모드", _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
+        AddSettingRow(video, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
         {
             List<Vector2Int> list = GameSettings.Resolutions;
             if (list.Count == 0) return;
             int index = Mathf.Max(0, list.IndexOf(GameSettings.Resolution));
             GameSettings.Resolution = list[(index + step + list.Count) % list.Count];
         });
-        AddSettingRow(left, "수직 동기화", () => GameSettings.VSync ? "켜짐" : "꺼짐", _ => GameSettings.VSync = !GameSettings.VSync);
-        VisualElement fpsRow = AddSettingRow(left, "프레임 제한", () =>
+        AddSettingRow(video, "수직 동기화", () => GameSettings.VSync ? "켜짐" : "꺼짐", _ => GameSettings.VSync = !GameSettings.VSync);
+        VisualElement fpsRow = AddSettingRow(video, "프레임 제한", () =>
         {
             int fps = GameSettings.FpsOptions[GameSettings.FpsIndex];
             return fps < 0 ? "무제한" : $"{fps} FPS";
@@ -293,7 +287,7 @@ public partial class SidePanelUI
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
         row.style.alignItems = Align.Center;
-        row.style.width = 780; // 창 너비에 맞춰 넓게
+        row.style.width = 650; // 세 칸이 한 줄에 들어가는 너비
         row.style.paddingLeft = 20;
         row.style.paddingRight = 12;
         row.style.paddingTop = 10; // 줄 간격
@@ -309,7 +303,7 @@ public partial class SidePanelUI
         row.Add(name);
 
         var value = new Label();
-        value.style.width = 290;
+        value.style.width = 200;
         PixelStyle.FitText(value, 40);
         value.style.flexShrink = 0;
         value.style.color = PixelStyle.Text.linear;

@@ -20,7 +20,6 @@ public static class GameSettings
 
     public static readonly int[] FpsOptions = { 30, 60, 120, 144, -1 }; // -1 = 무제한
 
-    private const string MenuSceneName = "MenuScene";
     private static AudioSource _bgm; // 씬이 바뀌어도 유지
 
     public static float MasterVolume
@@ -35,7 +34,7 @@ public static class GameSettings
 
     public static float BgmVolume
     {
-        get => PlayerPrefs.GetFloat(BgmVolumeKey, 0.5f);
+        get => PlayerPrefs.GetFloat(BgmVolumeKey, 1f);
         set
         {
             PlayerPrefs.SetFloat(BgmVolumeKey, Mathf.Clamp01(value));
@@ -222,11 +221,6 @@ public static class GameSettings
 
     private static void UpdateBgm()
     {
-        if (SceneManager.GetActiveScene().name != MenuSceneName)
-        {
-            if (_bgm != null) _bgm.Stop();
-            return;
-        }
         if (_bgm != null)
         {
             if (!_bgm.isPlaying) _bgm.Play();
