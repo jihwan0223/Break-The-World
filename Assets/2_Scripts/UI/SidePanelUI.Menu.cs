@@ -428,11 +428,11 @@ public partial class SidePanelUI
         AddStat(left, "해금한 무기", () => UnlockedText(WeaponManager.Instance != null ? WeaponManager.Instance.VisibleWeaponCount : 0, i => WeaponManager.Instance.IsUnlocked(i)));
         AddStat(left, "구매한 업그레이드", () =>
         {
-            int bought = 0, total = 0; // 환생 창 노드는 빼고 셈
+            int bought = 0, total = 0; // 환생 창 노드와 이번 버전에 없는 노드(데모의 풀버전 노드)는 빼고 셈
             if (U() != null)
                 foreach (var node in U().Nodes)
                 {
-                    if (U().UsesStarShards(node.id)) continue;
+                    if (U().UsesStarShards(node.id) || !U().IsInThisVersion(node.id)) continue;
                     total++;
                     if (U().GetLevel(node.id) >= 1) bought++;
                 }
