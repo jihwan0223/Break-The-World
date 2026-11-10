@@ -24,6 +24,8 @@ public static class NodeIconGenerator
     static readonly string[] CrispObjects = { "자전거" };
     static readonly RectInt CrispBox = new RectInt(2, 15, 26, 15);
     const int CrispScale = 2;
+    static readonly string[] HiResObjects = { "인공위성", "로켓", "UFO", "달", "지구" }; // 원본이 세밀해서 32px로 줄이면 뭉개짐 - 2배 해상도로
+    static readonly string[] WideObjects = { "인공위성" }; // 옆으로 긴 그림이라 넓은 칸에 (자르지 않음)
     static readonly string[] StripObjects = { "도로" };
     static readonly string[] SternObjects = { "배" }; // 너무 긴 그림이라 오른쪽(선교) 부분만
     static readonly Color32 BorderX = new Color32(255, 255, 255, 255);
@@ -96,8 +98,10 @@ public static class NodeIconGenerator
                 if (source == null) { Debug.LogWarning($"[NodeIcon] {name} 그림 없음"); continue; }
                 bool strip = System.Array.IndexOf(StripObjects, name) >= 0;
                 bool stern = System.Array.IndexOf(SternObjects, name) >= 0;
-                bool crisp = System.Array.IndexOf(CrispObjects, name) >= 0;
-                RectInt box = strip || stern ? WideBox : crisp ? CrispBox : ObjectBox;
+                bool crispBox = System.Array.IndexOf(CrispObjects, name) >= 0; // 자전거 전용 칸
+                bool crisp = crispBox || System.Array.IndexOf(HiResObjects, name) >= 0; // 2배 해상도
+                bool wide = System.Array.IndexOf(WideObjects, name) >= 0; // 넓은 칸
+                RectInt box = strip || stern || wide ? WideBox : crispBox ? CrispBox : ObjectBox;
                 if (crisp) { scale = CrispScale; box = new RectInt(box.x * scale, box.y * scale, box.width * scale, box.height * scale); }
                 layers.Add((FitObject(source, box, strip || stern ? StripAspect : 0f, crisp, stern), box));
             }

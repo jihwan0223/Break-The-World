@@ -6476,7 +6476,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: a8ec29b28a1e9164998bd9deae417ea1, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -6544,7 +6544,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0a3f49de99fdc1a49b45ad5d77381018, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -10621,7 +10621,6 @@ MonoBehaviour:
   isGain: 0
   label: {fileID: 1124934080}
   doneOverlay: {fileID: 1021695199}
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -10691,7 +10690,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b84d1102cd5f0b245b66d89c1500889f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -13196,7 +13195,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 2464afdb55367dd47b2333aee467b52c, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -13264,7 +13263,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0075b0573cb917a4dad87eb9be1ad2d8, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -13890,7 +13889,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 8b6d8efecccc4cc4585e2915f2a90e7b, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -13958,7 +13957,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 13631f3ac3840134f91edc781e408e17, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -14829,7 +14828,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 94571c73d4d549045923ae39fbd21a04, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -14897,7 +14896,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 672cd3e44df176b4ca4791c2e56b633f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -15702,7 +15701,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: f9b4e6b5de484a641a89b54f4df2ecf8, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -15770,7 +15769,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7a53487e76a17b0409e313cc0097a81b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -16886,7 +16885,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 7437f784bf2dff14bb5120363f07d0f6, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -16954,7 +16953,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: aed6aa8997ee28b47b16a2277596d169, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -19562,7 +19561,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 45b83749c47b2c943808674e03d00701, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -19630,7 +19629,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cdd5fa54304c7644ab48d4af50647c24, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -19736,7 +19735,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 1e1f030500a907f4e9932a09cda3e09f, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -19804,7 +19803,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cab3ef7cdd5c95f4f8f9905bca7d9a91, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -20079,7 +20078,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 7b5160b94f9cf3343ba074804cdd68c0, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -20147,7 +20146,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 184985559866260449e70e94d6ed1af4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -20391,7 +20390,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: c5f551e72a5bbe04fbbfafc806a012dd, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -20459,7 +20458,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f6349599bdcaff84e80bbe173a0c4df2, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -25165,7 +25164,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: dc8f86b457e4df84089032b86ec443ac, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -25233,7 +25232,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 803fad84fc03e954889c5682c837d42f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -28180,7 +28179,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 559f24e4ac439b440b50b5fadc181ad0, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -28248,7 +28247,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 109812d0a02cac344b9b2d4291b03c24, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -29415,7 +29414,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 286bcd7bb8ba69342b31bda0c0107911, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -29483,7 +29482,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 441df774ff66dfc43b24d6e2bcdb2b48, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -31517,7 +31516,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: bd62de482c7943c498ad08a91dae7885, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -31585,7 +31584,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6c9e8859dde137f4687a004fb6506678, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -33684,7 +33683,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: ecfbe31d539abc04c9013ca54f3c8527, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -33752,7 +33751,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c18d0dc7df65a144695888c75e1796a4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -36521,7 +36520,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 3b9292c2028858e4ea921b7ee9ef1469, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -36589,7 +36588,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 26c4f0031826c074faeced24c1c86e16, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -38828,7 +38827,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 0f9eda1458b74264c8710c90834ee874, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -38896,7 +38895,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9e63b590541ccce4ca732e5a05e2b109, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -39095,7 +39094,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 0538bf9c0c815474c90eff196c57911c, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -39163,7 +39162,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4fe3d0fe43f2b6649bd7fc04115f9e17, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -53100,7 +53099,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 57ba320d4a6705945a5c7b6fd93064ac, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -53168,7 +53167,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0046c360898fa5f4292586a303bdc029, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -57411,7 +57410,7 @@ MonoBehaviour:
   isGain: 0
   label: {fileID: 1600768712}
   doneOverlay: {fileID: 2010314585}
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: d035b7f9f2b6ec34fa86fee6e2f69d8c, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -57481,7 +57480,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f6112890a8ed6b24ba615ecf633e1c4a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -67638,7 +67637,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 30e10a386eee9b943a40331761ad5136, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -67706,7 +67705,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 995bc42559cb53945aa715e53b6c00f4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -68723,7 +68722,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: d5c17060488021b4ebcb19045a1ffd92, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -68791,7 +68790,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5abc107ac8d8e2d4ca1324019d6d85cd, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -71136,7 +71135,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 4f78b624a3da4c340885be28cccec01c, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -71204,7 +71203,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d29b728f7c134e14d830ec27aed07363, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -74111,7 +74110,7 @@ MonoBehaviour:
   isGain: 0
   label: {fileID: 2145510904}
   doneOverlay: {fileID: 289943433}
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: db40cb1cbf3252d409f9ae538e90cdba, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -74181,7 +74180,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: fd416bc4f9296694eb361ba09009c41b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -76050,7 +76049,7 @@ MonoBehaviour:
   isGain: 0
   label: {fileID: 1912065630}
   doneOverlay: {fileID: 21406528}
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 85294df17bce2e946bbe9ec7bc6d52c5, type: 3}
   fullVersionOnly: 0
   gateObjectName: "\uC778\uACF5\uC704\uC131"
   lockedSprite: {fileID: 21300000, guid: cf41f0fed7949ab4fadf02f5ccc6fd0c, type: 3}
@@ -76120,7 +76119,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d472dc68b650ca94294443d11687f18c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -77406,7 +77405,7 @@ MonoBehaviour:
   isGain: 0
   label: {fileID: 572754689}
   doneOverlay: {fileID: 1169563110}
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: e5ec16487e6781541b595dd187eedff3, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -77476,7 +77475,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f3a55db52579eeb42894e19697dc384f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -78252,7 +78251,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: bc6c133606393cb409d8af6bde332718, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -78320,7 +78319,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 04505674f144cca41a3836784c57de21, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -83455,7 +83454,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: 1d601fa0fdd3a75458495ea30df4038b, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 08db02f5f9fcade498e5e702a2f4fbcf, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
@@ -83523,7 +83522,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fc3f30320176a3c41828b95fda54d891, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3b7ed74731617da468e8f862cbe6a367, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
