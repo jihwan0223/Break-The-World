@@ -44,8 +44,8 @@ public class ZoneUnlockEffect : MonoBehaviour
         banner.style.top = Length.Percent(18);
         banner.style.alignItems = Align.Center;
         banner.style.opacity = 0f;
-        banner.Add(CreateLabel("새로운 지역 해금!", 64));
-        banner.Add(CreateLabel("화살표로 이동할 수 있어요", 30));
+        banner.Add(CreateLabel("새로운 지역 해금!", 72)); // 도트 글꼴은 12px 배수라야 또렷함
+        banner.Add(CreateLabel("화살표로 이동할 수 있어요", 36));
 
         root.Add(flash);
         root.Add(banner);
@@ -81,7 +81,9 @@ public class ZoneUnlockEffect : MonoBehaviour
         Label label = new Label(Loc.T(text));
         label.pickingMode = PickingMode.Ignore;
         label.style.fontSize = fontSize;
-        PixelStyle.OutlinedText(label, Color.black); // 빌드에서도 깨지지 않는 굵은 테두리 글꼴 (일반 Font + 굵게는 빌드에서 "="로 깨짐)
+        if (GameFonts.UiColored != null)
+            label.style.unityFontDefinition = FontDefinition.FromSDFFont(GameFonts.UiColored); // 굵지 않은 도트 글꼴 (일반 Font + 굵게는 빌드에서 "="로 깨짐)
+        label.style.color = Color.white;
         label.style.backgroundColor = new Color(0f, 0f, 0f, 0.6f);
         label.style.paddingLeft = 24;
         label.style.paddingRight = 24;

@@ -10621,6 +10621,7 @@ MonoBehaviour:
   isGain: 0
   label: {fileID: 1124934080}
   doneOverlay: {fileID: 1021695199}
+  upgradedSprite: {fileID: 21300000, guid: 2a4a7d784331f8f4198d4270af3d5fac, type: 3}
   fullVersionOnly: 0
   gateObjectName: 
   lockedSprite: {fileID: 0}
