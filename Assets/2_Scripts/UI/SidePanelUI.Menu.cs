@@ -482,7 +482,7 @@ public partial class SidePanelUI
                     int index = i; // 이 줄의 오브젝트
                     AddCountStat(column, ObjectManager.StaticObjectNameAt(index),
                         () => GameStats.BrokenOf(index), Times,
-                        () => ObjectManager.Instance != null && ObjectManager.Instance.IsUnlocked(index)); // 해금 전 오브젝트는 숨김
+                        () => ObjectManager.Instance != null && ObjectManager.Instance.IsUnlocked(index), index); // 해금 전 오브젝트는 숨김
                 }
             }
         }
@@ -564,14 +564,29 @@ public partial class SidePanelUI
     }
 
     // 개수 줄: 돈처럼 숫자가 굴러 올라감
-    private void AddCountStat(VisualElement column, string label, System.Func<long> number, System.Func<long, string> format, System.Func<bool> visible = null)
+    private void AddCountStat(VisualElement column, string label, System.Func<long> number, System.Func<long, string> format, System.Func<bool> visible = null, int objectIndex = -1)
     {
-        _statCounters.Add(new StatCounter { label = AddStatRow(column, label, visible), target = number, format = format });
+        _statCounters.Add(new StatCounter { label = AddStatRow(column, label, visible, objectIndex), target = number, format = format });
+    }
+
+    private const float StatIconSize = 48f; // 통계 줄 오브젝트 그림 크기
+    private readonly List<(VisualElement icon, int index)> _statIcons = new List<(VisualElement, int)>(); // 오브젝트 그림 칸 (그림은 창 열 때 채움)
+
+    // 그림 데이터가 창을 만든 뒤에 들어올 수 있어서 열 때 채움
+    private void FillStatIcons()
+    {
+        if (ObjectManager.Instance == null) return;
+        foreach (var (icon, index) in _statIcons)
+        {
+            if (icon.style.backgroundImage.value.sprite != null) continue;
+            Sprite[] stages = ObjectManager.Instance.GetObjectAt(index).healthStages; // 체력 단계별 그림 (0 = 멀쩡한 모습)
+            if (stages != null && stages.Length > 0 && stages[0] != null) icon.style.backgroundImage = new StyleBackground(stages[0]);
+        }
     }
 
     private static string Times(long n) => Loc.T("{0}번", NumberFormatUtil.Format(n));
 
-    private Label AddStatRow(VisualElement column, string label, System.Func<bool> visible)
+    private Label AddStatRow(VisualElement column, string label, System.Func<bool> visible, int objectIndex = -1)
     {
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
@@ -583,6 +598,19 @@ public partial class SidePanelUI
         row.style.paddingBottom = 8;
         row.style.marginBottom = 8; // 한 칸에 10줄이 화면에 들어가게
         PixelStyle.Frame(row, PixelStyle.Card);
+
+        if (objectIndex >= 0)
+        {
+            var icon = new VisualElement(); // 오브젝트 그림 (이름 앞)
+            icon.style.width = StatIconSize;
+            icon.style.height = StatIconSize;
+            icon.style.flexShrink = 0;
+            icon.style.marginRight = 14;
+            icon.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+            icon.pickingMode = PickingMode.Ignore;
+            row.Add(icon);
+            _statIcons.Add((icon, objectIndex));
+        }
 
         var name = new Label();
         Loc.Bind(name, label);
@@ -705,6 +733,7 @@ public partial class SidePanelUI
     {
         foreach (var label in _statPulses.Keys) label.style.scale = new Scale(Vector3.one); // 닫힐 때 뛰던 칸 원래 크기로
         _statPulses.Clear();
+        FillStatIcons();
         RefreshStatValues(false);
         ShowStatPage(0);
         _statsPanel.style.display = DisplayStyle.Flex;

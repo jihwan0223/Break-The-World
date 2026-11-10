@@ -84,7 +84,8 @@ public class HitEffects : MonoBehaviour
         if (GameSettings.DamageNumbers)
             _numbers.ShowDamage(numberPosition, damage,
                 shielded ? ShieldedDamageColor : lucky ? SuperDamageColor : strong ? StrongDamageColor : DamageColor,
-                shielded ? ShieldedNumberScale : strong ? StrongNumberScale : NumberScale);
+                shielded ? ShieldedNumberScale : strong ? StrongNumberScale : NumberScale,
+                !shielded && (strong || lucky));
     }
 
     void Update()

@@ -18,6 +18,10 @@ public class PickupPopup : MonoBehaviour
     [SerializeField] private float popStartScale = 0.3f;
     [SerializeField] private float popDrift = 0.45f; // 월드 유닛
     [SerializeField] private float popTilt = 12f; // 도
+    [SerializeField] private float flashDuration = 0.08f; // 초 - 데미지 숫자가 처음 하얗게 번쩍이는 시간
+    [SerializeField] private float shakeDuration = 0.15f; // 초 - 치명타 숫자가 떨리는 시간
+    [SerializeField] private float shakeAmount = 0.08f; // 월드 유닛 - 치명타 숫자 떨림 폭
+    [SerializeField] private float critOvershoot = 3f; // 치명타 팝이 튀는 정도 (일반 1.70158)
 
     private class Popup
     {
@@ -31,6 +35,8 @@ public class PickupPopup : MonoBehaviour
         public bool pops;
         public float drift;
         public float baseAlpha = 1f;
+        public Color baseColor = Color.white; // 번쩍임이 끝나고 돌아갈 색
+        public bool shakes; // 치명타라 떨림
     }
 
     private readonly List<Popup> _active = new List<Popup>();
@@ -58,10 +64,12 @@ public class PickupPopup : MonoBehaviour
         popup.mergeable = merge;
     }
 
-    public void ShowDamage(Vector3 position, long amount, Color color, float sizeScale)
+    public void ShowDamage(Vector3 position, long amount, Color color, float sizeScale, bool crit = false)
     {
         Popup popup = Begin(position, amount, color, "-", sizeScale);
         popup.pops = true;
+        popup.shakes = crit;
+        popup.text.color = new Color(1f, 1f, 1f, color.a); // 첫 프레임부터 하얗게
         popup.drift = Random.Range(-popDrift, popDrift);
         popup.text.transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(-popTilt, popTilt));
         popup.text.transform.localScale = Vector3.one * popStartScale;
@@ -88,6 +96,8 @@ public class PickupPopup : MonoBehaviour
         popup.sign = sign;
         popup.pops = false;
         popup.drift = 0f;
+        popup.shakes = false;
+        popup.baseColor = color;
         popup.text.transform.rotation = Quaternion.identity;
         popup.text.transform.localScale = Vector3.one;
         popup.text.color = color;
@@ -116,15 +126,20 @@ public class PickupPopup : MonoBehaviour
             }
 
             float eased = 1f - (1f - progress) * (1f - progress);
-            popup.text.transform.position = popup.start + new Vector3(popup.drift * eased, riseDistance * eased, 0f);
+            Vector3 shake = Vector3.zero; // 치명타 떨림 (점점 약해짐)
+            if (popup.shakes && popup.age < shakeDuration)
+                shake = (Vector3)(Random.insideUnitCircle * shakeAmount * (1f - popup.age / shakeDuration));
+            popup.text.transform.position = popup.start + new Vector3(popup.drift * eased, riseDistance * eased, 0f) + shake;
             if (popup.pops)
             {
-                const float overshoot = 1.70158f; // 표준 back 이징 값
+                float overshoot = popup.shakes ? critOvershoot : 1.70158f; // back 이징 값 (1.70158 = 표준)
                 float back = Mathf.Clamp01(popup.age / popDuration) - 1f;
                 float pop = 1f + (overshoot + 1f) * back * back * back + overshoot * back * back;
                 popup.text.transform.localScale = Vector3.one * Mathf.LerpUnclamped(popStartScale, 1f, pop);
             }
-            Color color = popup.text.color;
+            Color color = popup.pops && popup.age < flashDuration
+                ? Color.Lerp(Color.white, popup.baseColor, popup.age / flashDuration) // 처음엔 하얗게 번쩍
+                : popup.baseColor;
             color.a = popup.baseAlpha * (progress < 0.5f ? 1f : 1f - (progress - 0.5f) / 0.5f);
             popup.text.color = color;
         }
