@@ -13455,7 +13455,7 @@ MonoBehaviour:
   objectIndexInTier: 1
   hpMultiplier: 1
   fixedObjectIndex: 10
-  respawnDelay: 1
+  respawnDelay: 0
   dieFadeDuration: 0.25
   respawnFadeDuration: 0.25
   stayVisibleWhenDead: 0
@@ -27638,7 +27638,7 @@ MonoBehaviour:
   objectIndexInTier: 1
   hpMultiplier: 1
   fixedObjectIndex: 10
-  respawnDelay: 1
+  respawnDelay: 0
   dieFadeDuration: 0.25
   respawnFadeDuration: 0.25
   stayVisibleWhenDead: 0
@@ -52661,7 +52661,7 @@ MonoBehaviour:
   objectIndexInTier: 1
   hpMultiplier: 1
   fixedObjectIndex: 10
-  respawnDelay: 1
+  respawnDelay: 0
   dieFadeDuration: 0.25
   respawnFadeDuration: 0.25
   stayVisibleWhenDead: 0
@@ -75403,7 +75403,7 @@ MonoBehaviour:
   objectIndexInTier: 1
   hpMultiplier: 1
   fixedObjectIndex: 10
-  respawnDelay: 1
+  respawnDelay: 0
   dieFadeDuration: 0.25
   respawnFadeDuration: 0.25
   stayVisibleWhenDead: 0
