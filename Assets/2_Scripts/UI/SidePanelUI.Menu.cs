@@ -191,6 +191,7 @@ public partial class SidePanelUI
             HoverGrow(b);
             buttons.Add(b);
         }
+        if (!Application.isEditor) debug.style.display = DisplayStyle.None; // 디버그는 에디터에서만 - 빌드에선 숨김
 
         BuildLeaveConfirm();
         root.Add(_settingsPanel);

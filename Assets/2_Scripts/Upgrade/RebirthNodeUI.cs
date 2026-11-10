@@ -36,7 +36,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     private bool _busy; // 빨아들이는 중
     private bool _hovered; // 마우스가 올라와 있음 (툴팁 갱신용)
     private readonly List<(RectTransform rect, Vector3 position, Vector3 scale, Quaternion rotation)> _saved =
-        new List<(RectTransform, Vector3, Vector3, Quaternion)>(); // 원래 자리
+        new List<(RectTransform, Vector3, Vector3, Quaternion)>(); // 원래 자리 (부모 기준)
     private readonly List<GameObject> _effects = new List<GameObject>(); // 연출용으로 만든 것 (끝나면 지움)
     private readonly List<GameObject> _hiddenLinks = new List<GameObject>(); // 연출 동안 숨긴 연결선 (섞이면 거미줄처럼 보여서)
     private Vector2 _savedCameraPosition; // 연출 전 카메라 위치
@@ -168,7 +168,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         var orbits = new Orbit[_saved.Count]; // 노드별 궤도
         for (int i = 0; i < _saved.Count; i++)
         {
-            Vector2 offset = (Vector2)content.InverseTransformPoint(_saved[i].position) - center; // 가운데에서 노드까지
+            Vector2 offset = (Vector2)content.InverseTransformPoint(_saved[i].rect.position) - center; // 가운데에서 노드까지
             orbits[i] = new Orbit
             {
                 radius = offset.magnitude,
@@ -241,7 +241,8 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         SidePanelUI.ShowDemoComplete(0f); // 임시: 환생 대신 데모 감사창
     }
 
-    private void Save(RectTransform rect) => _saved.Add((rect, rect.position, rect.localScale, rect.localRotation));
+    // 판 기준 자리로 저장 - 화면 좌표로 저장하면 줌/이동이 바뀐 뒤 되돌릴 때 어긋남
+    private void Save(RectTransform rect) => _saved.Add((rect, rect.localPosition, rect.localScale, rect.localRotation));
 
     // k(0~1)만큼 진행한 소용돌이 자리: 거리는 (1-k)^3으로 줄어 멀리 있던 것도 금방 화면 안으로 오고,
     // 각도는 안쪽으로 갈수록 빨리 돎 (시계 방향)
@@ -297,7 +298,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         foreach (var (rect, position, scale, rotation) in _saved)
         {
             if (rect == null) continue;
-            rect.position = position;
+            rect.localPosition = position;
             rect.localScale = scale;
             rect.localRotation = rotation;
         }
