@@ -233,13 +233,19 @@ public class ObjectManager : MonoBehaviour
         return BaseRewardStart * Math.Pow(BaseRewardGrowth, map1Steps) * Math.Pow(Map2RewardGrowth, map2Steps) * Math.Pow(LaterRewardGrowth, laterSteps);
     }
 
-    public long GetUnlockCost(int index)
+    public long GetUnlockCost(int index) => Rounded(RawUnlockCost(index));
+
+    // 할인 전 해금 가격 (드랍량 강화 가격의 기준)
+    private static double RawUnlockCost(int index)
     {
         if (index <= 0) return 0;
         double breaksNeeded = UnlockBreaksStart * Math.Pow(UnlockBreaksGrowth, index - 1);
         if (index > ObjectsPerMap * 2) breaksNeeded *= Map3UnlockBreaksMultiplier;
-        return NumberFormatUtil.RoundPrice((long)(breaksNeeded * RawBaseReward(index - 1)));
+        return breaksNeeded * RawBaseReward(index - 1);
     }
+
+    // 보기 좋게 반올림
+    private static long Rounded(double cost) => cost <= 0 ? 0 : NumberFormatUtil.RoundPrice((long)cost);
 
     // 맵3부터는 필요 처치 수를 줄임 (1.15배씩 계속 늘면 후반이 너무 길어짐)
     private const double Map3UnlockBreaksMultiplier = 0.3;
@@ -277,7 +283,7 @@ public class ObjectManager : MonoBehaviour
         if (level >= MaxGainLevel) return -1;
 
         double levelFactor = Math.Pow(GainCostGrowthPerLevel, level);
-        return NumberFormatUtil.RoundPrice((long)(GetUnlockCost(index) * (GainCostBase / (double)UnlockCostBase) * levelFactor));
+        return Rounded(NumberFormatUtil.RoundPrice((long)RawUnlockCost(index)) * (GainCostBase / (double)UnlockCostBase) * levelFactor);
     }
 
     public long GetGainBonus(int index) => GetGainLevel(index) * GainBonusPerLevel(index);
@@ -325,6 +331,20 @@ public class ObjectManager : MonoBehaviour
 
         for (int i = 0; i < _gainLevel.Length; i++)
             SetGainLevel(i, MaxGainLevel);
+    }
+
+    // 환생: 환생 노드에 따라 해금/획득량을 남기고 나머지는 처음으로
+    public void ResetForRebirth(bool keepUnlocks, bool keepGains)
+    {
+        if (!keepUnlocks)
+            for (int i = 1; i < _unlocked.Length; i++)
+                _unlocked[i] = debugUnlockAll;
+        if (keepGains) return;
+        for (int i = 0; i < _gainLevel.Length; i++)
+        {
+            _gainLevel[i] = 0;
+            OnGainLevelChanged?.Invoke(i, 0);
+        }
     }
 
     public void ResetAll()

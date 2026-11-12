@@ -14,7 +14,7 @@ public partial class SidePanelUI : MonoBehaviour
 
     // 비활성으로 시작해서 Instance 대신 직접 SetActive로 켬
     [SerializeField] private GameObject upgradeTreePanel;
-    [SerializeField] private GameObject rebirthTreePanel; // 환생 창 (지금은 디버그에서만 엶)
+    [SerializeField] private GameObject rebirthTreePanel; // 환생 창 (환생 직후에만 열림)
     [SerializeField] private Sprite settingsIcon;
     [Tooltip("도감 맵 탭 그림, 0 = 책상 위")] [SerializeField] private Sprite[] zoneImages;
 
@@ -313,10 +313,11 @@ public partial class SidePanelUI : MonoBehaviour
 
         AddDebugButton(list, "돈 최대", () =>
         {
-            CurrencyManager.Instance?.AddPieces(10_000_000_000L);
-            CurrencyManager.Instance?.AddCrystals(1000);
+            const long max = long.MaxValue / 4; // 오버플로우 직전 (계속 벌어도 안 넘치게 여유 둠)
+            CurrencyManager.Instance?.SetPieces(max);
+            CurrencyManager.Instance?.SetCrystals(max);
             CurrencyManager.Instance?.AddStarShards(100);
-            return "조각 100억 개, 결정 1,000개, 별조각 100개를 지급했습니다";
+            return "조각과 결정을 최대로, 별조각 100개를 지급했습니다";
         });
         AddDebugButton(list, "환생 창 열기", () =>
         {
@@ -721,7 +722,7 @@ public partial class SidePanelUI : MonoBehaviour
 
         card.Clear();
         card.Add(PixelStyle.CardHeader("능력치"));
-        card.Add(CreateInfoRow("공격력", hidden ? "???" : NumberFormatUtil.Format(data.clickDamage + bonus), hidden ? HiddenColor : Color.white)); // 강화까지 더한 실제 공격력
+        card.Add(CreateInfoRow("공격력", hidden ? "???" : NumberFormatUtil.Format((long)data.clickDamage + bonus), hidden ? HiddenColor : Color.white)); // 강화까지 더한 실제 공격력
         if (buyable)
             card.Add(CreateInfoRow("해금 가격", Loc.T("{0} 조각", NumberFormatUtil.Format(cost)), Color.white));
         card.Add(CreateInfoRow("상태", equipped ? "장착 중" : unlocked ? "해금됨" : "잠김", equipped || unlocked ? GoodColor : BadColor));
@@ -972,7 +973,7 @@ public partial class SidePanelUI : MonoBehaviour
         int bonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetClickDamageBonus(index) : 0; // 강화 보너스
         return new[]
         {
-            ("공격력", locked ? "???" : NumberFormatUtil.Format(weapons.GetWeaponAt(index).clickDamage + bonus), locked ? HiddenColor : Color.white),
+            ("공격력", locked ? "???" : NumberFormatUtil.Format((long)weapons.GetWeaponAt(index).clickDamage + bonus), locked ? HiddenColor : Color.white),
             ("상태", weapons.EquippedIndex == index ? "장착 중" : locked ? "잠김" : "해금됨", locked ? BadColor : GoodColor),
         };
     }

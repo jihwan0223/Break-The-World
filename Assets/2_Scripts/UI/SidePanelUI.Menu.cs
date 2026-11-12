@@ -38,6 +38,12 @@ public partial class SidePanelUI
 
     private void CloseDemoBox() => _demoBox.style.display = DisplayStyle.None;
 
+    // 환생 직후 / 환생 버튼
+    public static void OpenRebirthTree()
+    {
+        if (_instance != null && _instance.rebirthTreePanel != null) _instance.rebirthTreePanel.SetActive(true);
+    }
+
     private void BuildDemoBox(VisualElement root)
     {
         _instance = this;
@@ -437,7 +443,7 @@ public partial class SidePanelUI
         AddStat(right, "클릭 데미지", () =>
         {
             if (WeaponManager.Instance == null || U() == null) return "-";
-            return NumberFormatUtil.Format(WeaponManager.Instance.CurrentClickDamage + U().GetClickDamageBonus(WeaponManager.Instance.EquippedIndex));
+            return NumberFormatUtil.Format((long)WeaponManager.Instance.CurrentClickDamage + U().GetClickDamageBonus(WeaponManager.Instance.EquippedIndex));
         });
         AddStat(right, "치명타 확률", () => U() != null ? Chance(U().CritChanceValue) : "-", CritOn);
         AddStat(right, "치명타 데미지", () => U() != null ? $"x{U().CritMultiplierValue:0.##}" : "-", CritOn);

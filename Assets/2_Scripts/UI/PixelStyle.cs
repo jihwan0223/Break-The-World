@@ -173,6 +173,15 @@ public static class PixelStyle
 
     private static readonly Dictionary<(Kind, Color, Color, Color, Color), Sprite> _sprites = new Dictionary<(Kind, Color, Color, Color, Color), Sprite>();
 
+    // uGUI 창 테두리 (버튼과 같은 도트 스타일)
+    public static void UguiFrame(UnityEngine.UI.Image image, Tone tone, float dot = Dot)
+    {
+        image.sprite = SpriteOf(Kind.Frame, tone);
+        image.type = UnityEngine.UI.Image.Type.Sliced;
+        image.color = Color.white;
+        image.pixelsPerUnitMultiplier = 1f / dot; // 도트 한 칸 = dot px
+    }
+
     public static void UguiButton(UnityEngine.UI.Button button, Tone tone, float dot = Dot)
     {
         var image = button.targetGraphic as UnityEngine.UI.Image;

@@ -213,22 +213,26 @@ public class Click : MonoBehaviour
 
         int equippedWeaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : -1;
         int clickDamageBonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetClickDamageBonus(equippedWeaponIndex) : 0;
-        int damage = baseDamage + clickDamageBonus;
+        float damageMultiplier = UpgradeManager.Instance != null ? UpgradeManager.Instance.ClickDamageMultiplier : 1f; // 환생 클릭 데미지 %
+        double rawDamage = ((double)baseDamage + clickDamageBonus) * damageMultiplier; // int 넘침 막으려고 double로 계산
+        if (autoClick && UpgradeManager.Instance != null) // 자동클릭 전용: +n 후 % / 2배
+            rawDamage = (System.Math.Round(rawDamage) + UpgradeManager.Instance.GetAutoClickDamageBonus(equippedWeaponIndex)) * UpgradeManager.Instance.AutoClickDamageMultiplier;
 
         bool isSuper = UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.LuckyClickChance;
         bool isCrit = !isSuper && UpgradeManager.Instance != null && Random.value < UpgradeManager.Instance.CritChanceValue;
         if (isSuper)
-            damage = Mathf.RoundToInt(damage * UpgradeManager.Instance.CritMultiplierValue * SuperCritMultiplier);
+            rawDamage = System.Math.Round(rawDamage) * UpgradeManager.Instance.CritMultiplierValue * SuperCritMultiplier;
         else if (isCrit)
-            damage = Mathf.RoundToInt(damage * UpgradeManager.Instance.CritMultiplierValue);
+            rawDamage = System.Math.Round(rawDamage) * UpgradeManager.Instance.CritMultiplierValue;
+        int damage = UpgradeManager.ClampToInt(rawDamage); // 실제 데미지 (int 최대값에서 멈춤)
         if (isSuper) GameStats.SuperCrits++;
         else if (isCrit) GameStats.Crits++;
         if (autoClick)
-            damage = Mathf.Max(1, Mathf.RoundToInt(damage * AutoClickDamageRatio));
+            damage = Mathf.Max(1, UpgradeManager.ClampToInt((double)damage * AutoClickDamageRatio));
 
         bool bossFight = _boss != null && _boss.BossActive;
         bool shielded = bossFight && _boss.ShieldRatio > 0f;
-        if (shielded) damage = Mathf.Max(1, Mathf.FloorToInt(damage * _boss.BossDamageMultiplier)); // 내림이라 작은 데미지도 줄어든 게 보임
+        if (shielded) damage = Mathf.Max(1, (int)System.Math.Min(int.MaxValue, System.Math.Floor((double)damage * _boss.BossDamageMultiplier))); // 내림이라 작은 데미지도 줄어든 게 보임
         GameStats.TotalDamage += damage;
         if (damage > GameStats.BestHit) GameStats.BestHit = damage;
 
@@ -326,6 +330,7 @@ public class Click : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < flightSeconds)
         {
+            if (projectile == null) yield break; // 컴포넌트가 꺼지면서 OnDisable이 지움
             elapsed += Time.deltaTime;
             float progress = Mathf.Clamp01(elapsed / flightSeconds);
             Vector3 position = Vector3.Lerp(start, end, progress);

@@ -52,7 +52,8 @@ public partial class ZoneBreaker
     public bool BossCleared => _bossWon || (IsFinalBoss ? FinalBossCleared : ZoneManager.Instance == null || ZoneManager.Instance.UnlockedMaxZone >= unlockZone);
     public bool BossAllowsDamage => BossCleared || BossActive;
     public float BossTimeLeft => _bossTimeLeft;
-    public float BossTimeRatio => bossTimeLimit > 0f ? Mathf.Clamp01(_bossTimeLeft / bossTimeLimit) : 0f;
+    private float TimeLimit => bossTimeLimit + (UpgradeManager.Instance != null ? UpgradeManager.Instance.BossTimeBonus : 0f); // 초 (환생 노드 보너스 포함)
+    public float BossTimeRatio => TimeLimit > 0f ? Mathf.Clamp01(_bossTimeLeft / TimeLimit) : 0f;
     public float BossHpRatio => _health != null && _health.MaxHP > 0 ? (float)_health.CurrentHP / _health.MaxHP : 0f;
     public float ShieldRatio { get; private set; }
     public float BossDamageMultiplier => 1f - ShieldRatio;
@@ -80,7 +81,7 @@ public partial class ZoneBreaker
         if (!CanChallenge || ActiveBoss != null) return;
 
         ActiveBoss = this;
-        _bossTimeLeft = bossTimeLimit;
+        _bossTimeLeft = TimeLimit;
         _health.ResetToFull();
 
         _links.Clear();

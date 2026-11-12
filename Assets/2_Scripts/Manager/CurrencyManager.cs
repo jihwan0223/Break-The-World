@@ -165,6 +165,13 @@ public class CurrencyManager : MonoBehaviour
         return (pieces, crystals, stars);
     }
 
+    // 환생: 조각/결정만 비움 (누적 기록, 별조각은 유지)
+    public void ResetForRebirth()
+    {
+        SetPieces(0);
+        SetCrystals(0);
+    }
+
     public void ResetAll()
     {
         _pieces = 0;

@@ -17,7 +17,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [ObjectNameField(ObjectNameFieldSource.Weapon)] [SerializeField] private string targetWeaponName;
     [Tooltip("오브젝트 대상 효과(자동클릭 계열 / 오브젝트 조각 획득 / 2배 드랍 확률)에서 씀. 그 오브젝트 장착 중일 때만 작동")]
     [ObjectNameField] [SerializeField] private string targetObjectName;
-    [Min(1)] [SerializeField] private int maxLevel = 5;
+    [Min(1)] [SerializeField] private int maxLevel = 5; // InfiniteLevel 이상이면 무한 레벨 (조각 털기용)
+    public const int InfiniteLevel = 9999; // 이 이상 최대 레벨은 화면에 안 보여줌
     [SerializeField] private float[] valuePerLevel = { 1f }; // 배열이 짧으면 마지막 값 반복
 
     [Tooltip("이 업그레이드 한 번 올리는 데 드는 비용들. 조각과 결정을 동시에 요구할 수 있음 (전부 있어야 구매됨)")]
@@ -29,6 +30,8 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] private Sprite upgradedSprite;
     [Tooltip("체크하면 데모 버전에서는 안 보임")] [SerializeField] private bool fullVersionOnly;
     public bool FullVersionOnly => fullVersionOnly;
+    [Tooltip("체크하면 선으로 이어진 앞 노드를 전부 1레벨 이상 올려야 열림 (끄면 하나만 올려도 열림)")] [SerializeField] private bool requireAllPrereqs;
+    public bool RequireAllPrereqs => requireAllPrereqs;
     [Tooltip("이 오브젝트를 해금해야 열리는 노드 (비우면 안 씀). 그 전엔 자물쇠 그림 + 제목/설명 ???, 해금하는 순간 트리 카메라가 와서 자물쇠가 깨지며 열림. 열리면 대상 오브젝트가 아직 없어도 살 수 있음")]
     [ObjectNameField] [SerializeField] private string gateObjectName;
     [SerializeField] private Sprite lockedSprite;
@@ -153,7 +156,7 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         {
             title = IsMasked() ? "???" : Loc.T(displayName),
             description = IsMasked() ? UpgradeManager.Instance.LockedTargetHintText(Id) : AutoDescription(level) ?? Loc.T(description).Replace("{n}", CurrentSecondsText()),
-            level = $"{level} / {maxLevel}",
+            level = maxLevel >= InfiniteLevel ? $"{level}" : $"{level} / {maxLevel}", // 무한 레벨 노드는 현재 레벨만
             price = IsMasked() ? "" : NextCostText(level),
         };
     }
@@ -222,10 +225,21 @@ public class UpgradeNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             case UpgradeManager.UpgradeEffect.AutoSweepLayers: return Loc.T("자동 줍기가 한 번에 쓸어 담는 양이 +{0} 늘어납니다.", n);
             case UpgradeManager.UpgradeEffect.HoverPickupLayers: return Loc.T("커서 줍기가 한 번에 줍는 양이 +{0} 늘어납니다.", n);
             case UpgradeManager.UpgradeEffect.CursorRange: return Loc.T("커서 범위가 더 증가합니다.");
-            case UpgradeManager.UpgradeEffect.UpgradeDiscount: return Loc.T("업그레이드 가격이 {0}% 줄어듭니다.", n);
-            case UpgradeManager.UpgradeEffect.StarShardGain: return Loc.T("환생할 때 얻는 별조각이 +{0}% 증가합니다.", n);
-            case UpgradeManager.UpgradeEffect.RebirthKeepPiecePercent: return Loc.T("환생할 때 가진 조각의 {0}%를 더 가지고 시작합니다.", n);
-            case UpgradeManager.UpgradeEffect.CrystalGainPercent: return Loc.T("결정을 얻을 때 개수가 +{0}% 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.StarShardGain: return Loc.T("환생할 때 얻는 별조각이 +{0}개 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.RebirthClickDamagePercent: return Loc.T("무기 데미지가 +{0}% 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.RebirthClickDamageDouble: return Loc.T("무기 데미지가 2배가 됩니다.");
+            case UpgradeManager.UpgradeEffect.RebirthAutoClickDamagePercent: return Loc.T("자동 클릭 데미지가 +{0}% 증가합니다.", n);
+            case UpgradeManager.UpgradeEffect.RebirthAutoClickDamageDouble: return Loc.T("자동 클릭 데미지가 2배가 됩니다.");
+            case UpgradeManager.UpgradeEffect.PickupBonusPieces: return Loc.T("바닥 조각을 주울 때마다 조각을 +{0}개 더 얻습니다.", n);
+            case UpgradeManager.UpgradeEffect.AutoClickDamageFlat:
+            {
+                int weaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : 0; // 장착 무기 티어 배율
+                string amount = NumberFormatUtil.Format(Mathf.RoundToInt(value * ObjectHealthCalculator.ScaleOfTier(weaponIndex + 1)));
+                return Loc.T("자동 클릭 데미지가 +{0} 증가합니다.", amount);
+            }
+            case UpgradeManager.UpgradeEffect.RebirthAutoClickSpeedPercent: return Loc.T("모든 자동 클릭 간격이 {0}% 줄어듭니다.", n);
+            case UpgradeManager.UpgradeEffect.RebirthBossTime: return Loc.T("보스 제한 시간이 +{0}초 늘어납니다.", n);
+            case UpgradeManager.UpgradeEffect.CrystalGainFlat: return Loc.T("결정을 얻을 때 개수가 +{0}개 증가합니다.", n);
             case UpgradeManager.UpgradeEffect.ObjectExtraCopies:
                 return Loc.T("맵에 {0}이(가) +{1}개 더 놓입니다.", targetObjectName, n);
             default: return null;

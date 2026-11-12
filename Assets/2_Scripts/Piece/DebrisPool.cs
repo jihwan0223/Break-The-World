@@ -453,15 +453,17 @@ public class DebrisPool : MonoBehaviour
 
     private void Collect(Piece piece, bool mergePopup, bool carry = false)
     {
+        long value = piece.value; // 받는 양 (조각은 환생 노드 +n)
+        if (!piece.isCrystal && UpgradeManager.Instance != null) value += UpgradeManager.Instance.PickupBonusPieces;
         if (piece.zone == CurrentZone)
         {
-            _popup.Show(piece.renderer.transform.position, piece.value, piece.isCrystal, mergePopup);
+            _popup.Show(piece.renderer.transform.position, value, piece.isCrystal, mergePopup);
             SfxPlayer.Play(_audioSource, pickupSound);
         }
         if (piece.isCrystal)
-            CurrencyManager.Instance?.AddCrystals(piece.value);
+            CurrencyManager.Instance?.AddCrystals(value);
         else
-            CurrencyManager.Instance?.AddPieces(piece.value);
+            CurrencyManager.Instance?.AddPieces(value);
         OnPieceCollected?.Invoke(piece.renderer.transform);
 
         if (carry && piece.zone == CurrentZone && _carried.Count < maxCarriedPieces)

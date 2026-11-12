@@ -65,7 +65,34 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         return CurrencyManager.Instance.GetPieces() >= cost;
     }
 
-    private bool PrerequisiteSatisfied()
+    private static int _revealDepth; // IsRevealed 재귀 깊이 (링크가 고리여도 무한 재귀 안 함)
+
+    // 트리에 보여야 하는지 - 선으로 이어진 부모가 숨어 있으면 같이 숨음 (환생 후 남은 오브젝트 등)
+    public bool IsRevealed()
+    {
+        if (ObjectManager.Instance == null || !IsInThisVersion) return false;
+        if (isGain && !ObjectManager.Instance.IsUnlocked(objectIndex)) return false; // Gain 노드는 자기 오브젝트가 해금돼야 나옴
+        if (_revealDepth > 64) return true;
+
+        _revealDepth++;
+        bool revealed = isGain && !HasLinkPrereqs() || PrerequisiteSatisfied();
+        _revealDepth--;
+        return revealed;
+    }
+
+    private bool HasLinkPrereqs()
+    {
+        ResolvePrereqs();
+        return _prereqNodes.Count > 0;
+    }
+
+    // 부모 노드가 레벨이 있고 화면에도 보임
+    private static bool IsShownAndLeveled(MonoBehaviour prereq) =>
+        prereq is UpgradeNodeUI upgradeNode ? upgradeNode.IsLeveled() && (UpgradeManager.Instance == null || UpgradeManager.Instance.IsRevealed(upgradeNode.Id))
+        : prereq is ObjectEconomyNodeUI economyNode ? economyNode.IsLeveled() && economyNode.IsRevealed()
+        : true;
+
+    private void ResolvePrereqs()
     {
         if (!_prereqResolved)
         {
@@ -81,21 +108,20 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
                 }
             }
         }
+    }
 
+    private bool PrerequisiteSatisfied()
+    {
+        ResolvePrereqs();
         if (_prereqNodes.Count > 0)
         {
             foreach (MonoBehaviour prereq in _prereqNodes)
-            {
-                bool leveled = prereq is UpgradeNodeUI upgradeNode ? upgradeNode.IsLeveled()
-                             : prereq is ObjectEconomyNodeUI economyNode ? economyNode.IsLeveled()
-                             : true;
-                if (leveled) return true;
-            }
+                if (IsShownAndLeveled(prereq)) return true;
             return false;
         }
 
-        if (anchorMainNode != null) return anchorMainNode.IsLeveled();
-        if (anchorEconomyNode != null) return anchorEconomyNode.IsLeveled();
+        if (anchorMainNode != null) return IsShownAndLeveled(anchorMainNode);
+        if (anchorEconomyNode != null) return IsShownAndLeveled(anchorEconomyNode);
         return true;
     }
 
@@ -188,7 +214,7 @@ public class ObjectEconomyNodeUI : MonoBehaviour, IPointerEnterHandler, IPointer
         }
 
         // Gain 노드는 자기 오브젝트가 해금되면 나타남
-        bool isRevealed = !(GameSettings.IsDemo && fullVersionOnly) && !GameSettings.IsDemoLockedObject(objectIndex) && (isGain ? ObjectManager.Instance.IsUnlocked(objectIndex) : PrerequisiteSatisfied());
+        bool isRevealed = IsRevealed();
 
         bool justRevealed = animateReveal && _refreshedOnce && isRevealed && !_wasRevealed;
         _wasRevealed = isRevealed;

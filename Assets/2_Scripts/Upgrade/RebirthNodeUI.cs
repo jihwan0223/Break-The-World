@@ -4,14 +4,14 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-// 업그레이드 트리의 환생 칸 (임시: 누르면 노드가 소용돌이로 빨려 들어간 뒤 데모 감사창)
+// 업그레이드 트리의 환생 칸: 누르면 노드가 소용돌이로 빨려 들어간 뒤 처음부터 다시 시작 (데모는 감사창)
 [RequireComponent(typeof(Image), typeof(Button))]
 public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private long pieceCost = 100_000_000; // 첫 환생 조각 가격 (100M)
     [SerializeField] private long crystalCost = 1_000_000; // 첫 환생 결정 가격 (1M)
     [SerializeField] private float costGrowth = 5f; // 환생할 때마다 가격 배율
-    [SerializeField] private long starShardReward = 1; // 환생할 때 받는 별조각
+    [SerializeField] private long starShardReward = 1; // 환생할 때 받는 별조각 최소값
 
     [Header("소용돌이 연출")]
     [SerializeField] private float vortexSeconds = 2.6f; // 노드가 다 빨려 들어가는 시간 (초)
@@ -34,6 +34,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     private ObjectEconomyNodeUI[] _economyNodes; // 트리의 오브젝트 해금 노드
     private float _nextRefresh; // 다음 조건 갱신 시각 (unscaled)
     private bool _busy; // 빨아들이는 중
+    private bool _quitting; // 게임 종료 중 (종료 때 OnDisable로 환생 처리 안 함)
     private bool _hovered; // 마우스가 올라와 있음 (툴팁 갱신용)
     private readonly List<(RectTransform rect, Vector3 position, Vector3 scale, Quaternion rotation)> _saved =
         new List<(RectTransform, Vector3, Vector3, Quaternion)>(); // 원래 자리 (부모 기준)
@@ -56,11 +57,15 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     void OnDisable()
     {
-        // 트리가 중간에 닫히면 노드를 제자리로
+        // 트리가 중간에 닫히면 (Esc 등) 노드를 제자리로 + 이미 값을 치렀으니 환생은 마저 함
+        bool wasBusy = _busy; // 소용돌이 도중이었음
         if (_busy) Restore();
         _busy = false;
         _hovered = Hovered = false;
+        if (wasBusy && !_quitting) FinishRebirth(false);
     }
+
+    void OnApplicationQuit() => _quitting = true;
 
     void Update()
     {
@@ -87,7 +92,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         return new UpgradeTooltip.Content
         {
             title = Loc.T("환생"),
-            description = Loc.T("환생 시 별조각 +{0}", NumberFormatUtil.Format(starShardReward)),
+            description = Loc.T("환생 시 별조각 +{0}", NumberFormatUtil.Format(StarShardReward())),
             price = $"{piecesText} + {crystalsText}",
         };
     }
@@ -106,6 +111,14 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         _hovered = Hovered = false;
         UpgradeTooltip.Instance?.Hide();
+    }
+
+    // n번째 환생이면 별조각 n개 + 별조각 획득 증가 노드 +n
+    private long StarShardReward()
+    {
+        long nth = GameStats.Rebirths + 1; // 이번이 몇 번째 환생인지
+        long bonus = UpgradeManager.Instance != null ? UpgradeManager.Instance.StarShardBonus : 0; // 노드 보너스
+        return System.Math.Max(starShardReward, nth + bonus);
     }
 
     // 환생할 때마다 costGrowth배 (long 넘치지 않게 막음)
@@ -127,7 +140,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             UpgradeTooltip.Instance?.PlayShake(); // 일반 노드처럼 못 사면 툴팁이 흔들림
             return;
         }
-        CurrencyManager.Instance.AddStarShards(starShardReward);
+        CurrencyManager.Instance.AddStarShards(StarShardReward());
         GameStats.Rebirths++;
         _hovered = false;
         UpgradeTooltip.Instance?.Hide();
@@ -236,9 +249,57 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         Restore();
         _busy = false;
-        SaveManager.Instance?.SaveNow();
         tree?.Close();
-        SidePanelUI.ShowDemoComplete(0f); // 임시: 환생 대신 데모 감사창
+        FinishRebirth(true);
+    }
+
+    // 소용돌이 끝 (또는 도중에 트리가 닫힘): 데모는 감사창, 풀버전은 리셋
+    private static void FinishRebirth(bool openRebirthTree)
+    {
+        if (GameSettings.IsDemo)
+        {
+            SaveManager.Instance?.SaveNow();
+            SidePanelUI.ShowDemoComplete(0f); // 데모는 환생 대신 감사창
+            return;
+        }
+        PerformReset();
+        if (openRebirthTree) SidePanelUI.OpenRebirthTree(); // 바로 별조각을 쓸 수 있게
+    }
+
+    // 환생: 별조각/환생 노드/통계만 남기고 처음부터 (환생 노드 효과에 따라 일부 유지)
+    private static void PerformReset()
+    {
+        UpgradeManager upgrades = UpgradeManager.Instance;
+        bool keepAll = upgrades != null && upgrades.KeepsAllUpgradesOnRebirth; // 모든 업그레이드 유지
+        bool keepObjects = keepAll || (upgrades != null && upgrades.KeepsObjectsOnRebirth); // 오브젝트 해금 유지
+        bool keepBosses = upgrades != null && upgrades.KeepsBossesOnRebirth; // 맵/보스 유지
+        bool keepWeapons = upgrades != null && upgrades.KeepsWeaponsOnRebirth; // 무기 유지
+
+        DebrisPool.Instance?.ClearAll();
+        CurrencyManager.Instance?.ResetForRebirth();
+        upgrades?.ResetForRebirth();
+        ObjectManager.Instance?.ResetForRebirth(keepObjects, keepAll);
+
+        ZoneManager zones = ZoneManager.Instance;
+        if (keepBosses)
+            zones?.SetState(zones.UnlockedMaxZone, 0); // 맵 첫 오브젝트를 다시 공짜로 줌
+        else
+        {
+            if (keepObjects) zones?.SetState(0, 0); // 오브젝트 해금은 그대로 두고 맵만 처음으로
+            else zones?.ResetAll();
+            ZoneBreaker.ResetBosses();
+        }
+        ObjectManager.Instance?.Equip(0);
+
+        WeaponManager weapons = WeaponManager.Instance;
+        if (weapons != null && !keepWeapons)
+        {
+            weapons.ResetUnlocks();
+            weapons.Equip(0);
+        }
+
+        UpgradeTreeUI.Instance?.RefreshAll();
+        SaveManager.Instance?.SaveNow();
     }
 
     // 판 기준 자리로 저장 - 화면 좌표로 저장하면 줌/이동이 바뀐 뒤 되돌릴 때 어긋남

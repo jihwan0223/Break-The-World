@@ -45,6 +45,11 @@ public class UnlockGate : MonoBehaviour
         _applied = true;
         _shown = show;
 
+        // 죽는 중에 잠기면 (환생 등) 꺼진 Health의 부활 코루틴이 잠긴 오브젝트를 왁스 없이 다시 켬 - 먼저 살려두고 숨김
+        if (!show)
+            foreach (Behaviour b in _behaviours)
+                if (b is Health h && h.IsDead) h.ResetToFull();
+
         if (!keepVisibleWhenLocked)
         {
             foreach (Renderer r in _renderers) if (r != null) r.enabled = show;

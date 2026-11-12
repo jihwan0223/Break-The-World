@@ -45,17 +45,26 @@ public class UpgradeManager : MonoBehaviour
         [InspectorName("왁스 코팅 해금")] WaxCoatUnlock,
         [InspectorName("커서 줍기 양 증가")] HoverPickupLayers, // +값 층 (화면엔 "양")
         [InspectorName("통계 창 해금")] StatsUnlock,
-        // 환생 창 (별조각) - 효과는 아직 없음
-        [InspectorName("환생: 업그레이드 유지")] RebirthKeepUpgrades,
+        // 환생 창 (별조각)
+        [InspectorName("환생: 모든 업그레이드 유지")] RebirthKeepAllUpgrades, // 환생해도 업그레이드/오브젝트 해금/획득량 유지
         [InspectorName("환생: 보스 클리어 유지")] RebirthKeepBosses,
         [InspectorName("환생: 무기 유지")] RebirthKeepWeapons,
-        [InspectorName("환생: 업그레이드 할인")] UpgradeDiscount, // -값 %
-        [InspectorName("환생: 별조각 획득 증가")] StarShardGain, // +값 %
-        [InspectorName("환생: 조각 일부 지급")] RebirthKeepPiecePercent, // 값 % 남김
-        [InspectorName("환생: 조각/결정 유지")] RebirthKeepCurrency,
-        [InspectorName("결정 획득량 증가 (%)")] CrystalGainPercent, // +값 %
-        [InspectorName("한 번에 최대 레벨 구매 해금")] BulkBuyUnlock,
+        [InspectorName("(사용 안 함) 환생: 업그레이드 할인")] UnusedUpgradeDiscount, // 사용 안 함 - 번호 유지용 자리
+        [InspectorName("환생: 별조각 획득 증가 (+n)")] StarShardGain, // +값 개
+        [InspectorName("(사용 안 함) 환생: 시작 조각")] UnusedRebirthStartPieces, // 사용 안 함 - 번호 유지용 자리
+        [InspectorName("환생: 오브젝트 해금 유지")] RebirthKeepObjects,
+        [InspectorName("결정 획득량 증가 (+n)")] CrystalGainFlat, // +값 개
+        [InspectorName("(사용 안 함) 한 번에 최대 레벨 구매 해금")] UnusedBulkBuyUnlock, // 사용 안 함 - 번호 유지용 자리
         [InspectorName("환생: 창 열어도 게임 진행")] WindowsKeepRunning,
+        [InspectorName("환생: 무기 데미지 증가 (%)")] RebirthClickDamagePercent, // +값 %
+        [InspectorName("환생: 자동클릭 속도 증가 (%)")] RebirthAutoClickSpeedPercent, // 주기 -값 %
+        [InspectorName("환생: 보스 제한 시간 증가")] RebirthBossTime, // +값 초
+        [InspectorName("(사용 안 함) 환생: 시작 무기")] UnusedRebirthStartWeapon, // 사용 안 함 - 번호 유지용 자리
+        [InspectorName("환생: 무기 데미지 2배")] RebirthClickDamageDouble,
+        [InspectorName("환생: 자동클릭 데미지 증가 (%)")] RebirthAutoClickDamagePercent, // +값 %
+        [InspectorName("환생: 자동클릭 데미지 2배")] RebirthAutoClickDamageDouble,
+        [InspectorName("환생: 줍는 조각 증가 (+n)")] PickupBonusPieces, // 바닥 조각 1개 주울 때마다 +값 개
+        [InspectorName("자동클릭 데미지 (+n)")] AutoClickDamageFlat, // +값, 장착 무기 티어 배율 곱함
     }
 
     public enum LinkRouting
@@ -179,13 +188,13 @@ public class UpgradeManager : MonoBehaviour
                 if (fromUi != null)
                 {
                     string fromId = fromUi.Id;
-                    list.Add((fromId, () => GetLevel(fromId) >= 1));
+                    list.Add((fromId, () => GetLevel(fromId) >= 1 && IsRevealed(fromId))); // 부모가 숨어 있으면 (환생 후 남은 노드 등) 같이 숨김
                     continue;
                 }
 
                 ObjectEconomyNodeUI fromEconomy = from.GetComponent<ObjectEconomyNodeUI>();
                 if (fromEconomy != null)
-                    list.Add((fromEconomy.name, fromEconomy.IsLeveled));
+                    list.Add((fromEconomy.name, () => fromEconomy.IsLeveled() && fromEconomy.IsRevealed())); // 부모가 숨어 있으면 같이 숨김
             }
         }
 
@@ -207,9 +216,9 @@ public class UpgradeManager : MonoBehaviour
                 fullVersionOnly = ui.FullVersionOnly,
                 maxLevel = Mathf.Max(1, ui.MaxLevel),
                 prerequisiteId = prereqs != null ? string.Join(", ", prereqs.ConvertAll(p => p.id)) : null,
-                prerequisiteSatisfied = prereqs != null && prereqs.Count > 0
-                    ? () => prereqs.Exists(p => p.satisfied()) // OR
-                    : null,
+                prerequisiteSatisfied = prereqs == null || prereqs.Count == 0 ? null
+                    : ui.RequireAllPrereqs ? () => prereqs.TrueForAll(p => p.satisfied()) // AND
+                    : () => prereqs.Exists(p => p.satisfied()), // OR
                 valuePerLevel = ui.ValuePerLevel,
                 costs = ResolveCosts(ui.Costs),
                 fullVersionCostMultiplier = ui.FullVersionCostMultiplier,
@@ -260,9 +269,14 @@ public class UpgradeManager : MonoBehaviour
         if (node == null) return false;
         if (IsDemoHidden(node)) return false; // 데모에선 풀버전 내용 숨김
         if (node.prerequisiteSatisfied == null) return true;
+        if (_revealDepth > 64) return true; // 링크가 고리로 이어져도 무한 재귀 안 함
 
-        return node.prerequisiteSatisfied();
+        _revealDepth++;
+        bool revealed = node.prerequisiteSatisfied();
+        _revealDepth--;
+        return revealed;
     }
+    private int _revealDepth; // IsRevealed 재귀 깊이
 
     private bool IsTargetObjectLocked(UpgradeNode node) =>
         node.targetObjectIndex >= 0 && ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(node.targetObjectIndex);
@@ -442,7 +456,7 @@ public class UpgradeManager : MonoBehaviour
                 total += node.ValueAtLevel(L);
         }
         // 노드 값에 장착 무기 티어 배율을 곱함
-        return Mathf.RoundToInt(total * ObjectHealthCalculator.ScaleOfTier(equippedWeaponIndex + 1));
+        return ClampToInt((double)total * ObjectHealthCalculator.ScaleOfTier(equippedWeaponIndex + 1));
     }
 
     public float CritChanceValue
@@ -476,7 +490,8 @@ public class UpgradeManager : MonoBehaviour
 
     public float AutoClickIntervalSecondsFor(int objectIndex) =>
         Mathf.Max(minAutoClickInterval, baseAutoClickInterval - SumEffect(UpgradeEffect.AutoClickSpeed, objectIndex))
-        * Mathf.Pow(autoClickIntervalGrowthPerObject, Mathf.Max(0, objectIndex));
+        * Mathf.Pow(autoClickIntervalGrowthPerObject, Mathf.Max(0, objectIndex))
+        * (1f - Mathf.Clamp(SumEffect(UpgradeEffect.RebirthAutoClickSpeedPercent), 0f, 90f) / 100f); // 환생 노드는 최소 주기 아래로도 줄임
 
     public int AutoClickClicksPerTriggerFor(int objectIndex) =>
         baseAutoClickCount + Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoClickCount, objectIndex));
@@ -535,7 +550,8 @@ public class UpgradeManager : MonoBehaviour
     public long CrystalDropAmountIn(int zone)
     {
         if (zone < 0) zone = ZoneManager.Instance != null ? ZoneManager.Instance.CurrentZone : 0;
-        return CrystalDropAmount * CrystalZoneMultipliers[Mathf.Clamp(zone, 0, CrystalZoneMultipliers.Length - 1)];
+        long amount = CrystalDropAmount * CrystalZoneMultipliers[Mathf.Clamp(zone, 0, CrystalZoneMultipliers.Length - 1)]; // 결정 개수 (보너스 전)
+        return amount + Mathf.RoundToInt(SumEffect(UpgradeEffect.CrystalGainFlat)); // 환생 노드: +n개
     }
 
     public bool AutoSweepIsUnlocked => AnyUnlocked(UpgradeEffect.AutoSweepUnlock);
@@ -560,6 +576,38 @@ public class UpgradeManager : MonoBehaviour
 
     public int AutoSweepLayers =>
         Mathf.Clamp(baseAutoSweepLayers + Mathf.RoundToInt(SumEffect(UpgradeEffect.AutoSweepLayers)), 1, DebrisPool.LayerCount);
+
+    // 환생 창 효과
+    // 무기 데미지 배율 (직접/자동 클릭 모두): % 증가 x 2배 노드
+    public float ClickDamageMultiplier =>
+        (1f + SumEffect(UpgradeEffect.RebirthClickDamagePercent) / 100f) * (AnyUnlocked(UpgradeEffect.RebirthClickDamageDouble) ? 2f : 1f);
+    // 자동클릭에만 붙는 배율: % 증가 x 2배 노드
+    public float AutoClickDamageMultiplier =>
+        (1f + SumEffect(UpgradeEffect.RebirthAutoClickDamagePercent) / 100f) * (AnyUnlocked(UpgradeEffect.RebirthAutoClickDamageDouble) ? 2f : 1f);
+    // 자동클릭 데미지 +n (클릭 데미지처럼 장착 무기 티어 배율을 곱함)
+    public int GetAutoClickDamageBonus(int equippedWeaponIndex) =>
+        ClampToInt((double)SumEffect(UpgradeEffect.AutoClickDamageFlat) * ObjectHealthCalculator.ScaleOfTier(equippedWeaponIndex + 1));
+    // 데미지 계산용: int를 넘으면 음수로 뒤집히지 않고 int 최대값에서 멈춤
+    public static int ClampToInt(double value) => value >= int.MaxValue ? int.MaxValue : value <= 0 ? 0 : (int)System.Math.Round(value);
+    public float BossTimeBonus => SumEffect(UpgradeEffect.RebirthBossTime); // 초
+    public long StarShardBonus => Mathf.RoundToInt(SumEffect(UpgradeEffect.StarShardGain)); // 환생할 때 별조각 +n
+    public long PickupBonusPieces => Mathf.RoundToInt(SumEffect(UpgradeEffect.PickupBonusPieces)); // 바닥 조각 1개 주울 때 +n
+    public bool KeepsAllUpgradesOnRebirth => AnyUnlocked(UpgradeEffect.RebirthKeepAllUpgrades);
+    public bool KeepsObjectsOnRebirth => AnyUnlocked(UpgradeEffect.RebirthKeepObjects);
+    public bool KeepsBossesOnRebirth => AnyUnlocked(UpgradeEffect.RebirthKeepBosses);
+    public bool KeepsWeaponsOnRebirth => AnyUnlocked(UpgradeEffect.RebirthKeepWeapons);
+
+    // 환생: 별조각 노드는 남기고 나머지 레벨을 0으로 (모든 업그레이드 유지면 그대로)
+    public void ResetForRebirth()
+    {
+        if (KeepsAllUpgradesOnRebirth) return;
+        foreach (UpgradeNode node in _nodes)
+        {
+            if (UsesStarShards(node.id) || GetLevel(node.id) == 0) continue;
+            _levels[node.id] = 0;
+            OnUpgradeChanged?.Invoke(node.id, 0);
+        }
+    }
 
     public long WeaponKillBonusPieces(int equippedWeaponIndex)
     {

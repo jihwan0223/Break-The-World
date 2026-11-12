@@ -91,6 +91,7 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         Loc.Changed += OnLanguageChanged;
 
         UIPointerGuard.SetPopup(name, true); // 게임은 계속 돌고 월드 클릭만 막음
+        if (isRebirthTree) Time.timeScale = 0f; // 환생 창에선 자동클릭 등 게임 진행 멈춤
         Current = this;
         UpgradeTooltip.Use(GetComponentInChildren<UpgradeTooltip>(true));
 
@@ -108,15 +109,87 @@ public class UpgradeTreeUI : MonoBehaviour, IScrollHandler, IPointerEnterHandler
         pending?.Invoke();
         _revealRunning = false;
 
+        if (_leaveConfirm != null) _leaveConfirm.SetActive(false); // 다음에 열 때 팝업 없이
         UIPointerGuard.SetPopup(name, false);
         if (Current == this) Current = null;
+        if (isRebirthTree) Time.timeScale = 1f;
 
         UIPointerGuard.IsPointerOverUI = false;
 
         OnTreeToggled?.Invoke(false);
     }
 
-    public void Close() => gameObject.SetActive(false);
+    private GameObject _leaveConfirm; // 환생 창 나가기 확인 팝업
+
+    // X 버튼 / Esc. 환생 창은 나가면 다음 환생까지 못 돌아오니 한 번 물어봄
+    public void Close()
+    {
+        if (!isRebirthTree || !gameObject.activeInHierarchy) { CloseNow(); return; }
+        if (_leaveConfirm == null) _leaveConfirm = BuildLeaveConfirm();
+        _leaveConfirm.SetActive(!_leaveConfirm.activeSelf); // 팝업이 떠 있을 때 Esc면 취소
+        _leaveConfirm.transform.SetAsLastSibling();
+    }
+
+    public void CloseNow() => gameObject.SetActive(false);
+
+    private GameObject BuildLeaveConfirm()
+    {
+        RectTransform dim = NewRect("LeaveConfirm", transform); // 화면 전체를 어둡게 덮어 뒤쪽 클릭을 막음
+        dim.anchorMin = Vector2.zero;
+        dim.anchorMax = Vector2.one;
+        dim.sizeDelta = Vector2.zero;
+        dim.gameObject.AddComponent<UnityEngine.UI.Image>().color = new Color(0f, 0f, 0f, 0.6f);
+
+        RectTransform window = NewRect("Window", dim); // 가운데 창
+        window.sizeDelta = new Vector2(1100f, 460f);
+        PixelStyle.UguiFrame(window.gameObject.AddComponent<UnityEngine.UI.Image>(), PixelStyle.Window);
+
+        NewLabel(window, "환생 창을 나갈까요?", 44f, PixelStyle.Text, new Vector2(0f, 120f));
+        NewLabel(window, "나가면 다음 환생을 할 때까지 다시 돌아올 수 없어요.", 30f, PixelStyle.MutedText, new Vector2(0f, 35f));
+        NewButton(window, "나가기", PixelStyle.Pink, new Vector2(-190f, -110f), CloseNow);
+        NewButton(window, "돌아가기", PixelStyle.Sky, new Vector2(190f, -110f), () => _leaveConfirm.SetActive(false));
+
+        dim.gameObject.SetActive(false);
+        return dim.gameObject;
+    }
+
+    private static RectTransform NewRect(string objectName, Transform parent)
+    {
+        var rect = new GameObject(objectName, typeof(RectTransform)).GetComponent<RectTransform>(); // 새 UI 오브젝트
+        rect.SetParent(parent, false);
+        return rect;
+    }
+
+    private static TMPro.TextMeshProUGUI NewLabel(RectTransform parent, string korean, float size, Color color, Vector2 pos)
+    {
+        RectTransform rect = NewRect("Label", parent); // 글자 자리
+        rect.sizeDelta = new Vector2(parent.sizeDelta.x - 80f, size * 1.6f);
+        rect.anchoredPosition = pos;
+        var text = rect.gameObject.AddComponent<TMPro.TextMeshProUGUI>(); // 글자
+        if (GameFonts.Tmp != null) text.font = GameFonts.Tmp;
+        text.fontSize = size;
+        text.color = color;
+        text.alignment = TMPro.TextAlignmentOptions.Center;
+        text.raycastTarget = false;
+        Loc.Bind(text, () => text.text = Loc.T(korean));
+        return text;
+    }
+
+    private static void NewButton(RectTransform parent, string korean, PixelStyle.Tone tone, Vector2 pos, UnityEngine.Events.UnityAction onClick)
+    {
+        RectTransform rect = NewRect("Button", parent); // 버튼 자리
+        rect.sizeDelta = new Vector2(340f, 100f);
+        rect.anchoredPosition = pos;
+        rect.gameObject.AddComponent<UnityEngine.UI.Image>();
+        var button = rect.gameObject.AddComponent<UnityEngine.UI.Button>(); // 버튼
+        button.onClick.AddListener(onClick);
+
+        TMPro.TextMeshProUGUI label = NewLabel(rect, korean, 36f, Color.white, Vector2.zero); // 버튼 글자
+        label.rectTransform.anchorMin = Vector2.zero;
+        label.rectTransform.anchorMax = Vector2.one;
+        label.rectTransform.sizeDelta = Vector2.zero;
+        PixelStyle.UguiButton(button, tone);
+    }
 
     public void RefreshAll(bool animateReveals = false)
     {
