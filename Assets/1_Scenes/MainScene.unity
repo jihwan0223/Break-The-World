@@ -4692,9 +4692,9 @@ MonoBehaviour:
   - useCrystals: 0
     useStarShards: 1
     baseAmount: 1
-    levelGrowth: 2
+    levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 01000000000000000100000000000000020000000000000002000000000000000300000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -13376,7 +13376,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RebirthNodeUI
   pieceCost: 100000000
   crystalCost: 1000000
-  costGrowth: 5
+  costGrowth: 2
   starShardReward: 1
   vortexSeconds: 2.6
   vortexZoom: 0.22
@@ -15940,10 +15940,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 15
-    levelGrowth: 2
+    baseAmount: 6
+    levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 0600000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -22462,10 +22462,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 1
+    baseAmount: 2
     levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 02000000000000000200000000000000020000000000000003000000000000000300000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -26505,9 +26505,9 @@ MonoBehaviour:
   - useCrystals: 0
     useStarShards: 1
     baseAmount: 2
-    levelGrowth: 2
+    levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 020000000000000002000000000000000300000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -46204,10 +46204,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 5
-    levelGrowth: 2
+    baseAmount: 3
+    levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -49241,10 +49241,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 1
-    levelGrowth: 2
+    baseAmount: 3
+    levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -50306,10 +50306,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 2
-    levelGrowth: 2
+    baseAmount: 1
+    levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 01000000000000000200000000000000030000000000000004000000000000000500000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -50461,10 +50461,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 1
+    baseAmount: 3
     levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -55932,10 +55932,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 2
-    levelGrowth: 2
-    firstLevelAmount: 1
-    levelAmounts: 
+    baseAmount: 1
+    levelGrowth: 1
+    firstLevelAmount: 0
+    levelAmounts: 01000000000000000100000000000000020000000000000002000000000000000300000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -68485,10 +68485,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 1
+    baseAmount: 5
     levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 0500000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -69257,10 +69257,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 2
-    levelGrowth: 2
-    firstLevelAmount: 1
-    levelAmounts: 
+    baseAmount: 1
+    levelGrowth: 1
+    firstLevelAmount: 0
+    levelAmounts: 0100000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -72420,10 +72420,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 10
-    levelGrowth: 2
+    baseAmount: 8
+    levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 0800000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -76038,10 +76038,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 1
+    baseAmount: 3
     levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -83923,10 +83923,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 5
-    levelGrowth: 2
+    baseAmount: 3
+    levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
@@ -97993,10 +97993,10 @@ MonoBehaviour:
   costs:
   - useCrystals: 0
     useStarShards: 1
-    baseAmount: 1
+    baseAmount: 3
     levelGrowth: 1
     firstLevelAmount: 0
-    levelAmounts: 
+    levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
   upgradedSprite: {fileID: 0}
   fullVersionOnly: 0
