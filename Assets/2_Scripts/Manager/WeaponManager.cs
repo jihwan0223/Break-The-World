@@ -12,7 +12,7 @@ public class WeaponManager : MonoBehaviour
     {
         new WeaponData(1, "맨손", 1),
         new WeaponData(2, "프라이팬", 6),
-        new WeaponData(3, "야구 방망이", 16),
+        new WeaponData(3, "야구 방망이", 16) { costMultiplier = 0.5f }, // 맵2 초반 기다림 줄이기 (18,000 -> 9,000)
         new WeaponData(4, "교통 표지판", 36),
         new WeaponData(5, "곡괭이", 76),
         new WeaponData(6, "다이너마이트", 156),
@@ -78,9 +78,9 @@ public class WeaponManager : MonoBehaviour
 
     public bool IsUnlockOrderMet(int index) => index > 0 && IsUnlocked(index - 1);
 
-    // 새 티어 첫 오브젝트의 해금 비용과 같음
+    // 새 티어 첫 오브젝트의 해금 비용 x 무기별 배수
     public long GetUnlockCost(int index) =>
-        ObjectManager.Instance != null ? ObjectManager.Instance.GetUnlockCost(ObjectManager.FirstIndexOfTier(weapons[index].tier)) : 0;
+        ObjectManager.Instance != null ? NumberFormatUtil.RoundPrice((long)(ObjectManager.Instance.GetUnlockCost(ObjectManager.FirstIndexOfTier(weapons[index].tier)) * (double)weapons[index].costMultiplier)) : 0;
 
     public bool AnyUnlockAffordable()
     {

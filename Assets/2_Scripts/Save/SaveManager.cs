@@ -191,7 +191,11 @@ public class SaveManager : MonoBehaviour
         GameStats.Reset();
         GateReveals.Reset();
         if (!File.Exists(SavePath))
+        {
+            TutorialGuideUI.Step = 0; // 새 게임: 같은 실행에서 전 판 값이 남지 않게
+            ZoneBreaker.FinalBossCleared = false;
             return;
+        }
 
         string json = File.ReadAllText(SavePath);
         SaveData data = JsonUtility.FromJson<SaveData>(json);

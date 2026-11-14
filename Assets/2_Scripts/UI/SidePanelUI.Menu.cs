@@ -12,6 +12,8 @@ public partial class SidePanelUI
     private readonly List<(Label value, System.Func<string> get)> _statRows = new List<(Label, System.Func<string>)>();
     private readonly List<(VisualElement row, System.Func<bool> visible)> _statGates = new List<(VisualElement, System.Func<bool>)>(); // 해금 전엔 숨길 통계 줄
     private VisualElement _settingsPanel;
+    private Label _settingHelp; // 설정 줄 제목에 마우스를 올리면 뜨는 설명 상자
+    private const float SettingHelpWidth = 520f; // 설명 상자 최대 너비 (px)
     private VisualElement _confirmBox;
     private Label _confirmMessage;
     private Button _confirmLeaveButton; // 나가기/종료 버튼 (누르면 저장하고 나감)
@@ -21,10 +23,13 @@ public partial class SidePanelUI
     private const float DemoBoxDelay = 2.5f; // 초
     private const float DemoButtonLock = 0.7f; // 초 - 창이 뜬 뒤 실수로 바로 넘기지 않게 버튼을 막는 시간 (보스전 실패 창과 같음)
     private VisualElement _demoButtons; // 데모 완료 창의 버튼 줄
+    private Label _demoRebirthNote; // 환생 칸으로 열었을 때만 보이는 '환생 미지원' 안내
 
-    public static void ShowDemoComplete(float delay = DemoBoxDelay)
+    public static void ShowDemoComplete(float delay = DemoBoxDelay, bool fromRebirth = false)
     {
-        if (_instance != null) _instance.StartCoroutine(_instance.ShowDemoBoxLater(delay));
+        if (_instance == null) return;
+        _instance._demoRebirthNote.style.display = fromRebirth ? DisplayStyle.Flex : DisplayStyle.None;
+        _instance.StartCoroutine(_instance.ShowDemoBoxLater(delay));
     }
 
     private System.Collections.IEnumerator ShowDemoBoxLater(float delay)
@@ -82,9 +87,8 @@ public partial class SidePanelUI
 
         string[] lines =
         {
-            "데모를 끝까지 플레이해 주셔서 감사합니다!",
-            "정식 버전에서는 더 많은 맵과 오브젝트가 기다리고 있어요.",
-            "정식 출시 때 다시 만나요!",
+            "데모 버전을 플레이해 주셔서 감사합니다!",
+            "정식 출시를 기다려 주세요!",
         };
         foreach (string text in lines)
         {
@@ -96,6 +100,14 @@ public partial class SidePanelUI
             line.style.marginBottom = 10;
             window.Add(line);
         }
+
+        _demoRebirthNote = new Label();
+        Loc.Bind(_demoRebirthNote, "데모 버전에서는 환생을 지원하지 않아요.");
+        _demoRebirthNote.style.fontSize = 28;
+        _demoRebirthNote.style.color = PixelStyle.MutedText.linear;
+        _demoRebirthNote.style.marginTop = 14;
+        _demoRebirthNote.style.display = DisplayStyle.None;
+        window.Add(_demoRebirthNote);
 
         var hint = new Label();
         Loc.Bind(hint, "계속하기를 누르면 지금 진행 그대로 이어서 할 수 있어요.");
@@ -149,11 +161,14 @@ public partial class SidePanelUI
         VisualElement game = StatColumn(columns, "게임"); // 가운데 칸: 게임
         game.style.marginLeft = 32;
         AddSettingRow(game, "언어", () => Loc.NativeNames[Loc.Language], step => Loc.Language = (Loc.Language + step + Loc.Codes.Length) % Loc.Codes.Length);
-        AddSettingRow(game, "숫자 단위", () => GameSettings.NumberUnits ? "1K" : "1,000", _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
+        AddSettingRow(game, "숫자 단위", () => GameSettings.NumberUnits ? "1K" : "1,000", _ => GameSettings.NumberUnits = !GameSettings.NumberUnits,
+            "큰 숫자를 1K나 1M처럼 줄여서 보여줘요.");
         AddSettingRow(game, "데미지 표시", () => GameSettings.DamageNumbers ? "켜짐" : "꺼짐", _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
         AddSettingRow(game, "화면 흔들림", () => GameSettings.ScreenShake ? "켜짐" : "꺼짐", _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
-        VisualElement hoverClickRow = AddSettingRow(game, "커서 타격", () => GameSettings.HoverClick ? "켜짐" : "꺼짐", _ => GameSettings.HoverClick = !GameSettings.HoverClick); // 커서 타격 켜기/끄기 줄
-        AddSettingRow(game, "백그라운드 실행", () => GameSettings.RunInBackground ? "켜짐" : "꺼짐", _ => GameSettings.RunInBackground = !GameSettings.RunInBackground);
+        VisualElement hoverClickRow = AddSettingRow(game, "커서 타격", () => GameSettings.HoverClick ? "켜짐" : "꺼짐", _ => GameSettings.HoverClick = !GameSettings.HoverClick,
+            "켜면 클릭하지 않고 커서만 올려도 오브젝트를 때려요."); // 커서 타격 켜기/끄기 줄
+        AddSettingRow(game, "백그라운드 실행", () => GameSettings.RunInBackground ? "켜짐" : "꺼짐", _ => GameSettings.RunInBackground = !GameSettings.RunInBackground,
+            "켜면 게임을 최소화해도 게임이 계속 진행돼요.");
         _settingRefreshers.Add(() => hoverClickRow.style.display = UpgradeManager.Instance != null && UpgradeManager.Instance.HoverClickIsUnlocked ? DisplayStyle.Flex : DisplayStyle.None); // 산 뒤에만 보임
 
         VisualElement video = StatColumn(columns, "비디오"); // 오른쪽 칸: 비디오
@@ -166,13 +181,18 @@ public partial class SidePanelUI
             int index = Mathf.Max(0, list.IndexOf(GameSettings.Resolution));
             GameSettings.Resolution = list[(index + step + list.Count) % list.Count];
         });
-        AddSettingRow(video, "수직 동기화", () => GameSettings.VSync ? "켜짐" : "꺼짐", _ => GameSettings.VSync = !GameSettings.VSync);
+        AddSettingRow(video, "수직 동기화", () => GameSettings.VSync ? "켜짐" : "꺼짐", _ => GameSettings.VSync = !GameSettings.VSync,
+            "모니터 주사율에 맞춰 화면 찢김을 줄여요.");
         VisualElement fpsRow = AddSettingRow(video, "프레임 제한", () =>
         {
             int fps = GameSettings.FpsOptions[GameSettings.FpsIndex];
             return fps < 0 ? "무제한" : $"{fps} FPS";
         }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length); // 프레임 제한 줄
-        _settingRefreshers.Add(() => fpsRow.style.display = GameSettings.VSync ? DisplayStyle.None : DisplayStyle.Flex); // 수직 동기화 중엔 의미 없어서 숨김
+        _settingRefreshers.Add(() =>
+        {
+            fpsRow.SetEnabled(!GameSettings.VSync); // 수직 동기화 중엔 의미 없어서 못 바꾸게
+            fpsRow.style.opacity = GameSettings.VSync ? 0.4f : 1f; // 흐리게
+        });
 
         var buttons = new VisualElement();
         buttons.style.flexDirection = FlexDirection.Row;
@@ -194,6 +214,20 @@ public partial class SidePanelUI
         if (!Application.isEditor) debug.style.display = DisplayStyle.None; // 디버그는 에디터에서만 - 빌드에선 숨김
 
         BuildLeaveConfirm();
+        _settingHelp = new Label(); // 설명 상자 (창 위에 그려지게 마지막에 붙임)
+        _settingHelp.style.position = Position.Absolute;
+        _settingHelp.style.maxWidth = SettingHelpWidth;
+        _settingHelp.style.whiteSpace = WhiteSpace.Normal;
+        _settingHelp.style.fontSize = 28;
+        _settingHelp.style.color = PixelStyle.Text.linear;
+        _settingHelp.style.paddingLeft = 18;
+        _settingHelp.style.paddingRight = 18;
+        _settingHelp.style.paddingTop = 12;
+        _settingHelp.style.paddingBottom = 14;
+        PixelStyle.Frame(_settingHelp, PixelStyle.Window);
+        _settingHelp.pickingMode = PickingMode.Ignore;
+        _settingHelp.style.display = DisplayStyle.None;
+        _settingsPanel.Add(_settingHelp);
         root.Add(_settingsPanel);
         Loc.Bind(_settingsPanel, () => { foreach (System.Action refresh in _settingRefreshers) refresh(); });
     }
@@ -288,7 +322,7 @@ public partial class SidePanelUI
         _settingRefreshers.Add(() => { cylinder.SetValue(get()); caption.text = $"{Loc.T(label)}  {Percent(get())}"; });
     }
 
-    private VisualElement AddSettingRow(VisualElement column, string label, System.Func<string> getValue, System.Action<int> step)
+    private VisualElement AddSettingRow(VisualElement column, string label, System.Func<string> getValue, System.Action<int> step, string help = null)
     {
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
@@ -307,6 +341,7 @@ public partial class SidePanelUI
         PixelStyle.FitText(name, 40);
         name.style.color = PixelStyle.Text.linear;
         row.Add(name);
+        if (help != null) AddHelpHover(name, help);
 
         var value = new Label();
         value.style.width = 200;
@@ -327,6 +362,21 @@ public partial class SidePanelUI
         HoverGrow(row);
         column.Add(row);
         return row;
+    }
+
+    // 제목에 마우스를 올리면 제목 아래에 설명 상자
+    private void AddHelpHover(Label name, string help)
+    {
+        name.RegisterCallback<PointerEnterEvent>(_ =>
+        {
+            _settingHelp.text = Loc.T(help);
+            Vector2 at = _settingsPanel.WorldToLocal(new Vector2(name.worldBound.xMin, name.worldBound.yMax + 8f)); // 제목 바로 아래
+            float maxLeft = _settingsPanel.resolvedStyle.width - SettingHelpWidth - 40f; // 창 오른쪽 밖으로 안 나가게
+            _settingHelp.style.left = Mathf.Max(0f, Mathf.Min(at.x, maxLeft));
+            _settingHelp.style.top = at.y;
+            _settingHelp.style.display = DisplayStyle.Flex;
+        });
+        name.RegisterCallback<PointerLeaveEvent>(_ => _settingHelp.style.display = DisplayStyle.None);
     }
 
     // 메인 메뉴 설정창처럼 마우스 올리면 살짝 커짐
@@ -366,6 +416,7 @@ public partial class SidePanelUI
     private void CloseSettingsPanel()
     {
         _settingsPanel.style.display = DisplayStyle.None;
+        _settingHelp.style.display = DisplayStyle.None; // 마우스를 올린 채 닫아도 다음에 안 남게
         PlayerPrefs.Save();
         RefreshButtonRowVisibility();
         PauseForWindow("Settings", false);

@@ -9,7 +9,7 @@ public class TutorialGuideUI : MonoBehaviour
 
     public static int Step { get; set; } // 진행 단계 (저장됨). 0 = 시작, Finished = 끝
 
-    private const float Left = 20f; // 보스 도전 버튼과 같은 왼쪽
+    private const float Left = 23f; // 조각 상자 / 보스 도전 버튼과 같은 왼쪽 (둘 다 left 20 + unity-button 기본 여백 3px)
     private const float Top = 172f; // 조각 표시 아래 (보스 도전 버튼 자리 142보다 조금 아래)
     private const float BelowButton = 142f + 80f + 12f; // 보스 도전 버튼(142, 높이 80)이 떠 있을 때 그 아래
     private const int FontSize = 36; // px - 도트 폰트 배수 (UiColored는 굵기 없음)

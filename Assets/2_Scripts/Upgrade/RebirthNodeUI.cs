@@ -92,7 +92,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         return new UpgradeTooltip.Content
         {
             title = Loc.T("환생"),
-            description = Loc.T("환생 시 별조각 +{0}", NumberFormatUtil.Format(StarShardReward())),
+            description = GameSettings.IsDemo ? Loc.T("데모 버전에서는 환생을 지원하지 않아요.") : Loc.T("환생 시 별조각 +{0}", NumberFormatUtil.Format(StarShardReward())),
             price = $"{piecesText} + {crystalsText}",
         };
     }
@@ -135,13 +135,16 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         if (_busy) return;
         var cost = new[] { new PieceCost(CurrentCost(pieceCost)), new PieceCost(CurrentCost(crystalCost), true) }; // 이번 환생 비용
-        if (!IsReady() || !CurrencyManager.Instance.TrySpendPieces(cost))
+        if (!IsReady() || (!GameSettings.IsDemo && !CurrencyManager.Instance.TrySpendPieces(cost))) // 데모는 조건만 보고 돈은 안 씀
         {
             UpgradeTooltip.Instance?.PlayShake(); // 일반 노드처럼 못 사면 툴팁이 흔들림
             return;
         }
-        CurrencyManager.Instance.AddStarShards(StarShardReward());
-        GameStats.Rebirths++;
+        if (!GameSettings.IsDemo) // 데모는 소용돌이만 보여주고 별조각/환생 횟수는 그대로
+        {
+            CurrencyManager.Instance.AddStarShards(StarShardReward());
+            GameStats.Rebirths++;
+        }
         _hovered = false;
         UpgradeTooltip.Instance?.Hide();
         StartCoroutine(VortexRoutine());
@@ -259,7 +262,7 @@ public class RebirthNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (GameSettings.IsDemo)
         {
             SaveManager.Instance?.SaveNow();
-            SidePanelUI.ShowDemoComplete(0f); // 데모는 환생 대신 감사창
+            SidePanelUI.ShowDemoComplete(0f, true); // 데모는 환생 대신 감사창 (환생 미지원 안내 포함)
             return;
         }
         PerformReset();

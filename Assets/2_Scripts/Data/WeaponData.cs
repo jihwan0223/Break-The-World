@@ -8,6 +8,7 @@ public class WeaponData
     public string weaponName;
     public int clickDamage;
     public Sprite icon;
+    public float costMultiplier = 1f; // 해금 가격 배수 (1 = 새 티어 첫 오브젝트 해금 가격과 같음)
 
     public WeaponData(int tier, string weaponName, int clickDamage)
     {

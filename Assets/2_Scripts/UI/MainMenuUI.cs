@@ -519,9 +519,8 @@ public class MainMenuUI : MonoBehaviour
         columns.style.alignItems = Align.FlexStart;
         window.Add(columns);
 
-        var sound = new VisualElement();
+        var sound = new VisualElement(); // 왼쪽 칸: 소리
         sound.style.alignItems = Align.Center;
-        sound.style.marginRight = 56;
         sound.Add(PixelStyle.CardHeader("소리"));
         columns.Add(sound);
 
@@ -535,37 +534,48 @@ public class MainMenuUI : MonoBehaviour
         AddVolumeCylinder(sound, "효과음", SfxPlayer.Volume, value => SfxPlayer.Volume = value);
         AddVolumeCylinder(sound, "배경음악", GameSettings.BgmVolume, value => GameSettings.BgmVolume = value);
 
-        var options = new VisualElement();
-        options.style.alignItems = Align.Center;
-        columns.Add(options);
-
-        options.Add(PixelStyle.CardHeader("게임"));
-        AddOptionRow(options, "언어", () => Loc.NativeNames[Loc.Language],
+        var game = new VisualElement(); // 가운데 칸: 게임 (게임 안 설정과 같은 순서)
+        game.style.alignItems = Align.Center;
+        game.style.marginLeft = 32;
+        columns.Add(game);
+        game.Add(PixelStyle.CardHeader("게임"));
+        AddOptionRow(game, "언어", () => Loc.NativeNames[Loc.Language],
             step => Loc.Language = (Loc.Language + step + Loc.Codes.Length) % Loc.Codes.Length);
-        AddOptionRow(options, "숫자 단위", () => GameSettings.NumberUnits ? "1K" : "1,000",
+        AddOptionRow(game, "숫자 단위", () => GameSettings.NumberUnits ? "1K" : "1,000",
             _ => GameSettings.NumberUnits = !GameSettings.NumberUnits);
-        AddOptionRow(options, "데미지 표시", () => GameSettings.DamageNumbers ? "켜짐" : "꺼짐",
+        AddOptionRow(game, "데미지 표시", () => GameSettings.DamageNumbers ? "켜짐" : "꺼짐",
             _ => GameSettings.DamageNumbers = !GameSettings.DamageNumbers);
-        AddOptionRow(options, "화면 흔들림", () => GameSettings.ScreenShake ? "켜짐" : "꺼짐",
+        AddOptionRow(game, "화면 흔들림", () => GameSettings.ScreenShake ? "켜짐" : "꺼짐",
             _ => GameSettings.ScreenShake = !GameSettings.ScreenShake);
+        AddOptionRow(game, "백그라운드 실행", () => GameSettings.RunInBackground ? "켜짐" : "꺼짐",
+            _ => GameSettings.RunInBackground = !GameSettings.RunInBackground);
 
-        var displayHeader = PixelStyle.CardHeader("화면");
-        displayHeader.style.marginTop = 10;
-        options.Add(displayHeader);
-        AddOptionRow(options, "화면 모드", () => GameSettings.Fullscreen ? "전체 화면" : "창 모드",
+        var video = new VisualElement(); // 오른쪽 칸: 비디오
+        video.style.alignItems = Align.Center;
+        video.style.marginLeft = 32;
+        columns.Add(video);
+        video.Add(PixelStyle.CardHeader("비디오"));
+        AddOptionRow(video, "화면 모드", () => GameSettings.Fullscreen ? "전체 화면" : "창 모드",
             _ => GameSettings.Fullscreen = !GameSettings.Fullscreen);
-        AddOptionRow(options, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
+        AddOptionRow(video, "해상도", () => { Vector2Int r = GameSettings.Resolution; return $"{r.x}x{r.y}"; }, step =>
         {
             List<Vector2Int> list = GameSettings.Resolutions;
             if (list.Count == 0) return;
             int index = Mathf.Max(0, list.IndexOf(GameSettings.Resolution));
             GameSettings.Resolution = list[(index + step + list.Count) % list.Count];
         });
-        AddOptionRow(options, "프레임 제한", () =>
+        AddOptionRow(video, "수직 동기화", () => GameSettings.VSync ? "켜짐" : "꺼짐",
+            _ => GameSettings.VSync = !GameSettings.VSync);
+        _fpsRow = AddOptionRow(video, "프레임 제한", () =>
         {
             int fps = GameSettings.FpsOptions[GameSettings.FpsIndex];
             return fps < 0 ? "무제한" : $"{fps} FPS";
-        }, step => GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length);
+        }, step =>
+        {
+            if (GameSettings.VSync) return; // 수직 동기화 중엔 못 바꿈 (키보드로도)
+            GameSettings.FpsIndex = (GameSettings.FpsIndex + step + GameSettings.FpsOptions.Length) % GameSettings.FpsOptions.Length;
+        });
+        RefreshFpsRow();
 
         Button back = CreateMenuButton("돌아가기", PixelStyle.Pink, WithClick(CloseSettings));
         back.style.marginTop = 16;
@@ -612,33 +622,43 @@ public class MainMenuUI : MonoBehaviour
         });
     }
 
-    private void AddOptionRow(VisualElement column, string label, System.Func<string> getValue, System.Action<int> step)
+    private VisualElement _fpsRow; // 프레임 제한 줄 (수직 동기화 켜지면 흐리게)
+
+    // 수직 동기화 중엔 프레임 제한이 의미 없어서 흐리게 하고 못 누르게 (게임 안 설정과 같음)
+    private void RefreshFpsRow()
+    {
+        if (_fpsRow == null) return;
+        _fpsRow.SetEnabled(!GameSettings.VSync);
+        _fpsRow.style.opacity = GameSettings.VSync ? 0.4f : 1f;
+    }
+
+    private VisualElement AddOptionRow(VisualElement column, string label, System.Func<string> getValue, System.Action<int> step)
     {
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
         row.style.alignItems = Align.Center;
-        row.style.width = 680;
+        row.style.width = 650; // 게임 안 설정과 같은 크기 (세 칸이 한 줄에 들어가는 너비)
         row.style.paddingLeft = 20;
         row.style.paddingRight = 12;
-        row.style.paddingTop = 8;
+        row.style.paddingTop = 10;
         row.style.paddingBottom = 12;
-        row.style.marginBottom = 12;
+        row.style.marginBottom = 8;
         PixelStyle.Frame(row, PixelStyle.Card);
 
         var name = new Label();
         Loc.Bind(name, label);
         name.style.flexGrow = 1;
-        PixelStyle.FitText(name, 36);
+        PixelStyle.FitText(name, 40);
         name.style.color = PixelStyle.Text.linear;
         row.Add(name);
 
         var value = new Label();
         Loc.Bind(value, () => value.text = Loc.T(getValue()));
-        System.Action<int> change = delta => { step(delta); value.text = Loc.T(getValue()); };
+        System.Action<int> change = delta => { step(delta); value.text = Loc.T(getValue()); RefreshFpsRow(); };
         Button left = CreateArrowButton("<", () => { PlayClick(); change(-1); });
         Button right = CreateArrowButton(">", () => { PlayClick(); change(1); });
-        value.style.width = 230;
-        PixelStyle.FitText(value, 36);
+        value.style.width = 200;
+        PixelStyle.FitText(value, 40);
         value.style.flexShrink = 0;
         value.style.color = PixelStyle.Text.linear;
         value.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -650,6 +670,7 @@ public class MainMenuUI : MonoBehaviour
         int index = _settingItems.Count;
         row.RegisterCallback<PointerEnterEvent>(_ => SelectSetting(index));
         _settingItems.Add(new SettingItem { element = row, onStep = d => { PlayClick(); change(d); }, onEnter = () => { PlayClick(); change(1); } });
+        return row;
     }
 
     private Button CreateArrowButton(string text, System.Action onClick)

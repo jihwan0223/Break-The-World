@@ -66,7 +66,7 @@ public class ObjectManager : MonoBehaviour
         new ObjectData(5, 2, "간판", new Color(0.92f, 0.92f, 0.90f)),
         new ObjectData(5, 3, "트럭", new Color(0.95f, 0.95f, 0.95f)),
         new ObjectData(6, 1, "택배상자", new Color(0.78f, 0.58f, 0.38f)),
-        new ObjectData(6, 2, "회사", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 163500f / 37000f * 0.65f }, // ★ 데모 마지막 - 다이너마이트 풀업이면 초당 약 3클릭으로 30초 보스전 클리어
+        new ObjectData(6, 2, "회사", new Color(0.80f, 0.80f, 0.78f)) { hpMultiplier = 163500f / 37000f * 1.3f }, // ★ 데모 마지막 - 체력 2배 (다이너마이트 풀업이면 초당 약 6클릭으로 30초 보스전 클리어)
         // 존4: 바다 (풀버전) - 튜브는 존4가 열릴 때 공짜
         new ObjectData(7, 1, "튜브", new Color(1.00f, 0.55f, 0.70f)),
         new ObjectData(7, 2, "부표", new Color(0.90f, 0.30f, 0.30f)),
