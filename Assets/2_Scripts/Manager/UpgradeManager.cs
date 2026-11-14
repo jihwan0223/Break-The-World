@@ -352,33 +352,17 @@ public class UpgradeManager : MonoBehaviour
         UpgradeNode node = GetNode(nodeId);
         if (node == null) return false;
 
-        if (!IsRevealed(nodeId))
-        {
-            Debug.Log($"{nodeId} 업그레이드는 아직 잠겨있음 (선행 조건 미충족)");
-            return false;
-        }
-
-        if (IsTargetLocked(nodeId))
-        {
-            Debug.Log($"{nodeId} 업그레이드는 대상 오브젝트/무기가 아직 해금되지 않아 구매 불가");
-            return false;
-        }
+        if (!IsRevealed(nodeId)) return false; // 선행 조건 미충족
+        if (IsTargetLocked(nodeId)) return false; // 대상 오브젝트/무기 미해금
 
         int level = GetLevel(nodeId);
-        if (level >= node.maxLevel)
-        {
-            Debug.Log($"{nodeId} 업그레이드는 이미 최대 레벨");
-            return false;
-        }
+        if (level >= node.maxLevel) return false;
 
         PieceCost[] cost = node.CostForLevel(level);
         if (cost != null && cost.Length > 0)
         {
             if (CurrencyManager.Instance == null || !CurrencyManager.Instance.TrySpendPieces(cost))
-            {
-                Debug.Log($"{nodeId} 업그레이드 조각 부족");
                 return false;
-            }
         }
 
         SetLevelInternal(nodeId, level + 1);

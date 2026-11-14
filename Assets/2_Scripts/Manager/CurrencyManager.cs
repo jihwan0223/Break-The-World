@@ -127,16 +127,8 @@ public class CurrencyManager : MonoBehaviour
         var (pieces, crystals, stars) = Sum(costs);
 
         if (_starShards < stars) return false;
-        if (!debugAlwaysMaxPieces && _pieces < pieces)
-        {
-            Debug.Log($"조각 부족: {pieces}개 필요, 현재 {_pieces}개 보유 (부족분 {pieces - _pieces}개)");
-            return false;
-        }
-        if (_crystals < crystals)
-        {
-            Debug.Log($"결정 부족: {crystals}개 필요, 현재 {_crystals}개 보유 (부족분 {crystals - _crystals}개)");
-            return false;
-        }
+        if (!debugAlwaysMaxPieces && _pieces < pieces) return false;
+        if (_crystals < crystals) return false;
 
         // 테스트 모드에선 조각 차감 안 함
         if (!debugAlwaysMaxPieces && pieces > 0)

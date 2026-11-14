@@ -47,8 +47,10 @@ public partial class SidePanelUI : MonoBehaviour
     private float _badgeTimer;
     private const float BadgeRefreshInterval = 0.25f; // 초 - 매 프레임 트리 전체를 훑지 않게
 
-    private VisualElement _debugPanel;
-    private Label _debugStatus;
+#if UNITY_EDITOR
+    private VisualElement _debugPanel; // 디버그 창 (에디터 전용)
+    private Label _debugStatus; // 디버그 버튼 결과 글
+#endif
 
     public static event System.Action<bool> OnSelectorPanelToggled;
 
@@ -77,7 +79,9 @@ public partial class SidePanelUI : MonoBehaviour
 
         if (_demoBox.style.display == DisplayStyle.Flex) CloseDemoBox();
         else if (_panel.style.display == DisplayStyle.Flex) ClosePanel();
+#if UNITY_EDITOR
         else if (_debugPanel.style.display == DisplayStyle.Flex) CloseDebugPanel();
+#endif
         else if (_statsPanel.style.display == DisplayStyle.Flex) CloseStatsPanel();
         else if (_confirmBox.style.display == DisplayStyle.Flex) _confirmBox.style.display = DisplayStyle.None;
         else if (_settingsPanel.style.display == DisplayStyle.Flex) CloseSettingsPanel();
@@ -131,10 +135,12 @@ public partial class SidePanelUI : MonoBehaviour
         if (_buttonRow == null) return;
 
         bool hide = (_panel != null && _panel.style.display == DisplayStyle.Flex)
-                    || (_debugPanel != null && _debugPanel.style.display == DisplayStyle.Flex)
                     || (_statsPanel != null && _statsPanel.style.display == DisplayStyle.Flex)
                     || (_settingsPanel != null && _settingsPanel.style.display == DisplayStyle.Flex)
                     || _upgradeTreeOpen;
+#if UNITY_EDITOR
+        hide |= _debugPanel != null && _debugPanel.style.display == DisplayStyle.Flex;
+#endif
         _buttonRow.style.display = hide ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
@@ -176,11 +182,7 @@ public partial class SidePanelUI : MonoBehaviour
                 return stages != null && stages.Length > 0 ? stages[0] : null;
             },
             () => ObjectManager.Instance != null ? ObjectManager.Instance.EquippedIndex : 0,
-            index =>
-            {
-                Debug.Log("오브젝트 선택 버튼 눌림");
-                ObjectManager.Instance?.Equip(index);
-            },
+            index => ObjectManager.Instance?.Equip(index),
             out _refreshObjectSelector,
             index => ObjectManager.Instance != null && !ObjectManager.Instance.IsUnlocked(index),
             GetObjectInfoRows);
@@ -189,7 +191,9 @@ public partial class SidePanelUI : MonoBehaviour
 
         root.Add(_panel);
         Loc.Bind(root, () => { _refreshWeaponSelector?.Invoke(); _refreshObjectSelector?.Invoke(); _refreshWeaponDex?.Invoke(); _refreshMapDex?.Invoke(); });
+#if UNITY_EDITOR
         BuildDebugPanel(root);
+#endif
         BuildStatsPanel(root);
         BuildSettingsPanel(root);
 
@@ -205,22 +209,13 @@ public partial class SidePanelUI : MonoBehaviour
 
         var upgradeButton = CreateButton("업그레이드", PixelStyle.Mint, () =>
         {
-            Debug.Log("업그레이드 버튼 눌림");
             if (upgradeTreePanel != null) upgradeTreePanel.SetActive(true);
             else Debug.LogWarning("SidePanelUI: Upgrade Tree Panel이 인스펙터에 비어있어서 업그레이드 화면을 못 엶");
         });
 
-        var weaponButton = CreateButton("무기", PixelStyle.Pink, () =>
-        {
-            Debug.Log("무기 버튼 눌림");
-            OpenPanel("무기", _weaponContent);
-        });
+        var weaponButton = CreateButton("무기", PixelStyle.Pink, () => OpenPanel("무기", _weaponContent));
 
-        var objectButton = CreateButton("도감", PixelStyle.Sky, () =>
-        {
-            Debug.Log("도감 버튼 눌림");
-            OpenPanel("도감", _lastDexContent ?? _objectContent);
-        });
+        var objectButton = CreateButton("도감", PixelStyle.Sky, () => OpenPanel("도감", _lastDexContent ?? _objectContent));
 
         _statsButton = CreateButton("통계", PixelStyle.Butter, OpenStatsPanel);
         _statsButton.style.display = DisplayStyle.None;
@@ -296,6 +291,7 @@ public partial class SidePanelUI : MonoBehaviour
         return panel;
     }
 
+#if UNITY_EDITOR
     private void BuildDebugPanel(VisualElement root)
     {
         _debugPanel = CreatePopupFrame(CloseDebugPanel, out Label title);
@@ -426,6 +422,7 @@ public partial class SidePanelUI : MonoBehaviour
         button.style.marginLeft = button.style.marginRight = 10;
         list.Add(button);
     }
+#endif
 
     // 창 열고 닫기: 환생 노드(창 열어도 진행)가 없으면 게임 정지, 있으면 계속 돌고 월드 클릭만 막음
     private static void PauseForWindow(string key, bool open)
@@ -435,6 +432,7 @@ public partial class SidePanelUI : MonoBehaviour
         Time.timeScale = open && !keepRunning ? 0f : 1f;
     }
 
+#if UNITY_EDITOR
     private void OpenDebugPanel()
     {
         _debugStatus.text = "";
@@ -453,6 +451,7 @@ public partial class SidePanelUI : MonoBehaviour
         Time.timeScale = 1f;
         OnSelectorPanelToggled?.Invoke(false);
     }
+#endif
 
     private VisualElement BuildSelectorSection(
         BrowseState browse,

@@ -199,10 +199,15 @@ public partial class SidePanelUI
         buttons.style.marginTop = 24;
         body.Add(buttons);
 
-        Button debug = CreateButton("디버그", PixelStyle.Butter, () => { CloseSettingsPanel(); OpenDebugPanel(); });
         Button menu = CreateButton("메인 메뉴로", PixelStyle.Sky, () => ShowLeaveConfirm("메인 메뉴로 나갈까요?", "나가기", GoToMainMenu));
         Button quit = CreateButton("게임 종료", PixelStyle.Pink, () => ShowLeaveConfirm("게임을 종료할까요?", "종료", QuitGame));
-        foreach (Button b in new[] { debug, menu, quit })
+#if UNITY_EDITOR
+        Button debug = CreateButton("디버그", PixelStyle.Butter, () => { CloseSettingsPanel(); OpenDebugPanel(); }); // 에디터 전용 (빌드엔 코드째 빠짐)
+        Button[] row = { debug, menu, quit }; // 설정 아래 버튼 줄
+#else
+        Button[] row = { menu, quit }; // 설정 아래 버튼 줄
+#endif
+        foreach (Button b in row)
         {
             b.style.width = 340;
             b.style.height = 96;
@@ -211,7 +216,6 @@ public partial class SidePanelUI
             HoverGrow(b);
             buttons.Add(b);
         }
-        if (!Application.isEditor) debug.style.display = DisplayStyle.None; // 디버그는 에디터에서만 - 빌드에선 숨김
 
         BuildLeaveConfirm();
         _settingHelp = new Label(); // 설명 상자 (창 위에 그려지게 마지막에 붙임)

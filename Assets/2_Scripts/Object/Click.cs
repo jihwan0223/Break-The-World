@@ -429,8 +429,6 @@ public class Click : MonoBehaviour
         {
             if (hover)
                 _hoverHitCooldown = UpgradeManager.Instance.HoverClickIntervalSeconds;
-            else
-                Debug.Log("Click");
             PerformClickHit(true, _collider.ClosestPoint(worldPos), !hover);
 
             // 첫 타격에 죽었으면 지연 타격은 IsDead로 무시됨
