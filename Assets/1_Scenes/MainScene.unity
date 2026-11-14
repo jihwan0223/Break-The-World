@@ -4696,7 +4696,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 01000000000000000100000000000000020000000000000002000000000000000300000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: 59049914dd264680aa0cee387fcbce89, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 1
   gateObjectName: 
@@ -4765,7 +4765,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c70010a999fb4ce7b91eee555c21410b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8350,7 +8350,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &172069872
@@ -8889,7 +8889,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!114 &178488021
@@ -12406,7 +12406,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &282435650
@@ -12533,7 +12533,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: f0341057a0e26dc47b2638468d674b2e, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 60a58b40c33b4c8492d8a9b89a53caa5, type: 3}
   fullVersionOnly: 1
   requireAllPrereqs: 0
   gateObjectName: 
@@ -12602,7 +12602,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d712a1135078f704cb68016148f5d586, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ada89d5b12e94f0fadffb90149a189ec, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -13674,7 +13674,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &323513089
@@ -15945,7 +15945,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 0600000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: 8c0ddeb275494cc7a2ab6d96fe64daa3, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -16014,7 +16014,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 967436817dc649b387d6e6ff7274d6e1, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -17502,7 +17502,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &436507162
@@ -20428,15 +20428,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: 9809e80814c04a36903b204e6d803eba, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -22397,7 +22397,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &604037333
@@ -22467,7 +22467,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 02000000000000000200000000000000020000000000000003000000000000000300000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: 5420635af5e344f8bce015d01af5a459, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -22536,7 +22536,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c30b6f0dd7cd4fe78f8b9319150dff5d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -26509,7 +26509,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 020000000000000002000000000000000300000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: bf5d194d482d4da3b75258416e519bd3, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -26578,7 +26578,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2ba7169d42e442e1b2d03189ec0b8f31, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -34378,7 +34378,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &861447282
@@ -34865,7 +34865,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: f0341057a0e26dc47b2638468d674b2e, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 7340beba4d574ed7bc8423020f1dc5a6, type: 3}
   fullVersionOnly: 1
   requireAllPrereqs: 0
   gateObjectName: 
@@ -34934,7 +34934,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d712a1135078f704cb68016148f5d586, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8fd9e23bd2a247d0842ca2e010335627, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -38730,7 +38730,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: f0341057a0e26dc47b2638468d674b2e, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 4ce7cbceb7ff48f2aa454d2ff41537f0, type: 3}
   fullVersionOnly: 1
   requireAllPrereqs: 0
   gateObjectName: 
@@ -38799,7 +38799,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d712a1135078f704cb68016148f5d586, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8cca344b919e4b9c96ae32c384489512, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -39003,7 +39003,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &932339959
@@ -39736,7 +39736,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &948665922
@@ -42618,7 +42618,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &1039071111
@@ -43145,7 +43145,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &1072142366
@@ -46209,7 +46209,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: 6b3f730c0c424e9c9c77c677a48bf107, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -46278,7 +46278,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1cee60e12d8648578c59f66e6adc37b4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -49246,7 +49246,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: 7509a9f17d8d49bda89aee922fcdc63e, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -49315,7 +49315,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 615a35a9ede14345aa7611e8dc4f5af3, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -49598,7 +49598,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &1168700766
@@ -50311,7 +50311,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 01000000000000000200000000000000030000000000000004000000000000000500000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: 02b68930d393413cbf59efa8554bd544, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -50380,7 +50380,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4be03b2ddd6f41afb280f2f8186ad1ec, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -50466,7 +50466,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: 040e33a3ac42435ca023b60b7759e054, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -50535,7 +50535,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 50f79fe879704ca8b0e9e3c6e47b0177, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -53246,7 +53246,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &1239542457
@@ -55937,7 +55937,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 01000000000000000100000000000000020000000000000002000000000000000300000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: 71a413d765b643b98693bf19f27987a8, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -56006,7 +56006,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dccc8134bc274c448728a6143a0691da, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -59455,7 +59455,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 21300000, guid: f0341057a0e26dc47b2638468d674b2e, type: 3}
+  upgradedSprite: {fileID: 21300000, guid: 2cc92f35d24b4a0cb5b70edf74ddee00, type: 3}
   fullVersionOnly: 1
   requireAllPrereqs: 0
   gateObjectName: 
@@ -59524,7 +59524,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d712a1135078f704cb68016148f5d586, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc6d5eef95f14847bf3fcdd6cc2f73e9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -61524,7 +61524,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &1422093721
@@ -68490,7 +68490,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 0500000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: ad62b6d50c06498f9b767d7073baac57, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -68559,7 +68559,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 518ca894233f40e9977904181dd8181e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -69262,7 +69262,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 0100000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: 18050ccf61ff4ec194310d38c706e55a, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -69331,7 +69331,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b90740523ad447b79cf80b67f0ea5a68, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -69408,7 +69408,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &1659082053
@@ -72354,7 +72354,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &1712517270
@@ -72425,7 +72425,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 0800000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: 4177b4146715421184dddb8cb0037e98, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -72494,7 +72494,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8a628947df1e43d3a0e0b595d384ad4d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -73288,7 +73288,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &1734288937
@@ -76043,7 +76043,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: ca4b7c05c24541b9b4aedb80ef44e5aa, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -76112,7 +76112,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4f2e95eafecb48c2aaacea2f95a50060, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -83928,7 +83928,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: ea0a4e42770e454b8599948f98ba9a63, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -83997,7 +83997,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f77f2534930143f89da25c53fe24e869, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -86405,7 +86405,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!1 &1986523628
@@ -87051,7 +87051,7 @@ MonoBehaviour:
   routing: 0
   thickness: 30
   bendRatio: 0.5
-  color: {r: 1, g: 1, b: 1, a: 0.5}
+  color: {r: 1, g: 0.8235294, b: 0.3529412, a: 0.78}
   crystalColor: {r: 0.45, g: 0.9, b: 1, a: 0.7}
   segmentSprite: {fileID: 0}
 --- !u!224 &2005129148 stripped
@@ -97998,7 +97998,7 @@ MonoBehaviour:
     firstLevelAmount: 0
     levelAmounts: 0300000000000000
   fullVersionCostMultiplier: 1
-  upgradedSprite: {fileID: 0}
+  upgradedSprite: {fileID: 21300000, guid: f7cc17f3a51a471d857e1f3f0c7f0d12, type: 3}
   fullVersionOnly: 0
   requireAllPrereqs: 0
   gateObjectName: 
@@ -98067,7 +98067,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aef1ff948453fec4abad4a1f6c8f1d6e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2f90c03a02f64ce28aa8ad19682fed2b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
