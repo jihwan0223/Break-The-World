@@ -246,6 +246,8 @@ public class UpgradeManager : MonoBehaviour
     }
 
     public int GetLevel(string nodeId) => _levels.TryGetValue(nodeId, out int level) ? level : 0;
+    public const string FirstNodeId = "0_달걀_드랍량_강화"; // 트리 가운데 첫 노드 (튜토리얼 / 첫 결정 확정 기준)
+    public bool FirstUpgradeBought => GetLevel(FirstNodeId) >= 1; // 첫 업그레이드를 샀는지
 
     public PieceCost[] GetNextCost(string nodeId)
     {

@@ -483,3 +483,14 @@ Shift를 누른 채 노드를 누르면 살 수 있는 만큼 레벨을 한 번�
 결정을 얻을 때 개수가 +{0}개 증가합니다.,Crystals gained +{0} each time.,結晶を得るたびに個数が+{0}個増えます。,每次获得结晶数量+{0}。,Кристаллов за раз +{0}.,Cristales obtenidos +{0} cada vez.,Cristais obtidos +{0} cada vez.,Kristalle pro Erhalt +{0}.,Cristaux obtenus +{0} à chaque fois.
 환생 창을 나갈까요?,Leave the rebirth window?,転生ウィンドウを出ますか？,要离开转生窗口吗？,Покинуть окно перерождения?,¿Salir de la ventana de renacimiento?,Sair da janela de renascimento?,Wiedergeburtsfenster verlassen?,Quitter la fenêtre de renaissance ?
 나가면 다음 환생을 할 때까지 다시 돌아올 수 없어요.,You can't come back until your next rebirth.,出ると次の転生まで戻れません。,离开后直到下次转生前都无法返回。,Вернуться можно будет только после следующего перерождения.,No podrás volver hasta tu próximo renacimiento.,Você não poderá voltar até o próximo renascimento.,Du kannst erst nach der nächsten Wiedergeburt zurückkehren.,Vous ne pourrez revenir qu'à la prochaine renaissance.
+달걀 부수기,Break the egg,卵を壊そう,打碎鸡蛋,Разбей яйцо,Rompe el huevo,Quebre o ovo,Zerbrich das Ei,Casse l'œuf
+조각 줍기,Pick up the pieces,かけらを拾おう,捡起碎片,Подбери осколки,Recoge los trozos,Pegue os pedaços,Sammle die Stücke auf,Ramasse les morceaux
+조각 {0}개로 업그레이드,Upgrade with {0} pieces,かけら{0}個でアップグレード,用{0}个碎片升级,Улучши за {0} осколков,Mejora con {0} trozos,Melhore com {0} pedaços,Mit {0} Stücken aufwerten,Améliore avec {0} morceaux
+사과 해금,Unlock the apple,リンゴを解放,解锁苹果,Открой яблоко,Desbloquea la manzana,Desbloqueie a maçã,Apfel freischalten,Débloque la pomme
+버터 해금,Unlock the butter,バターを解放,解锁黄油,Открой масло,Desbloquea la mantequilla,Desbloqueie a manteiga,Butter freischalten,Débloque le beurre
+식빵 해금,Unlock the bread,食パンを解放,解锁吐司,Открой хлеб,Desbloquea el pan de molde,Desbloqueie o pão de forma,Toastbrot freischalten,Débloque le pain de mie
+책상 부수기,Break the desk,机を壊そう,打碎书桌,Разбей стол,Rompe el escritorio,Quebre a escrivaninha,Zerbrich den Schreibtisch,Casse le bureau
+다음 맵 가기,Go to the next map,次のマップへ,前往下一张地图,Перейди на следующую карту,Ve al siguiente mapa,Vá para o próximo mapa,Zur nächsten Karte,Va à la carte suivante
+새 지역일수록 보상이 커집니다.,Newer areas give bigger rewards.,新しいエリアほど報酬が増えます。,区域越新奖励越多。,Чем новее зона - тем больше награда.,Cuanto más nueva la zona mayor la recompensa.,Quanto mais nova a área maior a recompensa.,Neuere Gebiete bringen mehr Belohnung.,Plus la zone est récente plus la récompense est grande.
+튜토리얼,Tutorial,チュートリアル,教程,Обучение,Tutorial,Tutorial,Tutorial,Tutoriel
+결정으로 커서 줍기 해금,Unlock Cursor Pickup with crystals,結晶でカーソル回収を解放,用结晶解锁光标拾取,Открой сбор курсором за кристаллы,Desbloquea Recoger con cursor con cristales,Desbloqueie Coleta com cursor com cristais,Cursor-Sammeln mit Kristallen freischalten,Débloque Ramassage au curseur avec des cristaux

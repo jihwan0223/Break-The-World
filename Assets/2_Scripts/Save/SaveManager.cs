@@ -167,6 +167,7 @@ public class SaveManager : MonoBehaviour
             statPlaySeconds = GameStats.PlaySeconds,
             statBrokenPerObject = GameStats.BrokenPerObject,
             pieceTutorialDone = PieceTutorial.Instance != null && PieceTutorial.Instance.Done,
+            tutorialStep = TutorialGuideUI.Step,
             unlockedObjects = unlockedObjects,
             gainLevels = gainLevels,
             weaponIndex = WeaponManager.Instance != null ? WeaponManager.Instance.EquippedIndex : 0,
@@ -209,6 +210,7 @@ public class SaveManager : MonoBehaviour
 
         if (PieceTutorial.Instance != null)
             PieceTutorial.Instance.Done = data.pieceTutorialDone;
+        TutorialGuideUI.Step = data.tutorialStep;
 
         // Equip 전에 해금 상태부터 복원
         if (ObjectManager.Instance != null && data.unlockedObjects != null)

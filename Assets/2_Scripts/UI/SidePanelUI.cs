@@ -388,6 +388,7 @@ public partial class SidePanelUI : MonoBehaviour
             CurrencyManager.Instance?.ResetAll();
             DebrisPool.Instance?.ClearAll();
             if (PieceTutorial.Instance != null) PieceTutorial.Instance.Done = false;
+            TutorialGuideUI.Step = 0;
             UpgradeManager.Instance?.ResetAll();
             ObjectManager.Instance?.ResetAll();
             ObjectManager.Instance?.Equip(0);

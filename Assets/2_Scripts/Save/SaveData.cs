@@ -29,6 +29,7 @@ public class SaveData
     public double statPlaySeconds; // 초
     public long[] statBrokenPerObject;
     public bool pieceTutorialDone;
+    public int tutorialStep; // 안내 글 진행 단계 (TutorialGuideUI)
     public bool[] unlockedObjects;
     public int[] gainLevels;
     public int weaponIndex;

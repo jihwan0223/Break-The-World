@@ -60,7 +60,10 @@ public class BossChallengeUI : MonoBehaviour
         document.sortingOrder = 10; // 조각 표시보다 위
         _instance = uiObject.AddComponent<BossChallengeUI>();
         uiObject.SetActive(true);
+        TutorialGuideUI.Ensure(); // 첫 플레이 안내 글 (보스 도전 버튼 자리)
     }
+
+    public static bool ChallengeShown => _instance != null && _instance._ready != null; // 보스 도전 버튼이 떠 있는지 (안내 글 자리 비키기용)
 
     public static void PlaySlowMotion()
     {

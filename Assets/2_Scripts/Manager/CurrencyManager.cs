@@ -37,8 +37,6 @@ public class CurrencyManager : MonoBehaviour
 
     public void SetStarShardProgress(long total) => _totalStarShards = total;
 
-    [SerializeField] private long starterCrystalPieces = 50; // 누적 이만큼 얻으면 첫 결정 확정 드랍
-
     private long _totalPieces;
     private bool _everHadCrystal;
     private bool _starterCrystalDropped; // 저장 안 함
@@ -67,7 +65,7 @@ public class CurrencyManager : MonoBehaviour
 
     public bool TakeStarterCrystal()
     {
-        if (_everHadCrystal || _starterCrystalDropped || _totalPieces < starterCrystalPieces)
+        if (_everHadCrystal || _starterCrystalDropped || UpgradeManager.Instance == null || !UpgradeManager.Instance.FirstUpgradeBought) // 첫 업글 뒤 처음 부술 때 확정
             return false;
         _starterCrystalDropped = true;
         return true;
